@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
@@ -19,7 +18,6 @@ import { EventConsumerComponent } from './event-consumer.component';
     styleUrls: ['./event-consumers-page.component.scss'],
     templateUrl: './event-consumers-page.component.html',
     imports: [
-        AsyncPipe,
         EventConsumerComponent,
         LayoutComponent,
         ListViewComponent,
@@ -38,11 +36,11 @@ import { EventConsumerComponent } from './event-consumer.component';
     ],
 })
 export class EventConsumersPageComponent {
-    public readonly eventConsumerErrorDialog = new DialogModel();
-    public readonly eventConsumerError = signal<string | undefined>(undefined);
+    protected readonly eventConsumerErrorDialog = new DialogModel();
+    protected readonly eventConsumerError = signal<string | undefined>(undefined);
 
     constructor(
-        public readonly eventConsumersState: EventConsumersState,
+        protected readonly eventConsumersState: EventConsumersState,
     ) {
         this.eventConsumersState.load();
 
@@ -56,11 +54,11 @@ export class EventConsumersPageComponent {
         });
     }
 
-    public reload() {
+    protected reload() {
         this.eventConsumersState.load(true, false);
     }
 
-    public showError(eventConsumer: EventConsumerDto) {
+    protected showError(eventConsumer: EventConsumerDto) {
         this.eventConsumerError.set(eventConsumer.error);
         this.eventConsumerErrorDialog.show();
     }

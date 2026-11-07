@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
+import { computed, Signal, signal, WritableSignal } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Types } from './utils/types';
 
 export type Mutable<T> = {
@@ -100,35 +100,43 @@ interface Change<T> {
 }
 
 export class State<T extends {}> {
-    private readonly state: BehaviorSubject<Change<T>>;
+    private readonly changes$: BehaviorSubject<Change<T>>;
+    private readonly current: WritableSignal<Readonly<T>>;
 
     public get changes(): Observable<Change<T>> {
-        return this.state;
+        return this.changes$;
     }
 
     public get snapshot(): Readonly<T> {
-        return this.state.value.snapshot;
+        return this.changes$.value.snapshot;
     }
 
-    public project<M>(project: (value: T) => M, compare?: (x: M, y: M) => boolean) {
-        return this.changes.pipe(
-            map(x => project(x.snapshot)), distinctUntilChanged(compare), shareReplay(1));
+    public readonly value: Signal<Readonly<T>>;
+
+    public project<M>(project: (value: T) => M, compare?: (x: M, y: M) => boolean): Signal<M> {
+        return computed(() => {
+            return project(this.current());
+        }, compare ? { equal: compare } : undefined);
     }
 
-    public projectFrom<M, N>(source: Observable<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean) {
-        return source.pipe(
-            map(project), distinctUntilChanged(compare), shareReplay(1));
+    public projectFrom<M, N>(source: Signal<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean): Signal<N> {
+        return computed(() => {
+            return project(source());
+        }, compare ? { equal: compare } : undefined);
     }
 
-    public projectFrom2<M, N, O>(lhs: Observable<M>, rhs: Observable<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean) {
-        return combineLatest([lhs, rhs]).pipe(
-            map(([x, y]) => project(x, y)), distinctUntilChanged(compare), shareReplay(1));
+    public projectFrom2<M, N, O>(lhs: Signal<M>, rhs: Signal<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean): Signal<O> {
+        return computed(() => {
+            return project(lhs(), rhs());
+        }, compare ? { equal: compare } : undefined);
     }
 
     constructor(
         private readonly initialState: Readonly<T>,
     ) {
-        this.state = new BehaviorSubject({ snapshot: initialState, event: 'Initial' });
+        this.changes$ = new BehaviorSubject({ snapshot: initialState, event: 'Initial' });
+        this.current = signal(initialState);
+        this.value = this.current.asReadonly();
     }
 
     public resetState(update?: ((v: T) => Readonly<T>) | Partial<T> | string, event = 'Reset') {
@@ -140,7 +148,7 @@ export class State<T extends {}> {
     }
 
     public next(update: ((v: T) => Readonly<T>) | Partial<T>, event = 'Update') {
-        return this.updateState(this.state.value.snapshot, event, update);
+        return this.updateState(this.snapshot, event, update);
     }
 
     private updateState(state: T, event: string, update?: ((v: T) => Readonly<T>) | Partial<T>) {
@@ -170,7 +178,8 @@ export class State<T extends {}> {
         }
 
         if (isChanged) {
-            this.state.next({ snapshot: newState, event });
+            this.current.set(newState);
+            this.changes$.next({ snapshot: newState, event });
         }
 
         return isChanged;

@@ -23,7 +23,7 @@ export class LayoutContainerDirective implements AfterViewInit {
     }
 
     @HostListener('window:resize')
-    public onResize() {
+    protected onResize() {
         this.invalidate(true);
     }
 

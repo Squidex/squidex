@@ -28,22 +28,22 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class RolesState extends State<Snapshot> {
-    public roles =
+    public readonly roles =
         this.project(x => x.roles);
 
-    public defaultRoles =
+    public readonly defaultRoles =
         this.project(x => x.roles.filter(y => y.isDefaultRole));
 
-    public customRoles =
+    public readonly customRoles =
         this.project(x => x.roles.filter(y => !y.isDefaultRole));
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {

@@ -40,7 +40,7 @@ export class UploadCanceled {}
     providedIn: 'root',
 })
 export class AssetUploaderState extends State<Snapshot> {
-    public uploads =
+    public readonly uploads =
         this.project(x => x.uploads);
 
     public get appId() {

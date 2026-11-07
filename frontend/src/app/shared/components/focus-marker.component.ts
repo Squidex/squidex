@@ -6,8 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, input, Optional, Renderer2 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { of } from 'rxjs';
 import { StringColorPipe } from '@app/framework';
 import { CollaborationService } from '@app/shared/internal';
 
@@ -21,12 +19,14 @@ import { CollaborationService } from '@app/shared/internal';
     ],
 })
 export class FocusMarkerComponent {
-    private readonly users;
+    private readonly users = computed(() => {
+        return this.collaboration?.users() ?? [];
+    });
 
     /** The ID of the control, to show which other user has focused it. */
     public readonly controlId = input.required<string>();
 
-    public readonly focusedUser = computed(() => {
+    protected readonly focusedUser = computed(() => {
         const controlId = this.controlId();
 
         return this.users().find(x => x['focusedControl'] === controlId)?.user;
@@ -36,8 +36,6 @@ export class FocusMarkerComponent {
         renderer: Renderer2,
         @Optional() private readonly collaboration?: CollaborationService,
     ) {
-        this.users = toSignal(collaboration?.userChanges ?? of([]), { initialValue: [] });
-
         effect(onCleanup => {
             if (!collaboration) {
                 return;
@@ -51,7 +49,7 @@ export class FocusMarkerComponent {
         });
     }
 
-    public onClick(event: MouseEvent) {
+    protected onClick(event: MouseEvent) {
         this.updateFocusedControl(event, this.controlId());
     }
 

@@ -1,4 +1,4 @@
-@if ((formSection().visibleChanges | async) || formCompare()) {
+@if (formSection().visible() || formCompare()) {
     @if (formSection().separator; as separator) {
         <div class="header">
             <div class="row g-0 align">

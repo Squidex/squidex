@@ -6,7 +6,6 @@
  */
 
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { switchMap, timer } from 'rxjs';
 import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, TranslatePipe, UIOptions } from '@app/shared';
@@ -19,7 +18,6 @@ import { IndexComponent } from './index.component';
     templateUrl: './schema-indexes.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeComponent,
         IndexFormComponent,
         IndexComponent,
@@ -30,16 +28,16 @@ import { IndexComponent } from './index.component';
     ],
 })
 export class SchemaIndexesComponent {
-    public readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
+    protected readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
 
     /** The schema to manage the indexes for. */
     public readonly schema = input.required<SchemaDto>();
 
-    public readonly addIndexDialog = new DialogModel();
+    protected readonly addIndexDialog = new DialogModel();
 
     constructor(
-        public readonly indexesState: IndexesState,
-        public readonly languagesState: LanguagesState,
+        protected readonly indexesState: IndexesState,
+        protected readonly languagesState: LanguagesState,
     ) {
         this.indexesState.load();
 

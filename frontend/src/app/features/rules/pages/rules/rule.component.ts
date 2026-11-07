@@ -40,48 +40,48 @@ export class RuleComponent {
     /** The rule to show. */
     public readonly rule = input.required<DynamicRuleDto>();
 
-    public readonly flow = computed(() => {
+    protected readonly flow = computed(() => {
         return new FlowView(this.rule().flow).getAllItems();
     });
 
-    public readonly dropdown = new ModalModel();
+    protected readonly dropdown = new ModalModel();
 
     constructor(
         private readonly rulesState: RulesState,
     ) {
     }
 
-    public delete() {
+    protected delete() {
         this.rulesState.delete(this.rule());
     }
 
-    public run() {
+    protected run() {
         this.rulesState.run(this.rule());
     }
 
-    public runFromSnapshots() {
+    protected runFromSnapshots() {
         this.rulesState.runFromSnapshots(this.rule());
     }
 
-    public rename(name: string) {
+    protected rename(name: string) {
         this.rulesState.update(this.rule(), new DynamicUpdateRuleDto({ name }));
     }
 
-    public disable() {
+    protected disable() {
         this.rulesState.update(this.rule(), new DynamicUpdateRuleDto({ isEnabled: false }));
     }
 
-    public enable() {
+    protected enable() {
         this.rulesState.update(this.rule(), new DynamicUpdateRuleDto({ isEnabled: true }));
     }
 
-    public toggle() {
+    protected toggle() {
         const rule = this.rule();
 
         this.rulesState.update(rule, new DynamicUpdateRuleDto({ isEnabled: !rule.isEnabled }));
     }
 
-    public trigger() {
+    protected trigger() {
         this.rulesState.trigger(this.rule());
     }
 }

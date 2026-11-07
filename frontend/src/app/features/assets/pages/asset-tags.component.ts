@@ -40,18 +40,18 @@ export class AssetTagsComponent {
     /** Shows a button to rename each tag. */
     public readonly canRename = input(false, { transform: booleanAttribute });
 
-    public readonly tagRenaming = signal<TagItem | undefined>(undefined);
-    public readonly tagRenameDialog = new DialogModel();
+    protected readonly tagRenaming = signal<TagItem | undefined>(undefined);
+    protected readonly tagRenameDialog = new DialogModel();
 
-    public readonly isEmpty = computed(() => {
+    protected readonly isEmpty = computed(() => {
         return Object.keys(this.tagsSelected()).length === 0;
     });
 
-    public isSelected(tag: TagItem) {
+    protected isSelected(tag: TagItem) {
         return this.tagsSelected()[tag.name] === true;
     }
 
-    public renameTag(tag: TagItem) {
+    protected renameTag(tag: TagItem) {
         this.tagRenaming.set(tag);
         this.tagRenameDialog.show();
     }

@@ -1,8 +1,8 @@
 <sqx-layout layout="right" overflow="true" padding="true" titleText="i18n:common.filters" white="true" width="20">
-    @if (schemaQueries | async; as queries) {
+    @if (schemaQueries(); as queries) {
         <sqx-query-list
             [queries]="queries.defaultQueries"
-            [queryUsed]="contentsState.query | async"
+            [queryUsed]="contentsState.query()"
             (search)="search($event)"
             [types]="'common.contents' | sqxTranslate" />
         <hr />
@@ -10,8 +10,8 @@
         <div class="sidebar-section">
             <h3>{{ "contents.statusQueries" | sqxTranslate }}</h3>
             <sqx-query-list
-                [queries]="contentsState.statusQueries | async"
-                [queryUsed]="contentsState.query | async"
+                [queries]="contentsState.statusQueries()"
+                [queryUsed]="contentsState.query()"
                 (search)="search($event)"
                 [types]="'common.contents' | sqxTranslate" />
         </div>
@@ -19,7 +19,7 @@
         <hr />
         <sqx-shared-queries
             [queries]="queries"
-            [queryUsed]="contentsState.query | async"
+            [queryUsed]="contentsState.query()"
             (search)="search($event)"
             [types]="'common.contents' | sqxTranslate" />
     }

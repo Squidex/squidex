@@ -8,7 +8,7 @@
             }
         </ng-container>
         <ng-container content>
-            <sqx-form-error [error]="editForm.error | async" />
+            <sqx-form-error [error]="editForm.error()" />
 
             <sqx-form-row for="folderName" label="assets.folderName" required vertical>
                 <input class="form-control" id="folderName" autocomplete="off" formControlName="folderName" sqxFocusOnInit />

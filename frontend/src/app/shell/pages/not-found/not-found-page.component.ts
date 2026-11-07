@@ -24,7 +24,7 @@ export class NotFoundPageComponent {
     ) {
     }
 
-    public back() {
+    protected back() {
         this.location.back();
     }
 }

@@ -60,55 +60,55 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class AssetsStateBase extends State<Snapshot> {
-    public tagsUnsorted =
+    public readonly tagsUnsorted =
         this.project(x => x.tagsAvailable);
 
-    public tagsSelected =
+    public readonly tagsSelected =
         this.project(x => x.tagsSelected);
 
-    public tags =
+    public readonly tags =
         this.projectFrom(this.tagsUnsorted, getTagsSorted);
 
-    public tagsNames =
+    public readonly tagsNames =
         this.projectFrom(this.tagsUnsorted, getTagNames);
 
-    public selectedTagNames =
+    public readonly selectedTagNames =
         this.projectFrom(this.tagsSelected, getTagNames);
 
-    public assets =
+    public readonly assets =
         this.project(x => x.assets);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.assets.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public folders =
+    public readonly folders =
         this.project(x => x.folders);
 
-    public hasFolders =
+    public readonly hasFolders =
         this.project(x => x.folders.length > 0);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public path =
+    public readonly path =
         this.project(x => x.path);
 
-    public parentFolder =
+    public readonly parentFolder =
         this.project(x => getParent(x.path));
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public canCreateFolders =
+    public readonly canCreateFolders =
         this.project(x => x.canCreateFolders === true);
 
-    public canRenameTag =
+    public readonly canRenameTag =
         this.project(x => x.canRenameTag === true);
 
     public get parentId() {

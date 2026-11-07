@@ -28,7 +28,7 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormRo
     ],
 })
 export class StringValidationComponent {
-    public readonly contentTypes = StringContentTypeValues;
+    protected readonly contentTypes = StringContentTypeValues;
 
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();
@@ -51,7 +51,7 @@ export class StringValidationComponent {
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    public readonly patternsModal = new ModalModel();
+    protected readonly patternsModal = new ModalModel();
 
     private readonly patternControl = computed(() => {
         return this.fieldForm().controls['pattern'];
@@ -61,17 +61,17 @@ export class StringValidationComponent {
         toObservable(this.patternControl).pipe(
             switchMap(control => value$<string>(control))));
 
-    public readonly showPatternMessage = toSignal(
+    protected readonly showPatternMessage = toSignal(
         toObservable(this.patternControl).pipe(
             switchMap(control => hasValue$(control))),
         { initialValue: false });
 
-    public readonly showPatternSuggestions = toSignal(
+    protected readonly showPatternSuggestions = toSignal(
         toObservable(this.patternControl).pipe(
             switchMap(control => hasNoValue$(control))),
         { initialValue: false });
 
-    public readonly patternName = computed(() => {
+    protected readonly patternName = computed(() => {
         const regex = this.patternValue();
         if (!regex) {
             return '';
@@ -85,7 +85,7 @@ export class StringValidationComponent {
         return 'Advanced';
     });
 
-    public readonly showUnique = computed(() => {
+    protected readonly showUnique = computed(() => {
         const field = this.field();
 
         return Types.is(field, FieldDto) && !field.isLocalizable && this.schema().type !== 'Component';
@@ -107,7 +107,7 @@ export class StringValidationComponent {
         });
     }
 
-    public setPattern(pattern: PatternDto) {
+    protected setPattern(pattern: PatternDto) {
         const fieldForm = this.fieldForm();
 
         fieldForm.controls['pattern'].setValue(pattern.regex);

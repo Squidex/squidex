@@ -46,14 +46,14 @@ export class CalendarPageComponent {
     private readonly language: AppLanguageDto;
     private calendar: any;
 
-    public readonly view = signal<ViewMode>('month');
+    protected readonly view = signal<ViewMode>('month');
 
-    public readonly contentSelected = signal<ContentDto | undefined>(undefined);
-    public readonly contentDialog = new DialogModel();
+    protected readonly contentSelected = signal<ContentDto | undefined>(undefined);
+    protected readonly contentDialog = new DialogModel();
 
-    public readonly title = signal('');
+    protected readonly title = signal('');
 
-    public readonly isLoading = signal(false);
+    protected readonly isLoading = signal(false);
 
     constructor(
         private readonly appsState: AppsState,
@@ -106,7 +106,7 @@ export class CalendarPageComponent {
         this.load();
     }
 
-    public onClick(event: MouseEvent) {
+    protected onClick(event: MouseEvent) {
         const target = event.target as HTMLElement;
 
         if (target.classList.contains('tui-full-calendar-weekday-grid-date')) {
@@ -121,7 +121,7 @@ export class CalendarPageComponent {
         }
     }
 
-    public changeView(view: ViewMode) {
+    protected changeView(view: ViewMode) {
         this.view.set(view);
 
         this.calendar?.changeView(view);
@@ -129,19 +129,19 @@ export class CalendarPageComponent {
         this.load();
     }
 
-    public goPrev() {
+    protected goPrev() {
         this.calendar?.prev();
 
         this.load();
     }
 
-    public goNext() {
+    protected goNext() {
         this.calendar?.next();
 
         this.load();
     }
 
-    public cancelStatus() {
+    protected cancelStatus() {
         const contentSelected = this.contentSelected();
         if (!contentSelected) {
             return;
@@ -215,7 +215,7 @@ export class CalendarPageComponent {
         }
     }
 
-    public createContentName(content: ContentDto) {
+    protected createContentName(content: ContentDto) {
         const name =
             content.referenceFields
                 .map(f => getContentValue(content, this.language, f, false))

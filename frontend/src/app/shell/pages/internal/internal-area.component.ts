@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { DialogService, LoadingService, Notification, UIOptions } from '@app/shared';
@@ -24,7 +23,6 @@ import { SearchMenuComponent } from './search-menu.component';
     imports: [
         AppsMenuComponent,
         AssetUploaderComponent,
-        AsyncPipe,
         ChatMenuComponent,
         LogoComponent,
         NotificationsMenuComponent,
@@ -35,10 +33,10 @@ import { SearchMenuComponent } from './search-menu.component';
     ],
 })
 export class InternalAreaComponent {
-    public readonly isEmbedded = inject(UIOptions).value.embedded;
+    protected readonly isEmbedded = inject(UIOptions).value.embedded;
 
     constructor(
-        public readonly loadingService: LoadingService,
+        protected readonly loadingService: LoadingService,
         private readonly dialogs: DialogService,
         private readonly route: ActivatedRoute,
     ) {

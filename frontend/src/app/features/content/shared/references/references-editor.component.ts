@@ -63,13 +63,13 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
     /** Allows to select the same content multiple times. */
     public readonly allowDuplicates = input(true, { transform: booleanAttribute });
 
-    public readonly contentItems = signal<ReadonlyArray<ContentDto>>([]);
-    public readonly contentCloned = signal<ContentDto | undefined>(undefined);
+    protected readonly contentItems = signal<ReadonlyArray<ContentDto>>([]);
+    protected readonly contentCloned = signal<ContentDto | undefined>(undefined);
 
-    public readonly isCompact = signal(false);
+    protected readonly isCompact = signal(false);
 
-    public readonly contentCreatorDialog = new DialogModel();
-    public readonly contentSelectorDialog = new DialogModel();
+    protected readonly contentCreatorDialog = new DialogModel();
+    protected readonly contentSelectorDialog = new DialogModel();
 
     constructor(
         private readonly contentsResolver: ResolveContents,
@@ -104,11 +104,11 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
             });
     }
 
-    public setContentItems(contentItems: ReadonlyArray<ContentDto>) {
+    private setContentItems(contentItems: ReadonlyArray<ContentDto>) {
         this.contentItems.set(contentItems);
     }
 
-    public select(contents: ReadonlyArray<ContentDto>) {
+    protected select(contents: ReadonlyArray<ContentDto>) {
         this.setContentItems([...this.contentItems(), ...contents]);
 
         if (contents.length > 0) {
@@ -119,7 +119,7 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
         this.contentCreatorDialog.hide();
     }
 
-    public remove(content: ContentDto) {
+    protected remove(content: ContentDto) {
         if (!content || this.isDisabled()) {
             return;
         }
@@ -129,7 +129,7 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
         this.updateValue();
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
+    protected sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
         if (!event || this.isDisabled()) {
             return;
         }
@@ -139,7 +139,7 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
         this.updateValue();
     }
 
-    public createContent(clone?: ContentDto) {
+    protected createContent(clone?: ContentDto) {
         this.contentCloned.set(clone);
 
         this.contentCreatorDialog.show();
@@ -157,7 +157,7 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
         this.callTouched();
     }
 
-    public setCompact(isCompact: boolean) {
+    protected setCompact(isCompact: boolean) {
         this.isCompact.set(isCompact);
     }
 }

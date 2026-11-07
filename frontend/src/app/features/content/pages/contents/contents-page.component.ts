@@ -7,12 +7,11 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, Signal, signal, untracked, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, signal, untracked, viewChild } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DialogModel, DropdownMenuComponent, EntriesPipe, getTableConfig, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentComponent } from '../../shared/list/content.component';
@@ -28,7 +27,6 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         ContentComponent,
         ContentListCellDirective,
@@ -64,23 +62,35 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
 })
 export class ContentsPageComponent {
     private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
-    private readonly languageMaster = toSignal(this.languagesState.isoMasterLanguage, { initialValue: null! });
-    private readonly settings = toSignal(this.appsState.selectedSettings, { initialValue: this.appsState.snapshot.selectedSettings });
+    private schemaLoaded?: SchemaDto;
 
-    public readonly schema = signal<SchemaDto>(null!);
+    protected readonly schema = computed(() => {
+        return this.schemasState.selectedSchema()!;
+    }, { equal: (lhs, rhs) => lhs?.id === rhs?.id });
 
-    public readonly tableSettings: Signal<TableSettings | undefined>;
-    public readonly tableViewModal = new ModalModel();
+    protected readonly tableSettings = computed(() => {
+        const schema = this.schema();
 
-    public readonly exportDialog = new DialogModel();
+        return untracked(() => new TableSettings(this.uiState, schema));
+    });
+
+    private readonly tableConfig = computed(() => {
+        return getTableConfig(this.tableSettings());
+    });
+
+    protected readonly tableViewModal = new ModalModel();
+
+    protected readonly exportDialog = new DialogModel();
 
     public readonly searchModal = new ModalModel();
 
-    public readonly contents = toSignal(this.contentsState.contents, { initialValue: [] });
+    protected readonly contents = computed(() => {
+        return this.contentsState.contents();
+    });
 
-    public readonly selectedItems = signal<Record<string, boolean>>({});
+    private readonly selectedItems = signal<Record<string, boolean>>({});
 
-    public readonly selection = computed(() => {
+    protected readonly selection = computed(() => {
         const contents = this.contents();
         const selectedItems = this.selectedItems();
 
@@ -117,13 +127,18 @@ export class ContentsPageComponent {
         return { selectedAll, selectedCount, selectedCanDelete, selectedStatuses };
     });
 
-    public readonly language = linkedSignal<AppLanguageDto>(() => {
-        return this.languageMaster()!;
+    protected readonly languages = computed(() => {
+        return this.languagesState.isoLanguages();
     });
 
-    public readonly languages = toSignal(this.languagesState.isoLanguages, { initialValue: [] });
+    protected readonly language = linkedSignal<AppLanguageDto>(() => {
+        const languageKey = this.localStore.get(this.languageKey());
+        const languageMaster = this.languagesState.isoMasterLanguage();
 
-    public readonly translationStatus = computed<TranslationStatuses | undefined>(() => {
+        return this.languages().find(x => x.iso2Code === languageKey) || languageMaster;
+    });
+
+    protected readonly translationStatus = computed<TranslationStatuses | undefined>(() => {
         const schema = this.schema();
         if (!schema) {
             return undefined;
@@ -132,22 +147,31 @@ export class ContentsPageComponent {
         return contentsTranslationStatus(this.contents().map(x => x.data), schema, this.languages());
     });
 
-    public readonly disableScheduler = computed(() => {
-        return this.settings()?.hideScheduler === true;
+    protected readonly disableScheduler = computed(() => {
+        return this.appsState.selectedSettings()?.hideScheduler === true;
     });
 
-    public readonly queryModel = toSignal(
-        this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
+    private readonly schemaName = computed(() => {
+        return this.schemasState.selectedSchema()?.name;
+    });
+
+    protected readonly queryModel = toSignal(
+        toObservable(this.schemaName).pipe(defined(),
             switchMap(x => this.schemasService.getFilters(this.appsState.appName, x))));
 
-    public readonly queries = toSignal(
-        this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
-            map(x => new Queries(this.uiState, `schemas.${x}`))));
+    protected readonly queries = computed(() => {
+        const schemaName = this.schemaName();
+        if (!schemaName) {
+            return undefined;
+        }
+
+        return new Queries(this.uiState, `schemas.${schemaName}`);
+    });
 
     constructor(
-        public readonly contentsRoute: Router2State,
-        public readonly contentsState: ContentsState,
-        public readonly languagesState: LanguagesState,
+        protected readonly contentsRoute: Router2State,
+        protected readonly contentsState: ContentsState,
+        protected readonly languagesState: LanguagesState,
         private readonly appsState: AppsState,
         private readonly contributorsState: ContributorsState,
         private readonly contentsService: ContentsService,
@@ -163,71 +187,54 @@ export class ContentsPageComponent {
             this.contributorsState.loadIfNotLoaded();
         }
 
-        const schema$ =
-            getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1), shareReplay(1))));
+        effect(() => {
+            const { fieldNames, schema } = this.tableConfig()();
 
-        const tableSetting$ =
-            schema$.pipe(map(schema => new TableSettings(this.uiState, schema)), shareReplay(1));
-
-        const tableConfig$ =
-            tableSetting$.pipe(switchMap(getTableConfig));
-
-        this.tableSettings = toSignal(tableSetting$);
-
-        effect(onCleanup => {
-            const subscription = untracked(() => tableConfig$
-                .subscribe(({ fieldNames, schema }) => {
-                    if (this.schema()?.id !== schema.id) {
-                        this.resetSelection();
-
-                        this.schema.set(schema);
-
-                        const initial =
-                            this.contentsRoute.mapTo(this.contentsState)
-                                .withPaging('contents', 10)
-                                .withSynchronizer(QuerySynchronizer.INSTANCE)
-                                .getInitial();
-
-                        this.contentsState.load(false, true, { fieldNames, ...initial });
-                        this.contentsRoute.listen();
-
-                        const languageKey = this.localStore.get(this.languageKey());
-                        const languageItem = this.languages().find(x => x.iso2Code === languageKey);
-
-                        if (languageItem) {
-                            this.language.set(languageItem);
-                        }
-                    } else {
-                        this.contentsState.setFieldNames(fieldNames);
-                        this.contentsState.load();
-                    }
-                }));
-
-            onCleanup(() => subscription.unsubscribe());
+            untracked(() => this.loadContents(fieldNames, schema));
         });
     }
 
-    public reload() {
+    private loadContents(fieldNames: string[], schema: SchemaDto) {
+        if (this.schemaLoaded?.id === schema.id) {
+            this.contentsState.setFieldNames(fieldNames);
+            this.contentsState.load();
+            return;
+        }
+
+        this.schemaLoaded = schema;
+        this.resetSelection();
+
+        const initial =
+            this.contentsRoute.mapTo(this.contentsState)
+                .withPaging('contents', 10)
+                .withSynchronizer(QuerySynchronizer.INSTANCE)
+                .getInitial();
+
+        this.contentsState.load(false, true, { fieldNames, ...initial });
+        this.contentsRoute.listen();
+    }
+
+    protected reload() {
         this.contentsState.load(true);
     }
 
-    public reloadTotal() {
+    protected reloadTotal() {
         this.contentsState.load(true, false);
     }
 
-    public delete(content: ContentDto) {
+    protected delete(content: ContentDto) {
         this.contentsState.deleteMany([content]);
     }
 
-    public deleteSelected() {
+    protected deleteSelected() {
         this.contentsState.deleteMany(this.selectItems());
     }
 
-    public changeStatus(content: ContentDto, status: string) {
+    protected changeStatus(content: ContentDto, status: string) {
         this.changeContentItems([content], status);
     }
 
-    public changeSelectedStatus(status: string) {
+    protected changeSelectedStatus(status: string) {
         this.changeContentItems(this.selectItems(c => c.status !== status), status);
     }
 
@@ -244,7 +251,7 @@ export class ContentsPageComponent {
             .subscribe();
     }
 
-    public clone(content: ContentDto) {
+    protected clone(content: ContentDto) {
         if (!content) {
             return;
         }
@@ -256,29 +263,29 @@ export class ContentsPageComponent {
             });
     }
 
-    public changeLanguage(language: AppLanguageDto) {
+    protected changeLanguage(language: AppLanguageDto) {
         this.language.set(language);
 
         this.localStore.set(this.languageKey(), language.iso2Code);
     }
 
-    public search(query: Query) {
+    protected search(query: Query) {
         this.contentsState.search(query);
     }
 
-    public isItemSelected(content: ContentDto): boolean {
+    protected isItemSelected(content: ContentDto): boolean {
         return this.selectedItems()[content.id] === true;
     }
 
-    public resetSelection() {
+    private resetSelection() {
         this.selectedItems.set({});
     }
 
-    public selectItem(content: ContentDto, isSelected: boolean) {
+    protected selectItem(content: ContentDto, isSelected: boolean) {
         this.selectedItems.update(x => ({ ...x, [content.id]: isSelected }));
     }
 
-    public selectAll(isSelected: boolean) {
+    protected selectAll(isSelected: boolean) {
         const selectedItems: Record<string, boolean> = {};
 
         if (isSelected) {
@@ -299,8 +306,4 @@ export class ContentsPageComponent {
     private languageKey(): any {
         return Settings.Local.CONTENT_LANGUAGE(this.schema().id);
     }
-}
-
-function getSchemaName(route: ActivatedRoute) {
-    return route.params.pipe(map(x => x['schemaName'] as string), distinctUntilChanged());
 }

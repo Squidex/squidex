@@ -34,9 +34,9 @@ export class ContentsExportDialogComponent {
     /** All languages of the app, to build the paths of localized fields. */
     public readonly languages = input<ReadonlyArray<AppLanguageDto>>([]);
 
-    public readonly metaPaths = ['id', 'created', 'createdBy', 'lastModified', 'lastModifiedBy', 'status', 'newStatus', 'version'];
+    protected readonly metaPaths = ['id', 'created', 'createdBy', 'lastModified', 'lastModifiedBy', 'status', 'newStatus', 'version'];
 
-    public readonly fieldPaths = computed<ReadonlyArray<FieldPaths>>(() => {
+    protected readonly fieldPaths = computed<ReadonlyArray<FieldPaths>>(() => {
         const languages = this.languages();
 
         return this.schema().fields.filter(x => x.properties.isContentField).map(field => {
@@ -49,22 +49,22 @@ export class ContentsExportDialogComponent {
         });
     });
 
-    public readonly format = signal<ExportFormat>('Csv');
-    public readonly fields = signal('');
-    public readonly unpublished = signal(false);
+    protected readonly format = signal<ExportFormat>('Csv');
+    protected readonly fields = signal('');
+    protected readonly unpublished = signal(false);
 
     constructor(
         private readonly schemasState: SchemasState,
     ) {
     }
 
-    public addPath(path: string) {
+    protected addPath(path: string) {
         const current = this.fields().trim();
 
         this.fields.set(current ? `${current}, ${path}` : path);
     }
 
-    public export() {
+    protected export() {
         const schema = this.schema();
         if (!schema.canContentsExport) {
             return;

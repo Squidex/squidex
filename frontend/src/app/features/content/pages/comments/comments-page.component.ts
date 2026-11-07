@@ -26,10 +26,10 @@ type Tab = 'unresolved' | 'all';
     ],
 })
 export class CommentsPageComponent {
-    public commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));
-    public commentsTab = this.route.queryParams.pipe(map(x => x['commentsTab'] as Tab || 'unresolved'));
+    protected readonly commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));
+    protected readonly commentsTab = this.route.queryParams.pipe(map(x => x['commentsTab'] as Tab || 'unresolved'));
 
-    public readonly content = this.contentStates.selectedContent;
+    protected readonly content = this.contentStates.selectedContent;
 
     constructor(
         private readonly route: ActivatedRoute,

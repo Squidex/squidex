@@ -26,7 +26,7 @@ import { AppsState, ExternalLinkDirective, LayoutComponent, TitleComponent, Tour
 })
 export class ApiAreaComponent {
     constructor(
-        public readonly appsState: AppsState,
+        protected readonly appsState: AppsState,
     ) {
     }
 }

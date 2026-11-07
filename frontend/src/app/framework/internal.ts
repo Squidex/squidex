@@ -8,7 +8,6 @@
 export * from './angular/drag-helper';
 export * from './angular/routers/router-utils';
 export * from './angular/signal-control.component';
-export * from './angular/stateful.component';
 export * from './angular/subscriptions';
 export * from './configurations';
 export * from './services/analytics.service';

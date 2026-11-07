@@ -21,7 +21,7 @@ import { FieldDto, FormRowComponent, ReferencesFieldEditorValues, ReferencesFiel
     ],
 })
 export class ReferencesUIComponent {
-    public readonly editors = ReferencesFieldEditorValues;
+    protected readonly editors = ReferencesFieldEditorValues;
 
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();

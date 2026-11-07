@@ -22,7 +22,7 @@ export class CopyDirective {
     }
 
     @HostListener('click')
-    public onClick() {
+    protected onClick() {
         if (this.inputElement) {
             this.copyToClipbord(this.inputElement);
         }

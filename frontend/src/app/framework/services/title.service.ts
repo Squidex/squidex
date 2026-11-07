@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, signal, untracked } from '@angular/core';
 import { Types } from '../utils/types';
 import { LocalizerService } from './localizer.service';
 
@@ -25,11 +24,9 @@ export type Title = { route?: any; localized: string; value: string };
     providedIn: 'root',
 })
 export class TitleService {
-    private readonly path$ = new BehaviorSubject<ReadonlyArray<Title>>([]);
+    private readonly pathValue = signal<ReadonlyArray<Title>>([]);
 
-    public get pathChanges(): Observable<ReadonlyArray<Title>> {
-        return this.path$;
-    }
+    public readonly path = this.pathValue.asReadonly();
 
     constructor(
         private readonly titles: TitlesConfig,
@@ -41,9 +38,7 @@ export class TitleService {
             this.titles.separator,
         );
 
-        this.path$.subscribe(value => {
-            this.updateTitle(value);
-        });
+        this.updateTitle([]);
     }
 
     public push(value: string, index?: number, route?: any) {
@@ -52,7 +47,7 @@ export class TitleService {
             return result;
         }
 
-        const clone = [...this.path$.value];
+        const clone = [...untracked(this.pathValue)];
 
         const lastIndex = clone.length - 1;
         const localized = this.localizer.getOrKey(value);
@@ -69,16 +64,22 @@ export class TitleService {
             result = lastIndex + 1;
         }
 
-        this.path$.next(clone);
+        this.setPath(clone);
         return result;
     }
 
     public pop() {
-        const clone = [...this.path$.value];
+        const clone = [...untracked(this.pathValue)];
 
         clone.pop();
 
-        this.path$.next(clone);
+        this.setPath(clone);
+    }
+
+    private setPath(path: ReadonlyArray<Title>) {
+        this.pathValue.set(path);
+
+        this.updateTitle(path);
     }
 
     private updateTitle(path: ReadonlyArray<Title>) {

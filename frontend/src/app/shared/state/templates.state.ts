@@ -24,16 +24,16 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class TemplatesState extends State<Snapshot> {
-    public templates =
+    public readonly templates =
         this.project(x => x.templates);
 
-    public starters =
+    public readonly starters =
         this.project(x => x.templates.filter(x => x.isStarter));
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     constructor(

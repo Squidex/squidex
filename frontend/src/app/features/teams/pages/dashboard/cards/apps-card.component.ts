@@ -27,7 +27,7 @@ export class AppsCardComponent {
     /** The team to show the apps for. */
     public readonly team = input.required<TeamDto>();
 
-    public readonly apps;
+    protected readonly apps;
 
     constructor(appsService: AppsService) {
         this.apps = toSignal(

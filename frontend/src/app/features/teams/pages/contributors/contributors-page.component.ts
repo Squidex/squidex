@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -23,7 +22,6 @@ import { ContributorComponent } from './contributor.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ContributorAddFormComponent,
         ContributorComponent,
         FormsModule,
@@ -44,8 +42,8 @@ import { ContributorComponent } from './contributor.component';
 })
 export class ContributorsPageComponent {
     constructor(
-        public readonly contributorsRoute: Router2State,
-        public readonly contributorsState: TeamContributorsState,
+        private readonly contributorsRoute: Router2State,
+        protected readonly contributorsState: TeamContributorsState,
     ) {
         const initial =
             this.contributorsRoute.mapTo(this.contributorsState)
@@ -56,11 +54,11 @@ export class ContributorsPageComponent {
         this.contributorsState.load(false, initial);
     }
 
-    public reload() {
+    protected reload() {
         this.contributorsState.load(true);
     }
 
-    public search(query: string) {
+    protected search(query: string) {
         this.contributorsState.search(query);
     }
 }

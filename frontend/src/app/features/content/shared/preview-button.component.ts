@@ -33,9 +33,9 @@ export class PreviewButtonComponent {
     /** The schema of the content, with the preview URLs. */
     public readonly schema = input.required<SchemaDto>();
 
-    public readonly dropdown = new ModalModel();
+    protected readonly dropdown = new ModalModel();
 
-    public readonly previewNameSelected = linkedSignal<string | undefined>(() => {
+    protected readonly previewNameSelected = linkedSignal<string | undefined>(() => {
         const previewUrls = this.schema().previewUrls;
 
         const selectedName = this.localStore.get(this.configKey());
@@ -46,7 +46,7 @@ export class PreviewButtonComponent {
         return selectedName;
     });
 
-    public readonly previewNamesMore = computed(() => {
+    protected readonly previewNamesMore = computed(() => {
         const previewNameSelected = this.previewNameSelected();
         const previewNames = Object.keys(this.schema().previewUrls);
         if (!previewNameSelected) {
@@ -62,7 +62,7 @@ export class PreviewButtonComponent {
     ) {
     }
 
-    public follow(name?: string) {
+    protected follow(name?: string) {
         if (name) {
             this.selectUrl(name);
 

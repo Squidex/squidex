@@ -40,7 +40,7 @@ export class QueryListComponent {
     /** The plural name of the searched items, for example "contents". */
     public readonly types = input('');
 
-    public isSelectedQuery(saved: SavedQuery) {
+    protected isSelectedQuery(saved: SavedQuery) {
         return equalsQuery(saved.query, this.queryUsed());
     }
 }

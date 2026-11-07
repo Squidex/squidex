@@ -24,25 +24,25 @@ interface Snapshot extends ListState<string> {
     providedIn: 'root',
 })
 export class AllAppsState extends State<Snapshot> {
-    public apps =
+    public readonly apps =
         this.project(x => x.apps);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.apps.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public total =
+    public readonly total =
         this.project(x => x.total);
 
-    public containsAllApps =
+    public readonly containsAllApps =
         this.project(x => x.containsAllApps === true);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     constructor(

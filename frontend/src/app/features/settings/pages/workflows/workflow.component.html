@@ -7,7 +7,7 @@
 
         <div class="col col-tags">
             <sqx-tag-editor
-                [itemConverter]="(schemasSource().normalConverter | async)!"
+                [itemConverter]="schemasSource().normalConverter()"
                 [ngModel]="workflowViewValue.dto.schemaIds"
                 readonly="true"
                 styleBlank="true"
@@ -79,8 +79,8 @@
                         <sqx-tag-editor
                             [id]="schemaIdsRow.fieldName()"
                             [disabled]="!isEditable()"
-                            [itemConverter]="(schemasSource().converter | async)!"
-                            [itemsSource]="(schemasSource().normalConverter | async)?.suggestions"
+                            [itemConverter]="schemasSource().converter()"
+                            [itemsSource]="schemasSource().normalConverter().suggestions"
                             [ngModel]="workflowViewValue.dto.schemaIds"
                             (ngModelChange)="changeSchemaIds($event)"
                             placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />

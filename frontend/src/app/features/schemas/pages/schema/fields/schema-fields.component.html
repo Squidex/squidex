@@ -10,7 +10,7 @@
     </div>
 }
 
-@if (appsState.selectedSettings | async; as settings) {
+@if (appsState.selectedSettings(); as settings) {
     <sqx-sortable-field-list
         [fields]="schema.fields"
         [fieldsEmpty]="schema.fields.length === 0"

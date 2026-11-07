@@ -28,14 +28,14 @@ import { StepDefinition, TourService } from './tour.service';
 export class TourTemplateComponent {
     private delayedDestroy: any;
 
-    public readonly isVisible = signal(false);
+    protected readonly isVisible = signal(false);
 
-    public readonly currentStep = signal<StepDefinition | null>(null);
-    public readonly currentElement = signal<any>(null);
+    protected readonly currentStep = signal<StepDefinition | null>(null);
+    protected readonly currentElement = signal<any>(null);
 
-    public readonly hasPrev = false;
+    protected readonly hasPrev = false;
 
-    public readonly hasNext = computed(() => {
+    protected readonly hasNext = computed(() => {
         const step = this.currentStep();
         if (!step) {
             return false;
@@ -44,7 +44,7 @@ export class TourTemplateComponent {
         return this.tourService.hasNext(step) && !step.nextOnAnchorClick && !step.nextOnCondition;
     });
 
-    public readonly hasFinish = computed(() => {
+    protected readonly hasFinish = computed(() => {
         const step = this.currentStep();
         if (!step) {
             return false;
@@ -53,7 +53,7 @@ export class TourTemplateComponent {
         return !this.tourService.hasNext(step) && !step.hideAll;
     });
 
-    public readonly progress = computed(() => {
+    protected readonly progress = computed(() => {
         const step = this.currentStep();
         if (!step) {
             return '0%';
@@ -66,7 +66,7 @@ export class TourTemplateComponent {
     });
 
     constructor(
-        public readonly tourService: TourService,
+        protected readonly tourService: TourService,
     ) {
         tourService.component = this;
     }

@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, numberAttribute, output, signal, viewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, HTTP, IndeterminateValueDirective, isValidValue, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -29,7 +28,6 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
     imports: [
         ArrayEditorComponent,
         AssetsEditorComponent,
-        AsyncPipe,
         ChatDialogComponent,
         CheckboxGroupComponent,
         CodeEditorComponent,
@@ -107,46 +105,46 @@ export class FieldEditorComponent {
     /** The text to show after the field name, for example the language. */
     public readonly displaySuffix = input('');
 
-    public readonly uniqueId = MathHelper.guid();
+    protected readonly uniqueId = MathHelper.guid();
 
-    public readonly isExpanded = signal(false);
-    public readonly isSelected = signal(false);
+    protected readonly isExpanded = signal(false);
+    private readonly isSelected = signal(false);
 
-    public readonly chatDialog = new DialogModel();
+    protected readonly chatDialog = new DialogModel();
 
-    public readonly field = computed(() => {
+    protected readonly field = computed(() => {
         return this.formModel().field;
     });
 
-    public readonly fieldForm = computed(() => {
+    protected readonly fieldForm = computed(() => {
         return this.formModel().form;
     });
 
-    public readonly isString = computed(() => {
+    protected readonly isString = computed(() => {
         return this.field().properties.fieldType === 'String';
     });
 
-    public readonly hasComments = computed(() => {
+    protected readonly hasComments = computed(() => {
         return this.field().properties.hasComments;
     });
 
-    public readonly schemaIds = computed(() => {
+    protected readonly schemaIds = computed(() => {
         const properties = this.field().properties;
 
         return Types.is(properties, ReferencesFieldPropertiesDto) ? properties.schemaIds : undefined;
     });
 
-    public readonly isDisabled = computed(() => {
-        return disabled$(this.formModel().form);
+    protected readonly isDisabled = computed(() => {
+        return this.formModel().disabled();
     });
 
-    public readonly isEmpty = computed(() => {
-        return hasNoValue$(this.formModel().form);
+    protected readonly isEmpty = computed(() => {
+        return !isValidValue(this.formModel().value());
     });
 
-    public readonly annotations = computed(() => {
+    protected readonly annotations = computed(() => {
         return this.comments()?.getAnnotations(this.formModel().path);
-    });
+    }, { equal: Types.equals });
 
     constructor(
         private readonly messageBus: MessageBus,
@@ -185,31 +183,31 @@ export class FieldEditorComponent {
         }
     }
 
-    public toggleExpanded() {
+    protected toggleExpanded() {
         this.isExpanded.update(x => !x);
     }
 
-    public select() {
+    protected select() {
         this.messageBus.emit(new FieldSelected(this.formModel().path));
     }
 
-    public annotationCreate(annotation?: AnnotationSelection) {
+    protected annotationCreate(annotation?: AnnotationSelection) {
         this.messageBus.emit(new AnnotationCreate(this.formModel().path, annotation));
     }
 
-    public annotationsSelect(annotation: ReadonlyArray<string>) {
+    protected annotationsSelect(annotation: ReadonlyArray<string>) {
         this.messageBus.emit(new AnnotationsSelected(annotation));
     }
 
-    public annotationsUpdate(annotations: ReadonlyArray<Annotation>) {
+    protected annotationsUpdate(annotations: ReadonlyArray<Annotation>) {
         this.comments()?.updateAnnotations(this.formModel().path, annotations);
     }
 
-    public unset() {
+    protected unset() {
         this.formModel().unset();
     }
 
-    public setValue(content: string | HTTP.UploadFile | null | undefined) {
+    protected setValue(content: string | HTTP.UploadFile | null | undefined) {
         this.chatDialog.hide();
 
         if (Types.isString(content)) {

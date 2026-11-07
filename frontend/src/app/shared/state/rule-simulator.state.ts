@@ -31,16 +31,16 @@ interface Snapshot extends ListState {
     providedIn: 'root',
 })
 export class RuleSimulatorState extends State<Snapshot> {
-    public simulatedRuleEvents =
+    public readonly simulatedRuleEvents =
         this.project(x => x.simulatedRuleEvents);
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     public get appId() {

@@ -24,84 +24,58 @@ describe('LoadingService', () => {
         const loadingService = new LoadingService(<any>{ events });
         loadingService.scheduler = action => action();
 
-        let state = false;
-        loadingService.loading.subscribe(v => {
-            state = v;
-        });
         loadingService.startLoading('1');
 
-        expect(state).toBeTruthy();
+        expect(loadingService.loading()).toBeTruthy();
     });
 
     it('should set to loaded on navigation start', () => {
         const loadingService = new LoadingService(<any>{ events });
         loadingService.scheduler = action => action();
 
-        let state = false;
-        loadingService.loading.subscribe(v => {
-            state = v;
-        });
-
         events.next(new NavigationStart(0, ''));
 
-        expect(state).toBeTruthy();
+        expect(loadingService.loading()).toBeTruthy();
     });
 
     it('should not unset from loaded immediately', () => {
         const loadingService = new LoadingService(<any>{ events });
 
-        let state = false;
-        loadingService.loading.subscribe(v => {
-            state = v;
-        });
         loadingService.startLoading('1');
         loadingService.completeLoading('1');
 
-        expect(state).toBeTruthy();
+        expect(loadingService.loading()).toBeTruthy();
     });
 
     it('should not unset from loaded delayed', async () => {
         const loadingService = new LoadingService(<any>{ events });
         loadingService.scheduler = action => action();
 
-        let state = false;
-        loadingService.loading.subscribe(v => {
-            state = v;
-        });
         loadingService.startLoading('1');
         loadingService.completeLoading('1');
 
-        expect(state).toBeFalsy();
+        expect(loadingService.loading()).toBeFalsy();
     });
 
     it('should not unset from loaded delayed on navigation event', async () => {
         const loadingService = new LoadingService(<any>{ events });
         loadingService.scheduler = action => action();
 
-        let state = false;
-        loadingService.loading.subscribe(v => {
-            state = v;
-        });
         events.next(new NavigationStart(0, ''));
         events.next(new NavigationError(0, '', 0));
 
-        expect(state).toBeFalsy();
+        expect(loadingService.loading()).toBeFalsy();
     });
 
     it('should set back to loaded after several completions', async () => {
         const loadingService = new LoadingService(<any>{ events });
         loadingService.scheduler = action => action();
 
-        let state = false;
-
-        loadingService.loading.subscribe(v => {
-            state = v;
-        });
         loadingService.startLoading('1');
         loadingService.completeLoading('1');
         loadingService.completeLoading('1');
         loadingService.startLoading('2');
 
-        expect(state).toBeTruthy();
+        expect(loadingService.loading()).toBeTruthy();
     });
 });

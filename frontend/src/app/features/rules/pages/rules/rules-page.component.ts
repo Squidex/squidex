@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -17,7 +16,6 @@ import { RuleComponent } from './rule.component';
     styleUrls: ['./rules-page.component.scss'],
     templateUrl: './rules-page.component.html',
     imports: [
-        AsyncPipe,
         LayoutComponent,
         ListViewComponent,
         RouterLink,
@@ -34,13 +32,13 @@ import { RuleComponent } from './rule.component';
     ],
 })
 export class RulesPageComponent {
-    public readonly availableTriggers = ALL_TRIGGERS;
-    public readonly availableSteps;
+    protected readonly availableTriggers = ALL_TRIGGERS;
+    protected readonly availableSteps;
 
     constructor(
-        public readonly rulesState: RulesState,
-        public readonly rulesService: RulesService,
-        public readonly schemasState: SchemasState,
+        protected readonly rulesState: RulesState,
+        rulesService: RulesService,
+        schemasState: SchemasState,
     ) {
         this.availableSteps = toSignal(rulesService.getSteps());
 
@@ -49,19 +47,19 @@ export class RulesPageComponent {
         schemasState.loadIfNotLoaded();
     }
 
-    public reload() {
+    protected reload() {
         this.rulesState.load(true);
     }
 
-    public cancelRun() {
+    protected cancelRun() {
         this.rulesState.runCancel();
     }
 
-    public delete(rule: DynamicRuleDto) {
+    protected delete(rule: DynamicRuleDto) {
         this.rulesState.delete(rule);
     }
 
-    public toggle(rule: DynamicRuleDto) {
+    protected toggle(rule: DynamicRuleDto) {
         this.rulesState.update(rule, new DynamicUpdateRuleDto({ isEnabled: !rule.isEnabled }));
     }
 }

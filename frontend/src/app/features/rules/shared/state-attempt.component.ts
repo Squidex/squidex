@@ -25,7 +25,7 @@ export class StateAttemptComponent {
     /** The execution attempt to show the times, error and log for. */
     public readonly attempt = input.required<FlowExecutionStepAttemptDto>();
 
-    public readonly output = computed(() => {
+    protected readonly output = computed(() => {
         let log = '';
 
         for (const line of this.attempt().log) {

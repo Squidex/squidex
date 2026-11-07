@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, input, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -16,7 +15,6 @@ import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/i
     styleUrls: ['./asset-tag-dialog.component.scss'],
     templateUrl: './asset-tag-dialog.component.html',
     imports: [
-        AsyncPipe,
         FocusOnInitDirective,
         FormErrorComponent,
         FormRowComponent,
@@ -34,7 +32,7 @@ export class AssetTagDialogComponent {
     /** The name of the tag to rename. */
     public readonly tagName = input.required<string>();
 
-    public readonly editForm = new RenameAssetTagForm();
+    protected readonly editForm = new RenameAssetTagForm();
 
     constructor(
         private readonly assetsState: AssetsState,
@@ -44,11 +42,11 @@ export class AssetTagDialogComponent {
         });
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public renameAssetTag() {
+    protected renameAssetTag() {
         const value = this.editForm.submit();
         if (!value) {
             return;

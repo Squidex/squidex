@@ -13,11 +13,11 @@ import { AfterViewInit, Directive, DoCheck, ElementRef, HostBinding, HostListene
 })
 export class AutosizeDirective implements AfterViewInit, DoCheck {
     @HostBinding('style.overflow')
-    public overflow = 'hidden';
+    protected overflow = 'hidden';
 
     @Input({ transform: numberAttribute })
     @HostBinding('rows')
-    public rows = 1;
+    protected rows = 1;
 
     constructor(
         private readonly element: ElementRef<HTMLTextAreaElement>,

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
 import { map, merge } from 'rxjs';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
@@ -17,17 +16,16 @@ import { TaskSnapshot, TourService, TourState } from '@app/shared/internal';
     templateUrl: './tour-guide.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ScrollActiveDirective,
         TranslatePipe,
     ],
 })
 export class TourGuideComponent {
-    public readonly isCollapsed = signal(false);
+    protected readonly isCollapsed = signal(false);
 
     constructor(
-        public readonly tourState: TourState,
-        public readonly tourService: TourService,
+        protected readonly tourState: TourState,
+        tourService: TourService,
     ) {
         effect(onCleanup => {
             const subscription =
@@ -42,15 +40,15 @@ export class TourGuideComponent {
         });
     }
 
-    public toggle() {
+    protected toggle() {
         this.isCollapsed.update(x => !x);
     }
 
-    public complete() {
+    protected complete() {
         this.tourState.complete();
     }
 
-    public start(task: TaskSnapshot) {
+    protected start(task: TaskSnapshot) {
         this.tourState.runTask(task);
     }
 }

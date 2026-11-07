@@ -34,23 +34,23 @@ export class CustomViewEditorComponent {
     /** All fields that can be shown in the list. */
     public readonly allFields = input.required<ReadonlyArray<TableField>>();
 
-    public readonly fieldsNotAdded = computed(() => {
+    protected readonly fieldsNotAdded = computed(() => {
         const listFields = this.listFields();
 
         return this.allFields().filter(lhs => !listFields.find(rhs => rhs.name === lhs.name));
     });
 
-    public drop(event: CdkDragDrop<TableField[], any>) {
+    protected drop(event: CdkDragDrop<TableField[], any>) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
 
         this.updateListFields(event.container.data);
     }
 
-    public addField(field: TableField) {
+    protected addField(field: TableField) {
         this.updateListFields([...this.listFields(), field]);
     }
 
-    public removeField(field: TableField) {
+    protected removeField(field: TableField) {
         this.updateListFields(this.listFields().removed(field));
     }
 
@@ -58,7 +58,7 @@ export class CustomViewEditorComponent {
         this.listFieldsChange.emit(fields);
     }
 
-    public resetDefault() {
+    protected resetDefault() {
         this.listFieldsReset.emit();
     }
 }

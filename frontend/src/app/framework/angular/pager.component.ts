@@ -37,7 +37,7 @@ export class PagerComponent {
     /** Hides the pager when there is only one page. */
     public readonly autoHide = input(false, { transform: booleanAttribute });
 
-    public readonly pageSizes = PAGE_SIZES;
+    protected readonly pageSizes = PAGE_SIZES;
 
     public readonly itemFirst = computed(() => {
         const paging = this.paging();
@@ -79,7 +79,7 @@ export class PagerComponent {
         return paging.page < Math.ceil(paging.total / paging.pageSize) - 1;
     });
 
-    public readonly translationInfo = computed(() => {
+    protected readonly translationInfo = computed(() => {
         return {
             itemFirst: this.itemFirst(),
             itemLast: this.itemLast(),

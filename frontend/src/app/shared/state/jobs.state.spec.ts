@@ -120,8 +120,7 @@ describe('JobsState', () => {
 
             jobsState.load().subscribe();
 
-            let canRebuild: boolean | undefined;
-            jobsState.canRebuildTextIndex.subscribe(x => canRebuild = x);
+            const canRebuild = jobsState.canRebuildTextIndex();
 
             expect(canRebuild).toBeFalsy();
         });

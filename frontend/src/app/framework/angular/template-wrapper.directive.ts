@@ -24,7 +24,7 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit {
     @Input('sqxTemplateWrapper')
     public templateRef!: TemplateRef<any>;
 
-    public view?: EmbeddedViewRef<any>;
+    private view?: EmbeddedViewRef<any>;
 
     public constructor(
         private readonly viewContainer: ViewContainerRef,

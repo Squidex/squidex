@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, numberAttribute, viewChildren } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldDto, FieldSection, FormHintComponent, MarkdownDirective } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
@@ -16,7 +15,6 @@ import { FieldEditorComponent } from './field-editor.component';
     templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FormHintComponent,
         MarkdownDirective,
         forwardRef(() => FieldEditorComponent),

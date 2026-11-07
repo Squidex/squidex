@@ -36,10 +36,10 @@
             </div>
         </ng-container>
         <ng-container content>
-            <sqx-form-error [error]="actualForm().error | async" />
+            <sqx-form-error [error]="actualForm().error()" />
 
             @if (selectedTab() !== 2) {
-                <sqx-form-row for="name" hint="schemas.schemaNameHint" label="common.name" required [submitCount]="createForm.submitCount | async" vertical>
+                <sqx-form-row for="name" hint="schemas.schemaNameHint" label="common.name" required [submitCount]="createForm.submitCount()" vertical>
                     <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                 </sqx-form-row>
 
@@ -108,7 +108,7 @@
                     </div>
                 </div>
 
-                @if (schemasState.categoryNames | async; as categories) {
+                @if (schemasState.categoryNames(); as categories) {
                     @if (categories.length > 0) {
                         <sqx-form-row for="category" label="common.category">
                             <select class="form-select" id="category" formControlName="initialCategory">
@@ -132,8 +132,8 @@
                         <div class="col-auto">
                             <label>&nbsp;</label>
                             <div>
-                                <button class="btn btn-primary" (click)="generatePreview()" [disabled]="generateForm.submitting | async" type="button">
-                                    @if (generateForm.submitting | async) {
+                                <button class="btn btn-primary" (click)="generatePreview()" [disabled]="generateForm.submitting()" type="button">
+                                    @if (generateForm.submitting()) {
                                         <sqx-loader color="white" size="12" />
                                     }
 

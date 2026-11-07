@@ -49,7 +49,7 @@ export class LanguageSelectorComponent<T extends Language = Language> {
     /** The size of the buttons. */
     public readonly size = input<'sm' | 'md' | 'lg'>('md');
 
-    public readonly dropdown = new ModalModel();
+    protected readonly dropdown = new ModalModel();
 
     constructor() {
         effect(() => {
@@ -67,7 +67,7 @@ export class LanguageSelectorComponent<T extends Language = Language> {
         });
     }
 
-    public selectLanguage(language: T) {
+    protected selectLanguage(language: T) {
         if (language?.iso2Code !== this.language()?.iso2Code) {
             this.language.set(language);
         }

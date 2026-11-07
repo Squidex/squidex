@@ -1,7 +1,7 @@
 <li class="nav-item nav-icon dropdown d-flex align-items-center position-relative" #button>
     <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
         <i class="icon-comments"></i>
-        @if (commentsState.unreadCountChanges | async; as unread) {
+        @if (commentsState.unreadCount(); as unread) {
             <span class="badge rounded-pill badge-danger">{{ unread }}</span>
         }
     </span>
@@ -13,7 +13,7 @@
     scrollY="true"
     [sqxAnchoredTo]="button"
     *sqxModal="modalMenu; onRoot: false">
-    @if (commentItems | async; as items) {
+    @if (commentItems(); as items) {
         @for (item of items.slice().reverse(); track $index) {
             <sqx-comment
                 canAnswer="false"

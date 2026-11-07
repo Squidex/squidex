@@ -23,11 +23,11 @@ export class ApiTrafficSummaryCardComponent {
     /** The API usage of the app. */
     public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    public readonly bytesMonth = computed(() => {
+    protected readonly bytesMonth = computed(() => {
         return this.usage()?.monthBytes ?? 0;
     });
 
-    public readonly bytesAllowed = computed(() => {
+    protected readonly bytesAllowed = computed(() => {
         return this.usage()?.allowedBytes ?? 0;
     });
 }

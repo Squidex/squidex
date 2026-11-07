@@ -48,11 +48,11 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
     /** Renders a small input. */
     public readonly small = input(false, { transform: booleanAttribute });
 
-    public readonly contentSelectorDialog = new DialogModel();
+    protected readonly contentSelectorDialog = new DialogModel();
 
-    public readonly selectedContent = signal<ContentDto | undefined>(undefined);
+    private readonly selectedContent = signal<ContentDto | undefined>(undefined);
 
-    public readonly selectedName = computed(() => {
+    protected readonly selectedName = computed(() => {
         const content = this.selectedContent();
         if (!content) {
             return undefined;
@@ -99,7 +99,7 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
             });
     }
 
-    public openDialog() {
+    protected openDialog() {
         if (this.isDisabled()) {
             return;
         }
@@ -107,7 +107,7 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
         this.contentSelectorDialog.show();
     }
 
-    public select(contents: ReadonlyArray<ContentDto>, clear = false) {
+    protected select(contents: ReadonlyArray<ContentDto>, clear = false) {
         if (contents.length > 0 || clear) {
             this.selectContent(contents[0]);
         }
@@ -115,7 +115,7 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
         this.contentSelectorDialog.hide();
     }
 
-    public selectContent(selectedContent?: ContentDto) {
+    private selectContent(selectedContent?: ContentDto) {
         if (this.isDisabled()) {
             return;
         }

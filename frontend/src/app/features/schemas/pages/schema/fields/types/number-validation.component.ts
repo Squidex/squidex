@@ -42,7 +42,7 @@ export class NumberValidationComponent {
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    public readonly showUnique = computed(() => {
+    protected readonly showUnique = computed(() => {
         const field = this.field();
 
         return Types.is(field, FieldDto) && !field.isLocalizable && this.schema().type !== 'Component';

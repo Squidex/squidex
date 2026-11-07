@@ -22,7 +22,7 @@ export class TabRouterlinkDirective {
     }
 
     @HostListener('click', ['$event'])
-    public onClick(event: MouseEvent) {
+    protected onClick(event: MouseEvent) {
         const escaped = this.commands.map(x => encodeURIComponent(x));
 
         const urlTree = this.router.createUrlTree(escaped, {

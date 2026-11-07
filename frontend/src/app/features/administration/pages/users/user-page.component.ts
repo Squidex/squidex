@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,7 +16,6 @@ import { UserDto, UserForm, UsersState } from '../../internal';
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html',
     imports: [
-        AsyncPipe,
         FormErrorComponent,
         FormRowComponent,
         FormsModule,
@@ -32,36 +30,32 @@ import { UserDto, UserForm, UsersState } from '../../internal';
 export class UserPageComponent {
     private user?: UserDto | null;
 
-    public readonly isEditable = signal(false);
+    protected readonly isEditable = signal(false);
 
-    public readonly userForm = new UserForm();
+    protected readonly userForm = new UserForm();
 
     constructor(
-        public readonly usersState: UsersState,
+        protected readonly usersState: UsersState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-        effect(onCleanup => {
-            const subscription =
-                this.usersState.selectedUser
-                    .subscribe(user => {
-                        this.user = user;
+        effect(() => {
+            const user = this.usersState.selectedUser();
 
-                        const isEditable = !user || user.canUpdate;
+            this.user = user;
 
-                        this.isEditable.set(isEditable);
+            const isEditable = !user || user.canUpdate;
 
-                        const permissions: string[] = [];
+            this.isEditable.set(isEditable);
 
-                        this.userForm.load(user || { permissions });
-                        this.userForm.setEnabled(isEditable);
-                    });
+            const permissions: string[] = [];
 
-            onCleanup(() => subscription.unsubscribe());
+            this.userForm.load(user || { permissions });
+            this.userForm.setEnabled(isEditable);
         });
     }
 
-    public save() {
+    protected save() {
         if (!this.isEditable()) {
             return;
         }

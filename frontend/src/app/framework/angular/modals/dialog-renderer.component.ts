@@ -51,10 +51,10 @@ function addTooltip(tooltips: ReadonlyArray<Tooltip>, tooltip: Tooltip) {
     ],
 })
 export class DialogRendererComponent {
-    public readonly dialogView = new DialogModel();
-    public readonly dialogRequest = signal<DialogRequest | null | undefined>(undefined);
-    public readonly notifications = signal<ReadonlyArray<Notification>>([]);
-    public readonly tooltips = signal<ReadonlyArray<Tooltip>>([]);
+    protected readonly dialogView = new DialogModel();
+    protected readonly dialogRequest = signal<DialogRequest | null | undefined>(undefined);
+    protected readonly notifications = signal<ReadonlyArray<Notification>>([]);
+    protected readonly tooltips = signal<ReadonlyArray<Tooltip>>([]);
 
     constructor(dialogs: DialogService) {
         effect(onCleanup => {
@@ -97,19 +97,19 @@ export class DialogRendererComponent {
         });
     }
 
-    public cancel() {
+    protected cancel() {
         this.finishRequest(false);
 
         this.dialogView.hide();
     }
 
-    public confirm() {
+    protected confirm() {
         this.finishRequest(true);
 
         this.dialogView.hide();
     }
 
-    public close(notification: Notification) {
+    protected close(notification: Notification) {
         this.notifications.update(x => x.filter(n => notification !== n));
     }
 

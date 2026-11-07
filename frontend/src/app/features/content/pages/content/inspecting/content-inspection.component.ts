@@ -41,15 +41,15 @@ export class ContentInspectionComponent {
     /** The content to inspect. */
     public readonly content = input.required<ContentDto>();
 
-    public readonly mode = signal<Mode>('Content');
+    protected readonly mode = signal<Mode>('Content');
 
-    public readonly contentError = signal<ErrorDto | null | undefined>(undefined);
+    protected readonly contentError = signal<ErrorDto | null | undefined>(undefined);
 
     private readonly request = computed(() => {
         return { language: this.language(), mode: this.mode() };
     });
 
-    public readonly actualData = toSignal(
+    protected readonly actualData = toSignal(
         toObservable(this.request).pipe(
             switchMap(({ language, mode }) => {
                 const content = this.content();
@@ -96,13 +96,13 @@ export class ContentInspectionComponent {
         }
     }
 
-    public setData(data: any) {
+    protected setData(data: any) {
         this.contentData = data;
 
         this.updateActions();
     }
 
-    public setMode(mode: Mode) {
+    protected setMode(mode: Mode) {
         this.mode.set(mode);
     }
 

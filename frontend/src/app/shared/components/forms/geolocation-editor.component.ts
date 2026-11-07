@@ -48,13 +48,13 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
     private map: any;
     private value: Geolocation | null = null;
 
-    public readonly isGoogleMaps = inject(UIOptions).value.map.type !== 'OSM';
+    protected readonly isGoogleMaps = inject(UIOptions).value.map.type !== 'OSM';
 
-    public readonly isMapHidden = signal(this.localStore.getBoolean(Settings.Local.HIDE_MAP));
+    protected readonly isMapHidden = signal(this.localStore.getBoolean(Settings.Local.HIDE_MAP));
 
-    public readonly isCompact = signal(false);
+    protected readonly isCompact = signal(false);
 
-    public readonly geolocationForm =
+    protected readonly geolocationForm =
         new ExtendedFormGroup({
             latitude: new UntypedFormControl('',
                 ValidatorsEx.between(-90, 90),
@@ -107,7 +107,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         });
     }
 
-    public hideMap(isMapHidden: boolean) {
+    protected hideMap(isMapHidden: boolean) {
         this.isMapHidden.set(isMapHidden);
     }
 
@@ -154,7 +154,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         }
     }
 
-    public updateValueByInput() {
+    protected updateValueByInput() {
         const lat = this.geolocationForm.controls['latitude'].value;
         const lng = this.geolocationForm.controls['longitude'].value;
 
@@ -273,7 +273,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         }
     }
 
-    public clearValue() {
+    protected clearValue() {
         this.value = null;
 
         this.updateMarker({ fire: true });
@@ -374,7 +374,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         this.marker.setPosition(latLng);
     }
 
-    public setCompact(isCompact: boolean) {
+    protected setCompact(isCompact: boolean) {
         this.isCompact.set(isCompact);
     }
 }

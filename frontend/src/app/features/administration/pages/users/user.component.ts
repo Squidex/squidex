@@ -37,15 +37,15 @@ export class UserComponent {
     ) {
     }
 
-    public lock() {
+    protected lock() {
         this.usersState.lock(this.user());
     }
 
-    public unlock() {
+    protected unlock() {
         this.usersState.unlock(this.user());
     }
 
-    public delete() {
+    protected delete() {
         this.usersState.delete(this.user());
     }
 }

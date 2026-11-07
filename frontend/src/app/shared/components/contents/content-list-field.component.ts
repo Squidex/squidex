@@ -35,7 +35,7 @@ import { TranslationStatusComponent } from './translation-status.component';
     ],
 })
 export class ContentListFieldComponent {
-    public readonly metaFields = META_FIELDS;
+    protected readonly metaFields = META_FIELDS;
 
     /** The field or meta field to render. */
     public readonly field = input.required<TableField>();
@@ -61,11 +61,11 @@ export class ContentListFieldComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly isInlineEditable = computed(() => {
+    protected readonly isInlineEditable = computed(() => {
         return this.field().rootField?.isInlineEditable === true;
     });
 
-    public readonly formatted = computed<FieldValue>(() => {
+    protected readonly formatted = computed<FieldValue>(() => {
         const rootField = this.field().rootField;
         if (!rootField) {
             return '';

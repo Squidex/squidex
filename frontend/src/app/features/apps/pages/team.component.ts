@@ -31,5 +31,5 @@ export class TeamComponent {
     /** Emits the team when the user confirms to leave it. */
     public readonly leave = output<TeamDto>();
 
-    public readonly dropdown = new ModalModel();
+    protected readonly dropdown = new ModalModel();
 }

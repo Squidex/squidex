@@ -31,19 +31,19 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class WorkflowsState extends State<Snapshot> {
-    public workflows =
+    public readonly workflows =
         this.project(x => x.workflows);
 
-    public errors =
+    public readonly errors =
         this.project(x => x.errors);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {

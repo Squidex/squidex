@@ -21,7 +21,7 @@ import { BooleanFieldEditorValues, BooleanFieldPropertiesDto, FieldDto, FormRowC
     ],
 })
 export class BooleanUIComponent {
-    public readonly editors = BooleanFieldEditorValues;
+    protected readonly editors = BooleanFieldEditorValues;
 
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();

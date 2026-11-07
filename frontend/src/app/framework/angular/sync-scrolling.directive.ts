@@ -20,7 +20,7 @@ export class SyncScollingDirective {
     }
 
     @HostListener('scroll', ['$event'])
-    public onScroll(event: Event) {
+    protected onScroll(event: Event) {
         if (this.target) {
             const scroll = (<HTMLElement>event.target).scrollLeft;
 

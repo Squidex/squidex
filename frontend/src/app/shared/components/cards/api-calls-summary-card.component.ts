@@ -23,11 +23,11 @@ export class ApiCallsSummaryCardComponent {
     /** The API usage of the app. */
     public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    public readonly callsMonth = computed(() => {
+    protected readonly callsMonth = computed(() => {
         return this.usage()?.monthCalls ?? 0;
     });
 
-    public readonly callsAllowed = computed(() => {
+    protected readonly callsAllowed = computed(() => {
         return this.usage()?.allowedCalls ?? 0;
     });
 }

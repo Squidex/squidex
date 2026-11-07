@@ -36,43 +36,43 @@ export class ClientComponent {
     /** The roles that can be assigned to the client. */
     public readonly clientRoles = input.required<ReadonlyArray<RoleDto>>();
 
-    public readonly apiCallsLimit = linkedSignal(() => this.client().apiCallsLimit);
+    protected readonly apiCallsLimit = linkedSignal(() => this.client().apiCallsLimit);
 
-    public readonly connectDialog = new DialogModel(false);
+    protected readonly connectDialog = new DialogModel(false);
 
     constructor(
-        public readonly appsState: AppsState,
+        protected readonly appsState: AppsState,
         private readonly clientsState: ClientsState,
     ) {
     }
 
-    public revoke() {
+    protected revoke() {
         this.clientsState.revoke(this.client());
     }
 
-    public regenerateSecret() {
+    protected regenerateSecret() {
         this.clientsState.regenerateSecret(this.client());
     }
 
-    public updateRole(role: string) {
+    protected updateRole(role: string) {
         const request = new UpdateClientDto({ role });
 
         this.clientsState.update(this.client(), request);
     }
 
-    public updateAllowAnonymous(allowAnonymous: boolean) {
+    protected updateAllowAnonymous(allowAnonymous: boolean) {
         const request = new UpdateClientDto({ allowAnonymous });
 
         this.clientsState.update(this.client(), request);
     }
 
-    public updateApiCallsLimit(apiCallsLimit: number) {
+    protected updateApiCallsLimit(apiCallsLimit: number) {
         const request = new UpdateClientDto({ apiCallsLimit });
 
         this.clientsState.update(this.client(), request);
     }
 
-    public rename(name: string) {
+    protected rename(name: string) {
         const request = new UpdateClientDto({ name });
 
         this.clientsState.update(this.client(), request);

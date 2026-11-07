@@ -52,16 +52,16 @@ export class FieldComponent {
     /** The settings of the app. */
     public readonly settings = input.required<AppSettingsDto>();
 
-    public readonly dropdown = new ModalModel();
-    public readonly fieldWizard = new DialogModel();
+    protected readonly dropdown = new ModalModel();
+    protected readonly fieldWizard = new DialogModel();
 
-    public readonly isEditing = signal(false);
+    protected readonly isEditing = signal(false);
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.field().canUpdate;
     });
 
-    public readonly editForm = computed(() => {
+    protected readonly editForm = computed(() => {
         const properties = this.field().properties;
 
         const editForm = new EditFieldForm(properties);
@@ -69,7 +69,7 @@ export class FieldComponent {
         return editForm;
     });
 
-    public readonly isLocalizable = computed(() => {
+    protected readonly isLocalizable = computed(() => {
         return this.parent()?.isLocalizable || (this.field() as any)['isLocalizable'];
     });
 
@@ -78,7 +78,7 @@ export class FieldComponent {
     ) {
     }
 
-    public toggleEditing() {
+    protected toggleEditing() {
         const isEditing = !this.isEditing();
 
         this.isEditing.set(isEditing);
@@ -88,35 +88,35 @@ export class FieldComponent {
         }
     }
 
-    public deleteField() {
+    protected deleteField() {
         this.schemasState.deleteField(this.schema(), this.field());
     }
 
-    public enableField() {
+    protected enableField() {
         this.schemasState.enableField(this.schema(), this.field());
     }
 
-    public disableField() {
+    protected disableField() {
         this.schemasState.disableField(this.schema(), this.field());
     }
 
-    public showField() {
+    protected showField() {
         this.schemasState.showField(this.schema(), this.field());
     }
 
-    public hideField() {
+    protected hideField() {
         this.schemasState.hideField(this.schema(), this.field());
     }
 
-    public sortFields(fields: ReadonlyArray<FieldDto>) {
+    protected sortFields(fields: ReadonlyArray<FieldDto>) {
         this.schemasState.orderFields(this.schema(), fields, this.field() as any);
     }
 
-    public lockField() {
+    protected lockField() {
         this.schemasState.lockField(this.schema(), this.field());
     }
 
-    public save() {
+    protected save() {
         if (!this.isEditable()) {
             return;
         }

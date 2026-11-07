@@ -39,21 +39,21 @@ export class ReferencesCheckboxesComponent extends SignalControlComponent<Readon
     /** The language to build the names of the contents. */
     public readonly language = input.required<AppLanguageDto>();
 
-    public readonly control = new FormControl<ReadonlyArray<string> | null | undefined>([]);
+    protected readonly control = new FormControl<ReadonlyArray<string> | null | undefined>([]);
 
-    public readonly contentItems = signal<ReadonlyArray<ContentDto> | null>(null);
+    private readonly contentItems = signal<ReadonlyArray<ContentDto> | null>(null);
 
-    public readonly isValid = computed(() => {
+    private readonly isValid = computed(() => {
         return !!this.schemaId() && !!this.language();
     });
 
-    public readonly isSuccess = computed(() => {
+    private readonly isSuccess = computed(() => {
         const contentItems = this.contentItems();
 
         return this.isValid() && !!contentItems && contentItems.length > 0;
     });
 
-    public readonly converter = computed(() => {
+    protected readonly converter = computed(() => {
         const contentItems = this.contentItems();
         if (!this.isSuccess() || !contentItems) {
             return new ReferencesTagsConverter(null!, [], this.localizer);

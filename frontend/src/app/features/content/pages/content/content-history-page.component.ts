@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { timer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppsState, ConfirmClickDirective, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -38,23 +38,23 @@ import { ContentPageComponent } from './content-page.component';
 export class ContentHistoryPageComponent {
     private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
 
-    public readonly content = toSignal(this.contentsState.selectedContent.pipe(defined()));
+    protected readonly content = computed(() => {
+        return this.contentsState.selectedContent();
+    });
 
-    public readonly contentEvents = toSignal(
-        this.contentsState.selectedContent.pipe(
+    protected readonly contentEvents = toSignal(
+        toObservable(this.contentsState.selectedContent).pipe(
             defined(),
             map(content => `schemas.${this.schemasState.schemaId}.contents.${content.id}`),
             switchSafe(channel => timer(0, 5000).pipe(map(() => channel))),
             switchSafe(channel => this.historyService.getHistory(this.appsState.appName, channel))),
         { initialValue: [] });
 
-    public readonly dropdown = new ModalModel();
-    public readonly dropdownNew = new ModalModel();
+    protected readonly dropdown = new ModalModel();
+    protected readonly dropdownNew = new ModalModel();
 
-    public readonly settings = toSignal(this.appsState.selectedSettings, { initialValue: this.appsState.snapshot.selectedSettings });
-
-    public readonly disableScheduler = computed(() => {
-        return this.settings()?.hideScheduler === true;
+    protected readonly disableScheduler = computed(() => {
+        return this.appsState.selectedSettings()?.hideScheduler === true;
     });
 
     constructor(
@@ -66,7 +66,7 @@ export class ContentHistoryPageComponent {
     ) {
     }
 
-    public changeStatus(status: string) {
+    protected changeStatus(status: string) {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
                 defined(),
                 switchSafe(_ => this.dueTimeSelector().selectDueTime(status)),
@@ -74,30 +74,30 @@ export class ContentHistoryPageComponent {
             .subscribe();
     }
 
-    public createDraft() {
+    protected createDraft() {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
                 defined(),
                 switchSafe(() => this.contentsState.createDraft(this.content()!)))
             .subscribe();
     }
 
-    public cancelStatus() {
+    protected cancelStatus() {
         this.contentsState.cancelStatus(this.content()!);
     }
 
-    public delete() {
+    protected delete() {
         this.contentsState.deleteMany([this.content()!]);
     }
 
-    public deleteDraft() {
+    protected deleteDraft() {
         this.contentsState.deleteDraft(this.content()!);
     }
 
-    public loadVersion(event: HistoryEventDto) {
+    protected loadVersion(event: HistoryEventDto) {
         this.contentPage.loadVersion(event.version, false);
     }
 
-    public compareVersion(event: HistoryEventDto) {
+    protected compareVersion(event: HistoryEventDto) {
         this.contentPage.loadVersion(event.version, true);
     }
 }

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormRowComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowView } from '@app/shared';
@@ -18,7 +17,6 @@ import { WorkflowStepComponent } from './workflow-step.component';
     templateUrl: './workflow.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         FormErrorComponent,
         FormRowComponent,
@@ -30,7 +28,7 @@ import { WorkflowStepComponent } from './workflow-step.component';
     ],
 })
 export class WorkflowComponent {
-    public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
+    protected readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     /** The workflow to show and edit. */
     public readonly workflow = input.required<WorkflowDto>();
@@ -41,32 +39,32 @@ export class WorkflowComponent {
     /** The source for the schemas the workflow can be assigned to. */
     public readonly schemasSource = input.required<SchemaTagSource>();
 
-    public readonly error = signal<ErrorDto | null | undefined>(undefined);
+    protected readonly error = signal<ErrorDto | null | undefined>(undefined);
 
-    public readonly isEditing = signal(false);
+    protected readonly isEditing = signal(false);
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.workflow().canUpdate;
     });
 
-    public readonly workflowView = linkedSignal(() => new WorkflowView(this.workflow()));
+    protected readonly workflowView = linkedSignal(() => new WorkflowView(this.workflow()));
 
-    public readonly selectedTab = signal(0);
+    protected readonly selectedTab = signal(0);
 
     constructor(
         private readonly workflowsState: WorkflowsState,
     ) {
     }
 
-    public toggleEditing() {
+    protected toggleEditing() {
         this.isEditing.update(x => !x);
     }
 
-    public remove() {
+    protected remove() {
         this.workflowsState.delete(this.workflowView().dto);
     }
 
-    public save() {
+    protected save() {
         if (!this.isEditable()) {
             return;
         }
@@ -84,7 +82,7 @@ export class WorkflowComponent {
             });
     }
 
-    public addStep() {
+    protected addStep() {
         const workflowView = this.workflowView();
         const index = workflowView.steps.length;
 
@@ -98,19 +96,19 @@ export class WorkflowComponent {
         }
     }
 
-    public rename(name: string) {
+    protected rename(name: string) {
         this.workflowView.update(x => x.changeName(name));
     }
 
-    public changeSchemaIds(schemaIds: string[]) {
+    protected changeSchemaIds(schemaIds: string[]) {
         this.workflowView.update(x => x.changeSchemaIds(schemaIds));
     }
 
-    public update(updated: WorkflowView) {
+    protected update(updated: WorkflowView) {
         this.workflowView.set(updated);
     }
 
-    public selectTab(tab: number) {
+    protected selectTab(tab: number) {
         this.selectedTab.set(tab);
     }
 }

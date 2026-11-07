@@ -5,20 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
+import { AppDto, AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, SchemaDto, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
     imports: [
-        AsyncPipe,
         FormsModule,
         LayoutComponent,
         ReactiveFormsModule,
@@ -31,33 +28,37 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, S
     ],
 })
 export class SchemasPageComponent {
-    public schemasFilter = new UntypedFormControl();
+    protected readonly schemasFilter = new UntypedFormControl();
 
-    public readonly isEmbedded = inject(UIOptions).value.embedded;
+    private readonly schemasFilterValue = toSignal(value$(this.schemasFilter));
 
-    public schemas =
-        this.schemasState.schemas.pipe(
-            map(schemas => {
-                const app = this.appsState.snapshot.selectedApp!;
+    protected readonly isEmbedded = inject(UIOptions).value.embedded;
 
-                return schemas.filter(schema =>
-                    schema.canReadContents &&
-                    schema.isPublished &&
-                    schema.type !== 'Component' &&
-                    !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(schema.name)],
-                );
-            }));
+    private readonly schemas = computed(() => {
+        const app = this.appsState.snapshot.selectedApp!;
 
-    public categories =
-        combineLatest([
-            this.schemas,
-            this.schemasState.addedCategories,
-            value$(this.schemasFilter),
-        ], getCategoryTree);
+        return this.schemasState.schemas().filter(schema => isVisible(schema, app));
+    });
+
+    protected readonly categories = computed(() => {
+        return getCategoryTree(this.schemas(), this.schemasState.addedCategories(), this.schemasFilterValue());
+    });
 
     constructor(
-        public readonly schemasState: SchemasState,
+        private readonly schemasState: SchemasState,
         private readonly appsState: AppsState,
     ) {
     }
+}
+
+function isVisible(schema: SchemaDto, app: AppDto) {
+    if (!schema.canReadContents || !schema.isPublished) {
+        return false;
+    }
+
+    if (schema.type === 'Component') {
+        return false;
+    }
+
+    return !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(schema.name)];
 }

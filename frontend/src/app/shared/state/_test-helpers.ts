@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { signal } from '@angular/core';
 import { Mock } from 'typemoq';
 import { AppsState, AuthService, DateTime, FieldDto, FieldPropertiesDto, FieldRuleDto, NestedFieldDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, TeamsState, VersionTag } from '../';
 
@@ -24,7 +24,7 @@ appsState.setup(x => x.appName)
     .returns(() => app);
 
 appsState.setup(x => x.selectedApp)
-    .returns(() => of(<any>{ name: app }));
+    .returns(() => signal(<any>{ name: app }));
 
 const teamsState = Mock.ofType<TeamsState>();
 
@@ -32,7 +32,7 @@ teamsState.setup(x => x.teamId)
     .returns(() => team);
 
 teamsState.setup(x => x.selectedTeam)
-    .returns(() => of(<any>{ id: team }));
+    .returns(() => signal(<any>{ id: team }));
 
 const authService = Mock.ofType<AuthService>();
 

@@ -48,15 +48,15 @@ export class StateStepComponent {
     /** The execution state of the step, if it has already been executed. */
     public readonly state = input.required<FlowExecutionStepStateDto | undefined>();
 
-    public readonly attemptIndex = linkedSignal<number>(() => {
+    protected readonly attemptIndex = linkedSignal<number>(() => {
         return this.stepInfo().properties.length > 0 ? -1 : 0;
     });
 
-    public readonly isExpandable = computed(() => {
+    protected readonly isExpandable = computed(() => {
         return (this.state()?.attempts.length ?? 0) > 0 || this.stepInfo().properties.length > 0;
     });
 
-    public selectAttempt(attempt: number) {
+    protected selectAttempt(attempt: number) {
         this.attemptIndex.set(attempt);
     }
 }

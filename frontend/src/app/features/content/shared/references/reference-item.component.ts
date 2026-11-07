@@ -28,7 +28,7 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     ],
 })
 export class ReferenceItemComponent {
-    public readonly metaFields = META_FIELDS;
+    protected readonly metaFields = META_FIELDS;
 
     /** Emits when the user removes the reference. */
     public readonly delete = output();
@@ -63,7 +63,7 @@ export class ReferenceItemComponent {
     /** The referenced content. */
     public readonly content = input.required<ContentDto>({ alias: 'sqxReferenceItem' });
 
-    public readonly values = computed(() => {
+    protected readonly values = computed(() => {
         const content = this.content();
         const language = this.language();
         const values: any[] = [];
@@ -83,7 +83,7 @@ export class ReferenceItemComponent {
         return values;
     });
 
-    public readonly isValid = computed(() => {
+    protected readonly isValid = computed(() => {
         const validations = this.validations();
 
         return !validations ? undefined : validations[this.content().id];

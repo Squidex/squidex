@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -22,7 +21,6 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         ComponentContentsState,
     ],
     imports: [
-        AsyncPipe,
         FormErrorComponent,
         FormsModule,
         LanguageSelectorComponent,
@@ -57,11 +55,11 @@ export class ContentCreatorComponent {
     /** Additional context information that is passed to custom editors. */
     public readonly formContext = input.required<any>();
 
-    public readonly languageSelected = linkedSignal(() => {
+    protected readonly languageSelected = linkedSignal(() => {
         return this.language();
     });
 
-    public readonly schemas = computed(() => {
+    protected readonly schemas = computed(() => {
         const schemaIds = this.schemaIds();
 
         const schemas = this.schemasState.snapshot.schemas.filter(x => x.canContentsCreate);
@@ -72,13 +70,13 @@ export class ContentCreatorComponent {
         return schemas.filter(x => x.type === 'Default' && schemaIds.indexOf(x.id) >= 0);
     });
 
-    public readonly schema = linkedSignal<SchemaDto | undefined>(() => {
+    protected readonly schema = linkedSignal<SchemaDto | undefined>(() => {
         const schemas = this.schemas();
 
         return schemas.find(x => x.name === this.schemaName()) || schemas[0];
     });
 
-    public readonly contentForm = signal<EditContentForm | undefined>(undefined);
+    protected readonly contentForm = signal<EditContentForm | undefined>(undefined);
 
     constructor(
         private readonly contentsState: ComponentContentsState,
@@ -94,7 +92,7 @@ export class ContentCreatorComponent {
         });
     }
 
-    public selectSchema(schema: SchemaDto) {
+    protected selectSchema(schema: SchemaDto) {
         this.schema.set(schema);
     }
 
@@ -119,11 +117,11 @@ export class ContentCreatorComponent {
         this.contentForm.set(contentForm);
     }
 
-    public saveAndPublish() {
+    protected saveAndPublish() {
         this.saveContent(true);
     }
 
-    public save() {
+    protected save() {
         this.saveContent(false);
     }
 
@@ -169,11 +167,11 @@ export class ContentCreatorComponent {
         }
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.contentCreate.emit([]);
     }
 
-    public emitSelect(content: ContentDto) {
+    private emitSelect(content: ContentDto) {
         this.contentCreate.emit([content]);
     }
 }

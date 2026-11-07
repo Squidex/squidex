@@ -32,5 +32,5 @@ export class ContentValueEditorComponent {
     /** The form group that contains a control with the name of the field. */
     public readonly form = input.required<UntypedFormGroup>();
 
-    public readonly uniqueId = MathHelper.guid();
+    protected readonly uniqueId = MathHelper.guid();
 }

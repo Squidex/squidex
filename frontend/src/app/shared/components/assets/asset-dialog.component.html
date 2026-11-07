@@ -90,7 +90,7 @@
             @switch (selectedTab()) {
                 @case (0) {
                     <div class="metadata">
-                        <sqx-form-error [error]="annotateForm.error | async" />
+                        <sqx-form-error [error]="annotateForm.error()" />
 
                         <sqx-form-row for="folder" hideError label="common.folder" vertical>
                             <div class="path">

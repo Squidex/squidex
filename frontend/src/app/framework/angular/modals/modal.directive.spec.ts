@@ -60,9 +60,9 @@ describe('ModalDirective', () => {
     it('should hide all open modals', () => {
         modalService.hideAll();
 
-        expect(host.dialog1.isOpen).toBeFalsy();
-        expect(host.dialog2.isOpen).toBeFalsy();
-        expect(host.dropdown.isOpen).toBeFalsy();
+        expect(host.dialog1.isOpen()).toBeFalsy();
+        expect(host.dialog2.isOpen()).toBeFalsy();
+        expect(host.dropdown.isOpen()).toBeFalsy();
     });
 
     it('should not hide modal that contains the element', () => {
@@ -70,8 +70,8 @@ describe('ModalDirective', () => {
 
         modalService.hideAll(anchor);
 
-        expect(host.dialog1.isOpen).toBeTruthy();
-        expect(host.dialog2.isOpen).toBeFalsy();
-        expect(host.dropdown.isOpen).toBeFalsy();
+        expect(host.dialog1.isOpen()).toBeTruthy();
+        expect(host.dialog2.isOpen()).toBeFalsy();
+        expect(host.dropdown.isOpen()).toBeFalsy();
     });
 });

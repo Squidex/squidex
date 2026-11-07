@@ -97,7 +97,7 @@
                         [language]="language"
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
-                        [percents]="contentForm.translationStatus | async" />
+                        [percents]="contentForm.translationStatus()" />
                     @if (content.canDelete || content.canClone) {
                         <button
                             class="btn btn-outline-secondary ms-2"
@@ -148,9 +148,9 @@
                         [language]="language"
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
-                        [percents]="contentForm.translationStatus | async" />
+                        [percents]="contentForm.translationStatus()" />
                     <div sqxTourStep="saveContent">
-                        @if (contentsState.canCreate | async) {
+                        @if (contentsState.canCreate()) {
                             <div class="btn-group ms-2" attr.aria-label="{{ 'common.save' | sqxTranslate }}" role="group">
                                 <button class="btn btn-primary" (click)="saveAsDraft('Edit')" type="button">
                                     {{ "common.save" | sqxTranslate }}
@@ -174,7 +174,7 @@
                             </div>
                         }
 
-                        @if (contentsState.canCreateAndPublish | async) {
+                        @if (contentsState.canCreateAndPublish()) {
                             <div class="btn-group ms-2" attr.aria-label="{{ 'contents.saveAndPublish' | sqxTranslate }}" role="group">
                                 <button class="btn btn-success" shortcut="CTRL + SHIFT + S" type="submit">
                                     {{ "contents.saveAndPublish" | sqxTranslate }}

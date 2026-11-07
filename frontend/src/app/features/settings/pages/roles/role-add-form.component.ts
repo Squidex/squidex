@@ -25,14 +25,14 @@ import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, Tra
     ],
 })
 export class RoleAddFormComponent {
-    public addRoleForm = new AddRoleForm();
+    protected addRoleForm = new AddRoleForm();
 
     constructor(
         private readonly rolesState: RolesState,
     ) {
     }
 
-    public addRole() {
+    protected addRole() {
         const value = this.addRoleForm.submit();
         if (!value) {
             return;
@@ -49,7 +49,7 @@ export class RoleAddFormComponent {
             });
     }
 
-    public cancel() {
+    protected cancel() {
         this.addRoleForm.submitCompleted();
     }
 }

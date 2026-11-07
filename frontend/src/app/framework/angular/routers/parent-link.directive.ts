@@ -47,7 +47,7 @@ export class ParentLinkDirective implements OnInit {
     }
 
     @HostListener('click')
-    public onClick(): boolean {
+    protected onClick(): boolean {
         if (this.url) {
             this.router.navigateByUrl(this.url);
         }

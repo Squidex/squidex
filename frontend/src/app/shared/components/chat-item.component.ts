@@ -56,12 +56,12 @@ export class ChatItemComponent {
     /** The text of the message, or the stream of the answer. */
     public readonly content = input.required<string | Observable<ChatEventDto>>();
 
-    public readonly contentText = signal('');
-    public readonly contentTools = signal<ReadonlyArray<string>>([]);
+    protected readonly contentText = signal('');
+    protected readonly contentTools = signal<ReadonlyArray<string>>([]);
 
-    public readonly isRunning = signal(false);
-    public readonly isFailed = signal(false);
-    public readonly isCopying = signal(false);
+    protected readonly isRunning = signal(false);
+    protected readonly isFailed = signal(false);
+    protected readonly isCopying = signal(false);
 
     constructor(
         private readonly apiUrl: ApiUrlConfig,
@@ -110,11 +110,11 @@ export class ChatItemComponent {
         });
     }
 
-    public scrollIntoView() {
+    protected scrollIntoView() {
         this.focusElement()?.nativeElement.scrollIntoView();
     }
 
-    public async selectContent() {
+    protected async selectContent() {
         let markdown = this.contentText();
 
         if (!markdownHasImage(markdown)) {

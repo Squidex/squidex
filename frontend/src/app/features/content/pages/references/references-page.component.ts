@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, linkedSignal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -23,7 +21,6 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ContentsColumnsPipe,
         LanguageSelectorComponent,
         LayoutComponent,
@@ -37,18 +34,18 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
     ],
 })
 export class ReferencesPageComponent {
-    private readonly languageMaster = toSignal(this.languagesState.isoMasterLanguage, { initialValue: null! });
-
-    public readonly language = linkedSignal<AppLanguageDto>(() => {
-        return this.languageMaster()!;
+    protected readonly language = linkedSignal<AppLanguageDto>(() => {
+        return this.languagesState.isoMasterLanguage();
     });
 
-    public readonly languages = toSignal(this.languagesState.isoLanguages, { initialValue: [] });
+    protected readonly languages = computed(() => {
+        return this.languagesState.isoLanguages();
+    });
 
     constructor(
-        public readonly contentsRoute: Router2State,
-        public readonly contentsState: ComponentContentsState,
-        public readonly languagesState: LanguagesState,
+        private readonly contentsRoute: Router2State,
+        protected readonly contentsState: ComponentContentsState,
+        private readonly languagesState: LanguagesState,
         private readonly route: ActivatedRoute,
     ) {
         effect(onCleanup => {
@@ -70,11 +67,11 @@ export class ReferencesPageComponent {
         });
     }
 
-    public reload() {
+    protected reload() {
         this.contentsState.load(true);
     }
 
-    public changeLanguage(language: AppLanguageDto) {
+    protected changeLanguage(language: AppLanguageDto) {
         this.language.set(language);
     }
 }

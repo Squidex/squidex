@@ -6,6 +6,7 @@
  */
 
 import { IMock, It, Mock } from 'typemoq';
+import '../utils/array-extensions';
 import { LocalizerService } from './localizer.service';
 import { TitlesConfig, TitleService } from './title.service';
 

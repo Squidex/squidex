@@ -1,7 +1,7 @@
 <sqx-list-view innerWidth="50rem">
     @if (canCreateIndexes) {
         <div class="mt-2">
-            @if ((indexesState.isLoaded | async) && (indexesState.indexes | async); as indexes) {
+            @if (indexesState.isLoaded() && indexesState.indexes(); as indexes) {
                 @if (indexes.length === 0) {
                     <div class="table-items-row table-items-row-summary table-items-row-empty">
                         {{ "schemas.indexes.empty" | sqxTranslate }}
@@ -32,14 +32,14 @@
     }
 </sqx-list-view>
 @if (canCreateIndexes) {
-    @if (indexesState.canCreate | async) {
+    @if (indexesState.canCreate()) {
         <button class="btn btn-success index-button" (click)="addIndexDialog.show()" type="button">
             <i class="icon icon-plus index-button-icon"></i>
             <div class="index-button-text">{{ "schemas.indexes.addIndexButton" | sqxTranslate }}</div>
         </button>
     }
 
-    @if (languagesState.isoLanguages | async; as languages) {
+    @if (languagesState.isoLanguages(); as languages) {
         <sqx-index-form
             (create)="addIndexDialog.hide()"
             (dialogClose)="addIndexDialog.hide()"

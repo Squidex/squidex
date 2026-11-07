@@ -22,7 +22,7 @@
 
                     @if (isString()) {
                         <sqx-menu-item
-                            [disabled]="(isDisabled() | async) || isCollapsed() || !hasChatBot()"
+                            [disabled]="isDisabled() || isCollapsed() || !hasChatBot()"
                             label="AI"
                             menuLabel="i18n:contents.fieldAIMenu"
                             small
@@ -42,7 +42,7 @@
 
                     <sqx-menu-item
                         (action)="toggleExpanded()"
-                        [disabled]="(isDisabled() | async) || isCollapsed()"
+                        [disabled]="isDisabled() || isCollapsed()"
                         icon="fullscreen"
                         menuLabel="i18n:contents.fieldFullscreenMenu"
                         small
@@ -54,7 +54,7 @@
                         confirmRememberKey="unsetValue"
                         confirmText="i18n:contents.unsetValueConfirmText"
                         confirmTitle="i18n:contents.unsetValueConfirmTitle"
-                        [disabled]="(isDisabled() | async) || isCollapsed() || (isEmpty() | async)"
+                        [disabled]="isDisabled() || isCollapsed() || isEmpty()"
                         icon="close"
                         menuLabel="i18n:contents.unsetValue"
                         small
@@ -76,7 +76,7 @@
                     [formControlBinding]="$any(fieldForm())"
                     [formField]="formModel().field.name"
                     [formIndex]="index()"
-                    [formValue]="form().valueChanges | async"
+                    [formValue]="form().value()"
                     [isExpanded]="isExpanded()"
                     (isExpandedChange)="toggleExpanded()"
                     [language]="language()"
@@ -262,7 +262,7 @@
                             @case ("RichText") {
                                 <sqx-rich-editor
                                     #editor
-                                    [annotations]="annotations() | async"
+                                    [annotations]="annotations()"
                                     (annotationsCreate)="annotationCreate($event)"
                                     (annotationsSelect)="annotationsSelect($event)"
                                     (annotationsUpdate)="annotationsUpdate($event)"
@@ -284,7 +284,7 @@
                             @case ("Markdown") {
                                 <sqx-rich-editor
                                     #editor
-                                    [annotations]="annotations() | async"
+                                    [annotations]="annotations()"
                                     (annotationsCreate)="annotationCreate($event)"
                                     (annotationsSelect)="annotationsSelect($event)"
                                     (annotationsUpdate)="annotationsUpdate($event)"
@@ -326,7 +326,7 @@
                     @case ("RichText") {
                         <sqx-rich-editor
                             #editor
-                            [annotations]="annotations() | async"
+                            [annotations]="annotations()"
                             (annotationsCreate)="annotationCreate($event)"
                             (annotationsSelect)="annotationsSelect($event)"
                             (annotationsUpdate)="annotationsUpdate($event)"

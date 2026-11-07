@@ -87,15 +87,15 @@ export class LayoutComponent {
     /** The width in rem of the left layout when collapsed. */
     public readonly collapsedWidth = input(3, { transform: numberAttribute });
 
-    public readonly sidebarMenuTemplate = contentChild(SidebarMenuDirective);
+    protected readonly sidebarMenuTemplate = contentChild(SidebarMenuDirective);
 
-    public readonly route = inject(ActivatedRoute, { optional: true });
+    protected readonly route = inject(ActivatedRoute, { optional: true });
 
-    public readonly displayMode = signal<DisplayMode>('Normal');
+    protected readonly displayMode = signal<DisplayMode>('Normal');
 
-    public readonly isMinimized = signal(false);
+    protected readonly isMinimized = signal(false);
 
-    public readonly desiredInnerWidth = computed(() => {
+    protected readonly desiredInnerWidth = computed(() => {
         const innerWidth = this.innerWidth();
         if (innerWidth > 0) {
             return `${innerWidth}rem`;
@@ -104,7 +104,7 @@ export class LayoutComponent {
         return '100%';
     });
 
-    public readonly desiredWidth = computed(() => {
+    protected readonly desiredWidth = computed(() => {
         const actualWidth = this.actualWidth();
         if (actualWidth >= 0) {
             return `${actualWidth}rem`;
@@ -113,7 +113,7 @@ export class LayoutComponent {
         return '100%';
     });
 
-    public readonly actualWidth = computed(() => {
+    private readonly actualWidth = computed(() => {
         const displayMode = this.displayMode();
         const layout = this.layout();
 
@@ -136,7 +136,7 @@ export class LayoutComponent {
         return this.width();
     });
 
-    public readonly hasFirstChild = toSignal(
+    protected readonly hasFirstChild = toSignal(
         this.router?.events.pipe(
             filter(event => event instanceof NavigationEnd),
             map(() => !!this.route?.firstChild)) ?? EMPTY,
@@ -221,7 +221,7 @@ export class LayoutComponent {
         this.renderer.setStyle(element, 'z-index', layer);
     }
 
-    public toggle() {
+    protected toggle() {
         const displayMode = this.displayMode();
 
         if (displayMode === 'Collapsed') {
@@ -237,7 +237,7 @@ export class LayoutComponent {
         }
     }
 
-    public switchToNormalFromDiv(event: MouseEvent) {
+    protected switchToNormalFromDiv(event: MouseEvent) {
         if ((event.target as any)?.['nodeName'] !== 'DIV') {
             return;
         }

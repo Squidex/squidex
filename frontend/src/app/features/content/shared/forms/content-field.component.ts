@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
-import { AppLanguageDto, AppsState, changed$, CommentSelected, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, UIOptions } from '@app/shared';
+import { AppLanguageDto, AppsState, CommentSelected, CommentsState, EditContentForm, FieldForm, FocusMarkerComponent, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, Types, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
@@ -18,7 +18,6 @@ import { FieldLanguagesComponent } from './field-languages.component';
     templateUrl: './content-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FieldCopyButtonComponent,
         FieldEditorComponent,
         FieldLanguagesComponent,
@@ -70,56 +69,56 @@ export class ContentFieldComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly commentsState = inject(CommentsState, { optional: true });
+    protected readonly commentsState = inject(CommentsState, { optional: true });
 
-    public readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
-    public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+    private readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
+    protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
-    public readonly showAllControls = linkedSignal(() => {
+    protected readonly showAllControls = linkedSignal(() => {
         return this.localStore.getBoolean(this.showAllControlsKey());
     });
 
-    public readonly isCollapsed = signal(false);
-    public readonly isSelected = signal(false);
+    protected readonly isCollapsed = signal(false);
+    protected readonly isSelected = signal(false);
 
-    public readonly isInvalid = computed(() => {
-        return invalid$(this.formModel().form);
+    protected readonly isInvalid = computed(() => {
+        return this.formModel().invalid();
     });
 
-    public readonly isDisabled = computed(() => {
-        return disabled$(this.formModel().form);
+    protected readonly isDisabled = computed(() => {
+        return this.formModel().disabled();
     });
 
-    public readonly isDifferent = computed(() => {
+    protected readonly isDifferent = computed(() => {
         const formModelCompare = this.formModelCompare();
         if (!formModelCompare) {
-            return undefined;
+            return false;
         }
 
-        return changed$(this.formModel().form, formModelCompare.form);
+        return !Types.equals(this.formModel().value(), formModelCompare.value(), true);
     });
 
-    public readonly isHalfWidth = computed(() => {
+    private readonly isHalfWidth = computed(() => {
         return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
     });
 
-    public readonly isLocalizable = computed(() => {
+    private readonly isLocalizable = computed(() => {
         return this.formModel().field.isLocalizable;
     });
 
-    public readonly isTranslatable = computed(() => {
+    protected readonly isTranslatable = computed(() => {
         return this.formModel().field.properties.fieldType === 'String' && this.hasTranslator && this.isLocalizable() && this.languages().length > 1;
     });
 
-    public readonly control = computed(() => {
+    protected readonly control = computed(() => {
         return this.formModel().get(this.language().iso2Code);
     });
 
-    public readonly controlCompare = computed(() => {
+    protected readonly controlCompare = computed(() => {
         return this.formModelCompare()?.get(this.language().iso2Code);
     });
 
-    public readonly hostClass = computed(() => {
+    protected readonly hostClass = computed(() => {
         return this.isHalfWidth() ? 'col-6 half-field' : 'col-12';
     });
 
@@ -137,13 +136,13 @@ export class ContentFieldComponent {
         });
     }
 
-    public changeShowAllControls(showAllControls: boolean) {
+    protected changeShowAllControls(showAllControls: boolean) {
         this.showAllControls.set(showAllControls);
 
         this.localStore.setBoolean(this.showAllControlsKey(), showAllControls);
     }
 
-    public copy() {
+    protected copy() {
         const formModel = this.formModel();
         const formModelCompare = this.formModelCompare();
         if (!formModelCompare) {
@@ -163,7 +162,7 @@ export class ContentFieldComponent {
         }
     }
 
-    public translate() {
+    protected translate() {
         const languages = this.languages();
 
         const master = languages.find(x => x.isMaster);
@@ -210,7 +209,7 @@ export class ContentFieldComponent {
             });
     }
 
-    public prefix(language: AppLanguageDto) {
+    protected prefix(language: AppLanguageDto) {
         return `(${language.iso2Code})`;
     }
 
@@ -218,7 +217,7 @@ export class ContentFieldComponent {
         return Settings.Local.FIELD_ALL(this.schema()?.id, this.formModel().field.fieldId);
     }
 
-    public toggle() {
+    protected toggle() {
         this.isCollapsed.update(x => !x);
     }
 }

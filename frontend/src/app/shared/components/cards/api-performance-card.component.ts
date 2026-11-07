@@ -33,15 +33,15 @@ export class ApiPerformanceCardComponent {
     /** Emits when the user toggles the stacked mode. */
     public readonly isStackedChange = output<boolean>();
 
-    public readonly chartOptions = computed(() => {
+    protected readonly chartOptions = computed(() => {
         return this.isStacked() ? ChartOptions.Stacked : ChartOptions.Default;
     });
 
-    public readonly chartSummary = computed(() => {
+    protected readonly chartSummary = computed(() => {
         return this.usage()?.averageElapsedMs ?? 0;
     });
 
-    public readonly chartData = computed<ChartData | undefined>(() => {
+    protected readonly chartData = computed<ChartData | undefined>(() => {
         const usage = this.usage();
         if (!usage) {
             return undefined;

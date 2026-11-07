@@ -32,7 +32,7 @@ export class ControlErrorsComponent {
     /** The field name in the error messages. Falls back to a name derived from the control. */
     public readonly fieldName = input<string | null>();
 
-    public readonly errorMessages = signal<ReadonlyArray<string>>([]);
+    protected readonly errorMessages = signal<ReadonlyArray<string>>([]);
 
     private readonly control = computed(() => {
         const control = this.for();

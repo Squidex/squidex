@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, Injectable } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { AutocompleteComponent, AutocompleteSource, DialogModel, DialogService, FormHintComponent, ModalDirective, TranslatePipe, UsersService } from '@app/shared';
 import { UserDtoPicture } from '@app/shared';
 import { AssignTeamContributorForm } from '../../internal';
@@ -30,11 +30,13 @@ export class UsersDataSource implements AutocompleteSource {
         }
 
         return this.usersService.getUsers(query).pipe(
-            withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
+            map(users => {
+                const contributors = this.contributorsState.contributors();
+
                 const results: any[] = [];
 
                 for (const user of users) {
-                    if (!contributors!.find(t => t.contributorId === user.id)) {
+                    if (!contributors.find(t => t.contributorId === user.id)) {
                         results.push(user);
                     }
                 }
@@ -64,18 +66,18 @@ export class UsersDataSource implements AutocompleteSource {
     ],
 })
 export class ContributorAddFormComponent {
-    public assignContributorForm = new AssignTeamContributorForm();
+    protected readonly assignContributorForm = new AssignTeamContributorForm();
 
-    public importDialog = new DialogModel();
+    protected readonly importDialog = new DialogModel();
 
     constructor(
-        public readonly contributorsState: TeamContributorsState,
-        public readonly usersDataSource: UsersDataSource,
+        private readonly contributorsState: TeamContributorsState,
+        protected readonly usersDataSource: UsersDataSource,
         private readonly dialogs: DialogService,
     ) {
     }
 
-    public assignContributor() {
+    protected assignContributor() {
         const value = this.assignContributorForm.submit();
         if (!value) {
             return;

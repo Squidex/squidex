@@ -5,7 +5,7 @@
             <label class="form-check-label" for="{{ content().id }}_selected"></label>
         </div>
 
-        @if (isDirty() | async) {
+        @if (isDirty()) {
             <div class="edit-menu">
                 <button
                     class="btn btn-text-secondary btn-cancel me-2"

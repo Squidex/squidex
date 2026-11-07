@@ -54,7 +54,7 @@ export class ListViewComponent {
     /** Shows the loading indicator. It is hidden with a short delay to avoid flickering. */
     public readonly isLoading = input(false, { transform: booleanAttribute });
 
-    public readonly isLoadingVisible = signal(false);
+    protected readonly isLoadingVisible = signal(false);
 
     constructor(renderer: Renderer2) {
         effect(onCleanup => {

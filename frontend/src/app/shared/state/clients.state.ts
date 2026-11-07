@@ -27,16 +27,16 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class ClientsState extends State<Snapshot> {
-    public clients =
+    public readonly clients =
         this.project(x => x.clients);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {

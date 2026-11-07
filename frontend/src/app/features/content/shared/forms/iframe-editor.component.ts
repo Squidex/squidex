@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, ThemeService, Types, value$ } from '@app/shared';
@@ -70,24 +69,24 @@ export class IFrameEditorComponent {
     /** The URL of the editor. */
     public readonly url = input<string | null>();
 
-    public readonly computedUrl = computed(() => {
+    protected readonly computedUrl = computed(() => {
         return computeEditorUrl(this.url(), this.appsState.snapshot.selectedSettings);
     });
 
-    public readonly isDisabled = computed(() => {
+    private readonly isDisabled = computed(() => {
         return this.disabled() || this.isDisabledByControl();
     });
 
-    public readonly isFullscreen = signal(false);
+    protected readonly isFullscreen = signal(false);
 
-    public assetsCorrelationId: any;
-    public readonly assetsDialog = new DialogModel();
+    private assetsCorrelationId: any;
+    protected readonly assetsDialog = new DialogModel();
 
-    public contentsCorrelationId: any;
-    public readonly contentsQuery = signal<string | undefined>(undefined);
-    public readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
-    public readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
-    public readonly contentsDialog = new DialogModel();
+    private contentsCorrelationId: any;
+    protected readonly contentsQuery = signal<string | undefined>(undefined);
+    protected readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
+    protected readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
+    protected readonly contentsDialog = new DialogModel();
 
     constructor(
         private readonly appsState: AppsState,
@@ -96,10 +95,8 @@ export class IFrameEditorComponent {
         private readonly router: Router,
         private readonly themeService: ThemeService,
     ) {
-        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
-
         effect(() => {
-            this.sendMessage('themeChanged', { theme: theme() });
+            this.sendMessage('themeChanged', { theme: themeService.theme() });
         });
 
         effect(() => {
@@ -155,7 +152,7 @@ export class IFrameEditorComponent {
         });
     }
 
-    public onWindowMessage(event: MessageEvent) {
+    protected onWindowMessage(event: MessageEvent) {
         const iframe = this.iframe()?.nativeElement;
         if (!iframe || event.source !== iframe.contentWindow) {
             return;
@@ -256,7 +253,7 @@ export class IFrameEditorComponent {
         }
     }
 
-    public pickAssets(assets: ReadonlyArray<AssetDto>) {
+    protected pickAssets(assets: ReadonlyArray<AssetDto>) {
         if (this.assetsCorrelationId) {
             this.sendMessage('pickAssetsResult', { correlationId: this.assetsCorrelationId, result: assets });
 
@@ -266,7 +263,7 @@ export class IFrameEditorComponent {
         this.assetsDialog.hide();
     }
 
-    public pickContents(contents: ReadonlyArray<ContentDto>) {
+    protected pickContents(contents: ReadonlyArray<ContentDto>) {
         if (this.contentsCorrelationId) {
             this.sendMessage('pickContentsResult', { correlationId: this.contentsCorrelationId, result: contents });
 
@@ -276,7 +273,7 @@ export class IFrameEditorComponent {
         this.contentsDialog.hide();
     }
 
-    public updateValue(obj: any) {
+    private updateValue(obj: any) {
         if (!Types.equals(obj, this.value)) {
             this.value = obj;
 
@@ -293,7 +290,7 @@ export class IFrameEditorComponent {
     }
 
     private sendTheme() {
-        this.sendMessage('themeChanged', { theme: this.themeService.theme });
+        this.sendMessage('themeChanged', { theme: this.themeService.theme() });
     }
 
     private sendValue() {

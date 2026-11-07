@@ -41,7 +41,7 @@ export class TableHeaderComponent {
     /** The sort order to show when the query has no sorting. */
     public readonly sortDefault = input<SortOrder | null>();
 
-    public readonly order = linkedSignal<SortOrder | null>(() => {
+    protected readonly order = linkedSignal<SortOrder | null>(() => {
         if (!this.sortable()) {
             return null;
         }
@@ -60,7 +60,7 @@ export class TableHeaderComponent {
         return null;
     });
 
-    public sort() {
+    protected sort() {
         const sortPath = this.sortPath();
         if (!this.sortable() || !sortPath) {
             return;

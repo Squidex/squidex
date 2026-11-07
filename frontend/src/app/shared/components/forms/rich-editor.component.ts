@@ -85,12 +85,12 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
     /** The format of the value. */
     public readonly mode = input.required<SquidexEditorMode>();
 
-    public readonly chatDialog = new DialogModel();
+    protected readonly chatDialog = new DialogModel();
 
-    public readonly assetsDialog = new DialogModel();
-    public readonly assetToEdit;
+    protected readonly assetsDialog = new DialogModel();
+    protected readonly assetToEdit;
 
-    public readonly contentsDialog = new DialogModel();
+    protected readonly contentsDialog = new DialogModel();
 
     constructor(destroyRef: DestroyRef,
         private readonly apiUrl: ApiUrlConfig,
@@ -126,14 +126,9 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
             this.editorWrapper?.setIsDisabled(isDisabled);
         });
 
-        effect(onCleanup => {
-            const subscription =
-                this.themeService.themeChanges
-                    .subscribe(() => {
-                        this.editorWrapper?.update(this.editorColors());
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            this.themeService.theme();
+            this.editorWrapper?.update(this.editorColors());
         });
 
         afterNextRender(() => {
@@ -253,7 +248,7 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
         }
     }
 
-    public insertText(content: string | HTTP.UploadFile | undefined | null) {
+    protected insertText(content: string | HTTP.UploadFile | undefined | null) {
         this.chatDialog.hide();
 
         if (!this.currentChat || !Types.isString(content)) {
@@ -264,7 +259,7 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
         this.currentChat = undefined;
     }
 
-    public insertAssets(assets: ReadonlyArray<AssetDto>) {
+    protected insertAssets(assets: ReadonlyArray<AssetDto>) {
         this.assetsDialog.hide();
 
         if (!this.currentAssets) {
@@ -277,7 +272,7 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
         this.currentAssets = undefined;
     }
 
-    public insertContents(contents: ReadonlyArray<ContentDto>) {
+    protected insertContents(contents: ReadonlyArray<ContentDto>) {
         this.contentsDialog.hide();
         if (!this.currentContents) {
             return;
@@ -317,7 +312,7 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
         return { ...content, title: buildContentTitle(content, this.language()) };
     }
 
-    public closeAssetDialog() {
+    protected closeAssetDialog() {
         this.assetId.set(null);
     }
 }

@@ -13,8 +13,8 @@
                     <div class="col-6">
                         <sqx-tag-editor
                             class="tags"
-                            [itemsSource]="assetsState.tagsNames | async"
-                            [ngModel]="assetsState.selectedTagNames | async"
+                            [itemsSource]="assetsState.tagsNames()"
+                            [ngModel]="assetsState.selectedTagNames()"
                             (ngModelChange)="selectTags($event)"
                             placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             styleScrollable="true"
@@ -29,7 +29,7 @@
                             placeholder="{{ 'assets.searchByName' | sqxTranslate }}"
                             [queries]="listQueries"
                             [queriesTypes]="'common.assets' | sqxTranslate"
-                            [query]="assetsState.query | async"
+                            [query]="assetsState.query()"
                             (queryChange)="search($event)" />
                     </div>
                 </div>
@@ -72,11 +72,11 @@
         </div>
     </ng-container>
     <ng-container>
-        <sqx-list-view [isLoading]="assetsState.isLoading | async">
+        <sqx-list-view [isLoading]="assetsState.isLoading()">
             <ng-container header>
-                <sqx-asset-path (navigate)="assetsState.navigate($event.id)" [path]="assetsState.path | async" />
+                <sqx-asset-path (navigate)="assetsState.navigate($event.id)" [path]="assetsState.path()" />
             </ng-container>
-            @if (assetsState.path | async; as path) {
+            @if (assetsState.path(); as path) {
                 <div>
                     <sqx-assets-list
                         [assetsState]="assetsState"
@@ -87,7 +87,7 @@
                 </div>
             }
             <ng-container footer>
-                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging | async" (pagingChange)="assetsState.page($event)" />
+                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging()" (pagingChange)="assetsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

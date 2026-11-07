@@ -5,19 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, computed, effect, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppsState, AvatarComponent, ConfirmClickDirective, defined, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
+import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
     imports: [
-        AsyncPipe,
         AvatarComponent,
         ConfirmClickDirective,
         FileDropDirective,
@@ -39,36 +36,36 @@ import { AppsState, AvatarComponent, ConfirmClickDirective, defined, DialogServi
     ],
 })
 export class MorePageComponent {
-    public readonly app = toSignal(this.appsState.selectedApp.pipe(defined()));
+    protected readonly app = this.appsState.selectedApp;
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.app()?.canUpdateGeneral === true;
     });
 
-    public readonly isEditableImage = computed(() => {
+    protected readonly isEditableImage = computed(() => {
         return this.app()?.canUpdateImage === true;
     });
 
-    public readonly isDeletable = computed(() => {
+    protected readonly isDeletable = computed(() => {
         return this.app()?.canDelete === true;
     });
 
-    public readonly isTransferable = computed(() => {
+    protected readonly isTransferable = computed(() => {
         return this.app()?.canUpdateTeam === true;
     });
 
-    public readonly uploading = signal(false);
-    public readonly uploadProgress = signal(10);
+    protected readonly uploading = signal(false);
+    protected readonly uploadProgress = signal(10);
 
-    public readonly transferForm = new TransferAppForm();
+    protected readonly transferForm = new TransferAppForm();
 
-    public readonly updateForm = new UpdateAppForm();
+    protected readonly updateForm = new UpdateAppForm();
 
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly router: Router,
-        public readonly teamsState: TeamsState,
+        protected readonly router: Router,
+        protected readonly teamsState: TeamsState,
     ) {
         effect(() => {
             const app = this.app();
@@ -86,7 +83,7 @@ export class MorePageComponent {
         this.appsState.reloadApps();
     }
 
-    public save() {
+    protected save() {
         const app = this.app();
         if (!app || !this.isEditable()) {
             return;
@@ -110,7 +107,7 @@ export class MorePageComponent {
             });
     }
 
-    public transfer() {
+    protected transfer() {
         const app = this.app();
         if (!app || !this.isTransferable()) {
             return;
@@ -134,7 +131,7 @@ export class MorePageComponent {
             });
     }
 
-    public uploadImage(file: ReadonlyArray<File>) {
+    protected uploadImage(file: ReadonlyArray<File>) {
         const app = this.app();
         if (!app || !this.isEditableImage()) {
             return;
@@ -159,7 +156,7 @@ export class MorePageComponent {
             });
     }
 
-    public removeImage() {
+    protected removeImage() {
         const app = this.app();
         if (!app || !this.isEditableImage()) {
             return;
@@ -168,7 +165,7 @@ export class MorePageComponent {
         this.appsState.removeImage(app);
     }
 
-    public deleteApp() {
+    protected deleteApp() {
         const app = this.app();
         if (!app || !this.isDeletable()) {
             return;

@@ -8,7 +8,7 @@
 
 import { Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormRowComponent } from '@app/shared';
+import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FormRowComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-ui',
@@ -21,8 +21,7 @@ import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatC
     ],
 })
 export class DateTimeUIComponent {
-    public readonly converter = FloatConverter.INSTANCE;
-    public readonly editors = DateTimeFieldEditorValues;
+    protected readonly editors = DateTimeFieldEditorValues;
 
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();

@@ -34,7 +34,7 @@ export class AssetFolderDropdownItemComponent {
     /** Emits when a node is clicked. */
     public readonly selectNode = output<AssetFolderDropdowNode>();
 
-    public readonly paddingLeft = computed(() => {
+    protected readonly paddingLeft = computed(() => {
         return `${this.nodeLevel()}rem`;
     });
 
@@ -44,7 +44,7 @@ export class AssetFolderDropdownItemComponent {
     ) {
     }
 
-    public toggle() {
+    protected toggle() {
         const nodeModel = this.nodeModel();
         if (nodeModel.isExpanded && nodeModel.isLoaded) {
             this.collapse();
@@ -53,17 +53,17 @@ export class AssetFolderDropdownItemComponent {
         }
     }
 
-    public collapse() {
+    private collapse() {
         this.nodeModel().isExpanded = false;
     }
 
-    public expand() {
+    private expand() {
         this.nodeModel().isExpanded = true;
 
         this.loadChildren();
     }
 
-    public loadChildren() {
+    private loadChildren() {
         const nodeModel = this.nodeModel();
         if (nodeModel.isLoading || nodeModel.isLoaded) {
             return;

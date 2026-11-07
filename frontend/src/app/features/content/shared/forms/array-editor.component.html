@@ -1,12 +1,12 @@
-@if (formModel().itemChanges | async; as items) {
+@if (formModel().items(); as items) {
     @if (items.length > 0 && items.length <= 20) {
         <div
             class="array-container static"
             cdkDropList
             [cdkDropListData]="items"
-            [cdkDropListDisabled]="isDisabled() | async"
+            [cdkDropListDisabled]="isDisabled()"
             (cdkDropListDropped)="sort($event)"
-            [cdkDropListSortingDisabled]="isDisabled() | async"
+            [cdkDropListSortingDisabled]="isDisabled()"
             [class.expanded]="isExpanded()">
             @for (itemForm of items; track itemForm; let i = $index; let isLast = $last; let isFirst = $first) {
                 <div class="table-drag item" cdkDrag cdkDragLockAxis="y" [class.first]="isFirst" [class.last]="isLast">
@@ -20,14 +20,14 @@
                         [index]="i"
                         [isCollapsedInitial]="isCollapsedInitial()"
                         [isComparing]="isComparing()"
-                        [isDisabled]="isDisabled() | async"
+                        [isDisabled]="isDisabled()"
                         [isFirst]="isFirst"
                         [isLast]="isLast"
                         (itemMove)="move(itemForm, $event)"
                         (itemRemove)="removeItem(i)"
                         [language]="language()"
                         [languages]="languages()">
-                        <i class="icon-drag2" cdkDragHandle [class.disabled]="isDisabled() | async"></i>
+                        <i class="icon-drag2" cdkDragHandle [class.disabled]="isDisabled()"></i>
                     </sqx-array-item>
                 </div>
             }
@@ -52,7 +52,7 @@
                             [index]="scroll.viewPortInfo.startIndexWithBuffer + i"
                             [isCollapsedInitial]="isCollapsedInitial()"
                             [isComparing]="isComparing()"
-                            [isDisabled]="isDisabled() | async"
+                            [isDisabled]="isDisabled()"
                             [isFirst]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
                             [isLast]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1"
                             (itemExpanded)="scroll.invalidateCachedMeasurementAtIndex(scroll.viewPortInfo.startIndexWithBuffer + i)"
@@ -70,7 +70,7 @@
         <div class="col-auto">
             @if (isArray()) {
                 @if (hasField()) {
-                    <button class="btn btn-outline-success" (click)="addItem()" [disabled]="isDisabledOrFull() | async" type="button">
+                    <button class="btn btn-outline-success" (click)="addItem()" [disabled]="isDisabledOrFull()" type="button">
                         {{ "contents.arrayAddItem" | sqxTranslate }}
                     </button>
                 }
@@ -84,7 +84,7 @@
                         class="btn btn-outline-success dropdown-toggle"
                         #buttonSelect
                         (click)="schemasDropdown.show()"
-                        [disabled]="isDisabledOrFull() | async"
+                        [disabled]="isDisabledOrFull()"
                         type="button">
                         {{ "contents.addComponent" | sqxTranslate }}
                     </button>
@@ -96,7 +96,7 @@
                 }
 
                 @if (schemasList().length === 1) {
-                    <button class="btn btn-outline-success" (click)="addComponent(schemasList()[0])" [disabled]="isDisabledOrFull() | async" type="button">
+                    <button class="btn btn-outline-success" (click)="addComponent(schemasList()[0])" [disabled]="isDisabledOrFull()" type="button">
                         {{ "contents.addComponent" | sqxTranslate }}
                     </button>
                 }
@@ -114,7 +114,7 @@
                     confirmRememberKey="leaveApp"
                     confirmText="i18n:contents.arrayClearConfirmText"
                     confirmTitle="i18n:contents.arrayClearConfirmTitle"
-                    [disabled]="isDisabled() | async"
+                    [disabled]="isDisabled()"
                     (sqxConfirmClick)="clear()"
                     type="button">
                     {{ "contents.arrayClear" | sqxTranslate }}

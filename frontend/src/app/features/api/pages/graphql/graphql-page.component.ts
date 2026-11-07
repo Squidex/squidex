@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { afterNextRender, Component, DestroyRef, effect, ElementRef, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
@@ -19,7 +18,6 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html',
     imports: [
-        AsyncPipe,
         FormHintComponent,
         FormsModule,
         FormRowComponent,
@@ -37,9 +35,9 @@ export class GraphQLPageComponent {
     private reactRoot?: ReactDOM.Root | null;
     private fetcher?: ReturnType<typeof createGraphiQLFetcher>;
 
-    public readonly clientsReadable: boolean;
-    public readonly clientsDialog = new DialogModel();
-    public readonly clientSelected = signal<ClientDto | null>(null);
+    protected readonly clientsReadable: boolean;
+    protected readonly clientsDialog = new DialogModel();
+    protected readonly clientSelected = signal<ClientDto | null>(null);
 
     constructor(
         private readonly appsState: AppsState,
@@ -48,7 +46,7 @@ export class GraphQLPageComponent {
         private readonly clientsService: ClientsService,
         private readonly messageBus: MessageBus,
         private readonly themeService: ThemeService,
-        public readonly clientsState: ClientsState,
+        protected readonly clientsState: ClientsState,
         destroyRef: DestroyRef,
     ) {
         this.clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
@@ -62,14 +60,9 @@ export class GraphQLPageComponent {
             this.selectClient(null);
         });
 
-        effect(onCleanup => {
-            const subscription =
-                this.themeService.themeChanges
-                    .subscribe(() => {
-                        this.render();
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            this.themeService.theme();
+            this.render();
         });
 
         destroyRef.onDestroy(() => {
@@ -78,7 +71,7 @@ export class GraphQLPageComponent {
         });
     }
 
-    public selectClient(client: ClientDto | null) {
+    protected selectClient(client: ClientDto | null) {
         this.clientSelected.set(client);
 
         if (!client) {
@@ -130,7 +123,7 @@ export class GraphQLPageComponent {
         this.reactRoot?.render(
             React.createElement(GraphiQL, {
                 fetcher: this.fetcher,
-                forcedTheme: this.themeService.theme,
+                forcedTheme: this.themeService.theme(),
             }),
         );
     }

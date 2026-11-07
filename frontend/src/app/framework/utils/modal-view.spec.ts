@@ -115,5 +115,5 @@ function checkValue(modal: Openable, expected: boolean) {
     }).unsubscribe();
 
     expect(result!).toBe(expected);
-    expect(modal.isOpen).toBe(expected);
+    expect(modal.isOpen()).toBe(expected);
 }

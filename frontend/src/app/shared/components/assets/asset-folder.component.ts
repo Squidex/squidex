@@ -38,32 +38,32 @@ export class AssetFolderComponent {
     /** The folder to render. */
     public readonly assetPathItem = input.required<AssetPathItem>();
 
-    public readonly editDropdown = new ModalModel();
-    public readonly editDialog = new DialogModel();
+    protected readonly editDropdown = new ModalModel();
+    protected readonly editDialog = new DialogModel();
 
-    public readonly assetFolder = computed(() => {
+    protected readonly assetFolder = computed(() => {
         return this.assetPathItem() as AssetFolderDto;
     });
 
-    public readonly canUpdate = computed(() => {
+    protected readonly canUpdate = computed(() => {
         const item = this.assetPathItem();
 
         return Types.is(item, AssetFolderDto) && item.canUpdate;
     });
 
-    public readonly canDelete = computed(() => {
+    protected readonly canDelete = computed(() => {
         const item = this.assetPathItem();
 
         return Types.is(item, AssetFolderDto) && item.canDelete;
     });
 
-    public preventSelection(mouseEvent: MouseEvent) {
+    protected preventSelection(mouseEvent: MouseEvent) {
         if (mouseEvent.detail > 1) {
             mouseEvent.preventDefault();
         }
     }
 
-    public emitDelete() {
+    protected emitDelete() {
         if (this.isDisabled()) {
             return;
         }
@@ -71,7 +71,7 @@ export class AssetFolderComponent {
         this.delete.emit(this.assetFolder());
     }
 
-    public emitNavigate() {
+    protected emitNavigate() {
         if (this.isDisabled()) {
             return;
         }

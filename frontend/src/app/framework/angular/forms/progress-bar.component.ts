@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, numberAttribute, Renderer2, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import * as ProgressBar from 'progressbar.js';
 import { ThemeService } from '@app/framework/internal';
 
@@ -90,10 +89,8 @@ export class ProgressBarComponent {
             }
         });
 
-        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
-
         effect(() => {
-            theme();
+            themeService.theme();
 
             const progressBar = this.progressBar();
 

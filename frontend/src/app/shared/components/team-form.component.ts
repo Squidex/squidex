@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
-import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
+import { CreateTeamForm, TeamsState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-team-form',
@@ -17,7 +16,6 @@ import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
     templateUrl: './team-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
@@ -34,19 +32,18 @@ export class TeamFormComponent {
     /** Emits when the dialog is closed or the team has been created. */
     public readonly dialogClose = output();
 
-    public readonly createForm = new CreateTeamForm();
+    protected readonly createForm = new CreateTeamForm();
 
     constructor(
-        public readonly apiUrl: ApiUrlConfig,
         private readonly teamsStore: TeamsState,
     ) {
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public createTeam() {
+    protected createTeam() {
         const value = this.createForm.submit();
         if (!value) {
             return;

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
@@ -16,7 +15,6 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     templateUrl: './asset-uploader.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         DropdownMenuComponent,
         FileDropDirective,
         ModalDirective,
@@ -26,16 +24,16 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     ],
 })
 export class AssetUploaderComponent {
-    public modalMenu = new ModalModel();
+    protected modalMenu = new ModalModel();
 
     constructor(
-        public readonly appsState: AppsState,
-        public readonly assetUploader: AssetUploaderState,
-        public readonly assetsState: AssetsState,
+        protected readonly appsState: AppsState,
+        protected readonly assetUploader: AssetUploaderState,
+        private readonly assetsState: AssetsState,
     ) {
     }
 
-    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
+    protected addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         for (const file of files) {
             this.assetUploader.uploadFile(file)
                 .subscribe({
@@ -50,7 +48,7 @@ export class AssetUploaderComponent {
         this.modalMenu.show();
     }
 
-    public stopUpload(upload: Upload) {
+    protected stopUpload(upload: Upload) {
         this.assetUploader.stopUpload(upload);
     }
 }

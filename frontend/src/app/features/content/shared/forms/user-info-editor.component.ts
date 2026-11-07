@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, forwardRef, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
@@ -27,7 +26,6 @@ type UserInfo = { apiKey: string; role: string };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeComponent,
         FormsModule,
         FormHintComponent,
@@ -41,7 +39,7 @@ export class UserInfoEditorComponent extends SignalControlComponent<UserInfo> {
     /** The prefix for the IDs of the inner inputs. */
     public readonly formId = input.required<string>();
 
-    public readonly form = new ExtendedFormGroup({
+    protected readonly form = new ExtendedFormGroup({
         apiKey: new UntypedFormControl('',
             Validators.required,
         ),
@@ -50,13 +48,13 @@ export class UserInfoEditorComponent extends SignalControlComponent<UserInfo> {
         ),
     });
 
-    public readonly apiKey = toSignal(
+    protected readonly apiKey = toSignal(
         value$(this.form.get('apiKey')!)
             .pipe(map(x => x || 'NONE')),
         { initialValue: 'NONE' });
 
     constructor(
-        public readonly rolesState: RolesState,
+        protected readonly rolesState: RolesState,
     ) {
         super();
 
@@ -86,7 +84,7 @@ export class UserInfoEditorComponent extends SignalControlComponent<UserInfo> {
         }
     }
 
-    public async generateApiKey() {
+    protected async generateApiKey() {
         const apiKey = generateApiKey();
 
         this.form.patchValue({ apiKey });

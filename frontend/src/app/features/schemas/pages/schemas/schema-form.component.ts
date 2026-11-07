@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs';
-import { ApiUrlConfig, AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
@@ -17,7 +16,6 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, CreateSchemaForm, FocusOn
     templateUrl: './schema-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         FocusOnInitDirective,
         FormAlertComponent,
@@ -34,7 +32,7 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, CreateSchemaForm, FocusOn
     ],
 })
 export class SchemaFormComponent {
-    public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+    protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
     /** Emits the created schema. */
     public readonly create = output<SchemaDto>();
@@ -45,24 +43,23 @@ export class SchemaFormComponent {
     /** The exported schema to clone. Creates an empty schema when not set. */
     public readonly source = input<any>();
 
-    public readonly sourceActual = linkedSignal(() => this.source());
+    protected readonly sourceActual = linkedSignal(() => this.source());
 
-    public readonly createForm = new CreateSchemaForm();
-    public readonly generateForm = new GenerateSchemaForm();
-    public readonly generateLog = signal('');
+    protected readonly createForm = new CreateSchemaForm();
+    protected readonly generateForm = new GenerateSchemaForm();
+    protected readonly generateLog = signal('');
 
-    public readonly selectedTab = linkedSignal<number>(() => {
+    protected readonly selectedTab = linkedSignal<number>(() => {
         return this.source() ? 1 : 0;
     });
 
-    public readonly actualForm = computed(() => {
+    protected readonly actualForm = computed(() => {
         return this.selectedTab() === 2 ? this.generateForm : this.createForm;
     });
 
     constructor(
-        public readonly apiUrl: ApiUrlConfig,
-        public readonly appsState: AppsState,
-        public readonly schemasState: SchemasState,
+        private readonly appsState: AppsState,
+        protected readonly schemasState: SchemasState,
         private readonly schemasService: SchemasService,
     ) {
         effect(() => {
@@ -70,7 +67,7 @@ export class SchemaFormComponent {
         });
     }
 
-    public selectTab(tab: number) {
+    protected selectTab(tab: number) {
         this.selectedTab.set(tab);
         this.sourceActual.set(null);
 
@@ -78,15 +75,15 @@ export class SchemaFormComponent {
         this.createForm.load({ type, name });
     }
 
-    public emitCreate(value: SchemaDto) {
+    private emitCreate(value: SchemaDto) {
         this.create.emit(value);
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public createSchema() {
+    protected createSchema() {
         if (this.selectedTab() === 2) {
             this.generateCore();
         } else {
@@ -94,7 +91,7 @@ export class SchemaFormComponent {
         }
     }
 
-    public generatePreview() {
+    protected generatePreview() {
         const value = this.generateForm.submit();
         if (!value) {
             return;
@@ -138,7 +135,7 @@ export class SchemaFormComponent {
 
     }
 
-    public createCore() {
+    private createCore() {
         const value = this.createForm.submit();
         if (!value) {
             return;

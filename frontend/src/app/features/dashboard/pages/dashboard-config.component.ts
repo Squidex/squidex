@@ -10,8 +10,8 @@ import { booleanAttribute, Component, computed, input, output, signal } from '@a
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { GridsterItemConfig } from 'angular-gridster2';
-import { switchMap, take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, Types, UIState } from '@app/shared';
+import { switchMap } from 'rxjs/operators';
+import { AppDto, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, Types, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-dashboard-config',
@@ -48,7 +48,7 @@ export class DashboardConfigComponent {
     /** Emits the new grid configuration when it is loaded, reset or edited in expert mode. */
     public readonly configChange = output<GridsterItemConfig[]>();
 
-    public readonly configOptions = computed<ReadonlyArray<GridsterItemConfig>>(() => {
+    protected readonly configOptions = computed<ReadonlyArray<GridsterItemConfig>>(() => {
         return this.configAvailable().map(item => {
             const name = this.localizer.getOrKey(item.name);
 
@@ -56,20 +56,18 @@ export class DashboardConfigComponent {
         }).sortByString(x => x.name);
     });
 
-    public readonly expertDialog = new DialogModel();
-    public readonly expertConfig = signal<GridsterItemConfig[] | undefined>(undefined);
+    protected readonly expertDialog = new DialogModel();
+    protected readonly expertConfig = signal<GridsterItemConfig[] | undefined>(undefined);
 
-    public readonly dropdownModal = new ModalModel();
+    protected readonly dropdownModal = new ModalModel();
 
     constructor(
-        public readonly appsState: AppsState,
-        public readonly authState: AuthService,
         private readonly localizer: LocalizerService,
         private readonly dialogs: DialogService,
         private readonly uiState: UIState,
     ) {
         toObservable(this.app).pipe(
-            switchMap(() => this.uiState.getAppShared('dashboard.grid', this.configDefaults()).pipe(take(1))),
+            switchMap(() => this.uiState.waitForAppShared('dashboard.grid', this.configDefaults())),
             takeUntilDestroyed())
             .subscribe(dto => {
                 this.setConfig(dto);
@@ -84,32 +82,32 @@ export class DashboardConfigComponent {
         this.configChange.emit(Types.clone(config));
     }
 
-    public startExpertMode() {
+    protected startExpertMode() {
         this.dropdownModal.hide();
 
         this.expertConfig.set(Types.clone(this.config()));
         this.expertDialog.show();
     }
 
-    public completeExpertMode() {
+    protected completeExpertMode() {
         this.setConfig(this.expertConfig());
 
         this.expertConfig.set(undefined);
         this.expertDialog.hide();
     }
 
-    public resetConfig() {
+    protected resetConfig() {
         this.setConfig(Types.clone(this.configDefaults()));
         this.saveConfig();
     }
 
-    public saveConfig() {
+    protected saveConfig() {
         this.uiState.setAppShared('dashboard.grid', this.config());
 
         this.dialogs.notifyInfo('i18n:dashboard.configSaved');
     }
 
-    public addOrRemove(item: GridsterItemConfig) {
+    protected addOrRemove(item: GridsterItemConfig) {
         const config = this.config();
         const current = config.find(x => x.type === item.type);
 
@@ -130,7 +128,7 @@ export class DashboardConfigComponent {
         }
     }
 
-    public isSelected(item: GridsterItemConfig) {
+    protected isSelected(item: GridsterItemConfig) {
         return this.config().find(x => x.type === item.type);
     }
 }

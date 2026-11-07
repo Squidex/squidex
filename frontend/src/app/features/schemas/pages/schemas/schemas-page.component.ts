@@ -6,12 +6,10 @@
  */
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
-import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, value$ } from '@app/shared';
 import { SchemaCloning } from '../messages';
@@ -23,7 +21,6 @@ import { SchemaFormComponent } from './schema-form.component';
     templateUrl: './schemas-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CdkDropListGroup,
         FormsModule,
         LayoutComponent,
@@ -40,29 +37,25 @@ import { SchemaFormComponent } from './schema-form.component';
     ],
 })
 export class SchemasPageComponent {
-    public readonly addSchemaDialog = new DialogModel();
-    public readonly addCategoryForm = new CreateCategoryForm();
+    protected readonly addSchemaDialog = new DialogModel();
+    protected readonly addCategoryForm = new CreateCategoryForm();
 
-    public readonly schemasFilter = new UntypedFormControl();
+    protected readonly schemasFilter = new UntypedFormControl();
 
-    public readonly categories;
+    protected readonly categories;
 
-    public readonly source = signal<any>(null);
+    protected readonly source = signal<any>(null);
 
     constructor(messageBus: MessageBus,
-        public readonly schemasState: SchemasState,
+        protected readonly schemasState: SchemasState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-        this.categories = toSignal(
-            combineLatest([
-                value$(this.schemasFilter),
-                this.schemasState.schemas,
-                this.schemasState.addedCategories,
-            ], (filter, schemas, categories) => {
-                return getCategoryTree(schemas, categories, filter);
-            }),
-            { initialValue: [] });
+        const schemasFilterValue = toSignal(value$<string>(this.schemasFilter));
+
+        this.categories = computed(() => {
+            return getCategoryTree(this.schemasState.schemas(), this.schemasState.addedCategories(), schemasFilterValue());
+        });
 
         effect(onCleanup => {
             const subscription =
@@ -89,11 +82,11 @@ export class SchemasPageComponent {
         });
     }
 
-    public removeCategory(name: string) {
+    protected removeCategory(name: string) {
         this.schemasState.removeCategory(name);
     }
 
-    public addCategory() {
+    protected addCategory() {
         const value = this.addCategoryForm.submit();
         if (!value) {
             return;
@@ -106,13 +99,13 @@ export class SchemasPageComponent {
         }
     }
 
-    public redirectSchema(schema: SchemaDto) {
+    protected redirectSchema(schema: SchemaDto) {
         this.router.navigate([schema.name], { relativeTo: this.route });
 
         this.addSchemaDialog.hide();
     }
 
-    public createSchema(source: any = null) {
+    protected createSchema(source: any = null) {
         this.source.set(source);
 
         this.addSchemaDialog.show();

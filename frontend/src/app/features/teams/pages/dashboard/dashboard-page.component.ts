@@ -6,7 +6,7 @@
  */
 
 import { afterEveryRender, Component, effect, NgZone, Renderer2, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, defined, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, switchSafe, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
 import { AppsCardComponent } from './cards/apps-card.component';
@@ -39,24 +39,24 @@ import { AppsCardComponent } from './cards/apps-card.component';
 export class DashboardPageComponent {
     private readonly grid = viewChild<Gridster>('grid');
 
-    public readonly selectedTeam;
+    protected readonly selectedTeam;
 
-    public readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
-    public readonly isScrolled = signal(false);
+    protected readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
+    protected readonly isScrolled = signal(false);
 
-    public readonly storageCurrent;
-    public readonly storageUsage;
+    protected readonly storageCurrent;
+    protected readonly storageUsage;
 
-    public readonly callsUsage;
+    protected readonly callsUsage;
 
-    public readonly gridConfig = signal<GridsterItemConfig[]>(DEFAULT_CONFIG);
-    public readonly gridOptions = DEFAULT_OPTIONS;
-    public readonly gridDefault = DEFAULT_CONFIG;
-    public readonly gridOptionals = OPTIONAL_CARDS;
+    protected readonly gridConfig = signal<GridsterItemConfig[]>(DEFAULT_CONFIG);
+    protected readonly gridOptions = DEFAULT_OPTIONS;
+    protected readonly gridDefault = DEFAULT_CONFIG;
+    protected readonly gridOptionals = OPTIONAL_CARDS;
 
-    public readonly extendedHeight = signal('');
+    protected readonly extendedHeight = signal('');
 
-    public readonly user = this.authState.user?.displayName;
+    protected readonly user = this.authState.user?.displayName;
 
     constructor(teamsState: TeamsState, usagesService: UsagesService, renderer: Renderer2, zone: NgZone,
         private readonly authState: AuthService,
@@ -65,9 +65,9 @@ export class DashboardPageComponent {
         const dateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
         const dateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
 
-        const selectedTeam = teamsState.selectedTeam.pipe(defined());
+        this.selectedTeam = teamsState.selectedTeam;
 
-        this.selectedTeam = toSignal(selectedTeam);
+        const selectedTeam = toObservable(teamsState.selectedTeam).pipe(defined());
 
         this.storageCurrent = toSignal(
             selectedTeam.pipe(switchSafe(team => usagesService.getTodayStorageForTeam(team.id))));
@@ -113,13 +113,13 @@ export class DashboardPageComponent {
         });
     }
 
-    public changeIsStacked(value: boolean) {
+    protected changeIsStacked(value: boolean) {
         this.localStore.setBoolean(Settings.Local.DASHBOARD_CHART_STACKED, value);
 
         this.isStacked.set(value);
     }
 
-    public changeConfig(config: GridsterItemConfig[]) {
+    protected changeConfig(config: GridsterItemConfig[]) {
         this.gridConfig.set(config);
 
         this.grid()?.updateGrid();

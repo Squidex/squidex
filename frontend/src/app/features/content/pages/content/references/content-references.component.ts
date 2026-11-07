@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, effect, inject, input } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ToolbarService, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../../shared/references/reference-item.component';
@@ -20,7 +19,6 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ContentsColumnsPipe,
         ListViewComponent,
         PagerComponent,
@@ -42,8 +40,8 @@ export class ContentReferencesComponent {
     public readonly mode = input<'references' | 'referencing'>('references');
 
     constructor(
-        public readonly contentsRoute: Router2State,
-        public readonly contentsState: ComponentContentsState,
+        private readonly contentsRoute: Router2State,
+        protected readonly contentsState: ComponentContentsState,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly toolbar: ToolbarService,
     ) {

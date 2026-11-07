@@ -12,7 +12,7 @@ import { AddLanguageForm, AutocompleteComponent, AutocompleteSource, FormHintCom
 
 class LanguageSource implements AutocompleteSource {
     constructor(
-        private readonly languages: ReadonlyArray<LanguageDto>,
+        protected readonly languages: ReadonlyArray<LanguageDto>,
     ) {
     }
 
@@ -56,18 +56,18 @@ export class LanguageAddFormComponent {
     /** The languages that can still be added to the app. */
     public readonly newLanguages = input<ReadonlyArray<LanguageDto>>([]);
 
-    public readonly addLanguagesSource = computed(() => {
+    protected readonly addLanguagesSource = computed(() => {
         return new LanguageSource(this.newLanguages());
     });
 
-    public readonly addLanguageForm = new AddLanguageForm();
+    protected readonly addLanguageForm = new AddLanguageForm();
 
     constructor(
         private readonly languagesState: LanguagesState,
     ) {
     }
 
-    public addLanguage() {
+    protected addLanguage() {
         const value = this.addLanguageForm.submit();
         if (!value) {
             return;

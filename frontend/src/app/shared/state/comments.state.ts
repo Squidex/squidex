@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, map, of, Subscription, switchMap } from 'rxjs';
-import { DateTime, MathHelper, Types } from '@app/framework';
+import { computed, Injectable } from '@angular/core';
+import { DateTime, MathHelper } from '@app/framework';
 import { CollaborationService, SharedArray } from '../services/collaboration.service';
 
 export interface Comment {
@@ -46,42 +45,28 @@ export interface Comment {
 }
 
 @Injectable()
-export class CommentsState implements OnDestroy {
-    private readonly subscription: Subscription;
-    private readonly comments = new BehaviorSubject<SharedArray<Comment>>(null!);
+export class CommentsState {
+    private readonly comments = this.collaboration.getArray<Comment>('stream');
 
-    public get items() {
-        return this.comments.value.items;
-    }
+    public readonly items = computed(() => {
+        return this.comments().items();
+    });
 
-    public get itemsChanges() {
-        return this.comments.pipe(switchMap(x => x.itemsChanges));
-    }
+    public readonly unreadCount = computed(() => {
+        return this.items().filter(c => !c.isRead).length;
+    });
 
-    public get unreadCountChanges() {
-        return this.itemsChanges.pipe(map(x => x.filter(c => !c.isRead).length));
-    }
+    public readonly groupedComments = computed(() => {
+        return groupComments(this.items(), false);
+    });
 
-    public get groupedComments() {
-        return this.itemsChanges.pipe(map(x => groupComments(x, false)));
-    }
-
-    public get groupedUnresolvedComments() {
-        return this.itemsChanges.pipe(map(x => groupComments(x, true)));
-    }
+    public readonly groupedUnresolvedComments = computed(() => {
+        return groupComments(this.items(), true);
+    });
 
     constructor(
-        collaboration: CollaborationService,
-    )  {
-        this.subscription =
-            collaboration.getArray<Comment>('stream')
-                .subscribe(comments => {
-                    this.comments.next(comments);
-                });
-    }
-
-    public ngOnDestroy() {
-        this.subscription.unsubscribe();
+        private readonly collaboration: CollaborationService,
+    ) {
     }
 
     public create(user: string, text: string, url: string, optional?: Pick<Comment, 'editorId' | 'from' | 'to' | 'replyTo'>) {
@@ -101,7 +86,7 @@ export class CommentsState implements OnDestroy {
 
     public update(index: number, update: Partial<Comment>) {
         this.updateInternal(comments => {
-            const comment = comments.items[index];
+            const comment = comments.items()[index];
 
             if (comment) {
                 comments.set(index, { ...comment, ...update });
@@ -111,7 +96,7 @@ export class CommentsState implements OnDestroy {
 
     public prune(maxCount: number) {
         this.updateInternal(comments => {
-            const toDelete = comments.items.length - maxCount;
+            const toDelete = comments.items().length - maxCount;
 
             if (toDelete > 0) {
                 comments.remove(0, toDelete);
@@ -127,15 +112,17 @@ export class CommentsState implements OnDestroy {
 
     public markRead() {
         this.updateInternal(comments => {
-            comments.items.filter(x => !x.isRead).map((comment, index) => {
-                comments.set(index, { ...comment, isRead: true });
+            comments.items().forEach((comment, index) => {
+                if (!comment.isRead) {
+                    comments.set(index, { ...comment, isRead: true });
+                }
             });
         });
     }
 
     public updateAnnotations(editorId: string, updates: ReadonlyArray<Annotation>) {
         this.updateInternal(comments => {
-            comments.items.map((comment, index) => {
+            comments.items().map((comment, index) => {
                 if (!comment.id || comment.editorId !== editorId) {
                     return;
                 }
@@ -158,7 +145,7 @@ export class CommentsState implements OnDestroy {
     }
 
     private updateInternal(update: (comments: SharedArray<Comment>) => void) {
-        const comments = this.comments.value;
+        const comments = this.comments();
 
         if (!comments.doc) {
             return;
@@ -170,30 +157,33 @@ export class CommentsState implements OnDestroy {
 
     }
 
-    public getAnnotations(editorId: string | undefined | null) {
+    public getAnnotations(editorId: string | undefined | null): ReadonlyArray<Annotation> {
         if (!editorId) {
-            return of([]);
+            return [];
         }
 
-        return this.itemsChanges.pipe(
-            map(c => {
-                const annotations: Annotation[] = [];
+        const annotations: Annotation[] = [];
 
-                for (const comment of c) {
-                    if (comment.editorId &&
-                        comment.editorId === editorId &&
-                        comment.from &&
-                        comment.to &&
-                        comment.id &&
-                        comment.isResolved !== true) {
-                        annotations.push(comment as never);
-                    }
-                }
+        for (const comment of this.items()) {
+            if (isAnnotation(comment, editorId)) {
+                annotations.push(comment as never);
+            }
+        }
 
-                return annotations;
-            }),
-            distinctUntilChanged(Types.equals));
+        return annotations;
     }
+}
+
+function isAnnotation(comment: Comment, editorId: string) {
+    if (comment.editorId !== editorId) {
+        return false;
+    }
+
+    if (!comment.from || !comment.to || !comment.id) {
+        return false;
+    }
+
+    return comment.isResolved !== true;
 }
 
 function groupComments(comments: ReadonlyArray<Comment>, unresolvedOnly = true) {

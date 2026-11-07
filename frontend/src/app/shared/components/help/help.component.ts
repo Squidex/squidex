@@ -24,7 +24,7 @@ import { HelpMarkdownPipe } from './help-markdown.pipe';
     ],
 })
 export class HelpComponent {
-    public helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);
+    protected helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);
 
     constructor(
         private readonly helpService: HelpService,

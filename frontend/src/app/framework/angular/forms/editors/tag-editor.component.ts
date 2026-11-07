@@ -138,17 +138,17 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
     /** The suggested tags. */
     public readonly itemsSource = input<ReadonlyArray<string | TagValue> | undefined | null>();
 
-    public readonly itemsSorted = computed(() => {
+    protected readonly itemsSorted = computed(() => {
         return getTagValues(this.itemsSource());
     });
 
-    public readonly itemsModal = new ModalModel();
-    public readonly hasFocus = signal(false);
-    public readonly suggestedItems = signal<ReadonlyArray<TagValue>>([]);
-    public readonly suggestedIndex = signal(0);
-    public readonly tags = signal<ReadonlyArray<TagValue>>([]);
+    protected readonly itemsModal = new ModalModel();
+    protected readonly hasFocus = signal(false);
+    protected readonly suggestedItems = signal<ReadonlyArray<TagValue>>([]);
+    protected readonly suggestedIndex = signal(0);
+    protected readonly tags = signal<ReadonlyArray<TagValue>>([]);
 
-    public readonly addInput = new UntypedFormControl();
+    protected readonly addInput = new UntypedFormControl();
 
     constructor() {
         super();
@@ -229,13 +229,13 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         this.tags.set(convertTags(obj, this.itemConverter()));
     }
 
-    public focus() {
+    protected focus() {
         if (this.addInput.enabled) {
             this.hasFocus.set(true);
         }
     }
 
-    public markTouched() {
+    protected markTouched() {
         this.selectValue(this.addInput.value, true);
 
         this.resetAutocompletion();
@@ -244,11 +244,11 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         this.callTouched();
     }
 
-    public remove(index: number) {
+    protected remove(index: number) {
         this.updateItems(this.tags().filter((_, i) => i !== index), true);
     }
 
-    public resetSize() {
+    private resetSize() {
         const input = this.inputElement()?.nativeElement;
         if (!input) {
             return;
@@ -273,7 +273,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         }
     }
 
-    public onKeyDown(event: KeyboardEvent) {
+    protected onKeyDown(event: KeyboardEvent) {
         if (Keys.isComma(event)) {
             return !this.selectValue(this.addInput.value);
         } else if (Keys.isDelete(event)) {
@@ -284,7 +284,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
 
                 return false;
             }
-        } else if (Keys.isEscape(event) && this.itemsModal.isOpen) {
+        } else if (Keys.isEscape(event) && this.itemsModal.isOpen()) {
             this.closeModal();
             return false;
         } else if (Keys.isUp(event)) {
@@ -313,7 +313,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         return true;
     }
 
-    public selectValue(value: TagValue | string, noFocus?: boolean) {
+    protected selectValue(value: TagValue | string, noFocus?: boolean) {
         if (!noFocus) {
             this.inputElement()!.nativeElement.focus();
         }
@@ -338,7 +338,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         return true;
     }
 
-    public toggleValue(isSelected: boolean, tagValue: TagValue) {
+    protected toggleValue(isSelected: boolean, tagValue: TagValue) {
         if (isSelected) {
             this.updateItems([...this.tags(), tagValue], true);
         } else {
@@ -346,7 +346,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         }
     }
 
-    public selectIndex(suggestedIndex: number) {
+    protected selectIndex(suggestedIndex: number) {
         const suggestedItems = this.suggestedItems();
 
         if (suggestedIndex < 0) {
@@ -360,24 +360,24 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         this.suggestedIndex.set(suggestedIndex);
     }
 
-    public resetFocus() {
+    private resetFocus() {
         this.hasFocus.set(false);
     }
 
-    public isSelected(tagValue: TagValue) {
+    protected isSelected(tagValue: TagValue) {
         return this.tags().find(x => x.id === tagValue.id);
     }
 
-    public closeModal() {
-        if (this.itemsModal.isOpen) {
+    private closeModal() {
+        if (this.itemsModal.isOpen()) {
             this.dropdownClose.emit();
 
             this.itemsModal.hide();
         }
     }
 
-    public openModal() {
-        if (!this.itemsModal.isOpen) {
+    protected openModal() {
+        if (!this.itemsModal.isOpen()) {
             this.dropdownOpen.emit();
 
             this.itemsModal.show();
@@ -390,13 +390,13 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         super.callTouched();
     }
 
-    public focusInput(event: Event) {
+    protected focusInput(event: Event) {
         this.inputElement()!.nativeElement.focus();
 
         event?.preventDefault();
     }
 
-    public onCut(event: ClipboardEvent) {
+    protected onCut(event: ClipboardEvent) {
         if (!this.hasSelection()) {
             this.onCopy(event);
 
@@ -404,7 +404,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         }
     }
 
-    public onCopy(event: ClipboardEvent) {
+    protected onCopy(event: ClipboardEvent) {
         if (!this.hasSelection()) {
             if (event.clipboardData) {
                 event.clipboardData.setData('text/plain', this.tags().map(x => x.name).join(','));
@@ -414,7 +414,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         }
     }
 
-    public onPaste(event: ClipboardEvent) {
+    protected onPaste(event: ClipboardEvent) {
         if (!event.clipboardData) {
             return;
         }

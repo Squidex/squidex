@@ -6,7 +6,7 @@
         </button>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="eventConsumersState.isLoading | async" table="true">
+        <sqx-list-view innerWidth="50rem" [isLoading]="eventConsumersState.isLoading()" table="true">
             <ng-container header>
                 <table class="table table-items table-fixed" #header>
                     <thead>
@@ -24,7 +24,7 @@
             </ng-container>
             <ng-container>
                 <table class="table table-items table-fixed" [sqxSyncWidth]="header">
-                    @for (eventConsumer of eventConsumersState.eventConsumers | async; track eventConsumer.name) {
+                    @for (eventConsumer of eventConsumersState.eventConsumers(); track eventConsumer.name) {
                         <tbody (failure)="showError(eventConsumer)" [sqxEventConsumer]="eventConsumer"></tbody>
                     }
                 </table>

@@ -32,7 +32,7 @@ export class ContentListHeaderComponent {
     /** The language for localized fields, to sort by the value in this language. */
     public readonly language = input.required<AppLanguageDto>();
 
-    public readonly sortPath = computed(() => {
+    protected readonly sortPath = computed(() => {
         const field = this.field();
         if (field === META_FIELDS.created) {
             return 'created';
@@ -54,7 +54,7 @@ export class ContentListHeaderComponent {
         return `${field.name}.iv`;
     });
 
-    public readonly sortDefault = computed<SortOrder | undefined>(() => {
+    protected readonly sortDefault = computed<SortOrder | undefined>(() => {
         return this.field() === META_FIELDS.lastModified ? 'descending' : undefined;
     });
 }

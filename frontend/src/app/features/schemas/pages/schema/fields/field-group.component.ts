@@ -48,7 +48,7 @@ export class FieldGroupComponent {
     /** The group to render, with the optional separator and its fields. */
     public readonly fieldGroup = input.required<FieldGroup>();
 
-    public readonly isCollapsed = linkedSignal(() => {
+    protected readonly isCollapsed = linkedSignal(() => {
         const separator = this.fieldGroup().separator;
         if (!separator) {
             return false;
@@ -62,7 +62,7 @@ export class FieldGroupComponent {
     ) {
     }
 
-    public toggle() {
+    protected toggle() {
         const isCollapsed = !this.isCollapsed();
 
         this.isCollapsed.set(isCollapsed);
@@ -73,7 +73,7 @@ export class FieldGroupComponent {
         }
     }
 
-    public trackByField(field: FieldDto) {
+    protected trackByField(field: FieldDto) {
         return field.fieldId + this.schema().id;
     }
 

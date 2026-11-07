@@ -28,9 +28,9 @@ export class ApiCallsCardComponent {
     /** The API usage of the app or team. */
     public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    public readonly chartOptions = ChartOptions.Stacked;
+    protected readonly chartOptions = ChartOptions.Stacked;
 
-    public readonly chartData = computed<ChartData | undefined>(() => {
+    protected readonly chartData = computed<ChartData | undefined>(() => {
         const usage = this.usage();
         if (!usage) {
             return undefined;
@@ -54,7 +54,7 @@ export class ApiCallsCardComponent {
     ) {
     }
 
-    public downloadLog(app: AppDto) {
+    protected downloadLog(app: AppDto) {
         this.usagesService.getLog(app.name)
             .subscribe(url => {
                 window.open(url, '_blank');

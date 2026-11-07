@@ -26,9 +26,9 @@ export class SchemaExportFormComponent {
     /** The schema to export and synchronize. */
     public readonly schema = input.required<SchemaDto>();
 
-    public readonly synchronizeForm = new SynchronizeSchemaForm();
+    protected readonly synchronizeForm = new SynchronizeSchemaForm();
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.schema().canUpdateScripts;
     });
 
@@ -40,7 +40,7 @@ export class SchemaExportFormComponent {
         });
     }
 
-    public synchronize() {
+    protected synchronize() {
         if (!this.isEditable()) {
             return;
         }

@@ -30,15 +30,15 @@ export class StateStepPropertyComponent {
     /** The configured value of the property. */
     public readonly value = input<any>();
 
-    public readonly valueParsed = computed(() => {
+    private readonly valueParsed = computed(() => {
         return parseValue(this.value());
     });
 
-    public readonly valueFormatted = computed(() => {
+    protected readonly valueFormatted = computed(() => {
         return this.valueParsed().formatted;
     });
 
-    public readonly valueType = computed(() => {
+    protected readonly valueType = computed(() => {
         return this.valueParsed().type;
     });
 }

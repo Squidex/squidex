@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of } from 'rxjs';
+import { signal } from '@angular/core';
 import { IMock, It, Mock } from 'typemoq';
 import * as Y from 'yjs';
 import { CollaborationService, SharedArray } from '../internal';
-import { Comment, CommentItem, CommentsState } from './comments.state';
+import { Comment, CommentsState } from './comments.state';
 
 describe('CommentsState', () => {
     let collaborationSevice: IMock<CollaborationService>;
@@ -24,7 +24,7 @@ describe('CommentsState', () => {
 
         collaborationSevice = Mock.ofType<CollaborationService>();
         collaborationSevice.setup(x => x.getArray<Comment>(It.isAnyString()))
-            .returns(() => of(sharedArray));
+            .returns(() => signal(sharedArray));
 
         commentsState = new CommentsState(collaborationSevice.object);
     });
@@ -33,10 +33,7 @@ describe('CommentsState', () => {
         sharedArray.add({} as any);
         sharedArray.add({} as any);
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
+        const items = commentsState.items();
 
         expect(items.length).toEqual(2);
     });
@@ -46,10 +43,7 @@ describe('CommentsState', () => {
         sharedArray.add({} as any);
         sharedArray.add({ isRead: true } as any);
 
-        let unreadCount = 0;
-        commentsState.unreadCountChanges.subscribe(result => {
-            unreadCount = result;
-        });
+        const unreadCount = commentsState.unreadCount();
 
         expect(unreadCount).toEqual(2);
     });
@@ -57,12 +51,9 @@ describe('CommentsState', () => {
     it('should add comment', () => {
         const comment = { user: 'me', text: 'My Text', url: '/url/to/comment' };
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
-
         commentsState.create(comment.user, comment.text, comment.url);
+
+        const items = commentsState.items();
 
         expect(items.length).toEqual(1);
         expect(items[0].text).toEqual(comment.text);
@@ -77,12 +68,9 @@ describe('CommentsState', () => {
 
         sharedArray.add({} as any);
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
-
         commentsState.update(0, comment);
+
+        const items = commentsState.items();
 
         expect(items.length).toEqual(1);
         expect(items[0].text).toEqual(comment.text);
@@ -96,12 +84,9 @@ describe('CommentsState', () => {
         sharedArray.add({ id: '3' } as any);
         sharedArray.add({ id: '4' } as any);
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
-
         commentsState.prune(2);
+
+        const items = commentsState.items();
 
         expect(items.map(x => x.id)).toEqual(['3', '4']);
     });
@@ -112,12 +97,9 @@ describe('CommentsState', () => {
         sharedArray.add({ id: '3' } as any);
         sharedArray.add({ id: '4' } as any);
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
-
         commentsState.prune(4);
+
+        const items = commentsState.items();
 
         expect(items.map(x => x.id)).toEqual(['1', '2', '3', '4']);
     });
@@ -128,26 +110,32 @@ describe('CommentsState', () => {
         sharedArray.add({ id: '3' } as any);
         sharedArray.add({ id: '4' } as any);
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
+        commentsState.markRead();
+
+        const items = commentsState.items();
+
+        expect(items.map(x => x.isRead)).toEqual([true, true, true, true]);
+    });
+
+    it('should mark only unread comments as read', () => {
+        sharedArray.add({ id: '1', isRead: true } as any);
+        sharedArray.add({ id: '2' } as any);
 
         commentsState.markRead();
 
-        expect(items.map(x => x.isRead)).toEqual([true, true, true, true]);
+        const items = commentsState.items();
+
+        expect(items.map(x => x.id)).toEqual(['1', '2']);
+        expect(items.map(x => x.isRead)).toEqual([true, true]);
     });
 
     it('should update annotations', () => {
         sharedArray.add({ id: '1', editorId: '1', from: 11, to: 12 } as any);
         sharedArray.add({ id: '2', editorId: '2' } as any);
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
-
         commentsState.updateAnnotations('2', [{ id: '2', from: 13, to: 52 }]);
+
+        const items = commentsState.items();
 
         expect(items).toEqual([
             { id: '1', editorId: '1', from: 11, to: 12 } as any,
@@ -159,12 +147,9 @@ describe('CommentsState', () => {
         sharedArray.add({ editorId: '1', id: '1', from: 13, to: 52 } as any);
         sharedArray.add({ editorId: '1', id: '2' } as any);
 
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
-
         commentsState.updateAnnotations('1', [{ id: '2', from: 13, to: 52 }]);
+
+        const items = commentsState.items();
 
         expect(items).toEqual([
             { id: '1' } as any,
@@ -176,10 +161,7 @@ describe('CommentsState', () => {
         sharedArray.add({ editorId: '1', id: '1', from: 11, to: 12 } as any);
         sharedArray.add({ editorId: '2', id: '2', from: 21, to: 22 } as any);
 
-        let items: ReadonlyArray<Annotation> = [];
-        commentsState.getAnnotations('2').subscribe(result => {
-            items = result;
-        });
+        const items = commentsState.getAnnotations('2');
 
         expect(items).toEqual([
             { editorId: '2', id: '2', from: 21, to: 22 } as any,
@@ -190,10 +172,7 @@ describe('CommentsState', () => {
         sharedArray.add({ editorId: '1', id: '1', from: 11, to: 12 } as any);
         sharedArray.add({ editorId: '2', id: '2', from: 21, to: 22 } as any);
 
-        let items: ReadonlyArray<Annotation> = [];
-        commentsState.getAnnotations(undefined).subscribe(result => {
-            items = result;
-        });
+        const items = commentsState.getAnnotations(undefined);
 
         expect(items).toEqual([]);
     });
@@ -204,10 +183,7 @@ describe('CommentsState', () => {
         sharedArray.add({ id: '3', replyTo: '5' } as any);
         sharedArray.add({ id: '4', replyTo: '2' } as any);
 
-        let items: ReadonlyArray<CommentItem> = [];
-        commentsState.groupedComments.subscribe(result => {
-            items = result;
-        });
+        const items = commentsState.groupedComments();
 
         expect(items).toEqual([
             {
@@ -244,10 +220,7 @@ describe('CommentsState', () => {
         sharedArray.add({ id: '3', replyTo: '5' } as any);
         sharedArray.add({ id: '4', replyTo: '2' } as any);
 
-        let items: ReadonlyArray<CommentItem> = [];
-        commentsState.groupedUnresolvedComments.subscribe(result => {
-            items = result;
-        });
+        const items = commentsState.groupedUnresolvedComments();
 
         expect(items).toEqual([
             {

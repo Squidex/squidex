@@ -21,7 +21,7 @@ import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTr
     ],
 })
 export class WorkflowTransitionComponent {
-    public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
+    protected readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     /** Emits the updated workflow when the transition is changed or removed. */
     public readonly update = output<WorkflowView>();
@@ -38,15 +38,15 @@ export class WorkflowTransitionComponent {
     /** Prevents the transition from being changed. */
     public readonly disabled = input(false, { transform: booleanAttribute });
 
-    public changeExpression(expression: string) {
+    protected changeExpression(expression: string) {
         this.change({ expression });
     }
 
-    public changeRole(roles: string[]) {
+    protected changeRole(roles: string[]) {
         this.change({ roles });
     }
 
-    public remove() {
+    protected remove() {
         const { from, to } = this.transition();
         this.update.emit(this.workflow().removeTransition(from, to));
     }

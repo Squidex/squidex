@@ -32,17 +32,17 @@ export class FieldCopyButtonComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly copySource = linkedSignal<string | undefined>(() => {
+    protected readonly copySource = linkedSignal<string | undefined>(() => {
         return this.languages()[0]?.iso2Code;
     });
 
-    public readonly copyTargets = linkedSignal<ReadonlyArray<string>>(() => {
+    protected readonly copyTargets = linkedSignal<ReadonlyArray<string>>(() => {
         this.copySource();
 
         return [];
     });
 
-    public readonly languageCodes = computed(() => {
+    protected readonly languageCodes = computed(() => {
         const copySource = this.copySource();
         const codes = this.languages().map(x => x.iso2Code);
         if (!copySource) {
@@ -52,13 +52,13 @@ export class FieldCopyButtonComponent {
         return codes.removed(copySource);
     });
 
-    public readonly isLocalized = computed(() => {
+    protected readonly isLocalized = computed(() => {
         return this.formModel().field.isLocalizable && this.languages().length > 1;
     });
 
-    public readonly dropdown = new ModalModel();
+    protected readonly dropdown = new ModalModel();
 
-    public copy() {
+    protected copy() {
         const copySource = this.copySource();
         const copyTargets = this.copyTargets();
         if (!copySource || copyTargets.length === 0) {

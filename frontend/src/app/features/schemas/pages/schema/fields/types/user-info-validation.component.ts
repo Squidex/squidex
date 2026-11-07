@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } from '@app/shared';
@@ -16,7 +15,6 @@ import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } fr
     templateUrl: 'user-info-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
@@ -33,7 +31,7 @@ export class UserInfoValidationComponent {
     public readonly properties = input.required<UserInfoFieldPropertiesDto>();
 
     constructor(
-        public readonly rolesState: RolesState,
+        protected readonly rolesState: RolesState,
     ) {
         this.rolesState.loadIfNotLoaded();
     }

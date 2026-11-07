@@ -3,8 +3,8 @@
         <sqx-tag-editor
             [id]="schemaIdsRow.fieldName()"
             formControlName="schemaIds"
-            [itemConverter]="(schemasSource.normalConverter | async)!"
-            [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
+            [itemConverter]="schemasSource.normalConverter()"
+            [itemsSource]="schemasSource.normalConverter().suggestions"
             placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
     </sqx-form-row>
 

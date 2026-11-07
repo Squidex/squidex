@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -18,7 +17,6 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
     styleUrls: ['./rule-simulator-page.component.scss'],
     templateUrl: './rule-simulator-page.component.html',
     imports: [
-        AsyncPipe,
         LayoutComponent,
         ListViewComponent,
         SimulatedRuleEventComponent,
@@ -28,12 +26,12 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
     ],
 })
 export class RuleSimulatorPageComponent {
-    public readonly availableSteps;
+    protected readonly availableSteps;
 
-    public readonly selectedRuleEvent = signal<string | null | undefined>(undefined);
+    protected readonly selectedRuleEvent = signal<string | null | undefined>(undefined);
 
     constructor(
-        public readonly ruleSimulatorState: RuleSimulatorState,
+        protected readonly ruleSimulatorState: RuleSimulatorState,
         route: ActivatedRoute,
         rulesService: RulesService,
         messageBus: MessageBus,
@@ -60,11 +58,11 @@ export class RuleSimulatorPageComponent {
         });
     }
 
-    public simulate() {
+    protected simulate() {
         this.ruleSimulatorState.load(true);
     }
 
-    public selectEvent(event: SimulatedRuleEventDto) {
+    protected selectEvent(event: SimulatedRuleEventDto) {
         this.selectedRuleEvent.update(x => x === event.uniqueId ? null : event.uniqueId);
     }
 }

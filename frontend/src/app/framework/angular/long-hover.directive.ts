@@ -36,7 +36,7 @@ export class LongHoverDirective {
     }
 
     @HostListener('mouseover', ['$event'])
-    public onMove(event: MouseEvent) {
+    protected onMove(event: MouseEvent) {
         if (!(event.target instanceof Element)) {
             this.clearTimer();
             return;

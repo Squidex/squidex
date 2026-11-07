@@ -30,7 +30,7 @@ export class StarsComponent extends SignalControlComponent<number | null> {
     /** The number of stars to render. Shows a hint instead of stars when greater than 15. */
     public readonly maximumStars = input(5, { transform: (value: unknown) => numberAttribute(value, 5) });
 
-    public readonly starsArray = computed(() => {
+    protected readonly starsArray = computed(() => {
         const result: number[] = [];
 
         for (let i = 1; i <= this.maximumStars(); i++) {
@@ -40,8 +40,8 @@ export class StarsComponent extends SignalControlComponent<number | null> {
         return result;
     });
 
-    public readonly value = signal<number | null>(null);
-    public readonly valuePreview = signal(-1);
+    protected readonly value = signal<number | null>(null);
+    protected readonly valuePreview = signal(-1);
 
     public writeValue(obj: any) {
         const value = Types.isNumber(obj) ? obj : null;
@@ -50,7 +50,7 @@ export class StarsComponent extends SignalControlComponent<number | null> {
         this.valuePreview.set(value || 0);
     }
 
-    public setPreview(stars: number) {
+    protected setPreview(stars: number) {
         if (this.isDisabled()) {
             return;
         }
@@ -58,7 +58,7 @@ export class StarsComponent extends SignalControlComponent<number | null> {
         this.valuePreview.set(stars);
     }
 
-    public stopPreview() {
+    protected stopPreview() {
         if (this.isDisabled()) {
             return;
         }
@@ -66,7 +66,7 @@ export class StarsComponent extends SignalControlComponent<number | null> {
         this.valuePreview.set(this.value() || 0);
     }
 
-    public reset() {
+    protected reset() {
         if (this.isDisabled()) {
             return false;
         }
@@ -82,7 +82,7 @@ export class StarsComponent extends SignalControlComponent<number | null> {
         return false;
     }
 
-    public setValue(value: number) {
+    protected setValue(value: number) {
         if (this.isDisabled()) {
             return false;
         }

@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, Types, versioned } from '@app/shared/internal';
+import { DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, Types, versioned } from '@app/shared/internal';
 import { createRule } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { FlowView, RulesState } from './rules.state';
@@ -46,12 +46,7 @@ describe('RulesState', () => {
             expect(rulesState.snapshot.isLoading).toBeFalsy();
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
 
-            let ruleRunning: DynamicRuleDto | undefined;
-            rulesState.runningRule.subscribe(result => {
-                ruleRunning = result;
-            });
-
-            expect(ruleRunning).toBe(rule1);
+            expect(rulesState.runningRule()).toBe(rule1);
             expect(rulesState.snapshot.runningRuleId).toBe(rule1.id);
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });

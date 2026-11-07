@@ -57,16 +57,16 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
     /** Renders the assets in fullscreen mode. */
     public readonly isExpanded = input(false, { transform: booleanAttribute });
 
-    public readonly assetFiles = signal<ReadonlyArray<HTTP.UploadFile>>([]);
-    public readonly assetItems = signal<ReadonlyArray<AssetDto>>([]);
-    public readonly assetEdit = signal<AssetDto | undefined>(undefined);
+    protected readonly assetFiles = signal<ReadonlyArray<HTTP.UploadFile>>([]);
+    protected readonly assetItems = signal<ReadonlyArray<AssetDto>>([]);
+    protected readonly assetEdit = signal<AssetDto | undefined>(undefined);
 
-    public readonly isListView = signal(!this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
-    public readonly isCompact = signal(false);
+    protected readonly isListView = signal(!this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
+    protected readonly isCompact = signal(false);
 
-    public readonly chatDialog = new DialogModel();
+    protected readonly chatDialog = new DialogModel();
 
-    public readonly assetsDialog = new DialogModel();
+    protected readonly assetsDialog = new DialogModel();
 
     constructor(
         private readonly localStore: LocalStoreService,
@@ -113,15 +113,15 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
             });
     }
 
-    public notifyOthers(asset: AssetDto) {
+    protected notifyOthers(asset: AssetDto) {
         this.messageBus.emit(new AssetUpdated(asset, this));
     }
 
-    public setCompact(isCompact: boolean) {
+    protected setCompact(isCompact: boolean) {
         this.isCompact.set(isCompact);
     }
 
-    public setAssets(assets: ReadonlyArray<AssetDto>) {
+    private setAssets(assets: ReadonlyArray<AssetDto>) {
         this.assetItems.set(assets);
     }
 
@@ -133,7 +133,7 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
         }
     }
 
-    public addAssetFromAI(file: string | HTTP.UploadFile | null | undefined) {
+    protected addAssetFromAI(file: string | HTTP.UploadFile | null | undefined) {
         this.chatDialog.hide();
 
         if (!Types.isString(file) && file) {
@@ -141,13 +141,13 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
         }
     }
 
-    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
+    protected addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         for (const file of files) {
             this.assetFiles.update(x => [file, ...x]);
         }
     }
 
-    public selectAssets(assets: ReadonlyArray<AssetDto>) {
+    protected selectAssets(assets: ReadonlyArray<AssetDto>) {
         this.setAssets([...this.assetItems(), ...assets]);
 
         if (assets.length > 0) {
@@ -157,7 +157,7 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
         this.assetsDialog.hide();
     }
 
-    public addAsset(file: HTTP.UploadFile, asset: AssetDto) {
+    protected addAsset(file: HTTP.UploadFile, asset: AssetDto) {
         if (asset && file) {
             this.assetFiles.update(x => x.removed(file));
             this.assetItems.update(x => [asset, ...x]);
@@ -166,7 +166,7 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
         }
     }
 
-    public sortAssets(event: CdkDragDrop<ReadonlyArray<AssetDto>>) {
+    protected sortAssets(event: CdkDragDrop<ReadonlyArray<AssetDto>>) {
         if (event) {
             this.setAssets(sorted(event));
 
@@ -174,7 +174,7 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
         }
     }
 
-    public removeLoadedAsset(asset: AssetDto) {
+    protected removeLoadedAsset(asset: AssetDto) {
         if (asset) {
             this.setAssets(this.assetItems().removed(asset));
 
@@ -182,21 +182,21 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
         }
     }
 
-    public removeLoadingAsset(file: HTTP.UploadFile) {
+    protected removeLoadingAsset(file: HTTP.UploadFile) {
         this.assetFiles.update(x => x.removed(file));
     }
 
-    public changeView(isListView: boolean) {
+    protected changeView(isListView: boolean) {
         this.isListView.set(isListView);
 
         this.localStore.setBoolean(Settings.Local.ASSETS_MODE, !isListView);
     }
 
-    public editStart(asset: AssetDto) {
+    protected editStart(asset: AssetDto) {
         this.assetEdit.set(asset);
     }
 
-    public editDone() {
+    protected editDone() {
         this.assetEdit.set(undefined);
     }
 

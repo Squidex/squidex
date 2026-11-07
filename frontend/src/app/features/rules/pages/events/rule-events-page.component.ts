@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -20,7 +19,6 @@ import { RuleEventComponent } from './rule-event.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         LayoutComponent,
         ListViewComponent,
@@ -33,13 +31,13 @@ import { RuleEventComponent } from './rule-event.component';
     ],
 })
 export class RuleEventsPageComponent {
-    public readonly availableSteps;
+    protected readonly availableSteps;
 
-    public readonly selectedEventId = signal<string | null>(null);
+    protected readonly selectedEventId = signal<string | null>(null);
 
     constructor(
-        public readonly ruleEventsRoute: Router2State,
-        public readonly ruleEventsState: RuleEventsState,
+        private readonly ruleEventsRoute: Router2State,
+        protected readonly ruleEventsState: RuleEventsState,
         route: ActivatedRoute,
         rulesService: RulesService,
     ) {
@@ -62,23 +60,23 @@ export class RuleEventsPageComponent {
         });
     }
 
-    public reload() {
+    protected reload() {
         this.ruleEventsState.load(true);
     }
 
-    public enqueue(event: RuleEventDto) {
+    protected enqueue(event: RuleEventDto) {
         this.ruleEventsState.enqueue(event);
     }
 
-    public cancelAll() {
+    protected cancelAll() {
         this.ruleEventsState.cancelAll();
     }
 
-    public cancel(event: RuleEventDto) {
+    protected cancel(event: RuleEventDto) {
         this.ruleEventsState.cancel(event);
     }
 
-    public selectEvent(id: string) {
+    protected selectEvent(id: string) {
         this.selectedEventId.update(x => x === id ? null : id);
     }
 }

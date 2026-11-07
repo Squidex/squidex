@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { AssetsState, LayoutComponent, Queries, Query, SavedQueriesComponent, TranslatePipe, UIState } from '@app/shared';
 import { AssetTagsComponent } from './asset-tags.component';
@@ -16,34 +15,29 @@ import { AssetTagsComponent } from './asset-tags.component';
     templateUrl: './assets-filters-page.component.html',
     imports: [
         AssetTagsComponent,
-        AsyncPipe,
         LayoutComponent,
         SavedQueriesComponent,
         TranslatePipe,
     ],
 })
 export class AssetsFiltersPageComponent {
-    public assetsQueries: Queries;
+    protected readonly assetsQueries: Queries;
 
     constructor(uiState: UIState,
-        public readonly assetsState: AssetsState,
+        protected readonly assetsState: AssetsState,
     ) {
         this.assetsQueries = new Queries(uiState, 'assets');
     }
 
-    public search(query?: Query) {
+    protected search(query?: Query) {
         this.assetsState.search(query);
     }
 
-    public selectTags(tags: ReadonlyArray<string>) {
-        this.assetsState.selectTags(tags);
-    }
-
-    public toggleTag(tag: string) {
+    protected toggleTag(tag: string) {
         this.assetsState.toggleTag(tag);
     }
 
-    public resetTags() {
+    protected resetTags() {
         this.assetsState.resetTags();
     }
 }

@@ -38,7 +38,7 @@ export class FileDropDirective {
     }
 
     @HostListener('paste', ['$event'])
-    public async onPaste(event: ClipboardEvent) {
+    protected async onPaste(event: ClipboardEvent) {
         if (!this.noPaste) {
             this.stopEvent(event);
 
@@ -52,7 +52,7 @@ export class FileDropDirective {
 
     @HostListener('dragend', ['$event'])
     @HostListener('dragleave', ['$event'])
-    public onDragEnd(event: DragEvent) {
+    protected onDragEnd(event: DragEvent) {
         const hasFile = this.hasAllowedFile(event.dataTransfer);
 
         if (hasFile) {
@@ -61,7 +61,7 @@ export class FileDropDirective {
     }
 
     @HostListener('dragenter', ['$event'])
-    public onDragEnter(event: DragEvent) {
+    protected onDragEnter(event: DragEvent) {
         const hasFile = this.hasAllowedFile(event.dataTransfer);
 
         if (hasFile) {
@@ -70,7 +70,7 @@ export class FileDropDirective {
     }
 
     @HostListener('dragover', ['$event'])
-    public onDragOver(event: DragEvent) {
+    protected onDragOver(event: DragEvent) {
         const isFiles = hasFiles(event.dataTransfer);
 
         if (isFiles) {
@@ -79,7 +79,7 @@ export class FileDropDirective {
     }
 
     @HostListener('drop', ['$event'])
-    public async onDrop(event: DragEvent) {
+    protected async onDrop(event: DragEvent) {
         if (hasFiles(event.dataTransfer)) {
             this.stopDrag(event);
 

@@ -30,11 +30,11 @@ export class SchemaEditFormComponent {
     /** The languages of the app, to provide the localized search fields. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.schema().canUpdate;
     });
 
-    public readonly fieldNames = computed(() => {
+    protected readonly fieldNames = computed(() => {
         const languages = this.languages();
 
         const fieldNames = new Set<string>();
@@ -53,7 +53,7 @@ export class SchemaEditFormComponent {
         return [...fieldNames].sorted();
     });
 
-    public readonly schemaForm = new EditSchemaForm();
+    protected readonly schemaForm = new EditSchemaForm();
 
     constructor(
         private readonly schemasState: SchemasState,
@@ -66,7 +66,7 @@ export class SchemaEditFormComponent {
         });
     }
 
-    public saveSchema() {
+    protected saveSchema() {
         if (!this.isEditable()) {
             return;
         }

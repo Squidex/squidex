@@ -16,7 +16,7 @@
             <select class="form-control" id="client" [ngModel]="clientSelected()" (ngModelChange)="selectClient($event)">
                 <option [ngValue]="null">{{ "api.noClient" | sqxTranslate }}</option>
 
-                @for (client of clientsState.clients | async; track client) {
+                @for (client of clientsState.clients(); track client) {
                     <option [ngValue]="client">{{ client.id }}</option>
                 }
             </select>

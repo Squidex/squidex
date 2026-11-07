@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { Observable, ReplaySubject } from 'rxjs';
 import { ApiUrlConfig } from '@app/framework';
@@ -80,10 +80,12 @@ export class Profile {
 export class AuthService {
     private readonly userManager!: UserManager;
     private readonly user$ = new ReplaySubject<Profile | null>(1);
-    private currentUser: Profile | null = null;
+    private readonly currentUser = signal<Profile | null>(null);
+
+    public readonly userValue = this.currentUser.asReadonly();
 
     public get user(): Profile | null {
-        return this.currentUser;
+        return this.currentUser();
     }
 
     public get userChanges(): Observable<Profile | null> {
@@ -117,7 +119,7 @@ export class AuthService {
         });
 
         this.user$.subscribe(user => {
-            this.currentUser = user;
+            this.currentUser.set(user);
         });
 
         this.checkState(this.userManager.getUser());

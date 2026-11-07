@@ -19,7 +19,7 @@ export class CopyGlobalDirective {
     }
 
     @HostListener('document:click', ['$event'])
-    public onClick(event: MouseEvent) {
+    protected onClick(event: MouseEvent) {
         function findElement(target: HTMLElement | null): string | null {
             if (!target) {
                 return null;

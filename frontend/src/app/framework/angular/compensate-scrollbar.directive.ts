@@ -35,7 +35,7 @@ export class CompensateScrollbarDirective implements AfterViewInit, ResizeListen
     }
 
     @HostListener('scroll')
-    public onScroll() {
+    protected onScroll() {
         this.resize();
     }
 

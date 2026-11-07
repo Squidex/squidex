@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, ThemeService, Types } from '@app/shared';
 
@@ -38,7 +37,7 @@ export class ContentExtensionComponent {
     /** The URL of the extension. */
     public readonly editorUrl = input<string | null>();
 
-    public readonly computedUrl = computed(() => {
+    protected readonly computedUrl = computed(() => {
         return computeEditorUrl(this.editorUrl(), this.appsState.snapshot.selectedSettings);
     });
 
@@ -62,10 +61,8 @@ export class ContentExtensionComponent {
         private readonly router: Router,
         private readonly themeService: ThemeService,
     ) {
-        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
-
         effect(() => {
-            this.sendMessage('themeChanged', { theme: theme() });
+            this.sendMessage('themeChanged', { theme: themeService.theme() });
         });
 
         effect(() => {
@@ -73,7 +70,7 @@ export class ContentExtensionComponent {
         });
     }
 
-    public onWindowMessage(event: MessageEvent) {
+    protected onWindowMessage(event: MessageEvent) {
         const iframe = this.iframe()?.nativeElement;
         if (!iframe || event.source !== iframe.contentWindow) {
             return;
@@ -103,7 +100,7 @@ export class ContentExtensionComponent {
     }
 
     private sendTheme() {
-        this.sendMessage('themeChanged', { theme: this.themeService.theme });
+        this.sendMessage('themeChanged', { theme: this.themeService.theme() });
     }
 
     private sendContent() {

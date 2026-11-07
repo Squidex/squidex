@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, input, numberAttribute, viewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, DropdownMenuComponent, EditContentForm, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, TranslatePipe, Types } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, numberAttribute, viewChildren } from '@angular/core';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, DropdownMenuComponent, EditContentForm, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, TranslatePipe, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -16,7 +15,6 @@ import { ComponentSectionComponent } from './component-section.component';
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ComponentSectionComponent,
         DropdownMenuComponent,
         FormHintComponent,
@@ -52,9 +50,9 @@ export class ComponentComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly schemasDropdown = new ModalModel();
+    protected readonly schemasDropdown = new ModalModel();
 
-    public readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
+    protected readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
         const formModel = this.formModel();
 
         const properties = formModel.field.properties;
@@ -65,21 +63,9 @@ export class ComponentComponent {
         return properties.schemaIds?.map(x => formModel.globals.schemas[x]).defined() || [];
     });
 
-    public readonly isDisabled = computed(() => {
-        return disabled$(this.formModel().form);
+    protected readonly isDisabled = computed(() => {
+        return this.formModel().disabled();
     });
-
-    constructor(changeDetector: ChangeDetectorRef) {
-        effect(onCleanup => {
-            const subscription =
-                this.formModel().form.valueChanges
-                    .subscribe(() => {
-                        changeDetector.detectChanges();
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
-    }
 
     public reset() {
         for (const section of this.sections()) {
@@ -87,7 +73,7 @@ export class ComponentComponent {
         }
     }
 
-    public setSchema(schema: SchemaDto) {
+    protected setSchema(schema: SchemaDto) {
         this.formModel().selectSchema(schema.id);
     }
 }

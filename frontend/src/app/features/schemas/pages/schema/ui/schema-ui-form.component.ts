@@ -25,17 +25,17 @@ export class SchemaUIFormComponent {
     /** The schema to configure the list and reference fields for. */
     public readonly schema = input.required<SchemaDto>();
 
-    public readonly selectedTab = signal(0);
+    protected readonly selectedTab = signal(0);
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.schema().canUpdate;
     });
 
-    public readonly fieldsInLists = linkedSignal<string[]>(() => {
+    protected readonly fieldsInLists = linkedSignal<string[]>(() => {
         return this.schema().fieldsInLists;
     });
 
-    public readonly fieldsInReferences = linkedSignal<string[]>(() => {
+    protected readonly fieldsInReferences = linkedSignal<string[]>(() => {
         return this.schema().fieldsInReferences;
     });
 
@@ -44,19 +44,19 @@ export class SchemaUIFormComponent {
     ) {
     }
 
-    public setFieldsInLists(names: string[]) {
+    protected setFieldsInLists(names: string[]) {
         this.fieldsInLists.set(names);
     }
 
-    public setFieldsInReferences(names: string[]) {
+    protected setFieldsInReferences(names: string[]) {
         this.fieldsInReferences.set(names);
     }
 
-    public selectTab(tab: number) {
+    protected selectTab(tab: number) {
         this.selectedTab.set(tab);
     }
 
-    public saveSchema() {
+    protected saveSchema() {
         if (!this.isEditable()) {
             return;
         }

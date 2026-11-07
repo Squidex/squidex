@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, untracked } from '@angular/core';
 import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -19,7 +18,6 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
         CommentsState,
     ],
     imports: [
-        AsyncPipe,
         CommentComponent,
         DropdownMenuComponent,
         ModalDirective,
@@ -28,28 +26,26 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
     ],
 })
 export class NotificationDropdownComponent {
-    public readonly modalMenu = new ModalModel();
+    protected readonly modalMenu = new ModalModel();
 
-    public readonly commentUser: string;
-    public readonly commentItems = this.commentsState.groupedUnresolvedComments;
+    protected readonly commentUser: string;
+    protected readonly commentItems = this.commentsState.groupedUnresolvedComments;
 
     constructor(authService: AuthService,
-        public readonly commentsState: CommentsState,
-        public readonly collaboration: CollaborationService,
+        protected readonly commentsState: CommentsState,
+        private readonly collaboration: CollaborationService,
     ) {
         this.commentUser = authService.user!.token;
 
         this.collaboration.connect('users/collaboration');
 
-        effect(onCleanup => {
-            const subscription =
-                this.modalMenu.isOpenChanges
-                    .subscribe(() => {
-                        this.commentsState.prune(100);
-                        this.commentsState.markRead();
-                    });
+        effect(() => {
+            this.modalMenu.isOpen();
 
-            onCleanup(() => subscription.unsubscribe());
+            untracked(() => {
+                this.commentsState.prune(100);
+                this.commentsState.markRead();
+            });
         });
     }
 }

@@ -23,7 +23,7 @@
 
                     <hr />
 
-                    <sqx-form-error [error]="currentStep.error | async" />
+                    <sqx-form-error [error]="currentStep.error()" />
 
                     @for (property of currentStep.editableProperties; track property.name) {
                         <sqx-form-row

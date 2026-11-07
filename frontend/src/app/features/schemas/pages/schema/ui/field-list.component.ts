@@ -50,19 +50,19 @@ export class FieldListComponent {
         return fields;
     });
 
-    public readonly fieldsAdded = computed<TableField[]>(() => {
+    protected readonly fieldsAdded = computed<TableField[]>(() => {
         const fieldsAll = this.fieldsAll();
 
         return [...this.fieldNames().map(x => fieldsAll.find(z => z.name === x)).defined()];
     });
 
-    public readonly fieldsNotAdded = computed<TableField[]>(() => {
+    protected readonly fieldsNotAdded = computed<TableField[]>(() => {
         const fieldNames = this.fieldNames();
 
         return this.fieldsAll().filter(x => !fieldNames.includes(x.name));
     });
 
-    public drop(event: CdkDragDrop<TableField[]>) {
+    protected drop(event: CdkDragDrop<TableField[]>) {
         if (event.previousContainer === event.container) {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
         } else {

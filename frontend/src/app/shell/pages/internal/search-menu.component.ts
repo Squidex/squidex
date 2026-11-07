@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Injectable, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,7 +14,7 @@ import { AutocompleteComponent as AutocompleteComponent_1 } from '../../../frame
 
 @Injectable()
 export class SearchSource implements AutocompleteSource {
-    public selectedApp = this.appsState.selectedApp;
+    public readonly selectedApp = this.appsState.selectedApp;
 
     constructor(
         private readonly appsState: AppsState,
@@ -41,7 +40,6 @@ export class SearchSource implements AutocompleteSource {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         AutocompleteComponent_1,
         FormsModule,
         ShortcutComponent,
@@ -53,16 +51,16 @@ export class SearchSource implements AutocompleteSource {
 export class SearchMenuComponent {
     private readonly searchControl = viewChild(AutocompleteComponent);
 
-    public readonly searchResult?: SearchResultDto;
+    protected readonly searchResult?: SearchResultDto;
 
     constructor(
         private readonly router: Router,
         private readonly apiUrl: ApiUrlConfig,
-        public readonly searchSource: SearchSource,
+        protected readonly searchSource: SearchSource,
     ) {
     }
 
-    public selectResult(result: SearchResultDto) {
+    protected selectResult(result: SearchResultDto) {
         if (Types.is(result, SearchResultDto)) {
             const relativeUrl = result.url.substring(this.apiUrl.value.length);
 

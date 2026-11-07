@@ -26,14 +26,14 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
     ],
 })
 export class ClientAddFormComponent {
-    public addClientForm = new AddClientForm();
+    protected addClientForm = new AddClientForm();
 
     constructor(
         private readonly clientsState: ClientsState,
     ) {
     }
 
-    public addClient() {
+    protected addClient() {
         const value = this.addClientForm.submit();
         if (!value) {
             return;
@@ -50,7 +50,7 @@ export class ClientAddFormComponent {
             });
     }
 
-    public cancel() {
+    protected cancel() {
         this.addClientForm.submitCompleted();
     }
 }

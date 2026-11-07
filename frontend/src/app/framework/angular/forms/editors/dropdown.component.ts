@@ -92,25 +92,25 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
     /** Additional styles for the dropdown. */
     public readonly dropdownStyles = input<any>({});
 
-    public readonly templates = contentChildren(TemplateRef);
+    private readonly templates = contentChildren(TemplateRef);
 
-    public readonly templateItem = computed(() => {
+    protected readonly templateItem = computed(() => {
         return this.templates()[0];
     });
 
-    public readonly templateSelection = computed(() => {
+    protected readonly templateSelection = computed(() => {
         const templates = this.templates();
 
         return templates[templates.length - 1];
     });
 
-    public readonly dropdown = new ModalModel();
-    public readonly suggestedItems = signal<ReadonlyArray<any>>([]);
-    public readonly suggestedIndex = signal(-1);
-    public readonly selectedItem = signal<any>(undefined);
-    public readonly query = signal<RegExp | undefined>(undefined);
+    protected readonly dropdown = new ModalModel();
+    protected readonly suggestedItems = signal<ReadonlyArray<any>>([]);
+    protected readonly suggestedIndex = signal(-1);
+    protected readonly selectedItem = signal<any>(undefined);
+    protected readonly query = signal<RegExp | undefined>(undefined);
 
-    public readonly queryInput = new UntypedFormControl();
+    protected readonly queryInput = new UntypedFormControl();
 
     constructor() {
         super();
@@ -149,8 +149,8 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
         this.selectIndex(this.getSelectedIndex(obj), false);
     }
 
-    public onKeyDown(event: KeyboardEvent) {
-        if (Keys.isEscape(event) && this.dropdown.isOpen) {
+    protected onKeyDown(event: KeyboardEvent) {
+        if (Keys.isEscape(event) && this.dropdown.isOpen()) {
             this.closeModal();
             return false;
         } else if (Keys.isUp(event)) {
@@ -167,12 +167,12 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
         return true;
     }
 
-    public openModal() {
-        if (!this.dropdown.isOpen) {
+    protected openModal() {
+        if (!this.dropdown.isOpen()) {
             this.selectSearch('');
         }
 
-        if (!this.dropdown.isOpen) {
+        if (!this.dropdown.isOpen()) {
             this.dropdownOpen.emit();
 
             this.dropdown.show();
@@ -181,29 +181,29 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
         this.callTouched();
     }
 
-    public selectIndexAndClose(selectedIndex: number) {
+    protected selectIndexAndClose(selectedIndex: number) {
         this.selectIndex(selectedIndex, true);
 
         this.closeModal();
     }
 
-    public closeModal() {
-        if (this.dropdown.isOpen) {
+    private closeModal() {
+        if (this.dropdown.isOpen()) {
             this.dropdownClose.emit();
 
             this.dropdown.hide();
         }
     }
 
-    public selectPrevIndex() {
+    private selectPrevIndex() {
         this.selectIndex(this.suggestedIndex() - 1, true);
     }
 
-    public selectNextIndex() {
+    private selectNextIndex() {
         this.selectIndex(this.suggestedIndex() + 1, true);
     }
 
-    public selectIndex(suggestedIndex: number, fromUserAction: boolean) {
+    private selectIndex(suggestedIndex: number, fromUserAction: boolean) {
         const items = this.suggestedItems();
 
         const selectedItem = items[suggestedIndex];

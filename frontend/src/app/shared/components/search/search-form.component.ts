@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, linkedSignal, output, Type } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, SelectValue, StringValue } from 'ngx-inline-filter';
-import { of } from 'rxjs';
 import { DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, FormErrorComponent, FormRowComponent, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/framework';
 import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm } from '@app/shared/internal';
 import { UserDtoPicture } from '../pipes';
@@ -22,7 +20,6 @@ import { TourHintDirective } from '../tour-hint.directive';
     templateUrl: './search-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         DateTimeEditorComponent,
         DropdownComponent,
         FilterInput,
@@ -71,29 +68,29 @@ export class SearchFormComponent {
     /** Focuses the search input when CTRL + I is pressed. */
     public readonly enableShortcut = input(false, { transform: booleanAttribute });
 
-    public readonly filterModel = computed(() => {
+    protected readonly filterModel = computed(() => {
         return this.buildFilterModel(this.queryModel());
     });
 
-    public readonly saveKey = computed(() => {
+    protected readonly saveKey = computed(() => {
         const queries = this.queries();
         const query = this.query();
         if (!queries || !query) {
-            return of(undefined);
+            return undefined;
         }
 
         return queries.getSaveKey(query);
     });
 
-    public readonly saveQueryDialog = new DialogModel();
-    public readonly saveQueryForm = new SaveQueryForm();
+    protected readonly saveQueryDialog = new DialogModel();
+    protected readonly saveQueryForm = new SaveQueryForm();
 
-    public readonly cleanedQuery = linkedSignal(() => sanitize(this.query()));
+    protected readonly cleanedQuery = linkedSignal(() => sanitize(this.query()));
 
-    public readonly options: FilterOptions;
+    protected readonly options: FilterOptions;
 
     constructor(
-        public readonly contributorsState: ContributorsState,
+        protected readonly contributorsState: ContributorsState,
         private readonly localizer: LocalizerService,
     ) {
         this.options = {
@@ -200,7 +197,7 @@ export class SearchFormComponent {
         return filterModel;
     }
 
-    public bookmark(value: boolean) {
+    protected bookmark(value: boolean) {
         if (value) {
             this.saveQueryDialog.show();
         }
@@ -211,7 +208,7 @@ export class SearchFormComponent {
         this.saveQueryDialog.show();
     }
 
-    public saveQueryComplete() {
+    protected saveQueryComplete() {
         const queries = this.queries();
         const query = this.query();
 

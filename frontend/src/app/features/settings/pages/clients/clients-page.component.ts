@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ClientsState, LayoutComponent, ListViewComponent, RolesState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -18,7 +17,6 @@ import { ClientComponent } from './client.component';
     templateUrl: './clients-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ClientAddFormComponent,
         ClientComponent,
         LayoutComponent,
@@ -36,15 +34,15 @@ import { ClientComponent } from './client.component';
 })
 export class ClientsPageComponent {
     constructor(
-        public readonly clientsState: ClientsState,
-        public readonly rolesState: RolesState,
+        protected readonly clientsState: ClientsState,
+        protected readonly rolesState: RolesState,
     ) {
         this.rolesState.load();
 
         this.clientsState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.clientsState.load(true);
     }
 }

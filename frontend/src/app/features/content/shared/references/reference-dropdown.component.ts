@@ -49,17 +49,17 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
     /** Defines whether the value is a single ID or an array with one ID. */
     public readonly mode = input.required<'Array' | 'Single'>();
 
-    public readonly control = new UntypedFormControl('');
+    protected readonly control = new UntypedFormControl('');
 
-    public readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
+    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
         source: this.schemaId,
         computation: () => [],
     });
 
-    public readonly contentsFailed = signal(false);
-    public readonly contentsLoading = signal(false);
+    private readonly contentsFailed = signal(false);
+    protected readonly contentsLoading = signal(false);
 
-    public readonly contentNames = computed(() => {
+    protected readonly contentNames = computed(() => {
         const language = this.language();
 
         const contentNames: ContentName[] = [
@@ -81,7 +81,7 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
         return contentNames;
     });
 
-    public readonly isValid = computed(() => {
+    private readonly isValid = computed(() => {
         return !!this.schemaId() && !!this.language();
     });
 
@@ -132,7 +132,7 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
         }
     }
 
-    public onOpened() {
+    protected onOpened() {
         if (this.isOpenedBefore) {
             return;
         }

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LanguagesState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -18,7 +17,6 @@ import { LanguageComponent } from './language.component';
     templateUrl: './languages-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         LanguageAddFormComponent,
         LanguageComponent,
         LayoutComponent,
@@ -36,12 +34,12 @@ import { LanguageComponent } from './language.component';
 })
 export class LanguagesPageComponent {
     constructor(
-        public readonly languagesState: LanguagesState,
+        protected readonly languagesState: LanguagesState,
     ) {
         this.languagesState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.languagesState.load(true);
     }
 }

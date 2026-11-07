@@ -7,7 +7,6 @@
 
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, shareReplay } from 'rxjs';
@@ -39,25 +38,20 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     ],
 })
 export class AssetScriptsPageComponent {
-    public readonly assetScript = signal('query');
-    public readonly assetCompletions: Observable<ScriptCompletions>;
+    protected readonly assetScript = signal('query');
+    protected readonly assetCompletions: Observable<ScriptCompletions>;
 
-    public readonly editForm = new EditAssetScriptsForm();
+    protected readonly editForm = new EditAssetScriptsForm();
 
-    public readonly isEditable = toSignal(this.assetScriptsState.canUpdate, { initialValue: false });
+    protected readonly isEditable = this.assetScriptsState.canUpdate;
 
     constructor(appsState: AppsState, assetsService: AssetsService,
         private readonly assetScriptsState: AssetScriptsState,
     ) {
         this.assetCompletions = assetsService.getCompletions(appsState.appName).pipe(shareReplay(1));
 
-        effect(onCleanup => {
-            const subscription = this.assetScriptsState.scripts
-                .subscribe(scripts => {
-                    this.editForm.load(scripts);
-                });
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            this.editForm.load(this.assetScriptsState.scripts());
         });
 
         effect(() => {
@@ -67,15 +61,15 @@ export class AssetScriptsPageComponent {
         this.assetScriptsState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.assetScriptsState.load(true);
     }
 
-    public selectField(field: string) {
+    protected selectField(field: string) {
         this.assetScript.set(field);
     }
 
-    public saveScripts() {
+    protected saveScripts() {
         if (!this.isEditable()) {
             return;
         }

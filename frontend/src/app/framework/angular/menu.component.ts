@@ -66,9 +66,9 @@ export class MenuComponent implements ResizeListener {
     /** Renders small buttons with less space between them. */
     public readonly small = input(false, { transform: booleanAttribute });
 
-    public readonly overflowDropdown = new ModalModel();
+    protected readonly overflowDropdown = new ModalModel();
 
-    public readonly isRightAligned = computed(() => {
+    protected readonly isRightAligned = computed(() => {
         return this.alignment() === 'right';
     });
 

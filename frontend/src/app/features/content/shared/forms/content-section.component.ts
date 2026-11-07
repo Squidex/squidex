@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, linkedSignal, numberAttribute, output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldDto, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, SchemaDto, Settings } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
@@ -16,7 +15,6 @@ import { ContentFieldComponent } from './content-field.component';
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FormHintComponent,
         MarkdownDirective,
         forwardRef(() => ContentFieldComponent),
@@ -53,7 +51,7 @@ export class ContentSectionComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly isCollapsed = linkedSignal(() => {
+    protected readonly isCollapsed = linkedSignal(() => {
         if (!this.formSection().separator) {
             return false;
         }
@@ -66,7 +64,7 @@ export class ContentSectionComponent {
     ) {
     }
 
-    public toggle() {
+    protected toggle() {
         this.isCollapsed.update(x => !x);
 
         if (this.formSection().separator) {
@@ -74,7 +72,7 @@ export class ContentSectionComponent {
         }
     }
 
-    public getFieldFormCompare(formState: FieldForm) {
+    protected getFieldFormCompare(formState: FieldForm) {
         return this.formCompare()?.get(formState.field.name);
     }
 

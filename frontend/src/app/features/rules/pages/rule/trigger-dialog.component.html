@@ -11,7 +11,7 @@
         </ng-container>
         <ng-container content>
             @if (currentTrigger) {
-                <sqx-form-error [error]="currentTrigger.error | async" />
+                <sqx-form-error [error]="currentTrigger.error()" />
 
                 @switch (currentTrigger.triggerType) {
                     @case ("AssetChanged") {
@@ -24,7 +24,7 @@
 
                     @case ("ContentChanged") {
                         <sqx-content-changed-trigger
-                            [schemas]="schemasState.schemas | async"
+                            [schemas]="schemasState.schemas()"
                             [triggerDto]="currentTrigger.form.value"
                             [triggerForm]="currentTrigger" />
                     }

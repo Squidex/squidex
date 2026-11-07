@@ -75,7 +75,7 @@
                 <i class="icon-dots"></i>
             </button>
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editOptionsDropdown; closeAlways: true">
-                @if (schemasState.canCreate | async) {
+                @if (schemasState.canCreate()) {
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" (click)="cloneSchema()" type="button">{{ "common.clone" | sqxTranslate }}</button>
                 }
@@ -95,7 +95,7 @@
             </sqx-dropdown-menu>
         </ng-container>
         <ng-container content>
-            @if (languageState.isoLanguages | async; as languages) {
+            @if (languageState.isoLanguages(); as languages) {
                 @switch (tab) {
                     @case ("ui") {
                         <sqx-schema-ui-form [schema]="schema" />

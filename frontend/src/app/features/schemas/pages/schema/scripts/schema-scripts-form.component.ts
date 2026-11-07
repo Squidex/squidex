@@ -29,12 +29,12 @@ export class SchemaScriptsFormComponent {
     /** The schema to edit the scripts for. */
     public readonly schema = input.required<SchemaDto>();
 
-    public readonly schemaScript = signal('query');
-    public readonly schemaCompletions;
+    protected readonly schemaScript = signal('query');
+    protected readonly schemaCompletions;
 
-    public readonly editForm = new EditSchemaScriptsForm();
+    protected readonly editForm = new EditSchemaScriptsForm();
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.schema().canUpdateScripts;
     });
 
@@ -53,11 +53,11 @@ export class SchemaScriptsFormComponent {
         });
     }
 
-    public selectField(field: string) {
+    protected selectField(field: string) {
         this.schemaScript.set(field);
     }
 
-    public saveSchema() {
+    protected saveSchema() {
         if (!this.isEditable()) {
             return;
         }

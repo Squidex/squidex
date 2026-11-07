@@ -36,7 +36,7 @@ export class ContentEventComponent {
     /** The current content. */
     public readonly content = input.required<ContentDto>();
 
-    public readonly canLoadOrCompare = computed(() => {
+    protected readonly canLoadOrCompare = computed(() => {
         const event = this.event();
 
         const isContentEvent = event.eventType === 'ContentUpdatedEvent' || event.eventType === 'ContentCreatedEventV2';

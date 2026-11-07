@@ -6,7 +6,6 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FileDropDirective, HTTP, TourStepDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetFolderDto, AssetsState, getFiles, Types } from '@app/shared/internal';
@@ -21,7 +20,6 @@ import { AssetComponent } from './asset.component';
     imports: [
         AssetComponent,
         AssetFolderComponent,
-        AsyncPipe,
         CdkDrag,
         CdkDropList,
         CdkDropListGroup,
@@ -52,9 +50,9 @@ export class AssetsListComponent {
     /** Shows a button to open the folder of an asset, when no folder is selected. */
     public readonly showFolderIcon = input(true, { transform: booleanAttribute });
 
-    public readonly newFiles = signal<ReadonlyArray<HTTP.UploadFile>>([]);
+    protected readonly newFiles = signal<ReadonlyArray<HTTP.UploadFile>>([]);
 
-    public add(file: HTTP.UploadFile, asset: AssetDto) {
+    protected add(file: HTTP.UploadFile, asset: AssetDto) {
         if (asset.isDuplicate) {
             setTimeout(() => {
                 this.remove(file);
@@ -66,7 +64,7 @@ export class AssetsListComponent {
         }
     }
 
-    public move(drag: CdkDragDrop<any>) {
+    protected move(drag: CdkDragDrop<any>) {
         if (this.isDisabled() || !drag.isPointerOverContainer) {
             return;
         }
@@ -79,39 +77,39 @@ export class AssetsListComponent {
         }
     }
 
-    public replaceAsset(asset: AssetDto) {
+    protected replaceAsset(asset: AssetDto) {
         this.assetsState().replaceAsset(asset);
     }
 
-    public selectFolder(asset: AssetDto) {
+    protected selectFolder(asset: AssetDto) {
         this.assetsState().navigate(asset.parentId);
     }
 
-    public deleteAsset(asset: AssetDto) {
+    protected deleteAsset(asset: AssetDto) {
         this.assetsState().deleteAsset(asset);
     }
 
-    public deleteAssetFolder(assetFolder: AssetFolderDto) {
+    protected deleteAssetFolder(assetFolder: AssetFolderDto) {
         this.assetsState().deleteAssetFolder(assetFolder);
     }
 
-    public isSelected(asset: AssetDto) {
+    protected isSelected(asset: AssetDto) {
         return !!this.selectedIds()?.[asset.id];
     }
 
-    public remove(file: HTTP.UploadFile) {
+    protected remove(file: HTTP.UploadFile) {
         this.newFiles.update(s => s.removed(file));
 
         return true;
     }
 
-    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
+    protected addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         this.newFiles.update(s => [...getFiles(files), ...s]);
 
         return true;
     }
 
-    public canEnter(drag: CdkDrag, drop: CdkDropList) {
+    protected canEnter(drag: CdkDrag, drop: CdkDropList) {
         return drag.data.id !== drop.data;
     }
 }

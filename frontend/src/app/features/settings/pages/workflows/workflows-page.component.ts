@@ -5,11 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { map } from 'rxjs/operators';
 import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
 import { WorkflowAddFormComponent } from './workflow-add-form.component';
 import { WorkflowComponent } from './workflow.component';
@@ -20,7 +17,6 @@ import { WorkflowComponent } from './workflow.component';
     templateUrl: './workflows-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         LayoutComponent,
         ListViewComponent,
         RouterLink,
@@ -37,19 +33,21 @@ import { WorkflowComponent } from './workflow.component';
     ],
 })
 export class WorkflowsPageComponent {
-    public readonly roles = toSignal(this.rolesState.roles.pipe(map(roles => roles.map(x => x.name))), { initialValue: [] });
+    protected readonly roles = computed(() => {
+        return this.rolesState.roles().map(x => x.name);
+    });
 
     constructor(
-        public readonly rolesState: RolesState,
-        public readonly schemasSource: SchemaTagSource,
-        public readonly workflowsState: WorkflowsState,
+        private readonly rolesState: RolesState,
+        protected readonly schemasSource: SchemaTagSource,
+        protected readonly workflowsState: WorkflowsState,
     ) {
         this.rolesState.load();
 
         this.workflowsState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.workflowsState.load(true);
     }
 }

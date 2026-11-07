@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
@@ -16,7 +15,6 @@ import { FieldDto, FormRowComponent, ReferencesFieldPropertiesDto, SchemaTagSour
     templateUrl: 'component-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
@@ -35,7 +33,7 @@ export class ComponentValidationComponent {
     public readonly properties = input.required<ReferencesFieldPropertiesDto>();
 
     constructor(
-        public readonly schemasSource: SchemaTagSource,
+        protected readonly schemasSource: SchemaTagSource,
     ) {
     }
 }

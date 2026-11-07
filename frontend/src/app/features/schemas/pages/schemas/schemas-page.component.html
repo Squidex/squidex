@@ -2,7 +2,7 @@
 <sqx-layout expandedWidth="32" layout="left" overflow="true" padding="true" titleCollapsed="i18n:common.schemas" white="true" width="18">
     <ng-container menu>
         <div class="row g-0 flex-grow-1">
-            @if (schemasState.canCreate | async) {
+            @if (schemasState.canCreate()) {
                 <div class="col-auto">
                     <button
                         class="btn btn-success me-2"

@@ -94,7 +94,7 @@
     </ng-container>
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            @if (rule && (rulesState.canReadEvents | async)) {
+            @if (rule && rulesState.canReadEvents()) {
                 <a
                     class="panel-link panel-link-gray"
                     attr.aria-label="{{ 'common.history' | sqxTranslate }}"

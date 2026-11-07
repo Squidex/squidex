@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, PlansState, TranslatePipe } from '@app/shared';
 
@@ -15,7 +14,6 @@ import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, Pl
     templateUrl: './plan.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         FileSizePipe,
         FormHintComponent,
@@ -28,15 +26,15 @@ export class PlanComponent {
     public readonly planInfo = input.required<PlanInfo>();
 
     constructor(
-        public readonly plansState: PlansState,
+        protected readonly plansState: PlansState,
     ) {
     }
 
-    public changeMonthly() {
+    protected changeMonthly() {
         this.plansState.change(this.planInfo().plan.id);
     }
 
-    public changeYearly() {
+    protected changeYearly() {
         this.plansState.change(this.planInfo().plan.yearlyId!);
     }
 }

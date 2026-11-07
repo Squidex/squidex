@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
@@ -16,13 +15,12 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
     templateUrl: './contents-plugin.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ContentExtensionComponent,
         LayoutComponent,
     ],
 })
 export class ContentsPluginComponent {
-    public schema = this.schemasState.selectedSchema;
+    protected readonly schema = this.schemasState.selectedSchema;
 
     constructor(
         private readonly schemasState: SchemasState,

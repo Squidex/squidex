@@ -52,15 +52,15 @@ export class LocalizedInputComponent extends SignalControlComponent<LocalizedVal
     /** The ID of the inner input. */
     public readonly id = input('');
 
-    public readonly language = signal<Language>(DEFAULT_LANGUAGE);
+    protected readonly language = signal<Language>(DEFAULT_LANGUAGE);
 
-    public readonly value = signal<LocalizedValue | undefined>(undefined);
+    private readonly value = signal<LocalizedValue | undefined>(undefined);
 
-    public readonly valueCurrent = computed(() => {
+    protected readonly valueCurrent = computed(() => {
         return this.value()?.[this.language().iso2Code];
     });
 
-    public readonly valueIsEmpty = computed(() => {
+    protected readonly valueIsEmpty = computed(() => {
         const value = this.value();
         if (!value) {
             return true;
@@ -69,7 +69,7 @@ export class LocalizedInputComponent extends SignalControlComponent<LocalizedVal
         return !value.hasOwnProperty(this.language().iso2Code);
     });
 
-    public setLanguage(language: Language) {
+    protected setLanguage(language: Language) {
         this.language.set(language);
     }
 
@@ -77,14 +77,14 @@ export class LocalizedInputComponent extends SignalControlComponent<LocalizedVal
         this.value.set(Types.isObject(obj) ? obj : {});
     }
 
-    public setValue(value: any) {
+    protected setValue(value: any) {
         const result = { ...this.value() || {}, [this.language().iso2Code]: value };
 
         this.value.set(result);
         this.callChange(result);
     }
 
-    public unset() {
+    protected unset() {
         let result: LocalizedValue | undefined = { ...this.value() || {} };
 
         delete result[this.language().iso2Code];

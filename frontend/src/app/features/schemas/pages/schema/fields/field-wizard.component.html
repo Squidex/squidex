@@ -14,13 +14,13 @@
                     [fieldForm]="edit.form.form"
                     isEditable="true"
                     [isLocalizable]="isLocalizable()"
-                    [languages]="(languagesState.isoLanguages | async)!"
+                    [languages]="languagesState.isoLanguages()"
                     [schema]="schema()"
                     [settings]="settings()" />
             </form>
         } @else {
             <form [formGroup]="addFieldForm.form" (ngSubmit)="addField('Close')">
-                <sqx-form-error [error]="addFieldForm.error | async" />
+                <sqx-form-error [error]="addFieldForm.error()" />
 
                 <sqx-form-row for="type" hideError vertical>
                     <div class="row">
@@ -47,7 +47,7 @@
                     </div>
                 </sqx-form-row>
 
-                <sqx-form-row for="name" [submitCount]="addFieldForm.submitCount | async" vertical>
+                <sqx-form-row for="name" [submitCount]="addFieldForm.submitCount()" vertical>
                     <input
                         class="form-control"
                         #nameInput

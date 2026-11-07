@@ -48,25 +48,25 @@ interface Snapshot extends LoadingState {
 export class LanguagesState extends State<Snapshot> {
     private cachedLanguage$?: Observable<ReadonlyArray<LanguageDto>>;
 
-    public languages =
+    public readonly languages =
         this.project(x => x.languages);
 
-    public isoLanguages =
+    public readonly isoLanguages =
         this.project(x => x.languages.map(y => y.language));
 
-    public isoMasterLanguage =
+    public readonly isoMasterLanguage =
         this.projectFrom(this.isoLanguages, x => x.find(l => l.isMaster)!);
 
-    public newLanguages =
+    public readonly newLanguages =
         this.project(x => x.allLanguagesNew);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {

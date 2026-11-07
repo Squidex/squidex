@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
@@ -16,7 +15,6 @@ import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, Re
     templateUrl: 'references-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
@@ -42,7 +40,7 @@ export class ReferencesValidationComponent {
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
     constructor(
-        public readonly schemasSource: SchemaTagSource,
+        protected readonly schemasSource: SchemaTagSource,
     ) {
     }
 }

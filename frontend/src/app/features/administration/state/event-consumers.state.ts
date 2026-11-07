@@ -18,13 +18,13 @@ interface Snapshot extends LoadingState {
 
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {
-    public eventConsumers =
+    public readonly eventConsumers =
         this.project(x => x.eventConsumers);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     constructor(

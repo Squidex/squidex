@@ -22,18 +22,18 @@ export class IndexComponent {
     /** The index to show. */
     public readonly index = input.required<IndexDto>();
 
-    public readonly isExpanded = signal(false);
+    protected readonly isExpanded = signal(false);
 
     constructor(
         private readonly indexesState: IndexesState,
     ) {
     }
 
-    public toggleExpanded() {
+    protected toggleExpanded() {
         this.isExpanded.update(x => !x);
     }
 
-    public delete() {
+    protected delete() {
         this.indexesState.delete(this.index());
     }
 }

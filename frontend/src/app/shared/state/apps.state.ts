@@ -27,13 +27,13 @@ interface Snapshot {
     providedIn: 'root',
 })
 export class AppsState extends State<Snapshot> {
-    public apps =
+    public readonly apps =
         this.project(x => x.apps);
 
-    public selectedApp =
+    public readonly selectedApp =
         this.project(x => x.selectedApp);
 
-    public selectedSettings =
+    public readonly selectedSettings =
         this.project(x => x.selectedSettings);
 
     public get appId() {

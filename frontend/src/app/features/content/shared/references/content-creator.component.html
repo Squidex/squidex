@@ -25,7 +25,7 @@
                             dropdownPosition="bottom-end"
                             [(language)]="languageSelected"
                             [languages]="languages()"
-                            [percents]="contentForm()!.translationStatus | async" />
+                            [percents]="contentForm()!.translationStatus()" />
                     </div>
                 }
             </div>
@@ -37,7 +37,7 @@
                         {{ "contents.referencesCreatePublish" | sqxTranslate }}
                     </button>
                 }
-                <sqx-form-error bubble="true" closeable="true" [error]="contentForm()?.error | async" />
+                <sqx-form-error bubble="true" closeable="true" [error]="contentForm()?.error()" />
             </div>
         </div>
     </ng-container>

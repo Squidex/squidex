@@ -1,6 +1,6 @@
 <sqx-title message="i18n:apps.listPageTitle" />
 
-@if (authState.userChanges | async; as user) {
+@if (authState.userValue(); as user) {
     <div class="panel-container page flex-grow d-flex flex-grow flex-column justify-content-between" style="flex-grow: 1">
         <div class="apps">
             <div class="apps-section">
@@ -11,7 +11,7 @@
                         <div class="subtext">{{ "apps.welcomeSubtitle" | sqxTranslate }}</div>
                     </div>
 
-                    @if ((uiState.settings | async)?.canCreateApps) {
+                    @if (uiState.settings().canCreateApps) {
                         <div class="col-auto">
                             <button class="btn btn-block btn-success" (click)="addAppDialog.show()" data-testid="new-app" sqxTourStep="addApp" type="button">
                                 <i class="icon-plus"></i> {{ "apps.appsButtonCreate" | sqxTranslate }}
@@ -64,7 +64,7 @@
                     </div>
 
                     <div class="row g-2">
-                        @for (app of allAppsState.apps | async; track app.id) {
+                        @for (app of allAppsState.apps(); track app.id) {
                             <div class="col-12 col-md-6 col-lg-4">
                                 <sqx-app [app]="app" />
                             </div>
@@ -73,7 +73,7 @@
                         }
                     </div>
 
-                    <sqx-pager [paging]="allAppsState.paging | async" (pagingChange)="allAppsState.page($event)" />
+                    <sqx-pager [paging]="allAppsState.paging()" (pagingChange)="allAppsState.page($event)" />
                 </div>
             }
         </div>
@@ -88,7 +88,7 @@
 
 <sqx-onboarding-dialog (dialogClose)="onboardingDialog.hide()" *sqxModal="onboardingDialog" />
 
-@if (starters | async; as templates) {
+@if (starters(); as templates) {
     <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate()" [templates]="templates" />
 }
 

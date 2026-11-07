@@ -55,7 +55,7 @@ export class FieldFormComponent {
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    public readonly selectedTab = signal(0);
+    protected readonly selectedTab = signal(0);
 
     constructor() {
         effect(() => {
@@ -72,7 +72,7 @@ export class FieldFormComponent {
         });
     }
 
-    public selectTab(tab: number) {
+    protected selectTab(tab: number) {
         this.selectedTab.set(tab);
     }
 }

@@ -43,12 +43,12 @@ export class ChatDialogComponent {
     /** Defines what is copied when the user uses an answer. */
     public readonly copyMode = input<'Text' | 'Image'>();
 
-    public readonly user: Profile;
+    protected readonly user: Profile;
 
-    public readonly chatQuestion = signal('');
-    public readonly chatItems = signal<ReadonlyArray<ChatItem>>([]);
+    protected readonly chatQuestion = signal('');
+    protected readonly chatItems = signal<ReadonlyArray<ChatItem>>([]);
 
-    public readonly isRunning = signal(false);
+    protected readonly isRunning = signal(false);
 
     constructor(authService: AuthService,
         private readonly appsState: AppsState,
@@ -86,15 +86,15 @@ export class ChatDialogComponent {
         });
     }
 
-    public setQuestion(chatQuestion: string) {
+    protected setQuestion(chatQuestion: string) {
         this.chatQuestion.set(chatQuestion);
     }
 
-    public setCompleted() {
+    protected setCompleted() {
         this.isRunning.set(false);
     }
 
-    public ask() {
+    protected ask() {
         const prompt = this.chatQuestion();
         if (!prompt || prompt.length === 0) {
             return;

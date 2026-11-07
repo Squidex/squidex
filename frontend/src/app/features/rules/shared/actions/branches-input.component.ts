@@ -29,7 +29,7 @@ export class BranchesInputComponent {
     /** Allows the user to add and remove branches. */
     public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    public readonly branchesControls = computed<ReadonlyArray<ExtendedFormGroup>>(() => {
+    protected readonly branchesControls = computed<ReadonlyArray<ExtendedFormGroup>>(() => {
         return this.control().controls as any;
     });
 }

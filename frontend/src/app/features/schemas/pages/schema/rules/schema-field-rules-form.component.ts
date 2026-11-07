@@ -30,12 +30,12 @@ export class SchemaFieldRulesFormComponent {
     /** The schema to configure the field rules for. */
     public readonly schema = input.required<SchemaDto>();
 
-    public readonly editForm = new ConfigureFieldRulesForm();
+    protected readonly editForm = new ConfigureFieldRulesForm();
 
-    public readonly fieldActions = FIELD_RULE_ACTIONS;
-    public readonly fieldCompletions;
+    protected readonly fieldActions = FIELD_RULE_ACTIONS;
+    protected readonly fieldCompletions;
 
-    public readonly fieldOptions = computed(() => {
+    protected readonly fieldOptions = computed(() => {
         const fieldNames = new Set<string>();
         const fieldTags = new Set<string>();
 
@@ -71,7 +71,7 @@ export class SchemaFieldRulesFormComponent {
         ];
     });
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.schema().canUpdateUrls;
     });
 
@@ -92,11 +92,11 @@ export class SchemaFieldRulesFormComponent {
         });
     }
 
-    public add() {
+    protected add() {
         this.editForm.add(this.fieldOptions()[0].value);
     }
 
-    public saveSchema() {
+    protected saveSchema() {
         if (!this.isEditable()) {
             return;
         }

@@ -23,10 +23,10 @@ interface Snapshot {
     providedIn: 'root',
 })
 export class TeamsState extends State<Snapshot> {
-    public teams =
+    public readonly teams =
         this.project(x => x.teams);
 
-    public selectedTeam =
+    public readonly selectedTeam =
         this.project(x => x.selectedTeam);
 
     public get teamId() {

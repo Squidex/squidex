@@ -22,7 +22,7 @@ export class ScriptLogComponent {
     /** The script log to show, including its log entries. */
     public readonly scriptLog = input.required<ScriptLogDto>();
 
-    public readonly lines = computed(() => {
+    protected readonly lines = computed(() => {
         return this.scriptLog().entries.map(x => ({
             time: x.timestamp?.toStringFormat('yyyy-MM-dd HH:mm:ss.SSS') ?? '',
             level: x.level,
@@ -30,15 +30,15 @@ export class ScriptLogComponent {
         }));
     });
 
-    public readonly omitted = computed(() => {
+    protected readonly omitted = computed(() => {
         const scriptLog = this.scriptLog();
 
         return Math.max(0, scriptLog.totalEntries - scriptLog.entries.length);
     });
 
-    public readonly isExpanded = signal(false);
+    protected readonly isExpanded = signal(false);
 
-    public toggleExpanded() {
+    protected toggleExpanded() {
         this.isExpanded.update(x => !x);
     }
 }

@@ -34,7 +34,7 @@ export class AssetHistoryComponent {
     /** The asset to show the history for. */
     public readonly asset = input.required<AssetDto>();
 
-    public readonly assetEvents;
+    protected readonly assetEvents;
 
     constructor(appsState: AppsState, historyService: HistoryService) {
         this.assetEvents = toSignal(

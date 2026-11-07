@@ -60,21 +60,21 @@ export class RoleComponent {
     /** The schemas of the app, used to hide individual schemas for the role. */
     public readonly schemas = input.required<ReadonlyArray<SchemaDto>>();
 
-    public readonly descriptions = DESCRIPTIONS as Record<string, string>;
+    protected readonly descriptions = DESCRIPTIONS as Record<string, string>;
 
-    public readonly propertiesList = Settings.AppProperties;
-    public readonly properties = linkedSignal<Record<string, any>>(() => ({ ...this.role().properties }));
-    public readonly propertiesSimple = SIMPLE_PROPERTIES;
+    protected readonly propertiesList = Settings.AppProperties;
+    protected readonly properties = linkedSignal<Record<string, any>>(() => ({ ...this.role().properties }));
+    protected readonly propertiesSimple = SIMPLE_PROPERTIES;
 
-    public readonly isEditing = signal(false);
+    protected readonly isEditing = signal(false);
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.role().canUpdate;
     });
 
-    public readonly editForm = new EditRoleForm();
+    protected readonly editForm = new EditRoleForm();
 
-    public readonly halfSchemas = computed(() => {
+    protected readonly halfSchemas = computed(() => {
         return Math.ceil(this.schemas().length / 2);
     });
 
@@ -87,27 +87,27 @@ export class RoleComponent {
         });
     }
 
-    public getProperty(name: string) {
+    protected getProperty(name: string) {
         return this.properties()[name];
     }
 
-    public toggleEditing() {
+    protected toggleEditing() {
         this.isEditing.update(x => !x);
     }
 
-    public setProperty(name: string, value: boolean) {
+    protected setProperty(name: string, value: boolean) {
         this.properties.update(x => ({ ...x, [name]: value }));
     }
 
-    public delete() {
+    protected delete() {
         this.rolesState.delete(this.role());
     }
 
-    public addPermission() {
+    protected addPermission() {
         this.editForm.form.add('');
     }
 
-    public save() {
+    protected save() {
         const value = this.editForm.submit();
         if (!value) {
             return;

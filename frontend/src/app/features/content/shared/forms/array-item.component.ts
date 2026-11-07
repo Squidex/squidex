@@ -5,11 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, numberAttribute, output, viewChildren } from '@angular/core';
-import { of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, invalid$, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -18,7 +15,6 @@ import { ComponentSectionComponent } from './component-section.component';
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ComponentSectionComponent,
         FormHintComponent,
         IfOnceDirective,
@@ -80,62 +76,60 @@ export class ArrayItemComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly isInvalidForm = computed(() => {
-        return invalid$(this.formModel().form);
+    protected readonly isInvalidForm = computed(() => {
+        return this.formModel().invalid();
     });
 
-    public readonly isInvalidComponent = computed(() => {
+    protected readonly isInvalidComponent = computed(() => {
         const formModel = this.formModel();
         if (!Types.is(formModel, ComponentForm)) {
-            return of(false);
+            return false;
         }
 
-        return formModel.schemaChanges.pipe(map(x => !x));
+        return !formModel.schema();
     });
 
-    public readonly title = computed(() => {
-        const formModel = this.formModel();
-
-        return valueProjection$(formModel.form, () => getTitle(formModel));
+    protected readonly title = computed(() => {
+        return getTitle(this.formModel());
     });
 
-    public readonly isCollapsed = computed(() => {
-        return this.formModel().collapsedChanges;
+    protected readonly isCollapsed = computed(() => {
+        return this.formModel().collapsed();
     });
 
     constructor() {
         effect(() => {
-            if (this.isCollapsedInitial() && this.formModel().collapsed === null) {
+            if (this.isCollapsedInitial() && this.formModel().collapsed() === null) {
                 this.collapse();
             }
         });
     }
 
-    public collapse() {
+    protected collapse() {
         this.formModel().collapse();
 
         this.itemExpanded.emit();
     }
 
-    public expand() {
+    protected expand() {
         this.formModel().expand();
 
         this.itemExpanded.emit();
     }
 
-    public moveTop() {
+    protected moveTop() {
         this.itemMove.emit(0);
     }
 
-    public moveUp() {
+    protected moveUp() {
         this.itemMove.emit(this.index() - 1);
     }
 
-    public moveDown() {
+    protected moveDown() {
         this.itemMove.emit(this.index() + 1);
     }
 
-    public moveBottom() {
+    protected moveBottom() {
         this.itemMove.emit(99999);
     }
 
@@ -147,7 +141,7 @@ export class ArrayItemComponent {
 }
 
 function getTitle(formModel: ObjectFormBase) {
-    const value = formModel.form.value;
+    const value = formModel.value();
     const values: string[] = [];
 
     let valueLength = 0;
@@ -171,13 +165,15 @@ function getTitle(formModel: ObjectFormBase) {
         }
     }
 
-    if (Types.is(formModel, ComponentForm) && formModel.schema) {
-        const formatted = formModel.schema.displayName;
+    const schema = Types.is(formModel, ComponentForm) ? formModel.schema() : undefined;
+
+    if (schema) {
+        const formatted = schema.displayName;
 
         values.push(formatted);
         valueLength += formatted.length;
 
-        addFields(formModel.schema.fields);
+        addFields(schema.fields);
     } else if (Types.is(formModel.field, FieldDto) && formModel.field.nested) {
        addFields(formModel.field.nested);
     }

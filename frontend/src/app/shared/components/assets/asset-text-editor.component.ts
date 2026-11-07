@@ -30,7 +30,7 @@ export class AssetTextEditorComponent {
     /** The mime type of the file that is created from the text. */
     public readonly mimeType = input('');
 
-    public readonly text = signal('');
+    protected readonly text = signal('');
 
     constructor(httpClient: HttpClient) {
         effect(onCleanup => {

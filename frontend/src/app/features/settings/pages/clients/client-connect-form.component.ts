@@ -33,27 +33,27 @@ export class ClientConnectFormComponent {
     /** The client to show the connection instructions for. */
     public readonly client = input.required<ClientDto>();
 
-    public readonly sdks = this.helpService.getSDKs();
-    public readonly sdk = signal<SDKEntry | undefined>(undefined);
+    protected readonly sdks = this.helpService.getSDKs();
+    protected readonly sdk = signal<SDKEntry | undefined>(undefined);
 
-    public readonly appName: string;
-    public readonly appToken = signal<AccessTokenDto | undefined>(undefined);
+    protected readonly appName: string;
+    protected readonly appToken = signal<AccessTokenDto | undefined>(undefined);
 
-    public readonly step = signal('Start');
+    protected readonly step = signal('Start');
 
-    public readonly mcpUrl = computed(() => {
+    protected readonly mcpUrl = computed(() => {
         return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
     });
 
-    public readonly mcpServerName = computed(() => {
+    private readonly mcpServerName = computed(() => {
         return `squidex-${this.appName}`;
     });
 
-    public readonly mcpCommand = computed(() => {
+    protected readonly mcpCommand = computed(() => {
         return `claude mcp add --transport http ${this.mcpServerName()} ${this.mcpUrl()} --header "Authorization: ${this.mcpAuthorization()}"`;
     });
 
-    public readonly mcpConfig = computed(() => {
+    protected readonly mcpConfig = computed(() => {
         const config = {
             mcpServers: {
                 [this.mcpServerName()]: {
@@ -77,8 +77,8 @@ export class ClientConnectFormComponent {
     });
 
     constructor(
-        public readonly appsState: AppsState,
-        public readonly apiUrl: ApiUrlConfig,
+        appsState: AppsState,
+        protected readonly apiUrl: ApiUrlConfig,
         private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService,
         private readonly helpService: HelpService,
@@ -103,7 +103,7 @@ export class ClientConnectFormComponent {
         messageBus.emit(new ClientTourStated());
     }
 
-    public select(sdk: SDKEntry) {
+    protected select(sdk: SDKEntry) {
         const client = this.client();
 
         sdk.instructions = sdk.instructions.replace(/<APP_NAME>/g, this.appName);
@@ -114,7 +114,7 @@ export class ClientConnectFormComponent {
         this.sdk.set(sdk);
     }
 
-    public go(step: string) {
+    protected go(step: string) {
         this.step.set(step);
     }
 }

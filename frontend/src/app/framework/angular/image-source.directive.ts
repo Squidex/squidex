@@ -78,11 +78,11 @@ export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
         this.setImageSource();
     }
 
-    public onLoad() {
+    private onLoad() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'visible');
     }
 
-    public onError() {
+    private onError() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'hidden');
 
         this.retryLoadingImage();

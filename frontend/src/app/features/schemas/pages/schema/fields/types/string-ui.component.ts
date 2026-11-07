@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, input, untracked } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
@@ -18,7 +17,6 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSour
     templateUrl: 'string-ui.component.html',
     imports: [
         AssetFolderDropdownComponent,
-        AsyncPipe,
         FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
@@ -27,7 +25,7 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSour
     ],
 })
 export class StringUIComponent {
-    public readonly editors = StringFieldEditorValues;
+    protected readonly editors = StringFieldEditorValues;
 
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();
@@ -38,18 +36,18 @@ export class StringUIComponent {
     /** The type specific properties of the field. */
     public readonly properties = input.required<StringFieldPropertiesDto>();
 
-    public readonly hideAllowedValues = toSignal(
+    protected readonly hideAllowedValues = toSignal(
         toObservable(this.fieldForm).pipe(
             switchMap(form => valueProjection$(form.controls['editor'], hidesAllowedValues))),
         { initialValue: false });
 
-    public readonly hideClassNames = toSignal(
+    protected readonly hideClassNames = toSignal(
         toObservable(this.fieldForm).pipe(
             switchMap(form => valueProjection$(form.controls['editor'], hidesClassNames))),
         { initialValue: false });
 
     constructor(
-        public readonly schemasSource: SchemaTagSource,
+        protected readonly schemasSource: SchemaTagSource,
     ) {
         effect(onCleanup => {
             const fieldForm = this.fieldForm();

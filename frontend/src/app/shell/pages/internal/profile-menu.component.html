@@ -12,7 +12,7 @@
     </a>
     <div class="dropdown-divider"></div>
 
-    @if (uiState.canUseAdminResource | async) {
+    @if (uiState.canUseAdminResource()) {
         <button class="dropdown-item" routerLink="/app/administration" type="button">{{ "common.administration" | sqxTranslate }}</button>
     }
     <a class="dropdown-item" href="{{ profileUrl }}" sqxExternalLink="noicon"> {{ "profile.title" | sqxTranslate }}</a>
@@ -34,7 +34,7 @@
         <button class="dropdown-item dropdown-toggle" (click)="toggleSubmenu('theme')" sqxStopClick type="button">{{ "common.theme" | sqxTranslate }}</button>
         <div class="dropdown-menu" [class.open]="submenu() === 'theme'">
             @for (themeMode of themeModes; track themeMode.mode) {
-                <button class="dropdown-item" [class.active]="themeMode.mode === (themeService.modeChanges | async)" (click)="changeTheme(themeMode.mode)" type="button">
+                <button class="dropdown-item" [class.active]="themeMode.mode === themeService.mode()" (click)="changeTheme(themeMode.mode)" type="button">
                     {{ themeMode.label | sqxTranslate }}
                 </button>
             }

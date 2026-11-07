@@ -11,7 +11,7 @@ import { AbstractControl, UntypedFormArray } from '@angular/forms';
 import { MathHelper } from '@app/framework';
 import { AppLanguageDto, createProperties, EditContentForm, FieldDto, FieldRuleDto, getContentValue, HtmlValue, SchemaDto } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
-import { ComponentForm, FieldArrayForm } from './contents.forms';
+import { ComponentForm, FieldArrayForm, PatchContentForm } from './contents.forms';
 import { contentsTranslationStatus, contentTranslationStatus, fieldTranslationStatus, PartitionConfig } from './contents.forms-helpers';
 
 const { createField, createNestedField, createSchema } = TestValues;
@@ -561,7 +561,7 @@ describe('ContentForm', () => {
                     }),
                 ]);
 
-                expect(contentForm.value.field4.en).toEqual(test.value);
+                expect(contentForm.value().field4.en).toEqual(test.value);
             });
         });
 
@@ -574,7 +574,7 @@ describe('ContentForm', () => {
                     }),
                 ]);
 
-                expect(contentForm.value.field4.en).toEqual(test.value);
+                expect(contentForm.value().field4.en).toEqual(test.value);
             });
         });
 
@@ -669,7 +669,7 @@ describe('ContentForm', () => {
 
             const field2 = contentForm.get('field2');
 
-            expect(field1!.hidden).toBeFalsy();
+            expect(field1!.hidden()).toBeFalsy();
 
             contentForm.load({
                 field1: {
@@ -680,13 +680,13 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(field1!.hidden).toBeTruthy();
-            expect(field1_iv!.hidden).toBeTruthy();
+            expect(field1!.hidden()).toBeTruthy();
+            expect(field1_iv!.hidden()).toBeTruthy();
 
             field2?.get('iv')!.form.setValue(99);
 
-            expect(field1!.hidden).toBeFalsy();
-            expect(field1_iv!.hidden).toBeFalsy();
+            expect(field1!.hidden()).toBeFalsy();
+            expect(field1_iv!.hidden()).toBeFalsy();
         });
 
         it('should disable nested fields based on condition', () => {
@@ -751,8 +751,8 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(array.get(0)!.get('nested42')!.hidden).toBeTruthy();
-            expect(array.get(1)!.get('nested42')!.hidden).toBeFalsy();
+            expect(array.get(0)!.get('nested42')!.hidden()).toBeTruthy();
+            expect(array.get(1)!.get('nested42')!.hidden()).toBeFalsy();
         });
 
         it('should hide nested localized fields based on condition', () => {
@@ -784,8 +784,8 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(array.get(0)!.get('nested42')!.hidden).toBeTruthy();
-            expect(array.get(1)!.get('nested42')!.hidden).toBeFalsy();
+            expect(array.get(0)!.get('nested42')!.hidden()).toBeTruthy();
+            expect(array.get(1)!.get('nested42')!.hidden()).toBeFalsy();
         });
 
         it('should hide components fields based on condition', () => {
@@ -824,8 +824,8 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(array.get(0)!.get('field1')!.hidden).toBeTruthy();
-            expect(array.get(1)!.get('field1')!.hidden).toBeFalsy();
+            expect(array.get(0)!.get('field1')!.hidden()).toBeTruthy();
+            expect(array.get(1)!.get('field1')!.hidden()).toBeFalsy();
         });
 
         it('should hide field based on tags', () => {
@@ -840,9 +840,9 @@ describe('ContentForm', () => {
             const field1_iv = contentForm.get('field1')!.get('iv');
             const field2 = contentForm.get('field2');
 
-            expect(field1!.hidden).toBeTruthy();
-            expect(field2!.hidden).toBeFalsy();
-            expect(field1_iv!.hidden).toBeTruthy();
+            expect(field1!.hidden()).toBeTruthy();
+            expect(field2!.hidden()).toBeFalsy();
+            expect(field1_iv!.hidden()).toBeTruthy();
         });
 
         it('should add component with default values', () => {
@@ -880,7 +880,7 @@ describe('ContentForm', () => {
             contentForm.load({});
 
             // Should be undefined by default.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: undefined,
                 },
@@ -889,7 +889,7 @@ describe('ContentForm', () => {
             (contentForm.get('field4')?.get('iv') as ComponentForm).selectSchema(componentId);
 
             // Should add field from component.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {
                         schemaId: componentId,
@@ -898,6 +898,33 @@ describe('ContentForm', () => {
                     },
                 },
             });
+        });
+
+        it('should provide schema and sections of component', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                id: 1,
+                fields: [
+                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({ id: 4, properties: createProperties('Component'), partitioning: 'invariant' }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            const componentForm = contentForm.get('field4')!.get('iv') as ComponentForm;
+
+            expect(componentForm.schema()).toBeUndefined();
+            expect(componentForm.sections()).toEqual([]);
+
+            componentForm.selectSchema(componentId);
+
+            expect(componentForm.schema()).toBe(component);
+            expect(componentForm.sections().length).toBe(1);
+            expect(componentForm.fields()['field11']).toBeDefined();
         });
 
         it('should add components with default values', () => {
@@ -931,7 +958,7 @@ describe('ContentForm', () => {
             contentForm.load({});
 
             // Should be undefined by default.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: undefined,
                 },
@@ -940,7 +967,7 @@ describe('ContentForm', () => {
             (contentForm.get('field4')?.get('iv') as FieldArrayForm).addComponent(componentId);
 
             // Should add field from component.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: [{
                             schemaId: componentId,
@@ -978,7 +1005,7 @@ describe('ContentForm', () => {
             contentForm.load({});
 
             // Should be undefined by default.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: undefined,
                 },
@@ -993,7 +1020,7 @@ describe('ContentForm', () => {
             });
 
             // Should add field from component1.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {
                         schemaId: component1Id,
@@ -1011,7 +1038,7 @@ describe('ContentForm', () => {
             });
 
             // Should add field from component1.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {
                         schemaId: component2Id,
@@ -1045,7 +1072,7 @@ describe('ContentForm', () => {
             });
 
             // Should ignore invalid id.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {},
                 },
@@ -1158,7 +1185,7 @@ describe('ContentForm', () => {
 
         function expectLength(array: FieldArrayForm, length: number) {
             expect(array.form.controls.length).toBe(length);
-            expect(array.items.length).toBe(length);
+            expect(array.items().length).toBe(length);
         }
 
         function expectForm(parent: AbstractControl, path: string, test: {
@@ -1230,16 +1257,10 @@ describe('ContentForm', () => {
             expect(simpleForm.hasChanged()).toBeFalsy();
         });
 
-        it('should subscribe to values', () => {
+        it('should provide current value', () => {
             simpleForm.form.setValue({ field1: { iv: 'Change' } });
 
-            let value: any;
-
-            simpleForm.valueChanges.subscribe(result => {
-                value = result;
-            });
-
-            expect(value).toEqual({ field1: { iv: 'Change' } });
+            expect(simpleForm.value()).toEqual({ field1: { iv: 'Change' } });
         });
     });
 
@@ -1285,6 +1306,87 @@ describe('ContentForm', () => {
             simpleForm.submitCompleted();
 
             expect(simpleForm.hasChanged()).toBeFalsy();
+        });
+
+        it('should not mark field as changed if nothing has changed', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            expect(field1.hasChanges()).toBe(false);
+        });
+
+        it('should mark field as changed if value has changed', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            simpleForm.form.setValue({ field1: { iv: 'Change' } });
+
+            expect(field1.hasChanges()).toBe(true);
+        });
+
+        it('should not mark field as changed if value has changed and saved', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            simpleForm.form.setValue({ field1: { iv: 'Change' } });
+            simpleForm.submit();
+            simpleForm.submitCompleted();
+
+            expect(field1.hasChanges()).toBe(false);
+        });
+
+        it('should provide field value and translation status', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            simpleForm.form.setValue({ field1: { iv: null } });
+
+            expect(field1.value()).toEqual({ iv: null });
+            expect(field1.translationStatus()).toEqual({ iv: false });
+        });
+
+        it('should provide disabled state of field', () => {
+            const field1_iv = simpleForm.get('field1')!.get('iv')!;
+
+            simpleForm.setEnabled(false);
+
+            expect(field1_iv.disabled()).toBe(true);
+
+            simpleForm.setEnabled(true);
+
+            expect(field1_iv.disabled()).toBe(false);
+        });
+
+        it('should provide invalid state of field', () => {
+            const field1_iv = simpleForm.get('field1')!.get('iv')!;
+
+            field1_iv.form.setErrors({ custom: true });
+
+            expect(field1_iv.invalid()).toBe(true);
+        });
+
+        it('should collapse and expand field', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            expect(field1.collapsed()).toBeNull();
+
+            field1.collapse();
+
+            expect(field1.collapsed()).toBe(true);
+
+            field1.expand();
+
+            expect(field1.collapsed()).toBe(false);
+        });
+    });
+
+    describe('for patching content', () => {
+        it('should provide dirty state', () => {
+            const field = createField({ id: 1, properties: createProperties('String', { inlineEditable: true }), partitioning: 'invariant' });
+
+            const patchForm = new PatchContentForm([{ name: field.name, label: field.name, rootField: field }], languages[0]);
+
+            expect(patchForm.dirty()).toBe(false);
+
+            patchForm.form.get(field.name)!.markAsDirty();
+
+            expect(patchForm.dirty()).toBe(true);
         });
     });
 

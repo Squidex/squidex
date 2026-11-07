@@ -44,21 +44,21 @@ export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArra
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly control = new UntypedFormControl([]);
+    protected readonly control = new UntypedFormControl([]);
 
-    public readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
+    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
         source: this.schemaId,
         computation: () => [],
     });
 
-    public readonly contentsFailed = signal(false);
-    public readonly contentsLoading = signal(false);
+    private readonly contentsFailed = signal(false);
+    protected readonly contentsLoading = signal(false);
 
-    public readonly converter = computed(() => {
+    protected readonly converter = computed(() => {
         return new ReferencesTagsConverter(this.language(), this.contents(), this.localizer);
     });
 
-    public readonly isValid = computed(() => {
+    private readonly isValid = computed(() => {
         return !!this.schemaId() && !!this.language();
     });
 
@@ -93,7 +93,7 @@ export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArra
         });
     }
 
-    public onOpened() {
+    protected onOpened() {
         if (this.isOpenedBefore) {
             return;
         }

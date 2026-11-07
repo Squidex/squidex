@@ -41,11 +41,11 @@ export class ContributorComponent {
     ) {
     }
 
-    public remove() {
+    protected remove() {
         this.contributorsState.revoke(this.contributor());
     }
 
-    public changeRole(role: string) {
+    protected changeRole(role: string) {
         const request = new AssignContributorDto({ contributorId: this.contributor().contributorId, role });
 
         this.contributorsState.assign(request);

@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ApiUrlConfig, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
+import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
@@ -17,7 +16,6 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
     templateUrl: './app-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
@@ -42,25 +40,24 @@ export class AppFormComponent {
     /** The templates to choose from. */
     public readonly templates = input.required<TemplateDto[]>();
 
-    public readonly templateSelected = linkedSignal(() => this.template());
+    protected readonly templateSelected = linkedSignal(() => this.template());
 
-    public readonly createForm = new CreateAppForm();
+    protected readonly createForm = new CreateAppForm();
 
     constructor(
-        public readonly apiUrl: ApiUrlConfig,
         private readonly appsStore: AppsState,
     ) {
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public selectTemplate(template?: TemplateDto) {
+    protected selectTemplate(template?: TemplateDto) {
         this.templateSelected.set(template);
     }
 
-    public createApp() {
+    protected createApp() {
         const value = this.createForm.submit();
         if (!value) {
             return;

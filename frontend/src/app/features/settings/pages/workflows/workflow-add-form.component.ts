@@ -25,14 +25,14 @@ import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePi
     ],
 })
 export class WorkflowAddFormComponent {
-    public addWorkflowForm = new AddWorkflowForm();
+    protected addWorkflowForm = new AddWorkflowForm();
 
     constructor(
         private readonly workflowsState: WorkflowsState,
     ) {
     }
 
-    public addWorkflow() {
+    protected addWorkflow() {
         const value = this.addWorkflowForm.submit();
         if (!value) {
             return;
@@ -49,7 +49,7 @@ export class WorkflowAddFormComponent {
             });
     }
 
-    public cancel() {
+    protected cancel() {
         this.addWorkflowForm.submitCompleted();
     }
 }

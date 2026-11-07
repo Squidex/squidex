@@ -1,7 +1,7 @@
 <sqx-title message="i18n:common.settings" />
 <sqx-layout layout="left" overflow="true" padding="true" titleIcon="settings" titleText="i18n:common.settings" white="true" width="16">
     <ng-container>
-        @if (selectedTeam | async; as team) {
+        @if (teamsState.selectedTeam(); as team) {
             <sqx-settings-menu [team]="team" />
         }
     </ng-container>

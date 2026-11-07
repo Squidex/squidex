@@ -5,30 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ClipboardService {
-    private readonly text$ = new BehaviorSubject<string>('');
+    private readonly textValue = signal('');
 
-    public get textChanges(): Observable<string> {
-        return this.text$;
-    }
-
-    public selectText(): string {
-        let result = '';
-
-        this.text$.subscribe(t => {
-            result = t;
-        }).unsubscribe();
-
-        return result || '';
-    }
+    public readonly text = this.textValue.asReadonly();
 
     public setText(text: any) {
-        this.text$.next(text);
+        this.textValue.set(text || '');
     }
 }

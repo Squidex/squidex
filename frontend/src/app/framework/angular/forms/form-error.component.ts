@@ -31,9 +31,9 @@ export class FormErrorComponent {
     /** Shows a button to close the error. */
     public readonly closeable = input(false, { transform: booleanAttribute });
 
-    public readonly show = linkedSignal(() => !!this.error());
+    protected readonly show = linkedSignal(() => !!this.error());
 
-    public close() {
+    protected close() {
         this.show.set(false);
     }
 }

@@ -41,8 +41,7 @@ describe('CollaborationService', () => {
     it('should also get map if disconnected', () => {
         collaborationService.connect(null);
 
-        let map: any = undefined;
-        collaborationService.getMap('map').subscribe(v => map = v);
+        const map = collaborationService.getMap('map')();
 
         expect(map).toBeDefined();
     });
@@ -50,94 +49,60 @@ describe('CollaborationService', () => {
     it('should also get array if disconnected', () => {
         collaborationService.connect(null);
 
-        let array: any = undefined;
-        collaborationService.getArray('array').subscribe(v => array = v);
+        const array = collaborationService.getArray('array')();
 
         expect(array).toBeDefined();
     });
 
     it('should add to map', () => {
-        const map = collaborationService.getMap('map');
+        const state = collaborationService.getMap('map')();
 
-        let values: Record<string, any> = {};
+        state.set('key1', 41);
+        state.set('key1', 42);
 
-        map.subscribe(state => {
-            state.valueChanges.subscribe(v => values = v);
-
-            state.set('key1', 41);
-            state.set('key1', 42);
-        });
-
-        expect(values).toEqual({ key1: 42 });
+        expect(state.value()).toEqual({ key1: 42 });
     });
 
     it('should remove from map', () => {
-        const map = collaborationService.getMap('map');
+        const state = collaborationService.getMap('map')();
 
-        let values: Record<string, any> = {};
+        state.set('key0', 41);
+        state.set('key1', 42);
+        state.remove('key0');
 
-        map.subscribe(state => {
-            state.valueChanges.subscribe(v => values = v);
-
-            state.set('key0', 41);
-            state.set('key1', 42);
-            state.remove('key0');
-        });
-
-        expect(values).toEqual({ key1: 42 });
+        expect(state.value()).toEqual({ key1: 42 });
     });
 
     it('should add to array', () => {
-        const array = collaborationService.getArray('array');
+        const state = collaborationService.getArray('array')();
 
-        let items: ReadonlyArray<any> = [];
+        state.add(1);
+        state.add(2);
 
-        array.subscribe(state => {
-            state.itemsChanges.subscribe(i => items = i);
-
-            state.add(1);
-            state.add(2);
-        });
-
-        expect(items).toEqual([1, 2]);
+        expect(state.items()).toEqual([1, 2]);
     });
 
     it('should replace in array', () => {
-        const array = collaborationService.getArray('array');
+        const state = collaborationService.getArray('array')();
 
-        let items: ReadonlyArray<any> = [];
+        state.add(1);
+        state.add(2);
+        state.set(0, 42);
 
-        array.subscribe(state => {
-            state.itemsChanges.subscribe(i => items = i);
-
-            state.add(1);
-            state.add(2);
-            state.set(0, 42);
-        });
-
-        expect(items).toEqual([42, 2]);
+        expect(state.items()).toEqual([42, 2]);
     });
 
     it('should remove from array', () => {
-        const array = collaborationService.getArray('array');
+        const state = collaborationService.getArray('array')();
 
-        let items: ReadonlyArray<any> = [];
+        state.add(1);
+        state.add(2);
+        state.remove(0);
 
-        array.subscribe(state => {
-            state.itemsChanges.subscribe(i => items = i);
-
-            state.add(1);
-            state.add(2);
-            state.remove(0);
-        });
-
-        expect(items).toEqual([2]);
+        expect(state.items()).toEqual([2]);
     });
 
     it('should provide one awareness per user', () => {
-        let users: any[] = [];
-        collaborationService.userChanges.subscribe(u => users = u);
-
         collaborationProvider.awareness.setLocalStateField('user', { id: '0', displayName: 'User0' });
         collaborationProvider.awareness.setLocalStateField('key1', 101);
         collaborationProvider.awareness.setLocalStateField('key2', 102);
@@ -160,7 +125,7 @@ describe('CollaborationService', () => {
             key2: 402,
         });
 
-        expect(users).toEqual([
+        expect(collaborationService.users()).toEqual([
             {
                 user: { id: '1', displayName: 'User1' },
                 key1: 301,

@@ -38,27 +38,27 @@ export class ContentChangedTriggerComponent {
     /** The form to edit the trigger settings. */
     public readonly triggerForm = input.required<TriggerForm>();
 
-    public readonly schemasForm = computed(() => {
+    protected readonly schemasForm = computed(() => {
         return this.triggerForm().form.get('schemas') as TemplatedFormArray;
     });
 
-    public readonly referencedSchemasForm = computed(() => {
+    protected readonly referencedSchemasForm = computed(() => {
         return this.triggerForm().form.get('referencedSchemas') as TemplatedFormArray;
     });
 
-    public addSchema() {
+    protected addSchema() {
         this.schemasForm().add();
     }
 
-    public addReferencedSchema() {
+    protected addReferencedSchema() {
         this.referencedSchemasForm().add();
     }
 
-    public remove(index: number) {
+    protected remove(index: number) {
         this.schemasForm().removeAt(index);
     }
 
-    public removeReferencedSchema(index: number) {
+    protected removeReferencedSchema(index: number) {
         this.referencedSchemasForm().removeAt(index);
     }
 }

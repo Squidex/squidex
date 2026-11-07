@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
-import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { schemaMustNotBeSingletonGuard } from './schema-must-not-be-singleton.guard';
@@ -45,73 +45,73 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         });
     });
 
-    bit('should subscribe to schema and return true if default', async () => {
+    bit('should subscribe to schema and return true if default', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/my-schema/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', type: 'Default', properties: {} }));
+            .returns(() => signal(<SchemaDto>{ id: '123', type: 'Default', properties: {} }));
 
-        const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
+        const result = schemaMustNotBeSingletonGuard(false)(route, state);
 
         expect(result).toBeTruthy();
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    bit('should redirect to content if singleton', async () => {
+    bit('should redirect to content if singleton', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/my-schema/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
+            .returns(() => signal(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
-        const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
+        const result = schemaMustNotBeSingletonGuard(false)(route, state);
 
         expect(result).toBeFalsy();
         router.verify(x => x.navigate([state.url, '123']), Times.once());
     });
 
-    bit('should redirect to content if singleton on new page', async () => {
+    bit('should redirect to content if singleton on new page', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/my-schema/new/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
+            .returns(() => signal(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
-        const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
+        const result = schemaMustNotBeSingletonGuard(false)(route, state);
 
         expect(result).toBeFalsy();
         router.verify(x => x.navigate(['schemas/my-schema/', '123']), Times.once());
     });
 
-    bit('should redirect to extension if list url is configured', async () => {
+    bit('should redirect to extension if list url is configured', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/my-schema/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', type: 'Default', properties: { contentsListUrl: 'extension' } }));
+            .returns(() => signal(<SchemaDto>{ id: '123', type: 'Default', properties: { contentsListUrl: 'extension' } }));
 
-        const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
+        const result = schemaMustNotBeSingletonGuard(false)(route, state);
 
         expect(result).toBeFalsy();
         router.verify(x => x.navigate([state.url, 'extension']), Times.once());
     });
 
-    bit('should redirect to extension if list url is not configured on extension page', async () => {
+    bit('should redirect to extension if list url is not configured on extension page', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/my-schema/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', type: 'Default', properties: {} }));
+            .returns(() => signal(<SchemaDto>{ id: '123', type: 'Default', properties: {} }));
 
-        const result = await firstValueFrom(schemaMustNotBeSingletonGuard(true)(route, state));
+        const result = schemaMustNotBeSingletonGuard(true)(route, state);
 
         expect(result).toBeFalsy();
         router.verify(x => x.navigate([state.url, '..']), Times.once());
     });
 
-    bit('should return true when schemas has extension on extension page', async () => {
+    bit('should return true when schemas has extension on extension page', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/my-schema/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', type: 'Default', properties: { contentsListUrl: 'extension' } }));
+            .returns(() => signal(<SchemaDto>{ id: '123', type: 'Default', properties: { contentsListUrl: 'extension' } }));
 
-        const result = await firstValueFrom(schemaMustNotBeSingletonGuard(true)(route, state));
+        const result = schemaMustNotBeSingletonGuard(true)(route, state);
 
         expect(result).toBeTruthy();
         router.verify(x => x.navigate(It.isAny()), Times.never());

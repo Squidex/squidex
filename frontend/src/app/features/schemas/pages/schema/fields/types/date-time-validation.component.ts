@@ -42,15 +42,15 @@ export class DateTimeValidationComponent {
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    public readonly showDefaultValues = toSignal(
+    protected readonly showDefaultValues = toSignal(
         toObservable(this.fieldForm).pipe(
             switchMap(form => valueProjection$(form.controls['isRequired'], x => x !== true))),
         { initialValue: false });
 
-    public readonly showDefaultValue = toSignal(
+    protected readonly showDefaultValue = toSignal(
         toObservable(this.fieldForm).pipe(
             switchMap(form => hasNoValue$(form.controls['calculatedDefaultValue']))),
         { initialValue: false });
 
-    public readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
+    protected readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

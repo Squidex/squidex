@@ -32,14 +32,14 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     ],
 })
 export class AssetFolderDropdownComponent extends SignalControlComponent<string> {
-    public readonly appName: string;
+    protected readonly appName: string;
 
-    public readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
+    protected readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
 
-    public readonly selection = signal(this.root);
-    public readonly selectionPath = signal('');
+    protected readonly selection = signal(this.root);
+    protected readonly selectionPath = signal('');
 
-    public readonly dropdown = new ModalModel();
+    protected readonly dropdown = new ModalModel();
 
     constructor(appsState: AppsState,
         private readonly assetsService: AssetsService,
@@ -91,7 +91,7 @@ export class AssetFolderDropdownComponent extends SignalControlComponent<string>
             });
     }
 
-    public select(selected: AssetFolderDropdowNode, emit = true) {
+    protected select(selected: AssetFolderDropdowNode, emit = true) {
         this.resetSelected(this.root);
 
         const path: AssetFolderDropdowNode[] = [];

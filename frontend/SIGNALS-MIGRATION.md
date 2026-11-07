@@ -81,3 +81,40 @@ npx ng test --no-watch
 ```
 
 Other agents may be editing other folders at the same time, so errors in files outside your scope can be transient. Only fix errors in your own files and in consumers of your components. If a consumer you need to fix is in another agent's folder, do not edit it; report it instead.
+
+---
+
+# Phase 2: states, services and template-only members
+
+## What already changed (do not redo)
+
+- `framework/state.ts`: `State<T>` is signal-based. `project`, `projectFrom`, `projectFrom2` now return `Signal<M>` (a `computed`), and `projectFrom*` take signals instead of observables. `state.value` is a signal of the whole snapshot. `state.snapshot` (untracked read) and `state.changes` (observable of `{ snapshot, event }`) still exist.
+- `framework/utils/modal-view.ts`: `ModalModel.isOpen` / `DialogModel.isOpen` are signals (`isOpen()`). `isOpenChanges` is still an observable for the modal directive.
+- `StatefulComponent` was deleted.
+- `Form.submitCount`, `submitted`, `submitting`, `error` (framework/angular/forms/model.ts) are signals now because they use `project`.
+
+Because of this, the build is broken everywhere until all areas are migrated. Other agents work in parallel on other folders.
+
+## Rules
+
+1. **State stores** (`*.state.ts`, `table-settings.ts`, other classes extending `State<T>`): every public projection is a `Signal`. Remove observables that only exist to project state; derive with `project`/`projectFrom`/`computed`. Keep method signatures that return `Observable` for actions (`load()`, `create()`, ...) – HTTP and actions stay observables, the caller subscribes.
+   - Projection names: drop a `Changes` or `$` suffix if the plain name is free (`itemsChanges` -> `items`), otherwise keep the name.
+   - Getters that read `snapshot` (`appName`, `appId`) stay as they are.
+2. **Services**:
+   - **Values with a current state** (`BehaviorSubject`, `ReplaySubject(1)` holding "the current X"): expose a readonly signal (`private readonly x = signal(...)`, `public readonly xValue = this.x.asReadonly()` or a `computed`). Remove the observable if nobody needs it as a stream anymore; if a consumer really needs a stream (e.g. `switchMap` to HTTP), it uses `toObservable(signal)` in an injection context.
+   - **Event streams** (`Subject` without a current value: notifications, dialog requests, message bus, tour events) stay observables.
+   - **HTTP services** (`*.service.ts` calling `HttpClient`) stay observable-based. Do not use `httpResource` / `resource`.
+3. **Consumers**:
+   - Templates: `state.selectedApp | async` -> `state.selectedApp()`. Use `@let x = state.selectedApp();` or `@if (state.selectedApp(); as app)` instead of `| async` in `@if`. Remove `AsyncPipe` from `imports` when no `| async` is left.
+   - TypeScript: `toSignal(state.x.pipe(...))` -> `computed(() => { ... })`; `state.x.pipe(defined())` -> `computed` that returns the value (use `!`/a non-null computed only if the route guarantees it, same as before with `defined()`). Subscriptions on projections with side effects -> `effect`. If a real stream is needed (`switchMap` to HTTP, `take(1)` in a guard/resolver), use `toObservable(state.x)` – inside an injection context only (constructor, field initializer, guard/resolver function).
+   - `| async` on things that are not state projections (HTTP observables, event streams) stays.
+4. **Specs**: `state.x.subscribe(result => { actual = result; }); expect(actual)...` -> `expect(state.x())...`. Use `TestBed.runInInjectionContext` / `TestBed.inject` only if something needs an injection context.
+5. **Template-only members are `protected`**: in every component (and directive) in your area, every member (field, signal, method, injected constructor parameter like `public readonly appsState: AppsState`) that is only used by its own template becomes `protected`. Members only used inside the class become `private`. Stay `public`:
+   - inputs, outputs, models (the component API);
+   - members used from outside: other templates via template references (`#row` -> `row.fieldName()`), `viewChild` in parents, other classes, routes, specs, stories (`*.stories.ts`). Grep for the member name before you narrow it.
+   - Do not make a member `private` if the template uses it (template type-check fails).
+6. Everything from phase 1 still applies: readonly signals, block-body computeds, no lifecycle hooks, no `Subscriptions`, no new comments, `untracked` only when needed, `/** */` only on inputs/outputs.
+
+## Verification for phase 2
+
+While other areas are still in progress the global build has errors outside your area. Filter the output of `npx ng build --configuration development --output-path <your-own-temp-dir>` (or `npx tsc -p tsconfig.app.json --noEmit` and `npx tsc -p tsconfig.spec.json --noEmit`) to your own folders and get them to zero errors and zero NG8109 warnings. Run `npx eslint` on your changed files and `npx ng test --no-watch` filtered to your specs (`npx ng test --no-watch --include <glob>`), if possible.

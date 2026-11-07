@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { ListViewComponent, ResourceLoaderService, ThemeService, WorkflowView } from '@app/shared';
 
 declare const vis: any;
@@ -28,16 +27,14 @@ export class WorkflowDiagramComponent {
     /** The workflow to visualize as a diagram. */
     public readonly workflow = input.required<WorkflowView>();
 
-    public readonly isLoaded = signal(false);
+    protected readonly isLoaded = signal(false);
 
     constructor(destroyRef: DestroyRef,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly themeService: ThemeService,
     ) {
-        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
-
         effect(() => {
-            theme();
+            themeService.theme();
 
             const container = this.chartContainer()?.nativeElement;
             if (!container) {

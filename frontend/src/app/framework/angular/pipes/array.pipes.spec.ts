@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import '../../utils/array-extensions';
 import { EntriesPipe, KeysPipe, ReversePipe } from './array.pipes';
 
 describe('KeysPipe', () => {

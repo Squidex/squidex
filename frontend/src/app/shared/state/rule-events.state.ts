@@ -31,22 +31,22 @@ interface Snapshot extends ListState {
     providedIn: 'root',
 })
 export class RuleEventsState extends State<Snapshot> {
-    public ruleEvents =
+    public readonly ruleEvents =
         this.project(x => x.ruleEvents);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.ruleEvents.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCancelAll =
+    public readonly canCancelAll =
         this.project(x => x.canCancelAll === true);
 
     public get appId() {

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirective, UIOptions } from '@app/shared';
 
@@ -15,19 +14,18 @@ import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirectiv
     templateUrl: './chat-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ChatDialogComponent,
         ModalDirective,
     ],
 })
 export class ChatMenuComponent {
-    public readonly chatDialog = new DialogModel();
+    protected readonly chatDialog = new DialogModel();
 
-    public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+    protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
     constructor(
-        public readonly appsState: AppsState,
-        public readonly authService: AuthService,
+        protected readonly appsState: AppsState,
+        protected readonly authService: AuthService,
     ) {
     }
 }

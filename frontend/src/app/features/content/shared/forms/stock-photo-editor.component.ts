@@ -40,20 +40,20 @@ type Request = { search?: string; page: number };
     ],
 })
 export class StockPhotoEditorComponent extends SignalControlComponent<string> {
-    public readonly valueControl = new UntypedFormControl('');
+    protected readonly valueControl = new UntypedFormControl('');
 
-    public readonly value = toSignal(value$<string>(this.valueControl), { initialValue: '' });
+    protected readonly value = toSignal(value$<string>(this.valueControl), { initialValue: '' });
 
-    public readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
-    public readonly stockPhotoThumbnail = toSignal(valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x));
-    public readonly stockPhotoSearch = new UntypedFormControl('');
-    public readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
-    public readonly stockPhotosHasMore = signal(false);
-    public readonly stockPhotosLoading = signal(false);
+    private readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
+    protected readonly stockPhotoThumbnail = toSignal(valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x));
+    protected readonly stockPhotoSearch = new UntypedFormControl('');
+    protected readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
+    protected readonly stockPhotosHasMore = signal(false);
+    protected readonly stockPhotosLoading = signal(false);
 
-    public readonly thumbnailStatus = signal<'Loaded' | 'Failed' | undefined>(undefined);
+    protected readonly thumbnailStatus = signal<'Loaded' | 'Failed' | undefined>(undefined);
 
-    public readonly searchDialog = new DialogModel();
+    protected readonly searchDialog = new DialogModel();
 
     constructor(
         private readonly stockPhotoService: StockPhotoService,
@@ -120,7 +120,7 @@ export class StockPhotoEditorComponent extends SignalControlComponent<string> {
         }
     }
 
-    public selectPhoto(photo: StockPhotoDto) {
+    protected selectPhoto(photo: StockPhotoDto) {
         if (!this.isDisabled()) {
             this.valueControl.setValue(photo.url);
 
@@ -134,21 +134,21 @@ export class StockPhotoEditorComponent extends SignalControlComponent<string> {
         }
     }
 
-    public loadMore() {
+    protected loadMore() {
         const request = this.stockPhotoRequests.value;
 
         this.stockPhotoRequests.next({ search: request.search, page: request.page + 1 });
     }
 
-    public onThumbnailLoaded() {
+    protected onThumbnailLoaded() {
         this.thumbnailStatus.set('Loaded');
     }
 
-    public onThumbnailFailed() {
+    protected onThumbnailFailed() {
         this.thumbnailStatus.set('Failed');
     }
 
-    public isSelected(photo: StockPhotoDto) {
+    protected isSelected(photo: StockPhotoDto) {
         return photo.url === this.value();
     }
 }

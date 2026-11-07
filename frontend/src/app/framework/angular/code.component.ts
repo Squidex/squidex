@@ -19,5 +19,5 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ],
 })
 export class CodeComponent {
-    public readonly id = MathHelper.guid();
+    protected readonly id = MathHelper.guid();
 }

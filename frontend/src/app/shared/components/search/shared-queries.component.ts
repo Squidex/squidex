@@ -7,7 +7,6 @@
 
 /* eslint-disable @angular-eslint/no-output-native */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
 import { Queries, Query } from '@app/shared/internal';
@@ -19,7 +18,6 @@ import { QueryListComponent } from './query-list.component';
     templateUrl: './shared-queries.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         QueryListComponent,
         TranslatePipe,
     ],

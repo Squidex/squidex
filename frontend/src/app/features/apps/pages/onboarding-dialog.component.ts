@@ -27,14 +27,14 @@ export class OnboardingDialogComponent {
     /** Emits when the user closes the dialog, by skipping or starting the tour. */
     public readonly dialogClose = output();
 
-    public readonly answersForm =
+    protected readonly answersForm =
         this.formBuilder.group({
             companySize: '',
             companyRole: '',
             project: '',
         });
 
-    public readonly step = signal(0);
+    protected readonly step = signal(0);
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -43,22 +43,22 @@ export class OnboardingDialogComponent {
     ) {
     }
 
-    public submitAnswers() {
+    protected submitAnswers() {
         this.usersService.postUser({ answers: this.answersForm.value as any }).subscribe();
         this.next();
     }
 
-    public start() {
+    protected start() {
         this.tourState.start();
         this.dialogClose.emit();
     }
 
-    public cancel() {
+    protected cancel() {
         this.tourState.complete();
         this.dialogClose.emit();
     }
 
-    public next() {
+    protected next() {
         this.step.update(x => x + 1);
     }
 }

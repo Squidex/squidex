@@ -73,17 +73,17 @@ export class CommentComponent {
     /** The selector of the container to scroll when the comment is selected. */
     public readonly scrollContainer = input<string>();
 
-    public readonly replyForm = new UpsertCommentForm();
+    protected readonly replyForm = new UpsertCommentForm();
 
-    public readonly updateForm = new UpsertCommentForm();
+    protected readonly updateForm = new UpsertCommentForm();
 
-    public readonly mode = signal<'Normal' | 'Edit' | 'Reply'>('Normal');
+    protected readonly mode = signal<'Normal' | 'Edit' | 'Reply'>('Normal');
 
-    public readonly isMyComment = computed(() => {
+    protected readonly isMyComment = computed(() => {
         return this.commentItem().comment.user === this.userToken();
     });
 
-    public readonly isOnlyDelete = computed(() => {
+    protected readonly isOnlyDelete = computed(() => {
         // A single icon without context is hard to understand, therefore we show a label in this case.
         return !this.canAnswer() && !(this.isMyComment() && this.canEdit()) && !this.canResolve();
     });
@@ -94,7 +94,7 @@ export class CommentComponent {
     ) {
     }
 
-    public select() {
+    protected select() {
         const editorId = this.commentItem().comment.editorId;
         if (!editorId) {
             return;
@@ -103,20 +103,20 @@ export class CommentComponent {
         this.messageBus.emit(new CommentSelected(editorId));
     }
 
-    public startEdit() {
+    protected startEdit() {
         this.updateForm.load({ text: this.commentItem().comment.text });
         this.mode.set('Edit');
     }
 
-    public startReply() {
+    protected startReply() {
         this.mode.set('Reply');
     }
 
-    public cancelUpdateOrReply() {
+    protected cancelUpdateOrReply() {
         this.mode.set('Normal');
     }
 
-    public resolve(isResolved: boolean) {
+    protected resolve(isResolved: boolean) {
         if (!this.canResolve()) {
             return;
         }
@@ -124,7 +124,7 @@ export class CommentComponent {
         this.comments().update(this.commentItem().index, { isResolved });
     }
 
-    public delete() {
+    protected delete() {
         if (!this.isMyComment() && !this.canDelete()) {
             return;
         }
@@ -132,7 +132,7 @@ export class CommentComponent {
         this.comments().remove(this.commentItem().index);
     }
 
-    public reply() {
+    protected reply() {
         if (!this.canAnswer()) {
             return;
         }
@@ -148,7 +148,7 @@ export class CommentComponent {
         this.cancelUpdateOrReply();
     }
 
-    public update() {
+    protected update() {
         if (!this.isMyComment()) {
             return;
         }
@@ -170,14 +170,14 @@ export class CommentComponent {
         this.cancelUpdateOrReply();
     }
 
-    public onKeyPressReply(event: KeyboardEvent) {
+    protected onKeyPressReply(event: KeyboardEvent) {
         if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
             this.reply();
             event.preventDefault();
         }
     }
 
-    public onKeyPressUpdate(event: KeyboardEvent) {
+    protected onKeyPressUpdate(event: KeyboardEvent) {
         if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
             this.update();
             event.preventDefault();

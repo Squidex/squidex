@@ -35,7 +35,7 @@ export class ContentChangedSchemaComponent {
     /** Emits when the user confirms to remove the schema. */
     public readonly remove = output();
 
-    public readonly completions;
+    protected readonly completions;
 
     constructor(completionsCache: CompletionsCache) {
         this.completions = toSignal(

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, effect, input, output, signal, untracked } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
@@ -23,7 +22,6 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
     templateUrl: './trigger-dialog.component.html',
     imports: [
         AssetChangedTriggerComponent,
-        AsyncPipe,
         CommentTriggerComponent,
         ContentChangedTriggerComponent,
         CronJobTriggerComponent,
@@ -53,10 +51,10 @@ export class TriggerDialogComponent {
     /** Emits the validated trigger when the user saves it or selects a trigger without properties. */
     public readonly dialogSave = output<RuleTriggerDto>();
 
-    public readonly currentTrigger = signal<TriggerForm | undefined>(undefined);
+    protected readonly currentTrigger = signal<TriggerForm | undefined>(undefined);
 
     constructor(
-        public readonly schemasState: SchemasState,
+        protected readonly schemasState: SchemasState,
         private readonly rulesService: RulesService,
     ) {
         effect(() => {
@@ -71,7 +69,7 @@ export class TriggerDialogComponent {
         });
     }
 
-    public selectTrigger(type: string, values?: any) {
+    protected selectTrigger(type: string, values?: any) {
         const metadata = this.availableTriggers()[type];
 
         if (!metadata) {
@@ -95,7 +93,7 @@ export class TriggerDialogComponent {
         }
     }
 
-    public save() {
+    protected save() {
         const currentTrigger = this.currentTrigger();
         if (!this.isEditable() || !currentTrigger) {
             return;

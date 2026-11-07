@@ -26,19 +26,19 @@ export class LeftMenuComponent {
     /** The selected app, used to decide which menu items are visible. */
     public readonly app = input.required<AppDto>();
 
-    public readonly isAssetsHidden = computed(() => {
+    protected readonly isAssetsHidden = computed(() => {
         return this.app().roleProperties[Settings.AppProperties.HIDE_ASSETS] === true;
     });
 
-    public readonly isSettingsHidden = computed(() => {
+    protected readonly isSettingsHidden = computed(() => {
         return this.app().roleProperties[Settings.AppProperties.HIDE_SETTINGS] === true;
     });
 
-    public readonly isSchemasHidden = computed(() => {
+    protected readonly isSchemasHidden = computed(() => {
         return this.app().roleProperties[Settings.AppProperties.HIDE_SCHEMAS] === true;
     });
 
-    public readonly isApiHidden = computed(() => {
+    protected readonly isApiHidden = computed(() => {
         return this.app().roleProperties[Settings.AppProperties.HIDE_API] === true;
     });
 }

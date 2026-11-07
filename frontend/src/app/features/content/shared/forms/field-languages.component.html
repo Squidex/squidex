@@ -12,7 +12,7 @@
 
         @if (formModel().field.properties.isComplexUI || !showAllControls()) {
             <sqx-language-selector
-                [exists]="formModel().translationStatus | async"
+                [exists]="formModel().translationStatus()"
                 hintAfter="120000"
                 hintPosition="top-end"
                 hintText="i18n:contents.validationHint"

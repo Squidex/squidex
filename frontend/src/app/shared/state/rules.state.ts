@@ -37,31 +37,31 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class RulesState extends State<Snapshot> {
-    public selectedRule =
+    public readonly selectedRule =
         this.project(x => x.selectedRule);
 
-    public rules =
+    public readonly rules =
         this.project(x => x.rules);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public canCancelRun =
+    public readonly canCancelRun =
         this.project(x => x.canCancelRun === true);
 
-    public canReadEvents =
+    public readonly canReadEvents =
         this.project(x => x.canReadEvents === true);
 
-    public runningRuleId =
+    public readonly runningRuleId =
         this.project(x => x.runningRuleId);
 
-    public runningRule =
+    public readonly runningRule =
         this.projectFrom2(this.rules, this.runningRuleId, (r, id) => r.find(x => x.id === id));
 
     public get appId() {

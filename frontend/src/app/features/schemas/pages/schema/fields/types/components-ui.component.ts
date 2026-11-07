@@ -33,5 +33,5 @@ export class ComponentsUIComponent {
     /** The type specific properties of the field. */
     public readonly properties = input.required<ReferencesFieldPropertiesDto>();
 
-    public readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
+    protected readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

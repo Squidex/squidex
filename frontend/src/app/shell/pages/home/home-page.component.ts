@@ -22,8 +22,6 @@ import { AuthService, FormHintComponent, TranslatePipe, UIOptions } from '@app/s
 export class HomePageComponent {
     private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
 
-    public showLoginError = false;
-
     constructor(
         private readonly authService: AuthService,
         private readonly location: Location,
@@ -32,7 +30,7 @@ export class HomePageComponent {
     ) {
     }
 
-    public async login() {
+    protected async login() {
         const redirectPath =
             this.route.snapshot.queryParams.redirectPath ||
             this.location.path();
@@ -59,7 +57,7 @@ export class HomePageComponent {
         }
     }
 
-    public isInternetExplorer() {
+    protected isInternetExplorer() {
         return !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
     }
 }

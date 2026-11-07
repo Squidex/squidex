@@ -6,11 +6,9 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, numberAttribute, viewChild, viewChildren } from '@angular/core';
 import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
-import { combineLatest } from 'rxjs';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, disabled$, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
@@ -20,7 +18,6 @@ import { ArrayItemComponent } from './array-item.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ArrayItemComponent,
-        AsyncPipe,
         CdkDrag,
         CdkDragHandle,
         CdkDropList,
@@ -65,13 +62,13 @@ export class ArrayEditorComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public readonly schemasDropdown = new ModalModel();
+    protected readonly schemasDropdown = new ModalModel();
 
-    public readonly isArray = computed(() => {
+    protected readonly isArray = computed(() => {
         return !Types.is(this.formModel().field.properties, ComponentsFieldPropertiesDto);
     });
 
-    public readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
+    protected readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
         const formModel = this.formModel();
 
         const properties = formModel.field.properties;
@@ -82,27 +79,22 @@ export class ArrayEditorComponent {
         return properties.schemaIds?.map(x => formModel.globals.schemas[x]).defined().sortedByString(x => x.displayName) || [];
     });
 
-    public readonly isDisabled = computed(() => {
-        return disabled$(this.formModel().form);
+    protected readonly isDisabled = computed(() => {
+        return this.formModel().disabled();
     });
 
-    public readonly isDisabledOrFull = computed(() => {
+    protected readonly isDisabledOrFull = computed(() => {
         const formModel = this.formModel();
         const maxItems = formModel.field.rawProperties['maxItems'] || Number.MAX_VALUE;
 
-        return combineLatest([
-            this.isDisabled(),
-            formModel.itemChanges,
-        ], (disabled, items) => {
-            return disabled || items.length >= maxItems;
-        });
+        return this.isDisabled() || formModel.items().length >= maxItems;
     });
 
-    public readonly isCollapsedInitial = computed(() => {
+    protected readonly isCollapsedInitial = computed(() => {
         return this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel() > 0;
     });
 
-    public readonly hasField = computed(() => {
+    protected readonly hasField = computed(() => {
         return (this.formModel().field as any)['nested']?.length > 0;
     });
 
@@ -111,40 +103,40 @@ export class ArrayEditorComponent {
     ) {
     }
 
-    public removeItem(index: number) {
+    protected removeItem(index: number) {
         this.formModel().removeItemAt(index);
     }
 
-    public addCopy(value: ObjectFormBase) {
+    protected addCopy(value: ObjectFormBase) {
         this.formModel().addCopy(value);
     }
 
-    public addItem() {
+    protected addItem() {
         this.formModel().addItem();
     }
 
-    public addComponent(schema: SchemaDto) {
+    protected addComponent(schema: SchemaDto) {
         this.formModel().addComponent(schema.id);
     }
 
-    public clear() {
+    protected clear() {
         this.formModel().setValue([]);
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<ObjectFormBase>>) {
+    protected sort(event: CdkDragDrop<ReadonlyArray<ObjectFormBase>>) {
         this.formModel().sort(sorted(event));
 
         this.reset();
     }
 
-    public move(item: ObjectFormBase, index: number) {
+    protected move(item: ObjectFormBase, index: number) {
         this.formModel().move(index, item);
 
         this.reset();
     }
 
-    public collapseAll() {
-        for (const item of this.formModel().items) {
+    protected collapseAll() {
+        for (const item of this.formModel().items()) {
             item.collapse();
         }
 
@@ -155,8 +147,8 @@ export class ArrayEditorComponent {
         this.scroller()?.invalidateAllCachedMeasurements();
     }
 
-    public expandAll() {
-        for (const item of this.formModel().items) {
+    protected expandAll() {
+        for (const item of this.formModel().items()) {
             item.expand();
         }
 

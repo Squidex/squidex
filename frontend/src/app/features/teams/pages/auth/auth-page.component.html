@@ -19,7 +19,7 @@
                     @if (isEditing()) {
                         <form [formGroup]="updateForm.form" (ngSubmit)="save()">
                             <div class="card-body">
-                                <sqx-form-error [error]="updateForm.error | async" />
+                                <sqx-form-error [error]="updateForm.error()" />
 
                                 <sqx-form-row for="domain" label="teams.auth.domain">
                                     <input class="form-control" id="domain" formControlName="domain" />

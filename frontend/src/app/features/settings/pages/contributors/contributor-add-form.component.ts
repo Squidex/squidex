@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, Injectable, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { AssignContributorForm, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
@@ -27,11 +27,12 @@ export class UsersDataSource implements AutocompleteSource {
         }
 
         return this.usersService.getUsers(query).pipe(
-            withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
+            map(users => {
+                const contributors = this.contributorsState.contributors();
                 const results: any[] = [];
 
                 for (const user of users) {
-                    if (!contributors!.find(t => t.contributorId === user.id)) {
+                    if (!contributors.find(t => t.contributorId === user.id)) {
                         results.push(user);
                     }
                 }
@@ -68,13 +69,13 @@ export class ContributorAddFormComponent {
     /** The roles that can be assigned to new contributors. */
     public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    public readonly assignContributorForm = new AssignContributorForm();
+    protected readonly assignContributorForm = new AssignContributorForm();
 
-    public readonly importDialog = new DialogModel();
+    protected readonly importDialog = new DialogModel();
 
     constructor(
-        public readonly contributorsState: ContributorsState,
-        public readonly usersDataSource: UsersDataSource,
+        private readonly contributorsState: ContributorsState,
+        protected readonly usersDataSource: UsersDataSource,
         private readonly dialogs: DialogService,
     ) {
         effect(() => {
@@ -82,7 +83,7 @@ export class ContributorAddFormComponent {
         });
     }
 
-    public assignContributor() {
+    protected assignContributor() {
         const value = this.assignContributorForm.submit();
         if (!value) {
             return;

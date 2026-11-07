@@ -23,11 +23,11 @@ export class AssetUploadsSizeSummaryCardComponent {
     /** The asset storage usage of the app. */
     public readonly usage = input.required<CurrentStorageDto | undefined>();
 
-    public readonly storageCurrent = computed(() => {
+    protected readonly storageCurrent = computed(() => {
         return this.usage()?.size ?? 0;
     });
 
-    public readonly storageAllowed = computed(() => {
+    protected readonly storageAllowed = computed(() => {
         return this.usage()?.maxAllowed ?? 0;
     });
 }

@@ -33,10 +33,10 @@ export class DueTimeSelectorComponent {
     /** Skips the dialog and changes the status immediately. */
     public readonly disabled = input(false, { transform: booleanAttribute });
 
-    public readonly dueTimeDialog = new DialogModel();
-    public readonly dueTime = signal<string | null>('');
-    public readonly dueTimeAction = signal<string | null>('');
-    public readonly dueTimeMode = signal(OPTION_IMMEDIATELY);
+    protected readonly dueTimeDialog = new DialogModel();
+    protected readonly dueTime = signal<string | null>('');
+    protected readonly dueTimeAction = signal<string | null>('');
+    protected readonly dueTimeMode = signal(OPTION_IMMEDIATELY);
 
     public selectDueTime(action: string): Observable<DateTime | undefined> {
         if (this.disabled()) {
@@ -50,7 +50,7 @@ export class DueTimeSelectorComponent {
         return this.dueTimeResult;
     }
 
-    public confirmStatusChange() {
+    protected confirmStatusChange() {
         const result = this.dueTimeMode() === OPTION_IMMEDIATELY ? null : this.dueTime();
 
         this.dueTimeResult?.next(result ? DateTime.parseISO(result) : undefined);
@@ -59,7 +59,7 @@ export class DueTimeSelectorComponent {
         this.cancelStatusChange();
     }
 
-    public cancelStatusChange() {
+    protected cancelStatusChange() {
         this.dueTimeMode.set(OPTION_IMMEDIATELY);
         this.dueTimeDialog.hide();
         this.dueTimeResult = null!;

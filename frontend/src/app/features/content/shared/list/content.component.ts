@@ -9,12 +9,9 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, input, output, viewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { of } from 'rxjs';
-import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -23,7 +20,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     templateUrl: './content.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         ContentListCellDirective,
         ContentListCellResizeDirective,
@@ -82,13 +78,13 @@ export class ContentComponent {
     /** The content to render. */
     public readonly content = input.required<ContentDto>({ alias: 'sqxContent' });
 
-    public readonly dropdown = new ModalModel();
+    protected readonly dropdown = new ModalModel();
 
-    public readonly patchAllowed = computed(() => {
+    protected readonly patchAllowed = computed(() => {
         return this.content().canUpdate;
     });
 
-    public readonly patchForm = computed(() => {
+    protected readonly patchForm = computed(() => {
         if (!this.patchAllowed()) {
             return undefined;
         }
@@ -96,13 +92,8 @@ export class ContentComponent {
         return new PatchContentForm(this.tableFields(), this.language());
     });
 
-    public readonly isDirty = computed(() => {
-        const form = this.patchForm()?.form;
-        if (!form) {
-            return of(false);
-        }
-
-        return form.events.pipe(map(() => form.dirty), startWith(form.dirty), distinctUntilChanged());
+    protected readonly isDirty = computed(() => {
+        return this.patchForm()?.dirty() === true;
     });
 
     constructor(
@@ -111,7 +102,7 @@ export class ContentComponent {
     ) {
     }
 
-    public save() {
+    protected save() {
         const content = this.content();
         const patchForm = this.patchForm();
         if (!content.canUpdate || !patchForm) {
@@ -138,7 +129,7 @@ export class ContentComponent {
             });
     }
 
-    public shouldStop(field: TableField) {
+    protected shouldStop(field: TableField) {
         const isDirty = this.patchForm()?.form.dirty === true;
 
         if (field.rootField) {
@@ -148,7 +139,7 @@ export class ContentComponent {
         }
     }
 
-    public cancel() {
+    protected cancel() {
         this.patchForm()?.submitCompleted();
 
         for (const field of this.fields()) {

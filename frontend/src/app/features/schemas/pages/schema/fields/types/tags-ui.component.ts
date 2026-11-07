@@ -22,7 +22,7 @@ import { FieldDto, FormRowComponent, TagEditorComponent, TagsFieldEditorValues, 
     ],
 })
 export class TagsUIComponent {
-    public readonly editors = TagsFieldEditorValues;
+    protected readonly editors = TagsFieldEditorValues;
 
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();

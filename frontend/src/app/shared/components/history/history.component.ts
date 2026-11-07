@@ -28,7 +28,7 @@ import { HistoryListComponent } from './history-list.component';
 export class HistoryComponent {
     private readonly channel = this.calculateChannel();
 
-    public events: Observable<ReadonlyArray<HistoryEventDto>> =
+    protected events: Observable<ReadonlyArray<HistoryEventDto>> =
         merge(
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000)),

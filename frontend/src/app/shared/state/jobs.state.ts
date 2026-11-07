@@ -28,22 +28,22 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class JobsState extends State<Snapshot> {
-    public jobs =
+    public readonly jobs =
         this.project(x => x.jobs);
 
-    public maxBackupsReached =
+    public readonly maxBackupsReached =
         this.projectFrom(this.jobs, x => x.filter(j => j.taskName === 'backup').length >= 10);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreateBackup =
+    public readonly canCreateBackup =
         this.project(x => x.canCreateBackup === true);
 
-    public canRebuildTextIndex =
+    public readonly canRebuildTextIndex =
         this.project(x => !!x.textIndexResource);
 
     public get appId() {

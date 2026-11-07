@@ -21,7 +21,7 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     ],
 })
 export class NotificationsMenuComponent {
-    public isNotifoConfigured = false;
+    protected readonly isNotifoConfigured: boolean;
 
     constructor(authService: AuthService, uiOptions: UIOptions,
     ) {

@@ -5,12 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
+import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
@@ -18,7 +16,6 @@ import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, 
     templateUrl: './more-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         FormErrorComponent,
         FormHintComponent,
@@ -37,23 +34,23 @@ import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, 
     ],
 })
 export class MorePageComponent {
-    public readonly team;
+    private readonly team;
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return !!this.team()?.canUpdateGeneral;
     });
 
-    public readonly isDeletable = computed(() => {
+    protected readonly isDeletable = computed(() => {
         return !!this.team()?.canDelete;
     });
 
-    public readonly updateForm = new UpdateTeamForm();
+    protected readonly updateForm = new UpdateTeamForm();
 
     constructor(
         private readonly router: Router,
         private readonly teamsState: TeamsState,
     ) {
-        this.team = toSignal(this.teamsState.selectedTeam.pipe(defined()));
+        this.team = this.teamsState.selectedTeam;
 
         effect(() => {
             const team = this.team();
@@ -68,7 +65,7 @@ export class MorePageComponent {
         this.teamsState.reloadTeams();
     }
 
-    public save() {
+    protected save() {
         const team = this.team();
         if (!team || !this.isEditable()) {
             return;
@@ -90,7 +87,7 @@ export class MorePageComponent {
             });
     }
 
-    public deleteTeam() {
+    protected deleteTeam() {
         const team = this.team();
         if (!team || !this.isDeletable()) {
             return;

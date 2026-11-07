@@ -7,8 +7,7 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { Directive, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
-import { Subscriptions } from '@app/framework';
+import { computed, Directive, effect, ElementRef, input, Input, numberAttribute, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { ContentDto, FieldSizes, META_FIELDS, TableField, TableSettings } from '@app/shared/internal';
 
 export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
@@ -65,106 +64,80 @@ export class ContentsColumnsPipe implements PipeTransform {
 @Directive({
     selector: '[sqxContentListWidth]',
 })
-export class ContentListWidthDirective  {
-    private readonly subscriptions = new Subscriptions();
-    private sizes?: FieldSizes;
-    private size = -1;
+export class ContentListWidthDirective {
+    /** The fields to calculate the minimum width of the table from. */
+    public readonly fields = input<ReadonlyArray<TableField> | null | undefined>(undefined, { alias: 'sqxContentListWidth' });
 
-    @Input('sqxContentListWidth')
-    public fields!: ReadonlyArray<TableField>;
+    /** The table settings that provide the custom column sizes. */
+    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
 
-    @Input('fields')
-    public set tableSettings(value: TableSettings | undefined | null) {
-        this.subscriptions.unsubscribeAll();
+    private readonly size = computed(() => {
+        const fields = this.fields();
+        if (!fields) {
+            return undefined;
+        }
 
-        this.subscriptions.add(value?.fieldSizes.subscribe(sizes => {
-            this.sizes = sizes;
+        const sizes = this.tableSettings()?.fieldSizes();
 
-            this.updateSize();
-        }));
-    }
+        let size = 100;
+
+        for (const field of fields) {
+            size += getCellWidth(field, sizes);
+        }
+
+        return size;
+    });
 
     constructor(
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-    }
+        effect(() => {
+            const size = this.size();
+            if (size === undefined) {
+                return;
+            }
 
-    public ngOnChanges() {
-        this.updateSize();
-    }
-
-    private updateSize() {
-        if (!this.fields) {
-            return;
-        }
-
-        let size = 100;
-
-        for (const field of this.fields) {
-            size += getCellWidth(field, this.sizes);
-        }
-
-        if (size === this.size) {
-            return;
-        }
-
-        this.renderer.setStyle(this.element.nativeElement, 'min-width', `${size}px`);
-
-        this.size === size;
+            this.renderer.setStyle(this.element.nativeElement, 'min-width', `${size}px`);
+        });
     }
 }
 
 @Directive({
     selector: '[sqxContentListCell]',
 })
-export class ContentListCellDirective  {
-    private readonly subscriptions = new Subscriptions();
-    private sizes?: FieldSizes;
-    private size = -1;
+export class ContentListCellDirective {
+    /** The field of the cell to calculate the width for. */
+    public readonly field = input.required<TableField>();
 
-    @Input()
-    public field!: TableField;
+    /** The table settings that provide the custom column sizes. */
+    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
 
-    @Input('fields')
-    public set tableFields(value: TableSettings | undefined | null) {
-        this.subscriptions.unsubscribeAll();
+    private readonly size = computed(() => {
+        const field = this.field();
+        if (!field.name) {
+            return undefined;
+        }
 
-        this.subscriptions.add(value?.fieldSizes.subscribe(sizes => {
-            this.sizes = sizes;
-
-            this.updateSize();
-        }));
-    }
+        return getCellWidth(field, this.tableSettings()?.fieldSizes());
+    });
 
     constructor(
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-    }
+        effect(() => {
+            const size = this.size();
+            if (size === undefined) {
+                return;
+            }
 
-    public ngOnChanges() {
-        this.updateSize();
-    }
+            const width = `${size}px`;
 
-    private updateSize() {
-        if (!this.field.name) {
-            return;
-        }
-
-        const size = getCellWidth(this.field, this.sizes);
-
-        if (size === this.size) {
-            return;
-        }
-
-        const width = `${size}px`;
-
-        this.renderer.setStyle(this.element.nativeElement, 'min-width', width);
-        this.renderer.setStyle(this.element.nativeElement, 'max-width', width);
-        this.renderer.setStyle(this.element.nativeElement, 'width', width);
-
-        this.size === size;
+            this.renderer.setStyle(this.element.nativeElement, 'min-width', width);
+            this.renderer.setStyle(this.element.nativeElement, 'max-width', width);
+            this.renderer.setStyle(this.element.nativeElement, 'width', width);
+        });
     }
 }
 

@@ -1,6 +1,6 @@
-@if (appsState.selectedApp | async; as app) {
+@if (appsState.selectedApp(); as app) {
     @if (app.canUploadAssets) {
-        @if (assetUploader.uploads | async; as uploads) {
+        @if (assetUploader.uploads(); as uploads) {
             <ul class="nav navbar-nav align-items-center" (sqxDropFile)="addFiles($event)">
                 <li class="nav-item nav-icon dropdown d-flex align-items-center" #button>
                     <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">

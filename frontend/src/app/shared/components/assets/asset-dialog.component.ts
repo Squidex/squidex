@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, computed, effect, input, linkedSignal, output, signal, viewChild } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,7 +32,6 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
         AssetPreviewUrlPipe,
         AssetTextEditorComponent,
         AssetUrlPipe,
-        AsyncPipe,
         ConfirmClickDirective,
         ControlErrorsComponent,
         CopyDirective,
@@ -72,46 +70,46 @@ export class AssetDialogComponent {
     /** The asset to edit. */
     public readonly asset = input.required<AssetDto>();
 
-    public readonly assetActual = linkedSignal(() => this.asset());
+    protected readonly assetActual = linkedSignal(() => this.asset());
 
-    public readonly assetPath;
-    public readonly assetTags;
+    protected readonly assetPath;
+    protected readonly assetTags;
 
-    public readonly progress = signal(0);
+    protected readonly progress = signal(0);
 
-    public readonly selectedTab = signal(0);
+    protected readonly selectedTab = signal(0);
 
-    public readonly isMoving = signal(false);
+    protected readonly isMoving = signal(false);
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.assetActual().canUpdate;
     });
 
-    public readonly isUploadable = computed(() => {
+    protected readonly isUploadable = computed(() => {
         return this.assetActual().canUpload;
     });
 
-    public readonly isMoveable = computed(() => {
+    protected readonly isMoveable = computed(() => {
         return this.assetActual().canMove;
     });
 
-    public readonly isImage = computed(() => {
+    protected readonly isImage = computed(() => {
         return this.assetActual().type === 'Image';
     });
 
-    public readonly isVideo = computed(() => {
+    protected readonly isVideo = computed(() => {
         return this.assetActual().type === 'Video';
     });
 
-    public readonly isDocumentLikely = computed(() => {
+    protected readonly isDocumentLikely = computed(() => {
         const asset = this.assetActual();
 
         return asset.type === 'Unknown' && asset.fileSize < 100_000;
     });
 
-    public readonly moveForm = new MoveAssetForm();
+    protected readonly moveForm = new MoveAssetForm();
 
-    public readonly annotateForm = new AnnotateAssetForm();
+    protected readonly annotateForm = new AnnotateAssetForm();
 
     constructor(appsState: AppsState, assetsService: AssetsService,
         private readonly assetsState: AssetsState,
@@ -140,23 +138,23 @@ export class AssetDialogComponent {
         });
     }
 
-    public selectTab(tab: number) {
+    protected selectTab(tab: number) {
         this.selectedTab.set(tab);
     }
 
-    public navigate(id: string) {
+    protected navigate(id: string) {
         this.assetsState.navigate(id);
     }
 
-    public generateSlug() {
+    protected generateSlug() {
         this.annotateForm.generateSlug(this.assetActual());
     }
 
-    public startMoving() {
+    protected startMoving() {
         this.isMoving.set(true);
     }
 
-    public cropImage() {
+    protected cropImage() {
         const imageCropper = this.imageCropper();
         if (!imageCropper || !this.isUploadable()) {
             return;
@@ -165,7 +163,7 @@ export class AssetDialogComponent {
         this.uploadEdited(imageCropper.toFile());
     }
 
-    public saveText() {
+    protected saveText() {
         const textEditor = this.textEditor();
         if (!textEditor || !this.isUploadable()) {
             return;
@@ -174,7 +172,7 @@ export class AssetDialogComponent {
         this.uploadEdited(textEditor.toFile());
     }
 
-    public uploadEdited(fileChange: Promise<HTTP.UploadFile | null>) {
+    private uploadEdited(fileChange: Promise<HTTP.UploadFile | null>) {
         fileChange.then(file => {
             if (!file) {
                 this.dialogs.notifyInfo('i18n:common.nothingChanged');
@@ -207,7 +205,7 @@ export class AssetDialogComponent {
         });
     }
 
-    public setFocusPoint() {
+    protected setFocusPoint() {
         const imageFocus = this.imageFocus();
         if (!imageFocus || !this.isEditable()) {
             return;
@@ -216,7 +214,7 @@ export class AssetDialogComponent {
         this.annotateInternal(imageFocus.submit(this.assetActual()));
     }
 
-    public annotateAsset() {
+    protected annotateAsset() {
         if (!this.isEditable()) {
             return;
         }
@@ -224,7 +222,7 @@ export class AssetDialogComponent {
         this.annotateInternal(this.annotateForm.submit(this.assetActual()));
     }
 
-    public moveAsset() {
+    protected moveAsset() {
         if (!this.isMoveable()) {
             return;
         }

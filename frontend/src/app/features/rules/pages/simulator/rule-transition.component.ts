@@ -33,7 +33,7 @@ export class RuleTransitionComponent {
     /** The text of the transition. */
     public readonly text = input<string | undefined | null>();
 
-    public readonly filteredErrors = computed(() => {
+    protected readonly filteredErrors = computed(() => {
         const errors = this.errors();
         if (!errors) {
             return [];

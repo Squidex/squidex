@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, TemplateDto, TemplatesDto, TemplatesService, TemplatesState } from '@app/shared/internal';
+import { DialogService, TemplatesDto, TemplatesService, TemplatesState } from '@app/shared/internal';
 import { createTemplate } from '../services/templates.service.spec';
 
 describe('TemplatesState', () => {
@@ -48,10 +48,7 @@ describe('TemplatesState', () => {
 
             templatesState.load().subscribe();
 
-            let starters: TemplateDto[] = [];
-            templatesState.starters.subscribe(x => {
-                starters = x;
-            });
+            const starters = templatesState.starters();
 
             expect(starters).toEqual([template1]);
         });

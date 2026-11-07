@@ -48,25 +48,25 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class PlansState extends State<Snapshot> {
-    public plans =
+    public readonly plans =
         this.project(x => x.plans);
 
-    public planOwner =
+    public readonly planOwner =
         this.project(x => x.planOwner);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public locked =
+    public readonly locked =
         this.project(x => x.locked);
 
-    public referral =
+    public readonly referral =
         this.project(x => x.referral);
 
-    public portalLink =
+    public readonly portalLink =
         this.project(x => x.portalLink);
 
     public get appId() {

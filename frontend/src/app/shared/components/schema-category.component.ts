@@ -42,7 +42,7 @@ export class SchemaCategoryComponent {
     /** Defines whether the links point to the schema editor or to the contents. */
     public readonly schemaTarget = input<'Schema' | 'Contents'>();
 
-    public readonly isCollapsed = linkedSignal(() => {
+    protected readonly isCollapsed = linkedSignal(() => {
         const schemaCategory = this.schemaCategory();
         if (schemaCategory.countSchemasInSubtreeFiltered < schemaCategory.countSchemasInSubtree) {
             return false;
@@ -51,15 +51,15 @@ export class SchemaCategoryComponent {
         return this.localStore.getBoolean(getCollapsedKey(schemaCategory));
     });
 
-    public readonly forContent = computed(() => {
+    protected readonly forContent = computed(() => {
         return this.schemaTarget() === 'Contents';
     });
 
-    public readonly schemas = computed(() => {
+    protected readonly schemas = computed(() => {
         return this.schemaCategory().schemasFiltered;
     });
 
-    public readonly containerHeight = computed(() => {
+    protected readonly containerHeight = computed(() => {
         return `${ITEM_HEIGHT * this.schemas().length}rem`;
     });
 
@@ -69,14 +69,14 @@ export class SchemaCategoryComponent {
     ) {
     }
 
-    public toggle() {
+    protected toggle() {
         const isCollapsed = !this.isCollapsed();
 
         this.isCollapsed.set(isCollapsed);
         this.localStore.setBoolean(getCollapsedKey(this.schemaCategory()), isCollapsed);
     }
 
-    public schemaRoute(schema: SchemaDto) {
+    protected schemaRoute(schema: SchemaDto) {
         if (schema.type === 'Singleton' && this.forContent()) {
             return [schema.name, schema.id, 'history'];
         } else {
@@ -84,7 +84,7 @@ export class SchemaCategoryComponent {
         }
     }
 
-    public changeName(name: string) {
+    protected changeName(name: string) {
         const displayName = this.schemaCategory().displayName;
         if (name === displayName) {
             return;
@@ -93,7 +93,7 @@ export class SchemaCategoryComponent {
         this.schemasState.renameCategory(displayName, name);
     }
 
-    public changeCategory(drag: CdkDragDrop<any>) {
+    protected changeCategory(drag: CdkDragDrop<any>) {
         if (drag.previousContainer === drag.container) {
             return;
         }
@@ -101,7 +101,7 @@ export class SchemaCategoryComponent {
         this.schemasState.changeCategory(drag.item.data, this.schemaCategory().name);
     }
 
-    public dragStarted(event: CdkDragStart) {
+    protected dragStarted(event: CdkDragStart) {
         setTimeout(() => {
             const dropContainer = event.source._dragRef['_dropContainer'];
 

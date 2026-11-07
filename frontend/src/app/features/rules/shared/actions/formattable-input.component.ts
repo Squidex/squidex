@@ -39,11 +39,11 @@ export class FormattableInputComponent extends SignalControlComponent<string> {
     /** The suggestions for autocompletion. */
     public readonly completion = input<ScriptCompletions | undefined | null>();
 
-    public readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
+    protected readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
 
-    public readonly mode = signal<TemplateMode>('Text');
+    protected readonly mode = signal<TemplateMode>('Text');
 
-    public readonly editorMode = computed(() => {
+    protected readonly editorMode = computed(() => {
         switch (this.mode()) {
             case 'Script':
                 return 'ace/mode/javascript';
@@ -54,7 +54,7 @@ export class FormattableInputComponent extends SignalControlComponent<string> {
         }
     });
 
-    public readonly editorCompletion = computed(() => {
+    protected readonly editorCompletion = computed(() => {
         const completion = this.completion();
         if (this.mode() === 'Script') {
             return completion;
@@ -95,7 +95,7 @@ export class FormattableInputComponent extends SignalControlComponent<string> {
         this.codeEditor()?.writeValue(value);
     }
 
-    public setMode(mode: TemplateMode, emit = true) {
+    protected setMode(mode: TemplateMode, emit = true) {
         if (this.mode() === mode) {
             return;
         }

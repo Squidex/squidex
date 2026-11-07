@@ -39,9 +39,9 @@ export class IndexFormComponent {
     /** The languages of the app, to provide the localized fields. */
     public readonly languages = input.required<AppLanguageDto[]>();
 
-    public readonly createForm = new CreateIndexForm();
+    protected readonly createForm = new CreateIndexForm();
 
-    public readonly fieldNames = computed(() => {
+    protected readonly fieldNames = computed(() => {
         const languages = this.languages();
 
         const metaFields: string[] = [
@@ -75,15 +75,11 @@ export class IndexFormComponent {
     ) {
     }
 
-    public emitCreate() {
+    private emitCreate() {
         this.create.emit();
     }
 
-    public emitClose() {
-        this.dialogClose.emit();
-    }
-
-    public createSchema() {
+    protected createSchema() {
         const value = this.createForm.submit();
         if (!value) {
             return;

@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { computed, Signal, signal } from '@angular/core';
 import { AbstractControl, ValidatorFn } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AppLanguageDto, FieldDto, fieldInvariant, isValidValue, Language, NestedFieldDto, SchemaDto } from '../internal';
 import { CompiledRules, RuleContext, RulesProvider } from './contents.form-rules';
 
@@ -74,24 +73,16 @@ export function fieldTranslationStatus(data: any) {
 }
 
 export abstract class Hidden {
-    private readonly hidden$ = new BehaviorSubject<boolean>(false);
+    private readonly hiddenState = signal(false);
 
-    public get hidden() {
-        return this.hidden$.value;
-    }
+    public readonly hidden = this.hiddenState.asReadonly();
 
-    public get hiddenChanges(): Observable<boolean> {
-        return this.hidden$;
-    }
-
-    public get visibleChanges(): Observable<boolean> {
-        return this.hidden$.pipe(map(x => !x));
-    }
+    public readonly visible = computed(() => {
+        return !this.hiddenState();
+    });
 
     protected setHidden(hidden: boolean) {
-        if (hidden !== this.hidden) {
-            this.hidden$.next(hidden);
-        }
+        this.hiddenState.set(hidden);
     }
 }
 
@@ -125,7 +116,7 @@ export function groupFields<T extends AnyFieldDto>(fields: ReadonlyArray<T>, kee
     return result;
 }
 
-export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extends Hidden {
+export class FieldSection<TSeparator, TChild extends { hidden: Signal<boolean> }> extends Hidden {
     constructor(
         public readonly separator: TSeparator | undefined,
         public readonly fields: ReadonlyArray<TChild>,
@@ -137,7 +128,7 @@ export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extend
         let visible = false;
 
         for (const child of this.fields) {
-            visible = visible || !child.hidden;
+            visible = visible || !child.hidden();
         }
 
         this.setHidden(!visible);
@@ -190,7 +181,10 @@ export type ControlArgs<T = AnyFieldDto> = Readonly<{
 }>;
 
 export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends AbstractControl> extends Hidden {
-    private readonly collapsed$ = new BehaviorSubject<boolean | null>(null);
+    private readonly collapsedState = signal<boolean | null>(null);
+    private readonly formDisabled = signal(false);
+    private readonly formInvalid = signal(false);
+    private readonly formValue = signal<any>(undefined);
     private readonly ruleSet: CompiledRules;
 
     public readonly field: T;
@@ -199,13 +193,13 @@ export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends A
     public readonly partition: string;
     public readonly path: string;
 
-    public get collapsed() {
-        return this.collapsed$.value;
-    }
+    public readonly collapsed = this.collapsedState.asReadonly();
 
-    public get collapsedChanges(): Observable<boolean | null> {
-        return this.collapsed$;
-    }
+    public readonly disabled = this.formDisabled.asReadonly();
+
+    public readonly invalid = this.formInvalid.asReadonly();
+
+    public readonly value = this.formValue.asReadonly();
 
     protected constructor(
         public readonly args: ControlArgs<T>,
@@ -218,6 +212,17 @@ export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends A
         this.partition = args.partition;
         this.path = args.path;
         this.ruleSet = args.rules.getRules(args);
+
+        this.syncFormState();
+        this.form.events.subscribe(() => {
+            this.syncFormState();
+        });
+    }
+
+    protected syncFormState() {
+        this.formDisabled.set(this.form.disabled);
+        this.formInvalid.set(this.form.invalid);
+        this.formValue.set(this.form.value);
     }
 
     public relativePath(relative: string) {
@@ -233,11 +238,11 @@ export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends A
     }
 
     public collapse() {
-        this.collapsed$.next(true);
+        this.collapsedState.set(true);
     }
 
     public expand() {
-        this.collapsed$.next(false);
+        this.collapsedState.set(false);
     }
 
     public updateState(context: RuleContext, itemData: any, parentState: AbstractContentFormState) {

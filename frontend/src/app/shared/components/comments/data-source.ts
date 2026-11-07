@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AutocompleteSource } from '@app/framework';
 import { ContributorsState } from '@app/shared/internal';
 
@@ -26,8 +26,6 @@ export class ContributorsDataSource implements AutocompleteSource {
             return of([]);
         }
 
-        return this.contributorsState.contributors.pipe(
-            map(contributors => contributors.filter(c => c.contributorEmail.indexOf(query) >= 0)),
-        );
+        return of(this.contributorsState.contributors().filter(c => c.contributorEmail.indexOf(query) >= 0));
     }
 }

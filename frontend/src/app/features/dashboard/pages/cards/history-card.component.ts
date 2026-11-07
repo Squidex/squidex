@@ -24,7 +24,7 @@ export class HistoryCardComponent {
     /** The app to show the latest history events for. */
     public readonly app = input.required<AppDto>();
 
-    public readonly history;
+    protected readonly history;
 
     constructor(historyService: HistoryService) {
         this.history = toSignal(

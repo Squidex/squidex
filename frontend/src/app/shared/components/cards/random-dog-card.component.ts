@@ -14,7 +14,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RandomDogCardComponent {
-    public get random() {
+    protected get random() {
         return new Date().getTime();
     }
 }

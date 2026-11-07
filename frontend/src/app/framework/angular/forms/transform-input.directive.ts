@@ -53,7 +53,7 @@ export class TransformInputDirective implements ControlValueAccessor {
     }
 
     @HostListener('input', ['$event'])
-    public onChange(event: Event): void {
+    protected onChange(event: Event): void {
         const target = event.target as HTMLInputElement;
         if (target?.value === undefined) {
             return;
@@ -66,7 +66,7 @@ export class TransformInputDirective implements ControlValueAccessor {
     }
 
     @HostListener('blur')
-    public onTouched() {
+    protected onTouched() {
         this.callTouched();
     }
 

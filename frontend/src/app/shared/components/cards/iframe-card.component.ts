@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { ApiUrlConfig, ThemeService, Types } from '@app/framework';
 import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
 
@@ -58,14 +57,12 @@ export class IFrameCardComponent {
             }
         });
 
-        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
-
         effect(() => {
-            this.sendMessage('themeChanged', { theme: theme() });
+            this.sendMessage('themeChanged', { theme: themeService.theme() });
         });
     }
 
-    public onWindowMessage(event: MessageEvent) {
+    protected onWindowMessage(event: MessageEvent) {
         if (event.source !== this.iframe()?.nativeElement.contentWindow) {
             return;
         }
@@ -79,7 +76,7 @@ export class IFrameCardComponent {
     }
 
     private sendTheme() {
-        this.sendMessage('themeChanged', { theme: this.themeService.theme });
+        this.sendMessage('themeChanged', { theme: this.themeService.theme() });
     }
 
     private sendInit() {

@@ -26,16 +26,16 @@ export class SchemaMigrateFormComponent {
     /** The schema to migrate the contents for. */
     public readonly schema = input.required<SchemaDto>();
 
-    public readonly migrateDraft = signal(true);
+    protected readonly migrateDraft = signal(true);
 
-    public readonly migratePublished = signal(true);
+    protected readonly migratePublished = signal(true);
 
     constructor(
         private readonly schemasState: SchemasState,
     ) {
     }
 
-    public migrateContents() {
+    protected migrateContents() {
         const schema = this.schema();
         if (!schema.canContentsMigrate) {
             return;

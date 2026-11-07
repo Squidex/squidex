@@ -7,10 +7,9 @@
 
 
 import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppsState, ConfirmClickDirective, ControlErrorsComponent, defined, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-settings-page',
@@ -37,10 +36,10 @@ import { AppsState, ConfirmClickDirective, ControlErrorsComponent, defined, Edit
     ],
 })
 export class SettingsPageComponent {
-    public readonly editForm = new EditAppSettingsForm();
-    public readonly editingSettings = toSignal(this.appsState.selectedSettings.pipe(defined()));
+    protected readonly editForm = new EditAppSettingsForm();
+    private readonly editingSettings = this.appsState.selectedSettings;
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.editingSettings()?.canUpdate === true;
     });
 
@@ -60,11 +59,11 @@ export class SettingsPageComponent {
         });
     }
 
-    public reload() {
+    protected reload() {
         this.appsState.loadSettings(true);
     }
 
-    public save() {
+    protected save() {
         const settings = this.editingSettings();
         if (!settings) {
             return;

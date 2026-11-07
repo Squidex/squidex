@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -15,7 +14,6 @@ import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective
     templateUrl: './field-languages.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         LanguageSelectorComponent,
         TourHintDirective,
         TourStepDirective,
@@ -41,7 +39,7 @@ export class FieldLanguagesComponent {
     /** The form model of the field. */
     public readonly formModel = input.required<FieldForm>();
 
-    public toggleShowAllControls() {
+    protected toggleShowAllControls() {
         this.showAllControlsChange.emit(!this.showAllControls());
     }
 }

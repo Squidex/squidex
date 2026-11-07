@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -21,7 +20,6 @@ import { UserComponent } from './user.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
@@ -41,18 +39,16 @@ import { UserComponent } from './user.component';
     ],
 })
 export class UsersPageComponent {
-    public readonly usersFilter = new UntypedFormControl();
+    protected readonly usersFilter = new UntypedFormControl();
 
     constructor(
-        public readonly usersRoute: Router2State,
-        public readonly usersState: UsersState,
+        private readonly usersRoute: Router2State,
+        protected readonly usersState: UsersState,
     ) {
-        effect(onCleanup => {
-            const subscription =
-                this.usersState.query
-                    .subscribe(q => this.usersFilter.setValue(q || ''));
+        effect(() => {
+            const query = this.usersState.query();
 
-            onCleanup(() => subscription.unsubscribe());
+            this.usersFilter.setValue(query || '');
         });
 
         const initial =
@@ -65,11 +61,11 @@ export class UsersPageComponent {
         this.usersRoute.listen();
     }
 
-    public reload() {
+    protected reload() {
         this.usersState.load(true);
     }
 
-    public search() {
+    protected search() {
         this.usersState.search(this.usersFilter.value);
     }
 }

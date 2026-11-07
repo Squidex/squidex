@@ -11,7 +11,7 @@
             <div class="row g-0">
                 <div class="col col-left">
                     <div class="card-body">
-                        <sqx-form-error [error]="createForm.error | async" />
+                        <sqx-form-error [error]="createForm.error()" />
 
                         <sqx-form-row class="mt-2" for="name" hint="apps.appNameHint" label="common.name" required vertical>
                             <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />

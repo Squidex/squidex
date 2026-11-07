@@ -27,7 +27,7 @@ export class TranslationStatusComponent {
     /** The schema of the content. */
     public readonly schema = input.required<SchemaDto | undefined>();
 
-    public readonly text = computed(() => {
+    protected readonly text = computed(() => {
         const schema = this.schema();
         if (!schema) {
             return 'N/A';

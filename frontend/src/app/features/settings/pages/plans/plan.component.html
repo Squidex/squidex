@@ -33,7 +33,7 @@
                 [confirmRequired]="!!plan.confirmText"
                 [confirmText]="plan.confirmText"
                 confirmTitle="i18n:plans.changeConfirmTitle"
-                [disabled]="(plansState.locked | async) !== 'None'"
+                [disabled]="plansState.locked() !== 'None'"
                 (sqxConfirmClick)="changeMonthly()"
                 type="button">
                 {{ "plans.change" | sqxTranslate }}
@@ -58,7 +58,7 @@
                     [confirmRequired]="!!plan.yearlyConfirmText"
                     [confirmText]="plan.yearlyConfirmText!"
                     confirmTitle="i18n:plans.changeConfirmTitle"
-                    [disabled]="(plansState.locked | async) !== 'None'"
+                    [disabled]="plansState.locked() !== 'None'"
                     (sqxConfirmClick)="changeYearly()"
                     type="button">
                     {{ "plans.change" | sqxTranslate }}

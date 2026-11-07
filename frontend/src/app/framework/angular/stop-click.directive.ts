@@ -15,7 +15,7 @@ export class StopClickDirective {
     public shouldStop: any = true;
 
     @HostListener('click', ['$event'])
-    public onClick(event: Event) {
+    protected onClick(event: Event) {
         const shouldStop: any = this.shouldStop;
 
         if (shouldStop || shouldStop === '') {

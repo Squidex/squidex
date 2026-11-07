@@ -26,13 +26,13 @@ export class ToggleComponent extends SignalControlComponent<boolean | null> {
     /** Allows null as third state, besides checked and unchecked. */
     public readonly threeStates = input(false, { transform: booleanAttribute });
 
-    public readonly isChecked = signal<boolean | null>(null);
+    protected readonly isChecked = signal<boolean | null>(null);
 
     public writeValue(obj: any) {
         this.isChecked.set(Types.isBoolean(obj) ? obj : null);
     }
 
-    public changeState() {
+    protected changeState() {
         if (this.isDisabled()) {
             return;
         }

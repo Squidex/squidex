@@ -140,17 +140,15 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
             }
         });
 
-        effect(onCleanup => {
+        effect(() => {
             const aceEditor = this.aceEditor();
             if (!aceEditor) {
                 return;
             }
 
-            const subscription = this.themeService.themeChanges.subscribe(theme => {
-                aceEditor.setTheme(theme === 'dark' ? 'ace/theme/one_dark' : 'ace/theme/textmate');
-            });
+            const theme = this.themeService.theme();
 
-            onCleanup(() => subscription.unsubscribe());
+            aceEditor.setTheme(theme === 'dark' ? 'ace/theme/one_dark' : 'ace/theme/textmate');
         });
 
         effect(() => {

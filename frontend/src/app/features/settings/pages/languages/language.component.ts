@@ -37,19 +37,19 @@ export class LanguageComponent {
     /** The languages that can still be added as fallback languages. */
     public readonly fallbackLanguagesNew = input.required<ReadonlyArray<LanguageDto>>();
 
-    public readonly fallbackLanguagesLocal = linkedSignal(() => this.fallbackLanguages());
+    protected readonly fallbackLanguagesLocal = linkedSignal(() => this.fallbackLanguages());
 
-    public readonly fallbackLanguagesNewLocal = linkedSignal(() => this.fallbackLanguagesNew());
+    protected readonly fallbackLanguagesNewLocal = linkedSignal(() => this.fallbackLanguagesNew());
 
-    public readonly otherLanguageSelected = linkedSignal<LanguageDto | undefined>(() => this.fallbackLanguagesNewLocal()[0]);
+    protected readonly otherLanguageSelected = linkedSignal<LanguageDto | undefined>(() => this.fallbackLanguagesNewLocal()[0]);
 
-    public readonly isEditing = signal(false);
+    protected readonly isEditing = signal(false);
 
-    public readonly isEditable = computed(() => {
+    protected readonly isEditable = computed(() => {
         return this.language().canUpdate;
     });
 
-    public readonly editForm = new EditLanguageForm();
+    protected readonly editForm = new EditLanguageForm();
 
     constructor(
         private readonly languagesState: LanguagesState,
@@ -60,19 +60,19 @@ export class LanguageComponent {
         });
     }
 
-    public toggleEditing() {
+    protected toggleEditing() {
         this.isEditing.update(x => !x);
     }
 
-    public remove() {
+    protected remove() {
         this.languagesState.remove(this.language());
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<AppLanguageDto>>) {
+    protected sort(event: CdkDragDrop<ReadonlyArray<AppLanguageDto>>) {
         this.fallbackLanguagesLocal.set(sorted(event) as any);
     }
 
-    public save() {
+    protected save() {
         if (!this.isEditable()) {
             return;
         }
@@ -95,12 +95,12 @@ export class LanguageComponent {
             });
     }
 
-    public removeFallbackLanguage(language: LanguageDto) {
+    protected removeFallbackLanguage(language: LanguageDto) {
         this.fallbackLanguagesLocal.update(x => x.removed(language));
         this.fallbackLanguagesNewLocal.update(x => [...x, language].sortByString(l => l.iso2Code));
     }
 
-    public addFallbackLanguage() {
+    protected addFallbackLanguage() {
         const otherLanguage = this.otherLanguageSelected();
         if (!otherLanguage) {
             return;

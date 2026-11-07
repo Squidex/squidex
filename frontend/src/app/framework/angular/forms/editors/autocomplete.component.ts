@@ -168,14 +168,14 @@ export class AutocompleteComponent extends SignalControlComponent<ReadonlyArray<
     /** Additional styles for the suggestions dropdown. */
     public readonly dropdownStyles = input<any>({});
 
-    public readonly itemTemplate = contentChild(TemplateRef);
+    protected readonly itemTemplate = contentChild(TemplateRef);
 
-    public readonly suggestionsModal = new ModalModel();
-    public readonly suggestedItems = signal<ReadonlyArray<any>>([]);
-    public readonly suggestedIndex = signal(-1);
-    public readonly isLoading = signal(false);
+    protected readonly suggestionsModal = new ModalModel();
+    protected readonly suggestedItems = signal<ReadonlyArray<any>>([]);
+    protected readonly suggestedIndex = signal(-1);
+    protected readonly isLoading = signal(false);
 
-    public readonly queryInput = new UntypedFormControl();
+    protected readonly queryInput = new UntypedFormControl();
 
     constructor() {
         super();
@@ -234,7 +234,7 @@ export class AutocompleteComponent extends SignalControlComponent<ReadonlyArray<
         );
     }
 
-    public onKeyDown(event: KeyboardEvent) {
+    protected onKeyDown(event: KeyboardEvent) {
         this.lastCursor = this.inputControl().nativeElement.selectionEnd || 0;
         this.editorKeyDown.emit(event);
 
@@ -274,7 +274,7 @@ export class AutocompleteComponent extends SignalControlComponent<ReadonlyArray<
         this.resetState();
     }
 
-    public openModal() {
+    protected openModal() {
         this.modalStream.next({ text: '' });
     }
 
@@ -288,13 +288,13 @@ export class AutocompleteComponent extends SignalControlComponent<ReadonlyArray<
         this.inputControl().nativeElement.focus();
     }
 
-    public blur() {
+    protected blur() {
         this.resetState();
         this.callTouched();
         this.editorBlur.emit();
     }
 
-    public selectItem(selection: any | null = null): boolean {
+    protected selectItem(selection: any | null = null): boolean {
         const suggestedItems = this.suggestedItems();
 
         if (!selection) {
@@ -344,7 +344,7 @@ export class AutocompleteComponent extends SignalControlComponent<ReadonlyArray<
         return true;
     }
 
-    public selectIndex(suggestedIndex: number) {
+    protected selectIndex(suggestedIndex: number) {
         const suggestedItems = this.suggestedItems();
 
         if (suggestedIndex < 0) {

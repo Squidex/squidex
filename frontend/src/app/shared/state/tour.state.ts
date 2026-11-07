@@ -6,7 +6,7 @@
  */
 
 import { EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext } from '@angular/core';
-import { filter, skip, take } from 'rxjs';
+import { filter, skip } from 'rxjs';
 import { debug, State, TourService, UIOptions } from '@app/framework';
 import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
@@ -37,16 +37,16 @@ export class TourState extends State<Snapshot> {
     private readonly injector = inject(EnvironmentInjector);
     private readonly isDisabled = inject(UIOptions).value.hideOnboarding;
 
-    public completedTasks =
+    public readonly completedTasks =
         this.project(x => x.completedTasks);
 
-    public status =
+    public readonly status =
         this.project(x => x.status);
 
-    public tasks =
+    public readonly tasks =
         this.projectFrom(this.completedTasks, x => createTasks(this.definition.tasks, x));
 
-    public pendingTasks =
+    public readonly pendingTasks =
         this.projectFrom(this.tasks, x => x.filter(t => !t.isCompleted).length);
 
     constructor(
@@ -63,7 +63,7 @@ export class TourState extends State<Snapshot> {
                 this.uiState.setCommon('tour', change.snapshot);
             });
 
-        this.uiState.getCommon('tour', {} as Snapshot).pipe(take(1))
+        this.uiState.waitForCommon('tour', {} as Snapshot)
             .subscribe(change => {
                 this.next({ ...change, status: change.status || 'Ready' }, LoadedEvent);
 

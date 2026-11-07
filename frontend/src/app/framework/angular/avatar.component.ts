@@ -28,17 +28,17 @@ export class AvatarComponent {
     /** The width and height of the avatar in pixels. */
     public readonly size = input(50, { transform: numberAttribute });
 
-    public readonly actualImage = linkedSignal(() => this.image());
+    private readonly actualImage = linkedSignal(() => this.image());
 
-    public readonly imageSource = computed(() => {
+    protected readonly imageSource = computed(() => {
         return this.actualImage() || this.createSvg(this.identifier());
     });
 
-    public readonly imageSize = computed(() => {
+    protected readonly imageSize = computed(() => {
         return `${this.size()}px`;
     });
 
-    public unsetImage() {
+    protected unsetImage() {
         this.actualImage.set(null);
     }
 

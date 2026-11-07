@@ -50,7 +50,7 @@ export class FieldWizardComponent {
     /** Emits when the dialog is closed. */
     public readonly dialogClose = output();
 
-    public readonly fieldTypes = computed(() => {
+    protected readonly fieldTypes = computed(() => {
         if (this.parent()) {
             return fieldTypes.filter(x => x.type !== 'Array');
         }
@@ -58,26 +58,26 @@ export class FieldWizardComponent {
         return fieldTypes;
     });
 
-    public readonly addFieldForm = new AddFieldForm();
-    public readonly addFieldModal = new ModalModel();
+    protected readonly addFieldForm = new AddFieldForm();
+    protected readonly addFieldModal = new ModalModel();
 
-    public readonly editing = signal<{ field: FieldDto; form: EditFieldForm } | null>(null);
+    protected readonly editing = signal<{ field: FieldDto; form: EditFieldForm } | null>(null);
 
-    public readonly isLocalizable = computed(() => {
+    protected readonly isLocalizable = computed(() => {
         return this.parent()?.isLocalizable || (this.editing()?.field as any)?.['isLocalizable'];
     });
 
     constructor(
         private readonly schemasState: SchemasState,
-        public readonly languagesState: LanguagesState,
+        protected readonly languagesState: LanguagesState,
     ) {
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public addField(navigationMode: SaveNavigationMode) {
+    protected addField(navigationMode: SaveNavigationMode) {
         const value = this.addFieldForm.submit();
         if (!value) {
             return;
@@ -106,7 +106,7 @@ export class FieldWizardComponent {
             });
     }
 
-    public save(navigationMode: SaveNavigationMode) {
+    protected save(navigationMode: SaveNavigationMode) {
         const editing = this.editing();
         if (!editing) {
             return;

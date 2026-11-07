@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, ConfirmClickDirective, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ConfirmClickDirective, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { JobComponent } from './job.component';
 
 @Component({
@@ -19,7 +18,6 @@ import { JobComponent } from './job.component';
     templateUrl: './jobs-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         JobComponent,
         LayoutComponent,
@@ -37,8 +35,7 @@ import { JobComponent } from './job.component';
 })
 export class JobsPageComponent {
     constructor(
-        public readonly apiUrl: ApiUrlConfig,
-        public readonly jobsState: JobsState,
+        protected readonly jobsState: JobsState,
     ) {
         this.jobsState.load();
 
@@ -52,15 +49,15 @@ export class JobsPageComponent {
         });
     }
 
-    public reload() {
+    protected reload() {
         this.jobsState.load(true, false);
     }
 
-    public startBackup() {
+    protected startBackup() {
         this.jobsState.startBackup();
     }
 
-    public rebuildTextIndex() {
+    protected rebuildTextIndex() {
         this.jobsState.rebuildTextIndex();
     }
 }

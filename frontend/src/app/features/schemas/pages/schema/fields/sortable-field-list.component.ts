@@ -49,15 +49,15 @@ export class SortableFieldListComponent {
     /** The fields to render, grouped by their separators. */
     public readonly fields = input.required<ReadonlyArray<FieldDto>>();
 
-    public readonly fieldGroups = computed(() => {
+    protected readonly fieldGroups = computed(() => {
         return groupFields(this.fields(), true);
     });
 
-    public sortGroups(event: CdkDragDrop<FieldGroup[]>) {
+    protected sortGroups(event: CdkDragDrop<FieldGroup[]>) {
         this.onSort(event);
     }
 
-    public sortFields(event: CdkDragDrop<FieldDto[]>) {
+    protected sortFields(event: CdkDragDrop<FieldDto[]>) {
         this.onSort(event);
     }
 

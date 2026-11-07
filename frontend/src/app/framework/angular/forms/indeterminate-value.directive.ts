@@ -34,7 +34,7 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     }
 
     @HostListener('click')
-    public onClick() {
+    protected onClick() {
         let isChecked = this.isChecked;
 
         if (this.threeStates) {
@@ -55,7 +55,7 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     }
 
     @HostListener('blur')
-    public onTouched() {
+    protected onTouched() {
         this.callTouched();
     }
 

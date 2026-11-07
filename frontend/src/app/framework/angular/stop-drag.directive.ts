@@ -15,7 +15,7 @@ export class StopDragDirective {
     public shouldStop = true;
 
     @HostListener('dragstart', ['$event'])
-    public onDragStart(event: Event) {
+    protected onDragStart(event: Event) {
         const shouldStop: any = this.shouldStop;
 
         if (shouldStop || shouldStop === '') {

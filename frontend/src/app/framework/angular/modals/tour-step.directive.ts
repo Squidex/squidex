@@ -54,7 +54,7 @@ export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective
     }
 
     @HostListener('click')
-    public onClick() {
+    protected onClick() {
         this.wasClicked = true;
     }
 

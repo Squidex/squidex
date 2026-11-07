@@ -23,14 +23,14 @@ export class HoverBackgroundDirective {
     }
 
     @HostListener('mouseenter')
-    public onEnter() {
+    protected onEnter() {
         this.previousBackground = this.element.nativeElement.style.background;
 
         this.renderer.setStyle(this.element.nativeElement, 'background', this.background);
     }
 
     @HostListener('mouseleave')
-    public onLEave() {
+    protected onLEave() {
         this.renderer.setStyle(this.element.nativeElement, 'background', this.previousBackground);
     }
 }

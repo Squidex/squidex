@@ -1,7 +1,7 @@
 <sqx-title message="i18n:common.administrationPageTitle" />
 <div class="sidebar">
     <ul class="nav nav-panel flex-column">
-        @if (uiState.canReadUsers | async) {
+        @if (uiState.canReadUsers()) {
             <li class="nav-item">
                 <a class="nav-link" routerLink="users" routerLinkActive="active">
                     <i class="nav-icon icon-user-o"></i>
@@ -10,7 +10,7 @@
             </li>
         }
 
-        @if (uiState.canReadEvents | async) {
+        @if (uiState.canReadEvents()) {
             <li class="nav-item">
                 <a class="nav-link" routerLink="event-consumers" routerLinkActive="active">
                     <i class="nav-icon icon-time"></i>
@@ -19,7 +19,7 @@
             </li>
         }
 
-        @if (uiState.canRestore | async) {
+        @if (uiState.canRestore()) {
             <li class="nav-item">
                 <a class="nav-link" routerLink="restore" routerLinkActive="active">
                     <i class="nav-icon icon-backup"></i>

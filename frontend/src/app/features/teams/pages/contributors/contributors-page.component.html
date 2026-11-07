@@ -8,7 +8,7 @@
         <div class="form-inline">
             <input
                 class="form-control"
-                [ngModel]="contributorsState.query | async"
+                [ngModel]="contributorsState.query()"
                 (ngModelChange)="search($event)"
                 placeholder="{{ 'contributors.search' | sqxTranslate }}"
                 shortcut="CTRL + I"
@@ -16,13 +16,13 @@
         </div>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading | async">
+        <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading()">
             <ng-container>
-                @if (contributorsState.canCreate | async) {
+                @if (contributorsState.canCreate()) {
                     <sqx-contributor-add-form />
                 }
 
-                @if ((contributorsState.isLoaded | async) && (contributorsState.contributorsFiltered | async); as contributors) {
+                @if (contributorsState.isLoaded() && contributorsState.contributorsFiltered(); as contributors) {
                     @if (contributors.length === 0) {
                         <div class="table-items-row table-items-row-summary table-items-row-empty">
                             {{ "contributors.empty" | sqxTranslate }}
@@ -31,13 +31,13 @@
 
                     <table class="table table-items table-fixed">
                         @for (contributor of contributors; track contributor.contributorId) {
-                            <tbody [search]="contributorsState.queryRegex | async" [sqxContributor]="contributor"></tbody>
+                            <tbody [search]="contributorsState.queryRegex()" [sqxContributor]="contributor"></tbody>
                         }
                     </table>
                 }
             </ng-container>
             <ng-container footer>
-                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)" />
+                <sqx-pager [paging]="contributorsState.paging()" (pagingChange)="contributorsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

@@ -34,15 +34,15 @@ export class EventConsumerComponent {
     ) {
     }
 
-    public start() {
+    protected start() {
         this.eventConsumersState.start(this.eventConsumer());
     }
 
-    public stop() {
+    protected stop() {
         this.eventConsumersState.stop(this.eventConsumer());
     }
 
-    public reset() {
+    protected reset() {
         this.eventConsumersState.reset(this.eventConsumer());
     }
 }

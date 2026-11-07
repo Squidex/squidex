@@ -24,7 +24,7 @@ export class ContentSummaryCardComponent {
     /** The card configuration, with the name, the schema and the optional query to count the items. */
     public readonly options = input<any>();
 
-    public readonly itemCount = signal(0);
+    protected readonly itemCount = signal(0);
 
     constructor(contentsService: ContentsService) {
         effect(onCleanup => {

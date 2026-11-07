@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
@@ -34,41 +34,30 @@ export class ContentValueComponent {
     /** The table settings, to wrap long text. */
     public readonly fields = input<TableSettings>();
 
-    public readonly previewModal = new ModalModel();
+    protected readonly previewModal = new ModalModel();
 
-    public readonly wrapping = signal(false);
+    protected readonly wrapping = computed(() => {
+        const fieldName = this.field()?.name;
+        if (!fieldName) {
+            return false;
+        }
 
-    public readonly isString = computed(() => {
+        return this.fields()?.fieldWrappings()[fieldName] === true;
+    });
+
+    protected readonly isString = computed(() => {
         return this.field()?.rootField?.properties.fieldType === 'String';
     });
 
-    public readonly isPlain = computed(() => {
+    protected readonly isPlain = computed(() => {
         return !Types.is(this.value(), HtmlValue);
     });
 
-    public readonly title = computed(() => {
+    protected readonly title = computed(() => {
         return this.isString() && this.isPlain() ? this.value() : undefined;
     });
 
-    constructor() {
-        effect(onCleanup => {
-            const fields = this.fields();
-            if (!fields) {
-                return;
-            }
-
-            const fieldName = this.field()?.name;
-            const subscription =
-                fields.fieldWrappings
-                    .subscribe(wrappings => {
-                        this.wrapping.set(wrappings[fieldName!]);
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
-    }
-
-    public toggle() {
+    protected toggle() {
         const field = this.field();
         if (!field) {
             return;
@@ -77,7 +66,7 @@ export class ContentValueComponent {
         this.fields()?.toggleWrapping(field.name);
     }
 
-    public show() {
+    protected show() {
         const value = this.value();
         if (!Types.is(value, HtmlValue) || !value.preview) {
             return;
@@ -86,7 +75,7 @@ export class ContentValueComponent {
         this.previewModal.show();
     }
 
-    public hide() {
+    protected hide() {
         this.previewModal.hide();
     }
 }

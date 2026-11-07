@@ -25,16 +25,16 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class ScriptLogsState extends State<Snapshot> {
-    public scriptLogs =
+    public readonly scriptLogs =
         this.project(x => x.scriptLogs);
 
-    public name =
+    public readonly name =
         this.project(x => x.name);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     public get appName() {

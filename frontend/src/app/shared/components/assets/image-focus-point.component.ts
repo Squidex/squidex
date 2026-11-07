@@ -31,7 +31,7 @@ export class ImageFocusPointComponent {
     /** The asset metadata with the initial focus point (focusX and focusY). */
     public readonly focusPoint = input<any>();
 
-    public readonly focus = linkedSignal(() => getFocusPoint(this.focusPoint()));
+    private readonly focus = linkedSignal(() => getFocusPoint(this.focusPoint()));
 
     constructor(destroyRef: DestroyRef) {
         afterNextRender(() => {

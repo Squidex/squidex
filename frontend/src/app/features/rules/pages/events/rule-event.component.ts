@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 /* eslint-disable @angular-eslint/no-output-native */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, FlowView, FromNowPipe, RuleElementDto, RuleEventDto, TranslatePipe } from '@app/shared';
 import { RuleClassPipe } from '../../shared/pipes';
@@ -49,13 +49,7 @@ export class RuleEventComponent {
     /** Emits when the user confirms to cancel the event. */
     public readonly cancel = output();
 
-    public readonly selectedStep = signal<string | null>(null);
-
-    public readonly branchItems = computed(() => {
+    protected readonly branchItems = computed(() => {
         return new FlowView(this.event().flowState.definition as any).getAllItems();
     });
-
-    public selectStep(id: string) {
-        this.selectedStep.update(x => x === id ? null : id);
-    }
 }

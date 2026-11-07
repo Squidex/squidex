@@ -32,7 +32,7 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
     private readonly containerWidth = signal(0);
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
 
-    public readonly controlId = MathHelper.guid();
+    protected readonly controlId = MathHelper.guid();
 
     /** Renders the options in a single line, in multiple lines or depending on the available space. */
     public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');
@@ -43,19 +43,19 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
     /** The values to choose from. */
     public readonly values = input<ReadonlyArray<string | TagValue>>([]);
 
-    public readonly tagValuesUnsorted = computed(() => {
+    private readonly tagValuesUnsorted = computed(() => {
         return getTagValues(this.values(), false);
     });
 
-    public readonly tagValuesSorted = computed(() => {
+    private readonly tagValuesSorted = computed(() => {
         return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
     });
 
-    public readonly tagValues = computed(() => {
+    protected readonly tagValues = computed(() => {
         return this.unsorted() ? this.tagValuesUnsorted() : this.tagValuesSorted();
     });
 
-    public readonly tagValuesWidth = computed(() => {
+    private readonly tagValuesWidth = computed(() => {
         let width = 0;
         for (const value of this.tagValuesUnsorted()) {
             width += 40;
@@ -65,7 +65,7 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
         return width;
     });
 
-    public readonly isSingleline = computed(() => {
+    protected readonly isSingleline = computed(() => {
         const layout = this.layout();
         if (layout !== 'Auto') {
             return layout === 'Singleline';
@@ -79,9 +79,9 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
         return width < this.containerWidth();
     });
 
-    public readonly valueModel = signal<any>(undefined);
+    protected readonly valueModel = signal<any>(undefined);
 
-    public updateContainerWidth(width: number) {
+    protected updateContainerWidth(width: number) {
         this.containerWidth.set(width);
     }
 

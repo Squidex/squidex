@@ -49,18 +49,18 @@ export class EditableTitleComponent {
     /** The text to show when the title is empty. */
     public readonly displayFallback = input('');
 
-    public readonly inputTitleDisplayed = linkedSignal(() => this.inputTitle());
+    protected readonly inputTitleDisplayed = linkedSignal(() => this.inputTitle());
 
-    public readonly renaming = signal(false);
-    public readonly renameForm = new FormControl<string>('');
+    protected readonly renaming = signal(false);
+    protected readonly renameForm = new FormControl<string>('');
 
-    public onKeyDown(event: KeyboardEvent) {
+    protected onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {
             this.toggleRename();
         }
     }
 
-    public toggleRename() {
+    protected toggleRename() {
         if (this.disabled()) {
             return;
         }
@@ -84,7 +84,7 @@ export class EditableTitleComponent {
         this.renaming.update(x => !x);
     }
 
-    public rename() {
+    protected rename() {
         if (this.disabled()) {
             return;
         }

@@ -44,9 +44,9 @@ export class HistoryStepComponent {
     /** The metadata of the trigger or step to show the icon for. */
     public readonly elementInfo = input<RuleTriggerMetadataDto>();
 
-    public readonly isExpanded = signal(false);
+    protected readonly isExpanded = signal(false);
 
-    public toggle() {
+    protected toggle() {
         this.isExpanded.update(x => !x);
     }
 }

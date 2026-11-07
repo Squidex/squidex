@@ -89,7 +89,7 @@ export class AssetComponent {
     /** Renders the asset as row instead of a card. */
     public readonly isListView = input(false, { transform: booleanAttribute });
 
-    public readonly progress = signal(0);
+    protected readonly progress = signal(0);
 
     constructor(
         private readonly assetUploader: AssetUploaderState,
@@ -127,7 +127,7 @@ export class AssetComponent {
             });
     }
 
-    public updateFile(files: ReadonlyArray<HTTP.UploadFile>) {
+    protected updateFile(files: ReadonlyArray<HTTP.UploadFile>) {
         const asset = this.asset();
         if (files.length !== 1 || !asset?.canUpload) {
             return;
@@ -162,7 +162,7 @@ export class AssetComponent {
             });
     }
 
-    public emitEdit() {
+    protected emitEdit() {
         const asset = this.asset();
         if (!asset || this.isDisabled()) {
             return;

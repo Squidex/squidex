@@ -61,25 +61,25 @@ export class DateTimeEditorComponent extends SignalControlComponent<string | nul
     /** The initial size of the editor. It is adjusted to the available width. */
     public readonly size = input<'Normal' | 'Compact' | 'Mini'>('Normal');
 
-    public readonly sizeActual = linkedSignal(() => this.size());
+    protected readonly sizeActual = linkedSignal(() => this.size());
 
-    public readonly isLocal = signal(true);
+    protected readonly isLocal = signal(true);
 
-    public readonly isDateTimeMode = computed(() => {
+    protected readonly isDateTimeMode = computed(() => {
         return this.mode() === 'DateTime';
     });
 
-    public readonly shouldShowDateButtons = computed(() => {
+    protected readonly shouldShowDateButtons = computed(() => {
         return !this.hideDateButtonsSettings && !this.hideDateButtons();
     });
 
-    public readonly shouldShowDateTimeModeButton = computed(() => {
+    protected readonly shouldShowDateTimeModeButton = computed(() => {
         return !this.hideDateTimeModeButtonSetting && !this.hideDateTimeModeButton();
     });
 
-    public readonly value = signal<DateTime | null | undefined>(undefined);
+    protected readonly value = signal<DateTime | null | undefined>(undefined);
 
-    public readonly valueInput = computed(() => {
+    protected readonly valueInput = computed(() => {
         const value = this.value();
         if (!value) {
             return null;
@@ -111,28 +111,28 @@ export class DateTimeEditorComponent extends SignalControlComponent<string | nul
         this.value.set(value);
     }
 
-    public writeToday() {
+    protected writeToday() {
         this.update(new DateTime(DateHelper.getLocalDate(DateTime.today().raw)));
         return false;
     }
 
-    public writeNow() {
+    protected writeNow() {
         this.update(DateTime.now());
         return false;
     }
 
-    public reset() {
+    protected reset() {
         this.update(null);
         return false;
     }
 
-    public setLocalMode(isLocal: boolean) {
+    protected setLocalMode(isLocal: boolean) {
         this.isLocal.set(isLocal);
         this.update(this.value());
         return false;
     }
 
-    public updateValue(source: string) {
+    protected updateValue(source: string) {
         this.update(DateTime.tryParseISO(source, !this.isLocal()));
         return false;
     }
@@ -144,7 +144,7 @@ export class DateTimeEditorComponent extends SignalControlComponent<string | nul
         this.callTouched();
     }
 
-    public setSize(size: DOMRect) {
+    protected setSize(size: DOMRect) {
         if (size.width < 300) {
             this.sizeActual.set('Mini');
         } else if (size.width < 350) {

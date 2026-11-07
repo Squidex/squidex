@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, effect, input, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -16,7 +15,6 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
     styleUrls: ['./asset-folder-dialog.component.scss'],
     templateUrl: './asset-folder-dialog.component.html',
     imports: [
-        AsyncPipe,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
@@ -35,7 +33,7 @@ export class AssetFolderDialogComponent {
     /** The folder to rename. Creates a new folder when not set. */
     public readonly assetFolder = input<AssetFolderDto>();
 
-    public readonly editForm = new RenameAssetFolderForm();
+    protected readonly editForm = new RenameAssetFolderForm();
 
     constructor(
         private readonly assetsState: AssetsState,
@@ -48,11 +46,11 @@ export class AssetFolderDialogComponent {
         });
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public createAssetFolder() {
+    protected createAssetFolder() {
         const value = this.editForm.submit();
         if (!value) {
             return;

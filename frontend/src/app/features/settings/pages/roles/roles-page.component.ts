@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
@@ -35,7 +34,6 @@ class PermissionsAutocomplete implements AutocompleteSource {
     templateUrl: './roles-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         FormHintComponent,
         LayoutComponent,
         ListViewComponent,
@@ -53,20 +51,20 @@ class PermissionsAutocomplete implements AutocompleteSource {
     ],
 })
 export class RolesPageComponent {
-    public readonly allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
+    protected readonly allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
 
     constructor(
         private readonly appsState: AppsState,
-        public readonly rolesService: RolesService,
-        public readonly rolesState: RolesState,
-        public readonly schemasState: SchemasState,
+        private readonly rolesService: RolesService,
+        protected readonly rolesState: RolesState,
+        protected readonly schemasState: SchemasState,
     ) {
         this.schemasState.loadIfNotLoaded();
 
         this.rolesState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.rolesState.load(true);
     }
 }

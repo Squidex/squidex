@@ -39,15 +39,15 @@ export class ContentStatusComponent {
     /** Renders a small icon. */
     public readonly small = input(false, { transform: booleanAttribute });
 
-    public readonly isMultiline = computed(() => {
+    protected readonly isMultiline = computed(() => {
         return this.layout() === 'multiline';
     });
 
-    public readonly isText = computed(() => {
+    protected readonly isText = computed(() => {
         return this.layout() === 'text';
     });
 
-    public readonly tooltipText = computed(() => {
+    protected readonly tooltipText = computed(() => {
         const scheduled = this.scheduled();
         if (!scheduled) {
             return this.status();

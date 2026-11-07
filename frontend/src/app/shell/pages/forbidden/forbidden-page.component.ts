@@ -24,7 +24,7 @@ export class ForbiddenPageComponent {
     ) {
     }
 
-    public back() {
+    protected back() {
         this.location.back();
     }
 }

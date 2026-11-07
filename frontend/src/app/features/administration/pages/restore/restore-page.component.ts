@@ -10,7 +10,7 @@ import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
-import { AuthService, ControlErrorsComponent, DialogService, ISODatePipe, JobsService, LayoutComponent, ListViewComponent, RestoreForm, SidebarMenuDirective, switchSafe, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ControlErrorsComponent, DialogService, ISODatePipe, JobsService, LayoutComponent, ListViewComponent, RestoreForm, SidebarMenuDirective, switchSafe, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-restore-page',
@@ -35,19 +35,18 @@ import { AuthService, ControlErrorsComponent, DialogService, ISODatePipe, JobsSe
     ],
 })
 export class RestorePageComponent {
-    public restoreForm = new RestoreForm();
+    protected readonly restoreForm = new RestoreForm();
 
-    public restoreJob =
+    protected readonly restoreJob =
         timer(0, 2000).pipe(switchSafe(() => this.jobsService.getRestore()));
 
     constructor(
-        public readonly authState: AuthService,
         private readonly dialogs: DialogService,
         private readonly jobsService: JobsService,
     ) {
     }
 
-    public restore() {
+    protected restore() {
         const value = this.restoreForm.submit();
         if (!value) {
             return;

@@ -33,5 +33,5 @@ export class ArrayUIComponent {
     /** The type specific properties of the field. */
     public readonly properties = input.required<ArrayFieldPropertiesDto>();
 
-    public readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
+    protected readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

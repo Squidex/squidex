@@ -35,13 +35,13 @@ export class ColorPickerComponent extends SignalControlComponent<string> impleme
     /** Renders a text input or only a colored circle. */
     public readonly mode = input<'Input' | 'Circle'>('Input');
 
-    public readonly value = signal<string | null>('black');
+    protected readonly value = signal<string | null>('black');
 
-    public readonly valueParsed = computed(() => {
+    protected readonly valueParsed = computed(() => {
         return parseColor(this.value());
     });
 
-    public readonly valueForeground = computed(() => {
+    protected readonly valueForeground = computed(() => {
         if (MathHelper.toLuminance(MathHelper.parseColor(this.valueParsed())!) < 0.5) {
             return 'white';
         }
@@ -61,7 +61,7 @@ export class ColorPickerComponent extends SignalControlComponent<string> impleme
         this.inputElement()?.nativeElement?.focus();
     }
 
-    public blur() {
+    protected blur() {
         if (this.isDisabled()) {
             return;
         }
@@ -69,7 +69,7 @@ export class ColorPickerComponent extends SignalControlComponent<string> impleme
         this.callTouched();
     }
 
-    public updateValue(value: string) {
+    protected updateValue(value: string) {
         if (this.isDisabled()) {
             return;
         }

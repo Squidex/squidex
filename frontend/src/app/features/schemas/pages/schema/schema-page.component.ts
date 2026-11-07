@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, defined, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { ConfirmClickDirective, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaEditFormComponent } from './common/schema-edit-form.component';
 import { SchemaMigrateFormComponent } from './common/schema-migrate-form.component';
@@ -28,7 +27,6 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
     templateUrl: './schema-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         DropdownMenuComponent,
         LayoutComponent,
@@ -55,21 +53,21 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
     ],
 })
 export class SchemaPageComponent {
-    public readonly hideIndexes = inject(UIOptions).value.hideIndexes;
+    protected readonly hideIndexes = inject(UIOptions).value.hideIndexes;
 
-    public readonly schema;
-    public readonly schemaTab;
+    protected readonly schema;
+    protected readonly schemaTab;
 
-    public readonly editOptionsDropdown = new ModalModel();
+    protected readonly editOptionsDropdown = new ModalModel();
 
     constructor(
-        public readonly schemasState: SchemasState,
-        public readonly languageState: LanguagesState,
+        protected readonly schemasState: SchemasState,
+        protected readonly languageState: LanguagesState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus,
     ) {
-        this.schema = toSignal(this.schemasState.selectedSchema.pipe(defined()));
+        this.schema = this.schemasState.selectedSchema;
 
         this.schemaTab = toSignal(
             this.route.queryParams.pipe(map(x => (x['tab'] || 'fields') as string)),
@@ -78,7 +76,7 @@ export class SchemaPageComponent {
         this.languageState.load();
     }
 
-    public cloneSchema() {
+    protected cloneSchema() {
         const schema = this.schema();
         if (!schema) {
             return;
@@ -87,7 +85,7 @@ export class SchemaPageComponent {
         this.messageBus.emit(new SchemaCloning(schema.export()));
     }
 
-    public publish() {
+    protected publish() {
         const schema = this.schema();
         if (!schema) {
             return;
@@ -96,7 +94,7 @@ export class SchemaPageComponent {
         this.schemasState.publish(schema).subscribe();
     }
 
-    public unpublish() {
+    protected unpublish() {
         const schema = this.schema();
         if (!schema) {
             return;
@@ -105,7 +103,7 @@ export class SchemaPageComponent {
         this.schemasState.unpublish(schema).subscribe();
     }
 
-    public deleteSchema() {
+    protected deleteSchema() {
         const schema = this.schema();
         if (!schema) {
             return;

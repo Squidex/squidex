@@ -23,8 +23,8 @@ import { FieldDto, FloatConverter, FormRowComponent, NumberFieldEditorValues, Nu
     ],
 })
 export class NumberUIComponent {
-    public readonly converter = FloatConverter.INSTANCE;
-    public readonly editors = NumberFieldEditorValues;
+    protected readonly converter = FloatConverter.INSTANCE;
+    protected readonly editors = NumberFieldEditorValues;
 
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();
@@ -35,7 +35,7 @@ export class NumberUIComponent {
     /** The type specific properties of the field. */
     public readonly properties = input.required<NumberFieldPropertiesDto>();
 
-    public readonly hideAllowedValues = toSignal(
+    protected readonly hideAllowedValues = toSignal(
         toObservable(this.fieldForm).pipe(
             switchMap(form => valueProjection$(form.controls['editor'], hidesAllowedValues))),
         { initialValue: false });

@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ToolbarService } from '@app/framework/internal';
 import { TranslatePipe } from './pipes/translate.pipe';
 
@@ -20,9 +19,5 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ],
 })
 export class ToolbarComponent {
-    public readonly buttons;
-
-    constructor(toolbar: ToolbarService) {
-        this.buttons = toSignal(toolbar.buttonsChanges, { initialValue: [] });
-    }
+    protected readonly buttons = inject(ToolbarService).buttons;
 }

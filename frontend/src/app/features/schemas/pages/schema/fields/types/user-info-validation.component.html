@@ -6,7 +6,7 @@
         label="schemas.fieldTypes.userInfo.defaultRole"
         [prefix]="field().fieldId">
         <select class="form-select" [id]="roleRow.formId()" autocomplete="off" formControlName="defaultRole">
-            @for (role of rolesState.roles | async; track role.name) {
+            @for (role of rolesState.roles(); track role.name) {
                 <option [ngValue]="role.name">{{ role.name }}</option>
             }
         </select>

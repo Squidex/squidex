@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, RichTextFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
@@ -17,7 +16,6 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, RichTextField
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetFolderDropdownComponent,
-        AsyncPipe,
         FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
@@ -36,7 +34,7 @@ export class RichTextUIComponent {
     public readonly properties = input.required<RichTextFieldPropertiesDto>();
 
     constructor(
-        public readonly schemasSource: SchemaTagSource,
+        protected readonly schemasSource: SchemaTagSource,
     ) {
     }
 }

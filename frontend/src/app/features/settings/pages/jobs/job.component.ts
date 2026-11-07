@@ -28,13 +28,13 @@ export class JobComponent {
     /** The job to show. */
     public readonly job = input.required<JobDto>();
 
-    public readonly duration = computed(() => {
+    protected readonly duration = computed(() => {
         const job = this.job();
 
         return Duration.create(job.started, job.stopped!).toString();
     });
 
-    public readonly details = computed(() => {
+    protected readonly details = computed(() => {
         const job = this.job();
 
         let details = '';
@@ -52,19 +52,19 @@ export class JobComponent {
         return details;
     });
 
-    public readonly isExpanded = signal(false);
+    protected readonly isExpanded = signal(false);
 
     constructor(
-        public readonly apiUrl: ApiUrlConfig,
+        protected readonly apiUrl: ApiUrlConfig,
         private readonly jobsState: JobsState,
     ) {
     }
 
-    public delete() {
+    protected delete() {
         this.jobsState.delete(this.job());
     }
 
-    public toggleExpanded() {
+    protected toggleExpanded() {
         this.isExpanded.update(x => !x);
     }
 }

@@ -6,12 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { map } from 'rxjs';
-import { ApiUrlConfig, CopyDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ApiUrlConfig, CopyDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
 
 @Component({
@@ -40,46 +38,43 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     ],
 })
 export class AuthPageComponent {
-    public readonly urlToRedirect;
-    public readonly urlToTest;
+    protected readonly urlToRedirect;
+    protected readonly urlToTest;
 
-    public readonly isEditable = signal(false);
-    public readonly isEditing = signal(false);
+    protected readonly isEditable = signal(false);
+    protected readonly isEditing = signal(false);
 
-    public readonly updateForm = new UpdateTeamAuthForm();
+    protected readonly updateForm = new UpdateTeamAuthForm();
 
     constructor(apiUrl: ApiUrlConfig, teamsState: TeamsState,
         private readonly authState: TeamAuthState,
     ) {
         this.urlToTest = apiUrl.buildUrl('/identity-server/test');
 
-        this.urlToRedirect = toSignal(
-            teamsState.selectedTeam.pipe(
-                defined(),
-                map(team => apiUrl.buildUrl(`/identity-server/signin-${team.id}`))),
-            { initialValue: '' });
+        this.urlToRedirect = computed(() => {
+            const team = teamsState.selectedTeam();
+            if (!team) {
+                return '';
+            }
 
-        effect(onCleanup => {
-            const subscription =
-                this.authState.changes.pipe(defined())
-                    .subscribe(state => {
-                        const scheme = state.snapshot.scheme;
-                        const isEditable = !!state.snapshot.canUpdate;
+            return apiUrl.buildUrl(`/identity-server/signin-${team.id}`);
+        });
 
-                        this.isEditable.set(isEditable);
-                        this.isEditing.set(!!scheme);
+        effect(() => {
+            const scheme = this.authState.scheme();
+            const isEditable = this.authState.canUpdate();
 
-                        this.updateForm.load(scheme || {});
-                        this.updateForm.setEnabled(isEditable);
-                    });
+            this.isEditable.set(isEditable);
+            this.isEditing.set(!!scheme);
 
-            onCleanup(() => subscription.unsubscribe());
+            this.updateForm.load(scheme || {});
+            this.updateForm.setEnabled(isEditable);
         });
 
         this.authState.load();
     }
 
-    public toggle(isEditing: boolean) {
+    protected toggle(isEditing: boolean) {
         if (!this.isEditable()) {
             return;
         }
@@ -90,7 +85,7 @@ export class AuthPageComponent {
         }
     }
 
-    public save() {
+    protected save() {
         if (!this.isEditable()) {
             return;
         }

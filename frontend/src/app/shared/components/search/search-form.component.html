@@ -5,7 +5,7 @@
 <div hintAfter="60000" hintPosition="bottom-end" hintText="i18n:search.advancedTour" sqxTourStep="search">
     <filter-input
         #inputFind
-        [isBookmarked]="!!(saveKey() | async)"
+        [isBookmarked]="!!saveKey()"
         (isBookmarkedChange)="bookmark($event)"
         [model]="filterModel()"
         [options]="options"
@@ -42,9 +42,9 @@
             }
 
             @case ("User") {
-                @if (contributorsState.isLoaded | async) {
+                @if (contributorsState.isLoaded()) {
                     <sqx-dropdown
-                        [items]="contributorsState.contributors | async"
+                        [items]="contributorsState.contributors()"
                         [ngModel]="value"
                         (ngModelChange)="onChange($event)"
                         searchProperty="contributorName"
@@ -72,7 +72,7 @@
         <sqx-modal-dialog (dialogClose)="saveQueryDialog.hide()">
             <ng-container title> {{ "search.nameQuery" | sqxTranslate }}</ng-container>
             <ng-container content>
-                <sqx-form-error [error]="saveQueryForm.error | async" />
+                <sqx-form-error [error]="saveQueryForm.error()" />
 
                 <sqx-form-row for="name" label="common.name" vertical>
                     <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit />

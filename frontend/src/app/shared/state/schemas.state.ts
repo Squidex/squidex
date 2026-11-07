@@ -33,28 +33,28 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class SchemasState extends State<Snapshot> {
-    public selectedSchema =
+    public readonly selectedSchema =
         this.project(x => x.selectedSchema);
 
-    public schemas =
+    public readonly schemas =
         this.project(x => x.schemas);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public publishedSchemas =
+    public readonly publishedSchemas =
         this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
 
-    public addedCategories =
+    public readonly addedCategories =
         this.project(x => x.addedCategories);
 
-    public categoryNames =
+    public readonly categoryNames =
         this.projectFrom2(this.schemas, this.addedCategories, (s, c) => buildCategoryNames(c, s));
 
     public get appId() {

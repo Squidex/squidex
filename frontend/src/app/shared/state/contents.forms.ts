@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { computed, signal } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, FormGroupTemplate, TemplatedFormArray, TemplatedFormGroup, Types, value$ } from '@app/framework';
 import { AppLanguageDto, ComponentFieldPropertiesDto, FieldDto, fieldInvariant, LanguageDto, SchemaDto, TableField } from '../model';
 import { ComponentRulesProvider, RootRulesProvider } from './contents.form-rules';
@@ -31,6 +31,9 @@ export class SaveQueryForm extends Form<ExtendedFormGroup, SaveQueryFormType> {
 
 export class PatchContentForm extends Form<ExtendedFormGroup, any> {
     private readonly editableFields: ReadonlyArray<FieldDto>;
+    private readonly dirtyState = signal(false);
+
+    public readonly dirty = this.dirtyState.asReadonly();
 
     constructor(
         private readonly listFields: ReadonlyArray<TableField>,
@@ -45,6 +48,10 @@ export class PatchContentForm extends Form<ExtendedFormGroup, any> {
 
             this.form.setControl(field.name, new UntypedFormControl(undefined, { validators }));
         }
+
+        this.form.events.subscribe(() => {
+            this.dirtyState.set(this.form.dirty);
+        });
     }
 
     public submit() {
@@ -72,21 +79,16 @@ export class PatchContentForm extends Form<ExtendedFormGroup, any> {
 
 export class EditContentForm extends Form<ExtendedFormGroup, any> {
     private readonly fields: { [name: string]: FieldForm } = {};
-    private readonly valueChange$ = new BehaviorSubject<any>(this.form.value);
+    private readonly valueState = signal<any>(this.form.value);
     private initialData: any;
 
     public readonly sections: ReadonlyArray<FieldSection<FieldDto, FieldForm>>;
 
-    public get valueChanges(): Observable<any> {
-        return this.valueChange$;
-    }
+    public readonly value = this.valueState.asReadonly();
 
-    public get value() {
-        return this.valueChange$.value;
-    }
-
-    public readonly translationStatus =
-        this.valueChange$.pipe(map(x => contentTranslationStatus(x, this.schema, this.languages)));
+    public readonly translationStatus = computed(() => {
+        return contentTranslationStatus(this.valueState(), this.schema, this.languages);
+    });
 
     constructor(
         public readonly languages: ReadonlyArray<AppLanguageDto>,
@@ -144,7 +146,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
     }
 
     public hasChanged() {
-        return !Types.equals(this.initialData, this.value, true);
+        return !Types.equals(this.initialData, this.value(), true);
     }
 
     public hasChanges(changes: any) {
@@ -167,12 +169,12 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
 
     protected enable() {
         this.form.enable({ onlySelf: true });
-        this.updateState(this.value);
+        this.updateState(this.value());
     }
 
     public setContext(context?: any) {
         this.context = context;
-        this.updateState(this.value);
+        this.updateState(this.value());
     }
 
     public submitCompleted(options?: { newValue?: any; noReset?: boolean }) {
@@ -187,7 +189,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
     }
 
     private updateValue(value: any) {
-        this.valueChange$.next(value);
+        this.valueState.set(value);
         this.updateState(value);
     }
 
@@ -211,16 +213,23 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
 
 export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
     private readonly partitions: { [partition: string]: FieldItemForm } = {};
-    private readonly initialValue$ = new Subject<any>();
+    private readonly initialValue = signal<{ value: any } | null>(null);
     private cachedInitial: any;
     private cachedHash?: string | null;
     private isRequired: boolean;
 
-    public readonly translationStatus =
-        value$(this.form).pipe(map(x => fieldTranslationStatus(x)));
+    public readonly translationStatus = computed(() => {
+        return fieldTranslationStatus(this.value());
+    });
 
-    public readonly hasChanges =
-        combineLatest([this.initialValue$, value$(this.form)]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs)));
+    public readonly hasChanges = computed(() => {
+        const initial = this.initialValue();
+        if (!initial) {
+            return false;
+        }
+
+        return !Types.equals(initial.value, this.value());
+    });
 
     public get initialHash() {
         return (this.cachedHash ??= Types.hashWithId(this.cachedInitial, this.field.name))
@@ -287,8 +296,8 @@ export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
 
     public updateInitial(data: any) {
         this.cachedInitial = data;
-        this.cachedInitial = null;
-        this.initialValue$.next(data);
+        this.cachedHash = null;
+        this.initialValue.set({ value: data });
     }
 
     private static buildForm() {
@@ -337,18 +346,12 @@ export class FieldValueForm extends AbstractContentForm<AnyFieldDto, UntypedForm
 }
 
 export class FieldArrayForm extends AbstractContentForm<AnyFieldDto, TemplatedFormArray> {
-    private readonly item$ = new BehaviorSubject<ReadonlyArray<ObjectFormBase>>([]);
+    private readonly itemsState = signal<ReadonlyArray<ObjectFormBase>>([]);
 
-    public get items() {
-        return this.item$.value;
-    }
-
-    public get itemChanges(): Observable<ReadonlyArray<ObjectFormBase>> {
-        return this.item$;
-    }
+    public readonly items = this.itemsState.asReadonly();
 
     public set internalItems(value: ReadonlyArray<ObjectFormBase>) {
-        this.item$.next(value);
+        this.itemsState.set(value);
     }
 
     constructor(args: ControlArgs,
@@ -360,12 +363,13 @@ export class FieldArrayForm extends AbstractContentForm<AnyFieldDto, TemplatedFo
                 FieldsValidators.create(args.field, args.isOptional)));
 
         this.form.setValue(FieldDefaultValue.get(args.field, args.partition), { emitEvent: false });
+        this.syncFormState();
 
         (this.form.template as any)['form'] = this;
     }
 
     public get(index: number) {
-        return this.items[index];
+        return this.items()[index];
     }
 
     public addCopy(source: ObjectFormBase) {
@@ -385,7 +389,7 @@ export class FieldArrayForm extends AbstractContentForm<AnyFieldDto, TemplatedFo
     }
 
     public move(index: number, item: ObjectFormBase) {
-        const children = [...this.items];
+        const children = [...this.items()];
 
         children.splice(children.indexOf(item), 1);
         children.splice(index, 0, item);
@@ -402,7 +406,7 @@ export class FieldArrayForm extends AbstractContentForm<AnyFieldDto, TemplatedFo
     }
 
     protected updateCustomState(context: any, itemData: any, state: AbstractContentFormState) {
-        for (const item of this.items) {
+        for (const item of this.items()) {
             item.updateState(context, itemData, state);
         }
     }
@@ -425,13 +429,13 @@ class ArrayTemplate implements FormArrayTemplate {
             this.createComponent(model) :
             this.createItem(model);
 
-        model.internalItems = [...this.model.items, child];
+        model.internalItems = [...this.model.items(), child];
         return child.form;
     }
 
     public removeControl(index: number) {
         const model = this.model;
-        model.internalItems = model.items.filter((_, i) => i !== index);
+        model.internalItems = model.items().filter((_, i) => i !== index);
     }
 
     public clearControls() {
@@ -453,31 +457,19 @@ export type FieldItemForm = ComponentForm | FieldValueForm | FieldArrayForm;
 type FieldMap = { [name: string]: FieldItemForm };
 
 export class ObjectFormBase extends AbstractContentForm<AnyFieldDto, TemplatedFormGroup> {
-    private readonly sections$ = new BehaviorSubject<ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>>([]);
-    private readonly fields$ = new BehaviorSubject<FieldMap>({});
+    private readonly sectionsState = signal<ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>>([]);
+    private readonly fieldsState = signal<FieldMap>({});
 
-    public get sectionsChanges(): Observable<ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>> {
-        return this.sections$;
-    }
+    public readonly sections = this.sectionsState.asReadonly();
 
-    public get sections() {
-        return this.sections$.value;
-    }
+    public readonly fields = this.fieldsState.asReadonly();
 
     public set internalFieldSections(value: ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>) {
-        this.sections$.next(value);
-    }
-
-    public get fieldsChanges(): Observable<FieldMap> {
-        return this.fields$;
-    }
-
-    public get fields() {
-        return this.fields$.value;
+        this.sectionsState.set(value);
     }
 
     public set internalFieldByName(value: FieldMap) {
-        this.fields$.next(value);
+        this.fieldsState.set(value);
     }
 
     constructor(args: ControlArgs, template: ObjectTemplate) {
@@ -485,15 +477,15 @@ export class ObjectFormBase extends AbstractContentForm<AnyFieldDto, TemplatedFo
     }
 
     public get(field: string | { name: string }): FieldItemForm | undefined {
-        return this.fields[(field as any)['name'] || field];
+        return this.fields()[(field as any)['name'] || field];
     }
 
     protected updateCustomState(context: any, _: any, state: AbstractContentFormState) {
-        for (const field of Object.values(this.fields)) {
+        for (const field of Object.values(this.fields())) {
             field.updateState(context, this.form.value, state);
         }
 
-        for (const section of this.sections) {
+        for (const section of this.sections()) {
             section.updateHidden();
         }
     }
@@ -595,18 +587,12 @@ class ArrayItemTemplate extends ObjectTemplate<ArrayItemForm> {
 }
 
 export class ComponentForm extends ObjectFormBase {
-    private readonly schema$ = new BehaviorSubject<SchemaDto | undefined>(undefined);
+    private readonly schemaState = signal<SchemaDto | undefined>(undefined);
 
-    public get schemaChanges(): Observable<SchemaDto | undefined> {
-        return this.schema$;
-    }
-
-    public get schema() {
-        return this.schema$.value;
-    }
+    public readonly schema = this.schemaState.asReadonly();
 
     public set internalSchema(value: SchemaDto | undefined) {
-        this.schema$.next(value);
+        this.schemaState.set(value);
     }
 
     public get properties() {
@@ -616,7 +602,7 @@ export class ComponentForm extends ObjectFormBase {
     constructor(args: ControlArgs) {
         super({
             ...args,
-            rules: new ComponentRulesProvider(args.path, args.rules, () => this.schema),
+            rules: new ComponentRulesProvider(args.path, args.rules, () => this.schema()),
         }, new ComponentTemplate(() => this));
 
         this.form.reset(undefined);

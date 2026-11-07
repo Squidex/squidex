@@ -4,9 +4,9 @@
 <div class="row g-0" [class.compare]="compareModel">
     <div [class.col-12]="!compareModel" [class.col-6]="compareModel">
         <sqx-focus-marker [controlId]="formModel().path">
-            @if (!(formModel().hiddenChanges | async)) {
-                <div class="table-items-row table-items-row-summary" [class.bounce]="isSelected()" [class.field-invalid]="isInvalid() | async">
-                    @if (formModel().hasChanges | async) {
+            @if (!formModel().hidden()) {
+                <div class="table-items-row table-items-row-summary" [class.bounce]="isSelected()" [class.field-invalid]="isInvalid()">
+                    @if (formModel().hasChanges()) {
                         <div class="change-marker-host">
                             <div class="change-marker">{{ "contents.pendingChangesTitle" | sqxTranslate }}</div>
                         </div>
@@ -59,9 +59,9 @@
 
     @if (compareModel && compareForm) {
         <div class="col-6 col-right">
-            @if (!(isDisabled() | async)) {
+            @if (!isDisabled()) {
                 <div class="copy-button-container">
-                    @if (isDifferent() | async) {
+                    @if (isDifferent()) {
                         <button class="btn btn-primary btn-sm field-copy" attr.aria-label="{{ 'common.copy' | sqxTranslate }}" (click)="copy()" type="button">
                             <i class="icon-arrow_back"></i>
                         </button>
@@ -69,7 +69,7 @@
                 </div>
             }
 
-            @if (!(compareModel.hiddenChanges | async)) {
+            @if (!compareModel.hidden()) {
                 <div class="table-items-row table-items-row-summary">
                     @if (showAllControls()) {
                         @for (languageItem of languages(); track languageItem) {
@@ -106,7 +106,7 @@
 </div>
 
 <ng-template #sharedButtons>
-    <fieldset class="d-flex gap-1" [disabled]="(isDisabled() | async) || isCollapsed()">
+    <fieldset class="d-flex gap-1" [disabled]="isDisabled() || isCollapsed()">
         <sqx-field-languages
             [formModel]="formModel()"
             [language]="language()"

@@ -35,16 +35,16 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class AssetScriptsState extends State<Snapshot> {
-    public scripts =
+    public readonly scripts =
         this.project(x => x.scripts);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canUpdate =
+    public readonly canUpdate =
         this.project(x => x.canUpdate === true);
 
     public get appId() {

@@ -54,15 +54,15 @@ export class BranchComponent {
     /** Emits when the user removes a step. */
     public readonly stepRemove = output<FlowStepRemove>();
 
-    public edit(item: BranchItem) {
+    protected edit(item: BranchItem) {
         this.stepUpdate.emit({ id: item.id, values: item.step });
     }
 
-    public remove(item: BranchItem) {
+    protected remove(item: BranchItem) {
         this.stepRemove.emit({ id: item.id, parentId: this.parentId(), branchIndex: this.parentBranch() });
     }
 
-    public add(index = 0) {
+    protected add(index = 0) {
         const afterId = this.branchItems()[index]?.id;
         this.stepAdd.emit({ afterId, parentId: this.parentId(), branchIndex: this.parentBranch() });
     }

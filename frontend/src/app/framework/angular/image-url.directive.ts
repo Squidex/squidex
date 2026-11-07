@@ -42,11 +42,11 @@ export class ImageUrlDirective implements  OnInit {
         this.onError();
     }
 
-    public onLoad() {
+    private onLoad() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'visible');
     }
 
-    public onError() {
+    private onError() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'hidden');
     }
 }

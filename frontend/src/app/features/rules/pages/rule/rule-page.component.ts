@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, LowerCasePipe } from '@angular/common';
+import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -33,7 +33,6 @@ type Snapshot = {
     templateUrl: './rule-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         BranchComponent,
         ConfirmClickDirective,
         FormsModule,
@@ -56,35 +55,35 @@ type Snapshot = {
     ],
 })
 export class RulePageComponent {
-    public readonly availableTriggers = ALL_TRIGGERS;
-    public readonly availableSteps;
+    protected readonly availableTriggers = ALL_TRIGGERS;
+    protected readonly availableSteps;
 
-    public readonly error = signal<ErrorDto | undefined>(undefined);
+    private readonly error = signal<ErrorDto | undefined>(undefined);
 
-    public readonly stepDialog = new DialogModel();
-    public readonly stepToUpsert = signal<{ step?: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd } | undefined>(undefined);
+    protected readonly stepDialog = new DialogModel();
+    protected readonly stepToUpsert = signal<{ step?: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd } | undefined>(undefined);
 
-    public readonly triggerToEdit = signal<RuleTriggerDto | undefined>(undefined);
-    public readonly triggerDialog = new DialogModel();
+    protected readonly triggerToEdit = signal<RuleTriggerDto | undefined>(undefined);
+    protected readonly triggerDialog = new DialogModel();
 
-    public readonly rule = signal<DynamicRuleDto | null | undefined>(undefined);
+    protected readonly rule = signal<DynamicRuleDto | null | undefined>(undefined);
 
-    public readonly editableRule = signal<Snapshot>({
+    protected readonly editableRule = signal<Snapshot>({
         flow: new FlowView(new DynamicFlowDefinitionDto({ initialStepId: null!, steps: {} })),
         isEditable: true,
         isEnabled: true,
     });
 
-    public readonly scriptCompletions;
+    protected readonly scriptCompletions;
 
-    public readonly isManual = computed(() => {
+    protected readonly isManual = computed(() => {
         return this.rule()?.trigger?.triggerType === 'Manual';
     });
 
     constructor(
-        public readonly rulesState: RulesState,
-        public readonly rulesService: RulesService,
-        public readonly schemasState: SchemasState,
+        protected readonly rulesState: RulesState,
+        rulesService: RulesService,
+        schemasState: SchemasState,
         private readonly dialogs: DialogService,
         messageBus: MessageBus,
         private readonly route: ActivatedRoute,
@@ -111,13 +110,8 @@ export class RulePageComponent {
             onCleanup(() => clearTimeout(timer));
         });
 
-        effect(onCleanup => {
-            const subscription = rulesState.selectedRule
-                .subscribe(rule => {
-                    this.initFromRule(rule);
-                });
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            this.initFromRule(rulesState.selectedRule());
         });
 
         schemasState.loadIfNotLoaded();
@@ -137,7 +131,7 @@ export class RulePageComponent {
         }
     }
 
-    public save() {
+    protected save() {
         const { flow, isEditable, isEnabled, name, trigger } = this.editableRule();
         if (!isEditable || !trigger || !flow?.dto.steps || Object.entries(flow.dto.steps).length === 0) {
             return;
@@ -174,7 +168,7 @@ export class RulePageComponent {
         }
     }
 
-    public changeStep(values: Mutable<IDynamicFlowStepDefinitionDto>) {
+    protected changeStep(values: Mutable<IDynamicFlowStepDefinitionDto>) {
         const target = this.stepToUpsert()!.target;
         this.update(s => ({
             ...s,
@@ -184,7 +178,7 @@ export class RulePageComponent {
         }));
     }
 
-    public startUpdateTrigger(update: RuleTriggerDto) {
+    protected startUpdateTrigger(update: RuleTriggerDto) {
         const metadata = this.availableTriggers[update.triggerType];
         if (!metadata || !metadata.hasProperties) {
             return;
@@ -194,37 +188,37 @@ export class RulePageComponent {
         this.triggerDialog.show();
     }
 
-    public startUpdateStep(update: FlowStepUpdate) {
+    protected startUpdateStep(update: FlowStepUpdate) {
         this.stepToUpsert.set({ target: update.id, step: update.values });
         this.stepDialog.show();
     }
 
-    public startAddStep(target: FlowStepAdd) {
+    protected startAddStep(target: FlowStepAdd) {
         this.stepToUpsert.set({ target });
         this.stepDialog.show();
     }
 
-    public changeTrigger(trigger: RuleTriggerDto) {
+    protected changeTrigger(trigger: RuleTriggerDto) {
         this.update(s => ({ ...s, trigger }));
     }
 
-    public changeEnabled(isEnabled: boolean) {
+    protected changeEnabled(isEnabled: boolean) {
         this.update(s => ({ ...s, isEnabled }));
     }
 
-    public rename(name: string) {
+    protected rename(name: string) {
         this.update(s => ({ ...s, name }));
     }
 
-    public removeTrigger() {
+    protected removeTrigger() {
         this.update(s => ({ ...s, trigger: undefined }));
     }
 
-    public removeStep(event: FlowStepRemove) {
+    protected removeStep(event: FlowStepRemove) {
         this.update(s => ({ ...s, flow: s.flow.remove(event.id, event.parentId, event.branchIndex) }));
     }
 
-    public cancel() {
+    protected cancel() {
         this.update(s => s);
     }
 
@@ -236,11 +230,11 @@ export class RulePageComponent {
         this.triggerDialog.hide();
     }
 
-    public trigger() {
+    protected trigger() {
         this.rulesState.trigger(this.rule()!);
     }
 
-    public back() {
+    protected back() {
         this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
     }
 }

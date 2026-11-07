@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, LowerCasePipe } from '@angular/common';
+import { LowerCasePipe } from '@angular/common';
 import { booleanAttribute, Component, effect, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe } from '@app/shared';
@@ -18,7 +18,6 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     styleUrls: ['./step-dialog.component.scss'],
     templateUrl: './step-dialog.component.html',
     imports: [
-        AsyncPipe,
         BranchesInputComponent,
         CodeEditorComponent,
         EntriesPipe,
@@ -57,13 +56,13 @@ export class StepDialogComponent {
     /** Emits the validated step when the user saves it. */
     public readonly dialogSave = output<DynamicFlowStepDefinitionDto>();
 
-    public readonly currentStep = signal<StepForm | undefined>(undefined);
+    protected readonly currentStep = signal<StepForm | undefined>(undefined);
 
-    public readonly stepName = linkedSignal(() => {
+    protected readonly stepName = linkedSignal(() => {
         return this.stepDefinition()?.name;
     });
 
-    public readonly stepIgnoreError = linkedSignal(() => {
+    protected readonly stepIgnoreError = linkedSignal(() => {
         return this.stepDefinition()?.ignoreError || false;
     });
 
@@ -83,7 +82,7 @@ export class StepDialogComponent {
         });
     }
 
-    public selectStep(type: string, values?: any) {
+    protected selectStep(type: string, values?: any) {
         if (this.currentStep()?.stepType !== type) {
             const element = this.availableSteps()[type];
 
@@ -98,7 +97,7 @@ export class StepDialogComponent {
         }
     }
 
-    public save() {
+    protected save() {
         const currentStep = this.currentStep();
         if (!this.isEditable() || !currentStep) {
             return;

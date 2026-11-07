@@ -2,7 +2,7 @@
     <h3>{{ "search.sharedQueries" | sqxTranslate }}</h3>
     <sqx-query-list
         canRemove="true"
-        [queries]="queries().queriesShared | async"
+        [queries]="queries().queriesShared()"
         [queryUsed]="queryUsed()"
         (remove)="queries().removeShared($event)"
         (search)="search.emit($event)"
@@ -15,7 +15,7 @@
     <h3>{{ "search.myQueries" | sqxTranslate }}</h3>
     <sqx-query-list
         canRemove="true"
-        [queries]="queries().queriesUser | async"
+        [queries]="queries().queriesUser()"
         [queryUsed]="queryUsed()"
         (remove)="queries().removeUser($event)"
         (search)="search.emit($event)"

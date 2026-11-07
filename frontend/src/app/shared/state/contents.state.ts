@@ -46,40 +46,40 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
-    public selectedContent: Observable<ContentDto | undefined | null> =
+    public readonly selectedContent =
         this.project(x => x.selectedContent, Types.equals);
 
-    public contents =
+    public readonly contents =
         this.project(x => x.contents);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.contents.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public validationResults =
+    public readonly validationResults =
         this.project(x => x.validationResults);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public canCreateAndPublish =
+    public readonly canCreateAndPublish =
         this.project(x => x.canCreateAndPublish === true);
 
-    public canCreateAny =
+    public readonly canCreateAny =
         this.project(x => x.canCreate === true || x.canCreateAndPublish === true);
 
-    public statuses =
+    public readonly statuses =
         this.project(x => x.statuses);
 
-    public statusQueries =
+    public readonly statusQueries =
         this.projectFrom(this.statuses, getStatusQueries);
 
     public get appId() {

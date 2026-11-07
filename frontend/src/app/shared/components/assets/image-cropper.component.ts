@@ -59,7 +59,7 @@ export class ImageCropperComponent {
         });
     }
 
-    public rotate(value: number) {
+    protected rotate(value: number) {
         if (this.cropper) {
             this.cropper.rotate(value);
 
@@ -76,7 +76,7 @@ export class ImageCropperComponent {
         }
     }
 
-    public flip(vertically: boolean) {
+    protected flip(vertically: boolean) {
         if (this.cropper) {
             const { rotate, scaleX, scaleY } = this.cropper.getData();
 
@@ -104,7 +104,7 @@ export class ImageCropperComponent {
         }
     }
 
-    public reset() {
+    protected reset() {
         if (this.cropper) {
             this.cropper.reset();
             this.cropper.clear();

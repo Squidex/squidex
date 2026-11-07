@@ -27,31 +27,31 @@ interface Snapshot extends ListState<string> {
 
 @Injectable()
 export class TeamContributorsState extends State<Snapshot> {
-    public contributors =
+    public readonly contributors =
         this.project(x => x.contributors);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.contributors.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public queryRegex =
+    public readonly queryRegex =
         this.projectFrom(this.query, x => getRegex(x));
 
-    public maxContributors =
+    public readonly maxContributors =
         this.project(x => x.maxContributors);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public contributorsFiltered =
+    public readonly contributorsFiltered =
         this.project(getFilteredContributors);
 
     public get teamId() {

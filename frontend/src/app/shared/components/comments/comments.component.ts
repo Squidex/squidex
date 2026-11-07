@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, computed, effect, input, signal, viewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -23,7 +22,6 @@ import { ContributorsDataSource } from './data-source';
         ContributorsDataSource,
     ],
     imports: [
-        AsyncPipe,
         AutocompleteComponent,
         CommentComponent,
         FormsModule,
@@ -45,21 +43,21 @@ export class CommentsComponent {
     /** The ID of the comments thread. */
     public readonly commentsId = input<string | null>('');
 
-    public readonly commentForm = new UpsertCommentForm();
-    public readonly commentUser: string;
+    protected readonly commentForm = new UpsertCommentForm();
+    protected readonly commentUser: string;
 
-    public readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
+    protected readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
 
-    public readonly commentItems = computed(() => {
+    protected readonly commentItems = computed(() => {
         return this.resolved() ?
-            this.commentsState.groupedComments :
-            this.commentsState.groupedUnresolvedComments;
+            this.commentsState.groupedComments() :
+            this.commentsState.groupedUnresolvedComments();
     });
 
     constructor(authService: AuthService, messageBus: MessageBus,
-        public readonly commentsState: CommentsState,
-        public readonly router: Router,
-        public readonly contributorsDataSource: ContributorsDataSource,
+        protected readonly commentsState: CommentsState,
+        protected readonly router: Router,
+        protected readonly contributorsDataSource: ContributorsDataSource,
     ) {
         this.commentUser = authService.user!.token;
 
@@ -69,7 +67,7 @@ export class CommentsComponent {
             const subscriptions = [
                 messageBus.of(FieldSelected)
                     .subscribe(message => {
-                        for (const content of this.commentsState.items) {
+                        for (const content of this.commentsState.items()) {
                             if (content.editorId === message.editorId) {
                                 this.selection.set([content.id!]);
                             }
@@ -94,7 +92,7 @@ export class CommentsComponent {
         });
     }
 
-    public comment() {
+    protected comment() {
         const { text } = this.commentForm.submit() || {};
 
         if (text && text.length > 0) {
@@ -108,20 +106,20 @@ export class CommentsComponent {
         this.commentForm.submitCompleted();
     }
 
-    public onKeyPress(event: KeyboardEvent) {
+    protected onKeyPress(event: KeyboardEvent) {
         if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
             this.comment();
             event.preventDefault();
         }
     }
 
-    public onBlur() {
+    protected onBlur() {
         setTimeout(() => {
             this.reference.set(undefined);
         }, 100);
     }
 
-    public isSelected(id: string | undefined) {
+    protected isSelected(id: string | undefined) {
         return !!id && this.selection().includes(id);
     }
 }

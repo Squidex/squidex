@@ -6,7 +6,7 @@
         </button>
     </ng-container>
     <ng-container>
-        <sqx-list-view [isLoading]="ruleSimulatorState.isLoading | async" table="true">
+        <sqx-list-view [isLoading]="ruleSimulatorState.isLoading()" table="true">
             <table class="table table-items table-fixed">
                 <thead>
                     <tr>
@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
 
-                @for (event of ruleSimulatorState.simulatedRuleEvents | async; track event.uniqueId) {
+                @for (event of ruleSimulatorState.simulatedRuleEvents(); track event.uniqueId) {
                     <tbody
                         [availableSteps]="availableSteps()"
                         [expanded]="event.uniqueId === selectedRuleEvent()"

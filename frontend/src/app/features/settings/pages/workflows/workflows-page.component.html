@@ -6,9 +6,9 @@
         </button>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="80rem" [isLoading]="workflowsState.isLoading | async">
+        <sqx-list-view innerWidth="80rem" [isLoading]="workflowsState.isLoading()">
             <ng-container>
-                @if (workflowsState.errors | async; as errors) {
+                @if (workflowsState.errors(); as errors) {
                     @if (errors.length > 1) {
                         <div class="alert alert-danger">
                             <ul>
@@ -24,11 +24,11 @@
                     }
                 }
 
-                @if (workflowsState.canCreate | async) {
+                @if (workflowsState.canCreate()) {
                     <sqx-workflow-add-form />
                 }
 
-                @if (schemasSource && (workflowsState.isLoaded | async) && (workflowsState.workflows | async); as workflows) {
+                @if (schemasSource && workflowsState.isLoaded() && workflowsState.workflows(); as workflows) {
                     @for (workflow of workflows; track workflow.id) {
                         <sqx-workflow [roles]="roles()" [schemasSource]="schemasSource" [workflow]="workflow" />
                     } @empty {

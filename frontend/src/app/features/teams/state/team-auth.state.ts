@@ -23,13 +23,16 @@ interface Snapshot extends LoadingState {
 
 @Injectable()
 export class TeamAuthState extends State<Snapshot> {
-    public scheme =
+    public readonly scheme =
         this.project(x => x.scheme);
 
-    public isLoaded =
+    public readonly canUpdate =
+        this.project(x => x.canUpdate === true);
+
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     public get teamId() {

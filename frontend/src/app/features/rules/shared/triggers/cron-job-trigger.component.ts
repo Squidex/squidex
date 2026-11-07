@@ -27,7 +27,7 @@ export class CronJobTriggerComponent {
     /** The form to edit the trigger settings. */
     public readonly triggerForm = input.required<TriggerForm>();
 
-    public readonly timezones;
+    protected readonly timezones;
 
     constructor(appsState: AppsState, rulesService: RulesService) {
         this.timezones = toSignal(rulesService.getTimezones(appsState.appName), { initialValue: [] });

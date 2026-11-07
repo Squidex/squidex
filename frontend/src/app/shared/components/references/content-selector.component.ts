@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, computed, effect, forwardRef, input, linkedSignal, numberAttribute, output, signal, untracked } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -26,7 +25,6 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         ComponentContentsState,
     ],
     imports: [
-        AsyncPipe,
         ContentListCellDirective,
         ContentListHeaderComponent,
         ContentListWidthDirective,
@@ -45,7 +43,7 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
 export class ContentSelectorComponent {
     private isInitialQueryUsed = false;
 
-    public readonly metaFields = META_FIELDS;
+    protected readonly metaFields = META_FIELDS;
 
     /** Emits the selected contents, or an empty array when the dialog is closed. */
     public readonly contentSelect = output<ReadonlyArray<ContentDto>>();
@@ -83,15 +81,15 @@ export class ContentSelectorComponent {
     /** The contents that have already been selected before. Takes precedence over the IDs. */
     public readonly alreadySelected = input<ReadonlyArray<ContentDto> | null>();
 
-    public readonly alreadySelectedIdsAll = computed(() => {
+    private readonly alreadySelectedIdsAll = computed(() => {
         return this.alreadySelected()?.map(x => x.id) ?? this.alreadySelectedIds();
     });
 
-    public readonly languageSelected = linkedSignal(() => this.language());
+    protected readonly languageSelected = linkedSignal(() => this.language());
 
-    public readonly schema = signal<SchemaDto | undefined>(undefined);
+    protected readonly schema = signal<SchemaDto | undefined>(undefined);
 
-    public readonly schemas = computed(() => {
+    protected readonly schemas = computed(() => {
         const schemas = this.schemasState.snapshot.schemas.filter(x => x.type === 'Default' && x.canReadContents);
 
         const schemaIdentifiers = this.schemaIdentifiers();
@@ -102,21 +100,21 @@ export class ContentSelectorComponent {
         return schemas.filter(x => schemaIdentifiers.includes(x.id) || schemaIdentifiers.includes(x.name));
     });
 
-    public readonly selectedItems = signal<Record<string, ContentDto>>({});
+    private readonly selectedItems = signal<Record<string, ContentDto>>({});
 
-    public readonly selectionCount = computed(() => {
+    protected readonly selectionCount = computed(() => {
         return Object.keys(this.selectedItems()).length;
     });
 
-    public readonly selectedAll = computed(() => {
+    protected readonly selectedAll = computed(() => {
         return this.selectionCount() === this.contentsState.snapshot.contents.length;
     });
 
-    public readonly queryModel;
+    protected readonly queryModel;
 
     constructor(appsState: AppsState, schemasService: SchemasService,
-        public readonly contentsState: ComponentContentsState,
-        public readonly schemasState: SchemasState,
+        protected readonly contentsState: ComponentContentsState,
+        private readonly schemasState: SchemasState,
     ) {
         this.queryModel = toSignal(
             toObservable(this.schema).pipe(map(x => x?.name), distinctUntilChanged(),
@@ -136,7 +134,7 @@ export class ContentSelectorComponent {
         });
     }
 
-    public selectSchema(schema: SchemaDto | undefined) {
+    protected selectSchema(schema: SchemaDto | undefined) {
         this.schema.set(schema);
 
         if (!schema) {
@@ -151,23 +149,23 @@ export class ContentSelectorComponent {
         this.isInitialQueryUsed = true;
     }
 
-    public reload() {
+    protected reload() {
         this.contentsState.load(true);
     }
 
-    public reloadTotal() {
+    protected reloadTotal() {
         this.contentsState.load(true, false);
     }
 
-    public search(query: Query) {
+    protected search(query: Query) {
         this.contentsState.search(query);
     }
 
-    public isItemSelected(content: ContentDto) {
+    protected isItemSelected(content: ContentDto) {
         return !!this.selectedItems()[content.id];
     }
 
-    public isItemAlreadySelected(content: ContentDto) {
+    protected isItemAlreadySelected(content: ContentDto) {
         if (this.allowDuplicates()) {
             return false;
         }
@@ -175,19 +173,19 @@ export class ContentSelectorComponent {
         return this.alreadySelectedIdsAll()?.includes(content.id) === true;
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.contentSelect.emit([]);
     }
 
-    public emitClear() {
+    protected emitClear() {
         this.contentClear.emit();
     }
 
-    public emitSelect() {
+    protected emitSelect() {
         this.contentSelect.emit(Object.values(this.selectedItems()));
     }
 
-    public selectAll(isSelected: boolean) {
+    protected selectAll(isSelected: boolean) {
         const selectedItems: Record<string, ContentDto> = {};
 
         if (isSelected) {
@@ -201,7 +199,7 @@ export class ContentSelectorComponent {
         this.selectedItems.set(selectedItems);
     }
 
-    public selectContent(content: ContentDto) {
+    protected selectContent(content: ContentDto) {
         this.selectedItems.update(s => {
             const selectedItems = { ...s };
 

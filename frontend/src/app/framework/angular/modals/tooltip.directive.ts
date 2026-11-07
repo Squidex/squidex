@@ -57,7 +57,7 @@ export class TooltipDirective implements OnDestroy {
     }
 
     @HostListener('mouseenter')
-    public onMouseEnter() {
+    protected onMouseEnter() {
         this.hide();
 
         if (this.titleText) {
@@ -72,12 +72,12 @@ export class TooltipDirective implements OnDestroy {
     }
 
     @HostListener('mouseleave')
-    public onMouseLeave() {
+    protected onMouseLeave() {
         this.hide();
     }
 
     @HostListener('click')
-    public onClick() {
+    protected onClick() {
         this.hide();
     }
 
