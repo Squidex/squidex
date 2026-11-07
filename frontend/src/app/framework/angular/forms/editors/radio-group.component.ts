@@ -5,20 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { AfterViewChecked, AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, forwardRef, input, signal, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
+import { getTagValues, MathHelper, SignalControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
 
 export const SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroupComponent), multi: true,
 };
-
-interface State {
-    // True when all checkboxes can be shown as single line.
-    isSingleline?: boolean;
-}
 
 @Component({
     selector: 'sqx-radio-group',
@@ -33,105 +27,65 @@ interface State {
         ResizedDirective,
     ],
 })
-export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked {
-    private readonly textMeasurer: TextMeasurer;
-    private childrenWidth = 0;
-    private containerWidth = 0;
-    private labelsMeasured = false;
+export class RadioGroupComponent extends SignalControlComponent<string> {
+    private readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
+    private readonly containerWidth = signal(0);
+    private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
 
     public readonly controlId = MathHelper.guid();
 
-    @ViewChild('container', { static: false })
-    public containerElement!: ElementRef<HTMLDivElement>;
+    /** Renders the options in a single line, in multiple lines or depending on the available space. */
+    public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');
 
-    @Input()
-    public layout: 'Auto' | 'Singleline' | 'Multiline' = 'Auto';
+    /** Keeps the order of the values instead of sorting them by name. */
+    public readonly unsorted = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public unsorted = true;
+    /** The values to choose from. */
+    public readonly values = input<ReadonlyArray<string | TagValue>>([]);
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly tagValuesUnsorted = computed(() => {
+        return getTagValues(this.values(), false);
+    });
 
-    @Input()
-    public set values(value: ReadonlyArray<string | TagValue>) {
-        this.tagValuesUnsorted = getTagValues(value, false);
-        this.tagValuesSorted = this.tagValuesUnsorted.sortedByString(x => x.lowerCaseName);
-    }
+    public readonly tagValuesSorted = computed(() => {
+        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
+    });
 
-    public get tagValues() {
-        return !this.unsorted ? this.tagValuesSorted : this.tagValuesUnsorted;
-    }
+    public readonly tagValues = computed(() => {
+        return this.unsorted() ? this.tagValuesUnsorted() : this.tagValuesSorted();
+    });
 
-    public tagValuesSorted: ReadonlyArray<TagValue> = [];
-    public tagValuesUnsorted: ReadonlyArray<TagValue> = [];
-
-    public valueModel: any;
-
-    constructor() {
-        super({});
-
-        this.textMeasurer = new TextMeasurer(() => this.containerElement);
-    }
-
-    public ngAfterViewInit() {
-        this.calculateWidth();
-    }
-
-    public ngAfterViewChecked() {
-        this.calculateWidth();
-    }
-
-    public ngOnChanges() {
-        this.labelsMeasured = false;
-
-        this.calculateWidth();
-    }
-
-    public updateContainerWidth(width: number) {
-        this.containerWidth = width;
-
-        this.calculateSingleLine();
-    }
-
-    private calculateWidth() {
-        if (this.labelsMeasured) {
-            this.calculateSingleLine();
-            return;
-        }
-
+    public readonly tagValuesWidth = computed(() => {
         let width = 0;
-
-        for (const value of this.tagValuesUnsorted) {
+        for (const value of this.tagValuesUnsorted()) {
             width += 40;
             width += this.textMeasurer.getTextSize(value.name);
         }
 
+        return width;
+    });
+
+    public readonly isSingleline = computed(() => {
+        const layout = this.layout();
+        if (layout !== 'Auto') {
+            return layout === 'Singleline';
+        }
+
+        const width = this.tagValuesWidth();
         if (width < 0) {
-            return;
+            return false;
         }
 
-        this.childrenWidth = width;
-        this.calculateSingleLine();
+        return width < this.containerWidth();
+    });
 
-        this.labelsMeasured = true;
-    }
+    public readonly valueModel = signal<any>(undefined);
 
-    private calculateSingleLine() {
-        let isSingleline = false;
-
-        if (this.layout !== 'Auto') {
-            isSingleline = this.layout === 'Singleline';
-        } else {
-            isSingleline = this.childrenWidth < this.containerWidth;
-        }
-
-        this.next({ isSingleline });
+    public updateContainerWidth(width: number) {
+        this.containerWidth.set(width);
     }
 
     public writeValue(obj: any) {
-        this.valueModel = obj;
+        this.valueModel.set(obj);
     }
 }

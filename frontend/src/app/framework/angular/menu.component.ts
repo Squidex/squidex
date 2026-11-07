@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
 import { NgTemplateOutlet } from '@angular/common';
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, Injectable, Input, Optional, signal, SkipSelf, ViewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, Injectable, input, Optional, signal, SkipSelf, viewChild } from '@angular/core';
 import { ModalModel, ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
 import { DropdownMenuComponent } from './dropdown-menu.component';
 import { MenuItemComponent } from './menu-item.component';
@@ -54,54 +53,27 @@ export class MenuItemRegistry {
         deps: [MenuComponent],
     }]
 })
-export class MenuComponent implements AfterViewInit, ResizeListener {
+export class MenuComponent implements ResizeListener {
     private readonly subscriptions = new Subscriptions();
     private readonly menuItemsRegistry: MenuItemRegistry;
     private readonly measuredContainer = signal(-1);
     private readonly measuredMenu = signal(-1);
+    private readonly container = viewChild.required<ElementRef<HTMLDivElement>>('container');
+    private readonly menu = viewChild.required<ElementRef<HTMLDivElement>>('menu');
 
-    @Input()
-    public alignment: 'left' | 'right' = 'left';
+    /** Aligns the menu items and the overflow button to the left or right. */
+    public readonly alignment = input<'left' | 'right'>('left');
 
-    @Input({ transform: booleanAttribute })
-    public small = false;
+    /** Renders small buttons with less space between them. */
+    public readonly small = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public showCustom = true;
+    public readonly overflowDropdown = new ModalModel();
 
-    @ViewChild('container', { static: true })
-    public container!: ElementRef<HTMLDivElement>;
+    public readonly isRightAligned = computed(() => {
+        return this.alignment() === 'right';
+    });
 
-    @ViewChild('menu', { static: true })
-    public menu!: ElementRef<HTMLDivElement>;
-
-    public overflowDropdown = new ModalModel();
-
-    public get isRightAligned() {
-        return this.alignment === 'right';
-    }
-
-    constructor(
-        private readonly resizeService: ResizeService,
-        @Optional() @SkipSelf() parentMenuItemRegistry?: MenuItemRegistry,
-    ) {
-        this.menuItemsRegistry = parentMenuItemRegistry ?? new MenuItemRegistry();
-    }
-
-    public ngAfterViewInit() {
-        this.subscriptions.add(this.resizeService.listen(this.container.nativeElement, this));
-        this.subscriptions.add(this.resizeService.listen(this.menu.nativeElement, this));
-    }
-
-    public onResize(rect: DOMRect, element: Element): void {
-        if (element === this.container.nativeElement) {
-            this.measuredContainer.set(rect.width);
-        } else {
-            this.measuredMenu.set(Math.max(rect.width, element.scrollWidth));
-        }
-    }
-
-    protected overflowMenuItems = computed(() => {
+    protected readonly overflowMenuItems = computed(() => {
         const items = this.menuItemsRegistry.menuItems();
         const measuredContainer = this.measuredContainer();
         const measuredMenu = this.measuredMenu();
@@ -113,4 +85,24 @@ export class MenuComponent implements AfterViewInit, ResizeListener {
         const isOverlapping = measuredMenu > measuredContainer;
         return isOverlapping ? [...items.values()].filter(x => x.actualMenuLabel()).sortedByString(x => x.actualMenuLabel()) : null;
     });
+
+    constructor(
+        resizeService: ResizeService,
+        @Optional() @SkipSelf() parentMenuItemRegistry?: MenuItemRegistry,
+    ) {
+        this.menuItemsRegistry = parentMenuItemRegistry ?? new MenuItemRegistry();
+
+        afterNextRender(() => {
+            this.subscriptions.add(resizeService.listen(this.container().nativeElement, this));
+            this.subscriptions.add(resizeService.listen(this.menu().nativeElement, this));
+        });
+    }
+
+    public onResize(rect: DOMRect, element: Element): void {
+        if (element === this.container().nativeElement) {
+            this.measuredContainer.set(rect.width);
+        } else {
+            this.measuredMenu.set(Math.max(rect.width, element.scrollWidth));
+        }
+    }
 }

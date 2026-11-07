@@ -5,26 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, forwardRef, input, signal, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MathHelper, StatefulControlComponent } from '@app/framework/internal';
+import { MathHelper, SignalControlComponent } from '@app/framework/internal';
 import { FocusComponent } from '../forms-helper';
 
 export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ColorPickerComponent), multi: true,
 };
-
-interface State {
-    // The current value.
-    value: string;
-
-    // The hex color.
-    parsed: string;
-
-    // The foreground color.
-    foreground: string;
-}
 
 @Component({
     selector: 'sqx-color-picker',
@@ -38,50 +26,43 @@ interface State {
         FormsModule,
     ],
 })
-export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
-    @Input()
-    public placeholder = '';
+export class ColorPickerComponent extends SignalControlComponent<string> implements FocusComponent {
+    private readonly inputElement = viewChild<ElementRef<HTMLElement>>('input');
 
-    @Input()
-    public mode: 'Input' | 'Circle' = 'Input';
+    /** The placeholder of the text input. */
+    public readonly placeholder = input('');
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** Renders a text input or only a colored circle. */
+    public readonly mode = input<'Input' | 'Circle'>('Input');
 
-    @ViewChild('input')
-    public input?: ElementRef<HTMLInputElement>;
+    public readonly value = signal<string | null>('black');
 
-    constructor() {
-        super({ foreground: 'black', value: 'black', parsed: '#000000' });
-    }
+    public readonly valueParsed = computed(() => {
+        return parseColor(this.value());
+    });
+
+    public readonly valueForeground = computed(() => {
+        if (MathHelper.toLuminance(MathHelper.parseColor(this.valueParsed())!) < 0.5) {
+            return 'white';
+        }
+
+        return 'black';
+    });
 
     public writeValue(value: any) {
-        const previousColor = this.snapshot.value;
-        const parsedColor = parseColor(value);
-
-        if (previousColor !== parsedColor) {
-            let foreground = 'black';
-
-            if (MathHelper.toLuminance(MathHelper.parseColor(parsedColor)!) < 0.5) {
-                foreground = 'white';
-            }
-
-            this.next({ value, parsed: parsedColor, foreground });
-        }
+        this.value.set(value);
     }
 
     public focus() {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
-        this.input?.nativeElement?.focus();
+        this.inputElement()?.nativeElement?.focus();
     }
 
     public blur() {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
@@ -89,11 +70,11 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
     }
 
     public updateValue(value: string) {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
-        if (this.snapshot.value !== value) {
+        if (this.value() !== value) {
             this.callChange(value);
             this.writeValue(value);
         }
@@ -101,16 +82,16 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
 }
 
 let canvas: HTMLCanvasElement;
-function parseColor(color: string) {
+function parseColor(color: string | null) {
     if (!canvas) {
         canvas = document.createElement('canvas');
     }
 
     const ctx = canvas.getContext('2d')!;
     if (!ctx) {
-        return color;
+        return color || '';
     }
 
-    ctx.fillStyle = color;
+    ctx.fillStyle = color || '';
     return ctx.fillStyle;
 }

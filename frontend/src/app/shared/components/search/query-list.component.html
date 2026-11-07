@@ -1,6 +1,7 @@
-@if (queries && queries.length > 0) {
+@let queriesAll = queries();
+@if (queriesAll && queriesAll.length > 0) {
     <ul class="nav nav-light flex-column">
-        @for (saved of queries; track saved.name) {
+        @for (saved of queriesAll; track saved.name) {
             <li class="nav-item">
                 <button class="nav-link w-full" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)" type="button">
                     <div class="row g-1 align-items-center">
@@ -10,7 +11,7 @@
                         </div>
 
                         <div class="col-auto">
-                            @if (canRemove) {
+                            @if (canRemove()) {
                                 <button
                                     class="btn btn-sm btn-text-danger btn-remove"
                                     attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
@@ -27,7 +28,7 @@
         }
     </ul>
 } @else {
-    @if (canRemove) {
-        <div class="text-muted small" [innerHTML]="'search.queriesEmpty' | sqxTranslate: { types: types }"></div>
+    @if (canRemove()) {
+        <div class="text-muted small" [innerHTML]="'search.queriesEmpty' | sqxTranslate: { types: types() }"></div>
     }
 }

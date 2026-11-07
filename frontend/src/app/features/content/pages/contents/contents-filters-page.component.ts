@@ -36,7 +36,7 @@ export class ContentsFiltersPageComponent {
     ) {
     }
 
-    public search(query: Query) {
+    public search(query?: Query) {
         this.contentsState.search(query);
     }
 }

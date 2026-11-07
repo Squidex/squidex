@@ -5,7 +5,7 @@
         hint="schemas.fieldTypes.assets.previewModeHint"
         label="schemas.fieldTypes.assets.previewMode"
         [prefix]="field.fieldId">
-        <select class="form-select" [id]="previewRow.fieldName" formControlName="previewMode">
+        <select class="form-select" [id]="previewRow.fieldName()" formControlName="previewMode">
             <option value="ImageAndFileName">{{ "schemas.fieldTypes.assets.previewImageAndFileName" | sqxTranslate }}</option>
             <option value="Image">{{ "schemas.fieldTypes.assets.previewImage" | sqxTranslate }}</option>
             <option value="FileName">{{ "schemas.fieldTypes.assets.previewFileName" | sqxTranslate }}</option>
@@ -18,7 +18,7 @@
         hint="schemas.fieldTypes.assets.previewFormatHint"
         label="schemas.fieldTypes.assets.previewFormat"
         [prefix]="field.fieldId">
-        <input class="form-control" [id]="previewFormatRow.fieldName" formControlName="previewFormat" />
+        <input class="form-control" [id]="previewFormatRow.fieldName()" formControlName="previewFormat" />
     </sqx-form-row>
 
     <sqx-form-row
@@ -28,7 +28,7 @@
         hint="schemas.fieldTypes.assets.resolveHint"
         label="schemas.fieldTypes.assets.resolve"
         [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="resolveFirstRow.fieldName" formControlName="resolveFirst" type="checkbox" />
+        <input class="form-check-input" [id]="resolveFirstRow.fieldName()" formControlName="resolveFirst" type="checkbox" />
     </sqx-form-row>
 
     <sqx-form-row for="folderId" hint="schemas.fieldTypes.assets.folderIdHint" label="schemas.fieldTypes.assets.folderId" [prefix]="field.fieldId">

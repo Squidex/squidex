@@ -31,7 +31,7 @@
         <div class="container">
             <sqx-form-row #clientIdRow for="clientId" hideError label="common.clientId" [prefix]="client.id">
                 <div class="input-group">
-                    <input class="form-control" [id]="clientIdRow.fieldName" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
+                    <input class="form-control" [id]="clientIdRow.fieldName()" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
                     <button
                         class="btn btn-outline-secondary"
                         attr.aria-label="{{ 'clients.copyClientId' | sqxTranslate }}"
@@ -45,7 +45,7 @@
 
             <sqx-form-row #clientSecretRow for="clientSecret" hideError label="common.clientSecret" [prefix]="client.id">
                 <div class="input-group">
-                    <input class="form-control" [id]="clientSecretRow.fieldName" #inputSecret readonly [value]="client.secret" />
+                    <input class="form-control" [id]="clientSecretRow.fieldName()" #inputSecret readonly [value]="client.secret" />
                     <button
                         class="btn btn-outline-secondary"
                         attr.aria-label="{{ 'clients.copyClientSecret' | sqxTranslate }}"
@@ -72,7 +72,7 @@
             <sqx-form-row #roleRow for="role" hideError label="common.role" [prefix]="client.id">
                 <select
                     class="form-select"
-                    [id]="roleRow.fieldName"
+                    [id]="roleRow.fieldName()"
                     [disabled]="!client.canUpdate"
                     [ngModel]="client.role"
                     (ngModelChange)="updateRole($event)">
@@ -85,7 +85,7 @@
             <sqx-form-row #allowAnonymousRow check for="allowAnonymous" hints="clients.allowAnonymousHint" label="clients.allowAnonymous" [prefix]="client.id">
                 <input
                     class="form-check-input"
-                    [id]="allowAnonymousRow.fieldName"
+                    [id]="allowAnonymousRow.fieldName()"
                     [disabled]="!client.canUpdate"
                     [ngModel]="client.allowAnonymous"
                     (ngModelChange)="updateAllowAnonymous($event)"
@@ -97,7 +97,7 @@
                     <div class="col">
                         <input
                             class="form-control"
-                            [id]="apiCallsLimitRow.fieldName"
+                            [id]="apiCallsLimitRow.fieldName()"
                             [disabled]="!client.canUpdate"
                             min="0"
                             [(ngModel)]="apiCallsLimit"

@@ -1,11 +1,11 @@
-<div class="d-flex flex-nowrap relative" #container [class.gap-1]="small" [class.gap-2]="!small" [class.justify-content-end]="isRightAligned">
+<div class="d-flex flex-nowrap relative" #container [class.gap-1]="small()" [class.gap-2]="!small()" [class.justify-content-end]="isRightAligned()">
     @if (overflowMenuItems(); as menu) {
         <button
             class="btn btn-text-secondary"
             #buttonOptions
             attr.aria-label="{{ 'common.options' | sqxTranslate }}"
-            [class.btn-sm]="small"
-            [class.order-1]="isRightAligned"
+            [class.btn-sm]="small()"
+            [class.order-1]="isRightAligned()"
             (click)="overflowDropdown.toggle()"
             sqxStopClick
             type="button">
@@ -13,7 +13,7 @@
         </button>
 
         <sqx-dropdown-menu
-            [position]="isRightAligned ? 'bottom-end' : 'bottom-start'"
+            [position]="isRightAligned() ? 'bottom-end' : 'bottom-start'"
             scrollY="true"
             [sqxAnchoredTo]="buttonOptions"
             *sqxModal="overflowDropdown; closeAlways: true">
@@ -26,10 +26,10 @@
     <div
         class="d-flex flex-nowrap"
         #menu
-        [class.gap-1]="small"
-        [class.gap-2]="!small"
-        [class.overflown-left]="!!overflowMenuItems() && !isRightAligned"
-        [class.overflown-right]="!!overflowMenuItems() && isRightAligned">
+        [class.gap-1]="small()"
+        [class.gap-2]="!small()"
+        [class.overflown-left]="!!overflowMenuItems() && !isRightAligned()"
+        [class.overflown-right]="!!overflowMenuItems() && isRightAligned()">
         <ng-content />
     </div>
 </div>

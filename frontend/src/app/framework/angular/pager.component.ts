@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PagingInfo } from '../state';
@@ -80,11 +79,13 @@ export class PagerComponent {
         return paging.page < Math.ceil(paging.total / paging.pageSize) - 1;
     });
 
-    public readonly translationInfo = computed(() => ({
-        itemFirst: this.itemFirst(),
-        itemLast: this.itemLast(),
-        numberOfItems: this.paging()?.total,
-    }));
+    public readonly translationInfo = computed(() => {
+        return {
+            itemFirst: this.itemFirst(),
+            itemLast: this.itemLast(),
+            numberOfItems: this.paging()?.total,
+        };
+    });
 
     public goPrev() {
         const paging = this.paging();

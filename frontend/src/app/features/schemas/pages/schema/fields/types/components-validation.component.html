@@ -23,7 +23,7 @@
 
     <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
         <sqx-tag-editor
-            [id]="schemaIdsRow.fieldName"
+            [id]="schemaIdsRow.fieldName()"
             formControlName="schemaIds"
             [itemConverter]="(schemasSource.converter | async)!"
             [itemsSource]="(schemasSource.converter | async)?.suggestions"
@@ -31,6 +31,6 @@
     </sqx-form-row>
 
     <sqx-form-row #uniqueFieldsRow for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName" formControlName="uniqueFields" />
+        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName()" formControlName="uniqueFields" />
     </sqx-form-row>
 </div>

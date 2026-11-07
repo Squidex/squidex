@@ -5,18 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { StatefulControlComponent, Types } from '@app/framework/internal';
+import { SignalControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_TOGGLE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true,
 };
-
-interface State {
-    // The value indicating if something is checked.
-    isChecked: boolean | null;
-}
 
 @Component({
     selector: 'sqx-toggle',
@@ -25,36 +20,26 @@ interface State {
     providers: [
         SQX_TOGGLE_CONTROL_VALUE_ACCESSOR,
     ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ToggleComponent extends StatefulControlComponent<State, boolean | null> {
-    @Input({ transform: booleanAttribute })
-    public threeStates?: boolean | null;
+export class ToggleComponent extends SignalControlComponent<boolean | null> {
+    /** Allows null as third state, besides checked and unchecked. */
+    public readonly threeStates = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
-
-    constructor() {
-        super({ isChecked: null });
-    }
+    public readonly isChecked = signal<boolean | null>(null);
 
     public writeValue(obj: any) {
-        const isChecked = Types.isBoolean(obj) ? obj : null;
-
-        this.next({ isChecked });
+        this.isChecked.set(Types.isBoolean(obj) ? obj : null);
     }
 
     public changeState() {
-        const isDisabled = this.snapshot.isDisabled;
-
-        if (isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
-        let isChecked = this.snapshot.isChecked;
+        let isChecked = this.isChecked();
 
-        if (this.threeStates) {
+        if (this.threeStates()) {
             if (isChecked) {
                 isChecked = null;
             } else {
@@ -64,7 +49,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
             isChecked = !(isChecked === true);
         }
 
-        this.next({ isChecked });
+        this.isChecked.set(isChecked);
 
         this.callChange(isChecked);
         this.callTouched();

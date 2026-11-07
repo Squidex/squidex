@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/no-output-native */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { StopClickDirective, TranslatePipe } from '@app/framework';
 import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
 
@@ -22,25 +22,25 @@ import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
     ],
 })
 export class QueryListComponent {
-    @Output()
-    public search = new EventEmitter<Query>();
+    /** Emits the query to search for. */
+    public readonly search = output<Query | undefined>();
 
-    @Output()
-    public remove = new EventEmitter<SavedQuery>();
+    /** Emits the saved query to remove. */
+    public readonly remove = output<SavedQuery>();
 
-    @Input()
-    public queryUsed?: Query | null;
+    /** The current query, to highlight the matching saved query. */
+    public readonly queryUsed = input<Query | null>();
 
-    @Input()
-    public queries?: ReadonlyArray<SavedQuery> | null;
+    /** The saved queries to render. */
+    public readonly queries = input<ReadonlyArray<SavedQuery> | null>();
 
-    @Input({ transform: booleanAttribute })
-    public canRemove?: boolean | null;
+    /** Shows a button to remove a query and a hint when there are no queries. */
+    public readonly canRemove = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public types = '';
+    /** The plural name of the searched items, for example "contents". */
+    public readonly types = input('');
 
     public isSelectedQuery(saved: SavedQuery) {
-        return equalsQuery(saved.query, this.queryUsed);
+        return equalsQuery(saved.query, this.queryUsed());
     }
 }

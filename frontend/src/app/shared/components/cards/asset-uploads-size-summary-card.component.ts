@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FileSizePipe, TranslatePipe } from '@app/framework';
 import { CurrentStorageDto } from '@app/shared/internal';
 
@@ -21,16 +20,14 @@ import { CurrentStorageDto } from '@app/shared/internal';
     ],
 })
 export class AssetUploadsSizeSummaryCardComponent {
-    @Input({ required: true })
-    public usage?: CurrentStorageDto;
+    /** The asset storage usage of the app. */
+    public readonly usage = input.required<CurrentStorageDto | undefined>();
 
-    public storageCurrent = 0;
-    public storageAllowed = 0;
+    public readonly storageCurrent = computed(() => {
+        return this.usage()?.size ?? 0;
+    });
 
-    public ngOnChanges() {
-        if (this.usage) {
-            this.storageCurrent = this.usage.size;
-            this.storageAllowed = this.usage.maxAllowed;
-        }
-    }
+    public readonly storageAllowed = computed(() => {
+        return this.usage()?.maxAllowed ?? 0;
+    });
 }

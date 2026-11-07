@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, numberAttribute, OnInit, Renderer2 } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, numberAttribute, Renderer2, signal } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
-import { Subscriptions, ThemeService, TypedSimpleChanges } from '@app/framework/internal';
+import { Subscriptions, ThemeService } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-progress-bar',
@@ -19,94 +19,92 @@ import { Subscriptions, ThemeService, TypedSimpleChanges } from '@app/framework/
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProgressBarComponent implements  OnInit {
+export class ProgressBarComponent {
     private readonly subscriptions = new Subscriptions();
-    private progressBar: any;
+    private readonly progressBar = signal<any>(null);
 
-    @Input()
-    public mode = 'Line';
+    /** Renders a horizontal line or a circle. */
+    public readonly mode = input<'Line' | 'Circle' | string>('Line');
 
-    @Input()
-    public color?: string;
+    /** The color of the progress. Falls back to the theme color. */
+    public readonly color = input<string>();
 
-    @Input()
-    public trailColor?: string;
+    /** The color of the remaining part. Falls back to the theme color. */
+    public readonly trailColor = input<string>();
 
-    @Input({ transform: numberAttribute })
-    public trailWidth = 4;
+    /** The width of the remaining part. */
+    public readonly trailWidth = input(4, { transform: numberAttribute });
 
-    @Input({ transform: numberAttribute })
-    public strokeWidth = 4;
+    /** The width of the progress. */
+    public readonly strokeWidth = input(4, { transform: numberAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public showText?: boolean | null = true;
+    /** Shows the value as percent text. */
+    public readonly showText = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public animated?: boolean | null = true;
+    /** Animates value changes. */
+    public readonly animated = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: numberAttribute })
-    public value = 0;
+    /** The progress in percent, between 0 and 100. */
+    public readonly value = input(0, { transform: numberAttribute });
 
-    constructor(changeDetector: ChangeDetectorRef,
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
+    constructor(
+        element: ElementRef,
+        renderer: Renderer2,
         private readonly themeService: ThemeService,
     ) {
-        changeDetector.detach();
-    }
+        renderer.setStyle(element.nativeElement, 'display', 'block');
 
-    public ngOnInit() {
-        const options = {
-            color: this.getColor(),
-            trailColor: this.getTrailColor(),
-            trailWidth: this.trailWidth,
-            strokeWidth: this.strokeWidth,
-            svgStyle: { width: '100%', height: '100%' },
-        };
+        effect(onCleanup => {
+            const options = {
+                color: this.getColor(),
+                trailColor: this.getTrailColor(),
+                trailWidth: this.trailWidth(),
+                strokeWidth: this.strokeWidth(),
+                svgStyle: { width: '100%', height: '100%' },
+            };
 
-        this.renderer.setStyle(this.element.nativeElement, 'display', 'block');
+            const progressBar = this.mode() === 'Circle' ?
+                new ProgressBar.Circle(element.nativeElement, options) :
+                new ProgressBar.Line(element.nativeElement, options);
 
-        if (this.mode === 'Circle') {
-            this.progressBar = new ProgressBar.Circle(this.element.nativeElement, options);
-        } else {
-            this.progressBar = new ProgressBar.Line(this.element.nativeElement, options);
-        }
+            this.progressBar.set(progressBar);
 
-        this.updateValue();
+            onCleanup(() => progressBar.destroy());
+        });
+
+        effect(() => {
+            const progressBar = this.progressBar();
+            if (!progressBar) {
+                return;
+            }
+
+            const value = this.value();
+            if (this.animated()) {
+                progressBar.animate(value / 100);
+            } else {
+                progressBar.set(value / 100);
+            }
+
+            if (value > 0 && this.showText()) {
+                progressBar.setText(`${Math.round(value)}%`);
+            }
+        });
 
         this.subscriptions.add(
-            this.themeService.themeChanges
+            themeService.themeChanges
                 .subscribe(() => {
-                    this.progressBar.path?.setAttribute('stroke', this.getColor());
-                    this.progressBar.trail?.setAttribute('stroke', this.getTrailColor());
+                    const progressBar = this.progressBar();
+
+                    progressBar?.path?.setAttribute('stroke', this.getColor());
+                    progressBar?.trail?.setAttribute('stroke', this.getTrailColor());
                 }));
     }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (this.progressBar && changes.value) {
-            this.updateValue();
-        }
-    }
-
     private getColor() {
-        return this.color || this.themeService.getColor('progress');
+        return this.color() || this.themeService.getColor('progress');
     }
 
     private getTrailColor() {
-        return this.trailColor || this.themeService.getColor('progress-trail');
-    }
-
-    private updateValue() {
-        const value = this.value;
-
-        if (this.animated) {
-            this.progressBar.animate(value / 100);
-        } else {
-            this.progressBar.set(value / 100);
-        }
-
-        if (value > 0 && this.showText) {
-            this.progressBar.setText(`${Math.round(value)}%`);
-        }
+        return this.trailColor() || this.themeService.getColor('progress-trail');
     }
 }

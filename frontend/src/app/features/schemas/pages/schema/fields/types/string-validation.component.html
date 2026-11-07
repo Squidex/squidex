@@ -1,7 +1,7 @@
 <div [formGroup]="fieldForm">
     @if (showUnique) {
         <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field.fieldId">
-            <input class="form-check-input" [id]="isUniqueRow.fieldName" formControlName="isUnique" type="checkbox" />
+            <input class="form-check-input" [id]="isUniqueRow.fieldName()" formControlName="isUnique" type="checkbox" />
         </sqx-form-row>
     }
 
@@ -30,7 +30,7 @@
     <sqx-form-row #patternRow for="pattern" [hint]="patternName" label="common.pattern" [prefix]="field.fieldId">
         <input
             class="form-control"
-            [id]="patternRow.fieldName"
+            [id]="patternRow.fieldName()"
             #inputPattern
             autocapitalize="off"
             autocomplete="off"
@@ -55,7 +55,7 @@
 
     @if (showPatternMessage | async) {
         <sqx-form-row #patternMessageRow for="patternMessage" label="schemas.fieldTypes.string.patternMessage" [prefix]="field.fieldId">
-            <input class="form-control" [id]="patternMessageRow.fieldName" formControlName="patternMessage" />
+            <input class="form-control" [id]="patternMessageRow.fieldName()" formControlName="patternMessage" />
         </sqx-form-row>
     }
 
@@ -106,12 +106,12 @@
     </sqx-form-row>
 
     <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-        <input class="form-control" [id]="defaultValueRow.fieldName" formControlName="defaultValue" />
+        <input class="form-control" [id]="defaultValueRow.fieldName()" formControlName="defaultValue" />
     </sqx-form-row>
 
     @if (isLocalizable) {
         <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-            <sqx-localized-input [id]="defaultValuesRow.fieldName" formControlName="defaultValues" [languages]="languages" />
+            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages" />
         </sqx-form-row>
     }
 </div>

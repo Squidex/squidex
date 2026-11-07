@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
 
@@ -21,16 +20,14 @@ import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
     ],
 })
 export class ApiTrafficSummaryCardComponent {
-    @Input({ required: true })
-    public usage?: CallsUsageDto;
+    /** The API usage of the app. */
+    public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    public bytesMonth = 0;
-    public bytesAllowed = 0;
+    public readonly bytesMonth = computed(() => {
+        return this.usage()?.monthBytes ?? 0;
+    });
 
-    public ngOnChanges() {
-        if (this.usage) {
-            this.bytesMonth = this.usage.monthBytes;
-            this.bytesAllowed = this.usage.allowedBytes;
-        }
-    }
+    public readonly bytesAllowed = computed(() => {
+        return this.usage()?.allowedBytes ?? 0;
+    });
 }

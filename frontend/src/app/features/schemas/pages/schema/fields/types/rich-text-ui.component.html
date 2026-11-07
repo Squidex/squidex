@@ -5,7 +5,7 @@
         hint="schemas.fieldTypes.string.classNamesHint"
         label="schemas.fieldTypes.string.classNames"
         [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="classNamesRow.fieldName" formControlName="classNames" />
+        <sqx-tag-editor [id]="classNamesRow.fieldName()" formControlName="classNames" />
     </sqx-form-row>
 
     <sqx-form-row for="folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field.fieldId">
@@ -14,7 +14,7 @@
 
     <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
         <sqx-tag-editor
-            [id]="schemaIdsRow.fieldName"
+            [id]="schemaIdsRow.fieldName()"
             formControlName="schemaIds"
             [itemConverter]="(schemasSource.normalConverter | async)!"
             [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"

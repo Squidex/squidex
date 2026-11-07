@@ -1,20 +1,21 @@
-<div [formGroup]="form">
-    @switch (field.properties.fieldType) {
+@let f = field();
+<div [formGroup]="form()">
+    @switch (f.properties.fieldType) {
         @case ("Number") {
-            @switch (field.rawProperties.editor) {
+            @switch (f.rawProperties.editor) {
                 @case ("Input") {
-                    <input class="form-control" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" type="number" />
+                    <input class="form-control" [formControlName]="f.name" [placeholder]="f.displayPlaceholder" type="number" />
                 }
 
                 @case ("Stars") {
-                    <sqx-stars [formControlName]="field.name" [maximumStars]="field.rawProperties.maxValue" />
+                    <sqx-stars [formControlName]="f.name" [maximumStars]="f.rawProperties.maxValue" />
                 }
 
                 @case ("Dropdown") {
-                    <select class="form-select" [formControlName]="field.name">
+                    <select class="form-select" [formControlName]="f.name">
                         <option [ngValue]="null"></option>
 
-                        @for (value of field.rawProperties.allowedValues; track value) {
+                        @for (value of f.rawProperties.allowedValues; track value) {
                             <option [ngValue]="value">{{ value }}</option>
                         }
                     </select>
@@ -23,20 +24,20 @@
         }
 
         @case ("String") {
-            @switch (field.rawProperties.editor) {
+            @switch (f.rawProperties.editor) {
                 @case ("Input") {
-                    <input class="form-control" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
+                    <input class="form-control" [formControlName]="f.name" [placeholder]="f.displayPlaceholder" />
                 }
 
                 @case ("Slug") {
-                    <input class="form-control" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify" />
+                    <input class="form-control" [formControlName]="f.name" [placeholder]="f.displayPlaceholder" sqxTransformInput="Slugify" />
                 }
 
                 @case ("Dropdown") {
-                    <select class="form-select" [formControlName]="field.name">
+                    <select class="form-select" [formControlName]="f.name">
                         <option [ngValue]="null"></option>
 
-                        @for (value of field.rawProperties.allowedValues; track value) {
+                        @for (value of f.rawProperties.allowedValues; track value) {
                             <option [ngValue]="value">{{ value }}</option>
                         }
                     </select>
@@ -45,14 +46,14 @@
         }
 
         @case ("Boolean") {
-            @switch (field.rawProperties.editor) {
+            @switch (f.rawProperties.editor) {
                 @case ("Toggle") {
-                    <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired" />
+                    <sqx-toggle [formControlName]="f.name" [threeStates]="!f.properties.isRequired" />
                 }
 
                 @case ("Checkbox") {
                     <div class="form-check">
-                        <input class="form-check-input" id="{{ uniqueId }}" [formControlName]="field.name" sqxIndeterminateValue type="checkbox" />
+                        <input class="form-check-input" id="{{ uniqueId }}" [formControlName]="f.name" sqxIndeterminateValue type="checkbox" />
                         <label class="form-check-label" for="{{ uniqueId }}"></label>
                     </div>
                 }

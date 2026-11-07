@@ -1,19 +1,19 @@
 <span class="color-container" #input>
-    @if (mode === "Input") {
+    @if (mode() === "Input") {
         <input
             class="form-control"
             (blur)="blur()"
             (click)="picker.click()"
             (focus)="picker.click()"
-            [ngModel]="snapshot.value"
+            [ngModel]="value()"
             (ngModelChange)="updateValue($event)"
-            [placeholder]="placeholder"
-            [style.background]="snapshot.value"
-            [style.color]="snapshot.foreground"
+            [placeholder]="placeholder()"
+            [style.background]="value()"
+            [style.color]="valueForeground()"
             type="text" />
     } @else {
-        <div class="circle" (click)="picker.click()" (focus)="picker.click()" [style.background]="snapshot.value"></div>
+        <div class="circle" (click)="picker.click()" (focus)="picker.click()" [style.background]="value()"></div>
     }
 
-    <input class="color-picker" #picker [ngModel]="snapshot.parsed" (ngModelChange)="updateValue($event)" type="color" />
+    <input class="color-picker" #picker [ngModel]="valueParsed()" (ngModelChange)="updateValue($event)" type="color" />
 </span>

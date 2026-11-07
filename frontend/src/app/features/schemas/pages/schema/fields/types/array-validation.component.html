@@ -14,6 +14,6 @@
     </sqx-form-row>
 
     <sqx-form-row #uniqueFieldsRow for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName" formControlName="uniqueFields" />
+        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName()" formControlName="uniqueFields" />
     </sqx-form-row>
 </div>

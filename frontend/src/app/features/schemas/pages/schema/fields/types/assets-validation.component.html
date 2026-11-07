@@ -72,15 +72,15 @@
     <hr />
 
     <sqx-form-row #allowDuplicatesRow check for="allowDuplicates" hideError label="schemas.fieldTypes.assets.allowDuplicates" [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="allowDuplicatesRow.fieldName" formControlName="allowDuplicates" type="checkbox" />
+        <input class="form-check-input" [id]="allowDuplicatesRow.fieldName()" formControlName="allowDuplicates" type="checkbox" />
     </sqx-form-row>
 
     <sqx-form-row #allowedExtensionsRow for="allowedExtensions" hideError label="schemas.fieldTypes.assets.fileExtensions" [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="allowedExtensionsRow.fieldName" formControlName="allowedExtensions" />
+        <sqx-tag-editor [id]="allowedExtensionsRow.fieldName()" formControlName="allowedExtensions" />
     </sqx-form-row>
 
     <sqx-form-row #defaultValueRow for="defaultValue" hideError label="schemas.field.defaultValue" [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="defaultValueRow.fieldName" formControlName="defaultValue" />
+        <sqx-tag-editor [id]="defaultValueRow.fieldName()" formControlName="defaultValue" />
     </sqx-form-row>
 
     @if (isLocalizable) {
@@ -91,7 +91,7 @@
             hint="schemas.field.defaultValuesHint"
             label="schemas.field.defaultValues"
             [prefix]="field.fieldId">
-            <sqx-localized-input [id]="defaultValuesRow.fieldName" formControlName="defaultValues" [languages]="languages" type="tags" />
+            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages" type="tags" />
         </sqx-form-row>
     }
 </div>

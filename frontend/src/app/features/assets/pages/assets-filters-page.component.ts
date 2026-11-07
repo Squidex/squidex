@@ -31,7 +31,7 @@ export class AssetsFiltersPageComponent {
         this.assetsQueries = new Queries(uiState, 'assets');
     }
 
-    public search(query: Query) {
+    public search(query?: Query) {
         this.assetsState.search(query);
     }
 

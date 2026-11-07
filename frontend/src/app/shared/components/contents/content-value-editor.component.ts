@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { IndeterminateValueDirective, StarsComponent, ToggleComponent, TransformInputDirective } from '@app/framework';
 import { FieldDto, MathHelper } from '@app/shared/internal';
@@ -26,11 +26,11 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
     ],
 })
 export class ContentValueEditorComponent {
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to render an editor for. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public form!: UntypedFormGroup;
+    /** The form group that contains a control with the name of the field. */
+    public readonly form = input.required<UntypedFormGroup>();
 
     public readonly uniqueId = MathHelper.guid();
 }

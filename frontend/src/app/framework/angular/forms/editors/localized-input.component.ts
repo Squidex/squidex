@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
+import { SignalControlComponent, Types } from '@app/framework/internal';
 import { Language, LanguageSelectorComponent } from '../../language-selector.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { IndeterminateValueDirective } from '../indeterminate-value.directive';
@@ -21,10 +20,7 @@ export const SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 
 const DEFAULT_LANGUAGE = { iso2Code: 'iv', englishName: 'Invariant' };
 
-interface State {
-    // The selected language.
-    language: Language;
-}
+type LocalizedValue = { [key: string]: any };
 
 @Component({
     selector: 'sqx-localized-input',
@@ -43,76 +39,61 @@ interface State {
         TranslatePipe,
     ],
 })
-export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
-    private value: { [key: string]: any } | undefined;
+export class LocalizedInputComponent extends SignalControlComponent<LocalizedValue> {
+    /** The languages to edit a value for. */
+    public readonly languages = input.required<ReadonlyArray<Language>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<Language>;
+    /** The editor to use for each value. */
+    public readonly type = input<'text' | 'boolean' | 'datetime' | 'date' | 'tags' | 'number'>('text');
 
-    @Input()
-    public type: 'text' | 'boolean' | 'datetime' | 'date' | 'tags' | 'number' = 'text';
+    /** The name attribute of the inner input. */
+    public readonly name = input('');
 
-    @Input()
-    public name = '';
+    /** The ID of the inner input. */
+    public readonly id = input('');
 
-    @Input()
-    public id = '';
+    public readonly language = signal<Language>(DEFAULT_LANGUAGE);
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly value = signal<LocalizedValue | undefined>(undefined);
 
-    public dropdown = new ModalModel();
+    public readonly valueCurrent = computed(() => {
+        return this.value()?.[this.language().iso2Code];
+    });
 
-    public get currentValue() {
-        if (!this.snapshot.language || !this.value) {
-            return undefined;
-        }
-
-        return this.value[this.snapshot.language.iso2Code];
-    }
-
-    public get isEmpty() {
-        if (!this.snapshot.language || !this.value) {
+    public readonly valueIsEmpty = computed(() => {
+        const value = this.value();
+        if (!value) {
             return true;
         }
 
-        return !this.value.hasOwnProperty(this.snapshot.language.iso2Code);
-    }
-
-    constructor() {
-        super({ language: DEFAULT_LANGUAGE });
-    }
+        return !value.hasOwnProperty(this.language().iso2Code);
+    });
 
     public setLanguage(language: Language) {
-        this.next({ language });
+        this.language.set(language);
     }
 
     public writeValue(obj: any) {
-        if (Types.isObject(obj)) {
-            this.value = obj;
-        } else {
-            this.value = {};
-        }
+        this.value.set(Types.isObject(obj) ? obj : {});
     }
 
     public setValue(value: any) {
-        this.value = { ...this.value || {} };
-        this.value[this.snapshot.language.iso2Code] = value;
+        const result = { ...this.value() || {}, [this.language().iso2Code]: value };
 
-        this.callChange(this.value);
+        this.value.set(result);
+        this.callChange(result);
     }
 
     public unset() {
-        this.value = { ...this.value || {} };
+        let result: LocalizedValue | undefined = { ...this.value() || {} };
 
-        delete this.value[this.snapshot.language.iso2Code];
+        delete result[this.language().iso2Code];
 
-        if (Object.keys(this.value).length === 0) {
-            this.value = undefined;
+        if (Object.keys(result).length === 0) {
+            result = undefined;
         }
 
-        this.callChange(this.value);
+        this.value.set(result);
+        this.callChange(result);
     }
 }

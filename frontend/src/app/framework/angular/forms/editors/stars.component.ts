@@ -5,26 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, input, numberAttribute, signal } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { StatefulControlComponent, Types } from '@app/framework/internal';
+import { SignalControlComponent, Types } from '@app/framework/internal';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true,
 };
-
-interface State {
-    // The current stars to show.
-    stars: number;
-
-    // The array for rendering the stars.
-    starsArray: ReadonlyArray<number>;
-
-    // The selected value.
-    value: number | null;
-}
 
 @Component({
     selector: 'sqx-stars',
@@ -38,72 +26,54 @@ interface State {
         TranslatePipe,
     ],
 })
-export class StarsComponent extends StatefulControlComponent<State, number | null> {
-    private maximumStarsValue = 5;
+export class StarsComponent extends SignalControlComponent<number | null> {
+    /** The number of stars to render. Shows a hint instead of stars when greater than 15. */
+    public readonly maximumStars = input(5, { transform: (value: unknown) => numberAttribute(value, 5) });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly starsArray = computed(() => {
+        const result: number[] = [];
 
-    @Input({ transform: numberAttribute })
-    public set maximumStars(value: number) {
-        const maxStars: number = Types.isNumber(value) ? value : 5;
-
-        if (this.maximumStarsValue !== maxStars) {
-            this.maximumStarsValue = value;
-
-            const starsArray: number[] = [];
-
-            for (let i = 1; i <= maxStars; i++) {
-                starsArray.push(i);
-            }
-
-            this.next({ starsArray });
+        for (let i = 1; i <= this.maximumStars(); i++) {
+            result.push(i);
         }
-    }
 
-    public get maximumStars() {
-        return this.maximumStarsValue;
-    }
+        return result;
+    });
 
-    constructor() {
-        super({
-            stars: -1,
-            starsArray: [1, 2, 3, 4, 5],
-            value: null,
-        });
-    }
+    public readonly value = signal<number | null>(null);
+    public readonly valuePreview = signal(-1);
 
     public writeValue(obj: any) {
-        const stars = Types.isNumber(obj) ? obj : 0;
+        const value = Types.isNumber(obj) ? obj : null;
 
-        this.next({ stars });
+        this.value.set(value);
+        this.valuePreview.set(value || 0);
     }
 
     public setPreview(stars: number) {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
-        this.next({ stars });
+        this.valuePreview.set(stars);
     }
 
     public stopPreview() {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
-        this.next(s => ({ ...s, stars: s.value || 0 }));
+        this.valuePreview.set(this.value() || 0);
     }
 
     public reset() {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return false;
         }
 
-        if (this.snapshot.value) {
-            this.next({ stars: -1, value: null });
+        if (this.value()) {
+            this.value.set(null);
+            this.valuePreview.set(-1);
 
             this.callChange(null);
             this.callTouched();
@@ -113,12 +83,13 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
     }
 
     public setValue(value: number) {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return false;
         }
 
-        if (this.snapshot.value !== value) {
-            this.next({ stars: value, value });
+        if (this.value() !== value) {
+            this.value.set(value);
+            this.valuePreview.set(value);
 
             this.callChange(value);
             this.callTouched();

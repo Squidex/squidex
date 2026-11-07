@@ -20,7 +20,7 @@
 
         @if (showDefaultValue | async) {
             <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-                <sqx-date-time-editor [id]="defaultValueRow.fieldName" formControlName="defaultValue" mode="DateTime" />
+                <sqx-date-time-editor [id]="defaultValueRow.fieldName()" formControlName="defaultValue" mode="DateTime" />
             </sqx-form-row>
         }
 
@@ -31,7 +31,7 @@
                 hint="schemas.field.defaultValuesHint"
                 label="schemas.field.defaultValues"
                 [prefix]="field.fieldId">
-                <sqx-localized-input [id]="defaultValueRows.fieldName" formControlName="defaultValues" [languages]="languages" type="datetime" />
+                <sqx-localized-input [id]="defaultValueRows.fieldName()" formControlName="defaultValues" [languages]="languages" type="datetime" />
             </sqx-form-row>
         }
     }

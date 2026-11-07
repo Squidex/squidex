@@ -1,6 +1,6 @@
 <div [formGroup]="fieldForm">
     <sqx-form-row #placeholderRow for="placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field.fieldId">
-        <input class="form-control" [id]="placeholderRow.fieldName" formControlName="placeholder" maxlength="100" />
+        <input class="form-control" [id]="placeholderRow.fieldName()" formControlName="placeholder" maxlength="100" />
     </sqx-form-row>
 
     <sqx-form-row for="editor" label="schemas.field.editor" [prefix]="field.fieldId">
@@ -19,11 +19,11 @@
         hint="schemas.fieldTypes.string.classNamesHint"
         label="schemas.fieldTypes.string.classNames"
         [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="classNamesRow.fieldName" formControlName="classNames" />
+        <sqx-tag-editor [id]="classNamesRow.fieldName()" formControlName="classNames" />
     </sqx-form-row>
 
     <sqx-form-row #allowedValuesRow [class.hidden]="hideAllowedValues | async" for="allowedValues" label="schemas.field.allowedValues" [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="allowedValuesRow.fieldName" formControlName="allowedValues" />
+        <sqx-tag-editor [id]="allowedValuesRow.fieldName()" formControlName="allowedValues" />
     </sqx-form-row>
 
     <sqx-form-row for="folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field.fieldId">
@@ -38,20 +38,20 @@
         hint="schemas.field.createEnumHint"
         label="schemas.field.createEnum"
         [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="createEnumRow.fieldName" formControlName="createEnum" type="checkbox" />
+        <input class="form-check-input" [id]="createEnumRow.fieldName()" formControlName="createEnum" type="checkbox" />
     </sqx-form-row>
 
     <sqx-form-row #inlineEditableRow check for="inlineEditable" label="schemas.field.inlineEditable" [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="inlineEditableRow.fieldName" formControlName="inlineEditable" type="checkbox" />
+        <input class="form-check-input" [id]="inlineEditableRow.fieldName()" formControlName="inlineEditable" type="checkbox" />
     </sqx-form-row>
 
     <sqx-form-row #isEmbeddableRow check for="isEmbeddable" hint="schemas.field.isEmbeddableHint" label="schemas.field.isEmbeddable" [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="isEmbeddableRow.fieldName" formControlName="isEmbeddable" type="checkbox" />
+        <input class="form-check-input" [id]="isEmbeddableRow.fieldName()" formControlName="isEmbeddable" type="checkbox" />
     </sqx-form-row>
 
     <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
         <sqx-tag-editor
-            [id]="schemaIdsRow.fieldName"
+            [id]="schemaIdsRow.fieldName()"
             formControlName="schemaIds"
             [itemConverter]="(schemasSource.normalConverter | async)!"
             [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"

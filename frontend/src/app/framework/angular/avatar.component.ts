@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
 import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, numberAttribute } from '@angular/core';
 import { picasso } from '@app/framework/internal';
 import { SafeUrlPipe } from './safe-html.pipe';
@@ -31,8 +30,13 @@ export class AvatarComponent {
 
     public readonly actualImage = linkedSignal(() => this.image());
 
-    public readonly imageSource = computed(() => this.actualImage() || this.createSvg(this.identifier()));
-    public readonly imageSize = computed(() => `${this.size()}px`);
+    public readonly imageSource = computed(() => {
+        return this.actualImage() || this.createSvg(this.identifier());
+    });
+
+    public readonly imageSize = computed(() => {
+        return `${this.size()}px`;
+    });
 
     public unsetImage() {
         this.actualImage.set(null);

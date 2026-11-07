@@ -1,6 +1,6 @@
 <div class="mb-3" [formGroup]="fieldForm">
     <sqx-form-row #editorUrlRow for="editorUrl" hints="schemas.field.editorUrlHint" label="schemas.field.editorUrl" [prefix]="field.fieldId">
-        <input class="form-control" [id]="editorUrlRow.fieldName" formControlName="editorUrl" type="url" />
+        <input class="form-control" [id]="editorUrlRow.fieldName()" formControlName="editorUrl" type="url" />
     </sqx-form-row>
 </div>
 
@@ -64,6 +64,6 @@
 
 <div class="mt-3" [formGroup]="fieldForm">
     <sqx-form-row #isHalfWidthRow check for="isHalfWidth" hint="schemas.field.halfWidthHint" label="schemas.field.halfWidth" [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="isHalfWidthRow.fieldName" formControlName="isHalfWidth" type="checkbox" />
+        <input class="form-check-input" [id]="isHalfWidthRow.fieldName()" formControlName="isHalfWidth" type="checkbox" />
     </sqx-form-row>
 </div>

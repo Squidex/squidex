@@ -2,22 +2,16 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights r vbeserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { ChangeDetectionStrategy, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, Host, input, Optional, signal, untracked } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
-import { LocalizerService, StatefulComponent, Subscriptions, Types } from '@app/framework/internal';
+import { LocalizerService, Types } from '@app/framework/internal';
 import { ControlErrorsMessagesComponent } from './control-errors-messages.component';
 import { formatError } from './error-formatting';
 import { touchedChange$ } from './forms-helper';
-
-interface State {
-    // The error messages to show.
-    errorMessages: ReadonlyArray<string>;
-}
 
 @Component({
     selector: 'sqx-control-errors',
@@ -28,102 +22,93 @@ interface State {
         ControlErrorsMessagesComponent,
     ],
 })
-export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
-    private readonly subscriptions = new Subscriptions();
-    private controlDisplayName = '';
-    private control: AbstractControl | null = null;
+export class ControlErrorsComponent {
+    /** The control or the name of the control in the parent form group. */
+    public readonly for = input.required<string | AbstractControl>();
 
-    @Input({ required: true })
-    public for!: string | AbstractControl;
+    /** Shows the errors only when the form has been submitted, if set. */
+    public readonly submitCount = input<number | null>();
 
-    @Input()
-    public submitCount: null | number | undefined;
+    /** The field name in the error messages. Falls back to a name derived from the control. */
+    public readonly fieldName = input<string | null>();
 
-    @Input()
-    public fieldName: string | null | undefined;
+    public readonly errorMessages = signal<ReadonlyArray<string>>([]);
 
-    public get isTouched() {
-        return this.control?.touched || Types.is(this.control, UntypedFormArray);
-    }
+    private readonly control = computed(() => {
+        const control = this.for();
+        if (!Types.isString(control)) {
+            return control;
+        }
+
+        return this.formGroupDirective?.form?.controls[control] ?? null;
+    });
+
+    private readonly controlDisplayName = computed(() => {
+        const fieldName = this.fieldName();
+        if (fieldName) {
+            return fieldName;
+        }
+
+        const control = this.for();
+        if (!Types.isString(control)) {
+            return this.localizer.get('common.field')!;
+        }
+
+        return this.localizer.get(`common.${control}`) || control.substring(0, 1).toUpperCase() + control.substring(1);
+    });
 
     constructor(
         @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
         private readonly localizer: LocalizerService,
     ) {
-        super({ errorMessages: [] });
+        effect(onCleanup => {
+            const control = this.control();
+            const controlDisplayName = this.controlDisplayName();
+            const submitCount = this.submitCount();
+
+            const update = () => {
+                untracked(() => this.updateMessages(control, controlDisplayName, submitCount));
+            };
+
+            update();
+
+            if (!control) {
+                return;
+            }
+
+            const subscription =
+                merge(
+                    control.valueChanges,
+                    control.statusChanges,
+                    touchedChange$(control),
+                ).subscribe(update);
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
-    public ngOnChanges() {
-        const previousControl = this.control;
-
-        if (this.fieldName) {
-            this.controlDisplayName = this.fieldName;
-        } else if (this.for) {
-            if (Types.isString(this.for)) {
-                let translation = this.localizer.get(`common.${this.for}`)!;
-
-                if (!translation) {
-                    translation = this.for.substring(0, 1).toUpperCase() + this.for.substring(1);
-                }
-
-                this.controlDisplayName = translation;
-            } else {
-                this.controlDisplayName = this.localizer.get('common.field')!;
-            }
-        }
-
-        if (Types.isString(this.for)) {
-            if (this.formGroupDirective && this.formGroupDirective.form) {
-                this.control = this.formGroupDirective.form.controls[this.for];
-            } else {
-                this.control = null;
-            }
-        } else {
-            this.control = this.for;
-        }
-
-        if (this.control !== previousControl) {
-            this.subscriptions.unsubscribeAll();
-
-            if (this.control) {
-                this.subscriptions.add(
-                    merge(
-                        this.control.valueChanges,
-                        this.control.statusChanges,
-                        touchedChange$(this.control),
-                    ).subscribe(() => {
-                        this.createMessages();
-                    }));
-            }
-        }
-
-        this.createMessages();
-    }
-
-    private createMessages() {
+    private updateMessages(control: AbstractControl | null, controlDisplayName: string, submitCount: number | null | undefined) {
         const errorMessages: string[] = [];
 
-        const submitCount = this.submitCount;
-        const submitted = !Types.isNumber(submitCount) || submitCount > 0;
+        const isSubmitted = !Types.isNumber(submitCount) || submitCount > 0;
+        const isTouched = control?.touched || Types.is(control, UntypedFormArray);
 
-        if (this.control && this.control.invalid && this.isTouched && this.control.errors && submitted) {
-            for (const [key, error] of Object.entries(this.control.errors)) {
-                const message = formatError(this.localizer, this.controlDisplayName, key, error, this.control.value);
+        if (control?.errors && control.invalid && isTouched && isSubmitted) {
+            for (const [key, error] of Object.entries(control.errors)) {
+                const message = formatError(this.localizer, controlDisplayName, key, error, control.value);
 
                 if (Types.isString(message)) {
                     errorMessages.push(message);
                 } else if (Types.isArray(message)) {
-                    for (const error of message) {
-                        errorMessages.push(error);
-                    }
+                    errorMessages.push(...message);
                 }
             }
         }
 
-        if (errorMessages.length === 0 && this.snapshot.errorMessages.length === 0) {
+        if (errorMessages.length === 0 && this.errorMessages().length === 0) {
             return;
         }
 
-        this.next({ errorMessages });
+        this.errorMessages.set(errorMessages);
     }
 }
