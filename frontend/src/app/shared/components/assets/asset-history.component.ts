@@ -5,25 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { map, switchMap } from 'rxjs/operators';
 import { ExternalLinkDirective, FromNowPipe, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/shared/internal';
 import { HistoryMessagePipe } from '../history/pipes';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { AssetUrlPipe } from './pipes';
 
-interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
-
 @Component({
     selector: 'sqx-asset-history',
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetUrlPipe,
-        AsyncPipe,
         ExternalLinkDirective,
         FromNowPipe,
         HistoryMessagePipe,
@@ -34,34 +31,20 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
     ],
 })
 export class AssetHistoryComponent {
-    @Input({ required: true })
-    public asset!: AssetDto;
+    /** The asset to show the history for. */
+    public readonly asset = input.required<AssetDto>();
 
-    public assetEvents!: Observable<ReadonlyArray<AssetEvent>>;
+    public readonly assetEvents;
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly historyService: HistoryService,
-    ) {
+    constructor(appsState: AppsState, historyService: HistoryService) {
+        this.assetEvents = toSignal(
+            toObservable(this.asset).pipe(
+                switchMap(asset => historyService.getHistory(appsState.appName, `assets.${asset.id}`)),
+                map(events => events.map((event, version) => ({ event, version, canDownload: isDownloadable(event) })))),
+            { initialValue: [] });
     }
+}
 
-    public ngOnChanges() {
-        const channel = `assets.${this.asset.id}`;
-
-        this.assetEvents =
-            this.historyService.getHistory(this.appsState.appName, channel).pipe(
-                map(events => {
-                    let version = -1;
-
-                    return events.map(event => {
-                        const canDownload =
-                            event.eventType === 'AssetUpdatedEventV2' ||
-                            event.eventType === 'AssetCreatedEventV2';
-
-                        version++;
-
-                        return { event, version, canDownload };
-                    });
-                }));
-    }
+function isDownloadable(event: HistoryEventDto) {
+    return event.eventType === 'AssetUpdatedEventV2' || event.eventType === 'AssetCreatedEventV2';
 }

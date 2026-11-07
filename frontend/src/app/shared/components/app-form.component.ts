@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApiUrlConfig, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared/internal';
@@ -33,16 +33,18 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
     ],
 })
 export class AppFormComponent {
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed or the app has been created. */
+    public readonly dialogClose = output();
 
-    @Input()
-    public template?: TemplateDto;
+    /** The template that is selected initially. Creates a blank app when not set. */
+    public readonly template = input<TemplateDto>();
 
-    @Input({ required: true })
-    public templates: TemplateDto[] = [];
+    /** The templates to choose from. */
+    public readonly templates = input.required<TemplateDto[]>();
 
-    public createForm = new CreateAppForm();
+    public readonly templateSelected = linkedSignal(() => this.template());
+
+    public readonly createForm = new CreateAppForm();
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
@@ -55,7 +57,7 @@ export class AppFormComponent {
     }
 
     public selectTemplate(template?: TemplateDto) {
-        this.template = template;
+        this.templateSelected.set(template);
     }
 
     public createApp() {
@@ -64,7 +66,7 @@ export class AppFormComponent {
             return;
         }
 
-        const request = new CreateAppDto({ ...value, template: this.template?.name });
+        const request = new CreateAppDto({ ...value, template: this.templateSelected()?.name });
 
         this.appsStore.create(request)
             .subscribe({

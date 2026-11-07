@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild } from '@angular/core';
 import { ApiUrlConfig, Subscriptions, ThemeService, Types } from '@app/framework';
 import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
 
@@ -14,61 +14,64 @@ import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
     styleUrls: ['./iframe-card.component.scss'],
     templateUrl: './iframe-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        '(window:message)': 'onWindowMessage($event)',
+    },
 })
-export class IFrameCardComponent implements AfterViewInit {
+export class IFrameCardComponent {
     private readonly subscriptions = new Subscriptions();
-    private readonly context: any;
+    private readonly iframe = viewChild.required<ElementRef<HTMLIFrameElement>>('iframe');
     private isInitialized = false;
 
-    @Input()
-    public options: any;
+    /** The card configuration, with the name and the URL of the page to embed. */
+    public readonly options = input<any>();
 
-    @ViewChild('iframe', { static: false })
-    public iframe!: ElementRef<HTMLIFrameElement>;
+    /** The team of the dashboard, passed to the embedded page. */
+    public readonly team = input<TeamDto | null>();
 
-    @Input()
-    public set team(value: TeamDto | undefined | null) {
-        if (value) {
-            this.context.teamId = value.id;
-            this.context.teamName = value.name;
-        }
-    }
+    /** The app of the dashboard, passed to the embedded page. */
+    public readonly app = input<AppDto | null>();
 
-    @Input()
-    public set app(value: AppDto | undefined | null) {
-        if (value) {
-            this.context.appId = value.id;
-            this.context.appName = value.name;
-        }
-    }
+    private readonly context = computed(() => {
+        const team = this.team();
+        const app = this.app();
 
-    constructor(apiUrl: ApiUrlConfig, authService: AuthService,
+        return {
+            apiUrl: this.apiUrl.buildUrl('api'),
+            user: this.authService.user,
+            teamId: team?.id,
+            teamName: team?.name,
+            appId: app?.id,
+            appName: app?.name,
+        };
+    });
+
+    constructor(
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly authService: AuthService,
         private readonly themeService: ThemeService,
     ) {
-        this.context = { apiUrl: apiUrl.buildUrl('api'), user: authService.user };
+        effect(() => {
+            this.iframe().nativeElement.src = this.options()?.src;
+        });
 
         this.subscriptions.add(
-            this.themeService.themeChanges
+            themeService.themeChanges
                 .subscribe(() => {
                     this.sendTheme();
                 }));
     }
 
-    public ngAfterViewInit() {
-        this.iframe.nativeElement.src = this.options?.src;
-    }
-
-    @HostListener('window:message', ['$event'])
     public onWindowMessage(event: MessageEvent) {
-        if (event.source === this.iframe.nativeElement.contentWindow) {
-            const { type } = event.data;
+        if (event.source !== this.iframe().nativeElement.contentWindow) {
+            return;
+        }
 
-            if (type === 'started') {
-                this.isInitialized = true;
+        if (event.data?.type === 'started') {
+            this.isInitialized = true;
 
-                this.sendTheme();
-                this.sendInit();
-            }
+            this.sendTheme();
+            this.sendInit();
         }
     }
 
@@ -77,20 +80,19 @@ export class IFrameCardComponent implements AfterViewInit {
     }
 
     private sendInit() {
-        this.sendMessage('init', { context: this.context });
+        this.sendMessage('init', { context: this.context() });
     }
 
     private sendMessage(type: string, payload: any) {
-        if (!this.iframe) {
+        if (!this.isInitialized) {
             return;
         }
 
-        const iframe = this.iframe.nativeElement;
-
-        if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
-            const message = { type, ...payload };
-
-            iframe.contentWindow.postMessage(message, '*');
+        const target = this.iframe().nativeElement.contentWindow;
+        if (!target || !Types.isFunction(target.postMessage)) {
+            return;
         }
+
+        target.postMessage({ type, ...payload }, '*');
     }
 }

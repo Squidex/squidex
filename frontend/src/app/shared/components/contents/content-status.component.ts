@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ScheduleJobDto } from '@app/shared/internal';
 
 @Component({
@@ -22,48 +21,45 @@ import { ScheduleJobDto } from '@app/shared/internal';
     ],
 })
 export class ContentStatusComponent {
-    @Input({ required: true })
-    public status!: string;
+    /** The name of the status. */
+    public readonly status = input.required<string>();
 
-    @Input({ required: true })
-    public statusColor!: string;
+    /** The color of the status. */
+    public readonly statusColor = input.required<string>();
 
-    @Input()
-    public scheduled?: ScheduleJobDto | null;
+    /** The scheduled status change, if any. */
+    public readonly scheduled = input<ScheduleJobDto | null>();
 
-    @Input()
-    public layout: 'icon' | 'text' | 'multiline' = 'icon';
+    /** Renders only the icon, the icon with the name or the details of the scheduled change. */
+    public readonly layout = input<'icon' | 'text' | 'multiline'>('icon');
 
-    @Input({ transform: booleanAttribute })
-    public truncate?: boolean | null;
+    /** Truncates the name when it is too long. */
+    public readonly truncate = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public small?: boolean | null;
+    /** Renders a small icon. */
+    public readonly small = input(false, { transform: booleanAttribute });
 
-    public tooltipText = '';
+    public readonly isMultiline = computed(() => {
+        return this.layout() === 'multiline';
+    });
 
-    public get isMultiline() {
-        return this.layout === 'multiline';
-    }
+    public readonly isText = computed(() => {
+        return this.layout() === 'text';
+    });
 
-    public get isText() {
-        return this.layout === 'text';
-    }
+    public readonly tooltipText = computed(() => {
+        const scheduled = this.scheduled();
+        if (!scheduled) {
+            return this.status();
+        }
+
+        const args = { status: scheduled.status, time: scheduled.dueTime.toStringFormat('PPpp') };
+
+        return this.localizer.getOrKey('i18n:contents.scheduledTooltip', args);
+    });
 
     constructor(
         private readonly localizer: LocalizerService,
     ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.scheduled || changes.status) {
-            if (this.scheduled) {
-                const args = { status: this.scheduled.status, time: this.scheduled.dueTime.toStringFormat('PPpp') };
-
-                this.tooltipText = this.localizer.getOrKey('i18n:contents.scheduledTooltip', args);
-            } else {
-                this.tooltipText = this.status;
-            }
-        }
     }
 }

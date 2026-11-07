@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalPlacementDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@app/shared/internal';
 import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
@@ -27,32 +26,36 @@ import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
     ],
 })
 export class AssetFolderComponent {
-    @Output()
-    public navigate = new EventEmitter<AssetPathItem>();
+    /** Emits the folder when the user opens it. */
+    public readonly navigate = output<AssetPathItem>();
 
-    @Output()
-    public delete = new EventEmitter<AssetFolderDto>();
+    /** Emits the folder when the user deletes it. */
+    public readonly delete = output<AssetFolderDto>();
 
-    @Input({ transform: booleanAttribute })
-    public isDisabled?: boolean | null;
+    /** Prevents opening, renaming and deleting the folder. */
+    public readonly isDisabled = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public assetPathItem!: AssetPathItem;
+    /** The folder to render. */
+    public readonly assetPathItem = input.required<AssetPathItem>();
 
-    public editDropdown = new ModalModel();
-    public editDialog = new DialogModel();
+    public readonly editDropdown = new ModalModel();
+    public readonly editDialog = new DialogModel();
 
-    public get assetFolder(): AssetFolderDto {
-        return this.assetPathItem as any;
-    }
+    public readonly assetFolder = computed(() => {
+        return this.assetPathItem() as AssetFolderDto;
+    });
 
-    public get canUpdate() {
-        return Types.is(this.assetPathItem, AssetFolderDto) && this.assetPathItem.canUpdate;
-    }
+    public readonly canUpdate = computed(() => {
+        const item = this.assetPathItem();
 
-    public get canDelete() {
-        return Types.is(this.assetPathItem, AssetFolderDto) && this.assetPathItem.canDelete;
-    }
+        return Types.is(item, AssetFolderDto) && item.canUpdate;
+    });
+
+    public readonly canDelete = computed(() => {
+        const item = this.assetPathItem();
+
+        return Types.is(item, AssetFolderDto) && item.canDelete;
+    });
 
     public preventSelection(mouseEvent: MouseEvent) {
         if (mouseEvent.detail > 1) {
@@ -61,18 +64,18 @@ export class AssetFolderComponent {
     }
 
     public emitDelete() {
-        if (this.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
-        this.delete.emit(this.assetFolder);
+        this.delete.emit(this.assetFolder());
     }
 
     public emitNavigate() {
-        if (this.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
-        this.navigate.emit(this.assetPathItem);
+        this.navigate.emit(this.assetPathItem());
     }
 }

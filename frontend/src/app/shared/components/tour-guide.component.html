@@ -1,6 +1,6 @@
 @if ((tourState.status | async) === "Started") {
     <div class="tour">
-        @if (!snapshot.isCollapsed) {
+        @if (!isCollapsed()) {
             <div class="card" animate.enter="fade-in" animate.leave="fade-out">
                 <div class="card-header">
                     <div class="row align-items-center">
@@ -64,7 +64,7 @@
         }
 
         <div class="d-flex justify-content-end">
-            <div class="summary" [class.expanded]="snapshot.isCollapsed" (click)="toggle()">
+            <div class="summary" [class.expanded]="isCollapsed()" (click)="toggle()">
                 <div class="counter">{{ tourState.pendingTasks | async }}</div>
                 <span>{{ "tour.guide-title" | sqxTranslate }}</span>
                 <div class="squid"><img src="./images/squid.svg" /></div>

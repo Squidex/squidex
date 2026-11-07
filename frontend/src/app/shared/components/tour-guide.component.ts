@@ -6,14 +6,9 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
-import { StatefulComponent, Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
-
-interface State {
-    // The when the section is collapsed.
-    isCollapsed: boolean;
-}
+import { Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-tour-guide',
@@ -26,32 +21,30 @@ interface State {
         TranslatePipe,
     ],
 })
-export class TourGuideComponent extends StatefulComponent<State> implements OnInit {
+export class TourGuideComponent {
     private readonly subscriptions = new Subscriptions();
+
+    public readonly isCollapsed = signal(false);
 
     constructor(
         public readonly tourState: TourState,
         public readonly tourService: TourService,
     ) {
-        super({ isCollapsed: false });
-    }
-
-    public ngOnInit() {
         this.subscriptions.add(
-            this.tourService.stepShow$
+            tourService.stepShow$
                 .subscribe(() => {
-                    this.next({ isCollapsed: true });
+                    this.isCollapsed.set(true);
                 }));
 
         this.subscriptions.add(
-            this.tourService.end$
+            tourService.end$
                 .subscribe(() => {
-                    this.next({ isCollapsed: false });
+                    this.isCollapsed.set(false);
                 }));
     }
 
     public toggle() {
-        this.next(s => ({ isCollapsed: !s.isCollapsed }));
+        this.isCollapsed.update(x => !x);
     }
 
     public complete() {

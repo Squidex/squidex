@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { SortOrder } from 'ngx-inline-filter';
 import { AppLanguageDto, META_FIELDS, Query, TableField } from '@app/shared/internal';
 import { TableHeaderComponent } from '../table-header.component';
@@ -20,40 +20,41 @@ import { TableHeaderComponent } from '../table-header.component';
     ],
 })
 export class ContentListHeaderComponent {
-    public readonly metaFields = META_FIELDS;
+    /** The field to render the header for. */
+    public readonly field = input.required<TableField>();
 
-    @Input({ required: true })
-    public field!: TableField;
+    /** Emits the new query when the user sorts by this field. */
+    public readonly queryChange = output<Query>();
 
-    @Output()
-    public queryChange = new EventEmitter<Query>();
+    /** The current query, to show the sort order. */
+    public readonly query = input<Query>();
 
-    @Input()
-    public query: Query | undefined;
+    /** The language for localized fields, to sort by the value in this language. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
-
-    public sortPath?: string;
-    public sortDefault?: SortOrder;
-
-    public ngOnChanges() {
-        const { field, language } = this;
-
+    public readonly sortPath = computed(() => {
+        const field = this.field();
         if (field === META_FIELDS.created) {
-            this.sortPath = 'created';
-        } else if (field === META_FIELDS.lastModified) {
-            this.sortPath = 'lastModified';
-        } else if (field.rootField?.properties.isSortable !== true) {
-            this.sortPath = undefined;
-        } else if (field.rootField.isLocalizable && language) {
-            this.sortPath = `${field.name}.${language.iso2Code}`;
-        } else {
-            this.sortPath = `${field.name}.iv`;
+            return 'created';
         }
 
         if (field === META_FIELDS.lastModified) {
-            this.sortDefault = 'descending';
+            return 'lastModified';
         }
-    }
+
+        if (field.rootField?.properties.isSortable !== true) {
+            return undefined;
+        }
+
+        const language = this.language();
+        if (field.rootField.isLocalizable && language) {
+            return `${field.name}.${language.iso2Code}`;
+        }
+
+        return `${field.name}.iv`;
+    });
+
+    public readonly sortDefault = computed<SortOrder | undefined>(() => {
+        return this.field() === META_FIELDS.lastModified ? 'descending' : undefined;
+    });
 }

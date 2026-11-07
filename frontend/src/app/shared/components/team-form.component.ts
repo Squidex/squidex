@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
@@ -31,10 +31,10 @@ import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
     ],
 })
 export class TeamFormComponent {
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed or the team has been created. */
+    public readonly dialogClose = output();
 
-    public createForm = new CreateTeamForm();
+    public readonly createForm = new CreateTeamForm();
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,

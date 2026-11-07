@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
@@ -23,39 +24,39 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
     ],
 })
 export class ApiPerformanceCardComponent {
-    @Input({ required: true })
-    public usage?: CallsUsageDto;
+    /** The API usage of the app. */
+    public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    @Input({ transform: booleanAttribute })
-    public isStacked?: boolean | null;
+    /** Stacks the bars of the different clients. */
+    public readonly isStacked = input(false, { transform: booleanAttribute });
 
-    @Output()
-    public isStackedChange = new EventEmitter<boolean>();
+    /** Emits when the user toggles the stacked mode. */
+    public readonly isStackedChange = output<boolean>();
 
-    public chartData: any;
-    public chartSummary = 0;
+    public readonly chartOptions = computed(() => {
+        return this.isStacked() ? ChartOptions.Stacked : ChartOptions.Default;
+    });
 
-    public get chartOptions() {
-        return this.isStacked ? ChartOptions.Stacked : ChartOptions.Default;
-    }
+    public readonly chartSummary = computed(() => {
+        return this.usage()?.averageElapsedMs ?? 0;
+    });
 
-    public ngOnChanges() {
-        if (this.usage) {
-            const labels = ChartHelpers.createLabelsFromSet(this.usage.details);
-
-            this.chartData = {
-                labels,
-                datasets: Object.entries(this.usage.details).map(([key, value], i) => (
-                    {
-                        label: ChartHelpers.label(key),
-                        backgroundColor: ChartHelpers.getBackgroundColor(i),
-                        borderColor: ChartHelpers.getBorderColor(i),
-                        borderWidth: 1,
-                        data: value.map(x => x.averageElapsedMs),
-                    })),
-            };
-
-            this.chartSummary = this.usage.averageElapsedMs;
+    public readonly chartData = computed<ChartData | undefined>(() => {
+        const usage = this.usage();
+        if (!usage) {
+            return undefined;
         }
-    }
+
+        return {
+            labels: [...ChartHelpers.createLabelsFromSet(usage.details)],
+            datasets: Object.entries(usage.details).map(([key, value], i) => (
+                {
+                    label: ChartHelpers.label(key),
+                    backgroundColor: ChartHelpers.getBackgroundColor(i),
+                    borderColor: ChartHelpers.getBorderColor(i),
+                    borderWidth: 1,
+                    data: value.map(x => x.averageElapsedMs),
+                })),
+        };
+    });
 }

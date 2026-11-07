@@ -1,16 +1,16 @@
-@if (sortable) {
+@if (sortable()) {
     <button class="btn-inline-link truncate" (click)="sort()" type="button">
         <span class="truncate">
-            @if (order === "ascending") {
+            @if (order() === "ascending") {
                 <i class="icon-caret-up"></i>
             }
 
-            @if (order === "descending") {
+            @if (order() === "descending") {
                 <i class="icon-caret-down"></i>
             }
-            {{ text | sqxTranslate }}
+            {{ text() | sqxTranslate }}
         </span>
     </button>
 } @else {
-    <span class="truncate">{{ text | sqxTranslate }}</span>
+    <span class="truncate">{{ text() | sqxTranslate }}</span>
 }

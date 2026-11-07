@@ -7,8 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StopClickDirective } from '@app/framework';
 import { AppLanguageDto, ContentDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
@@ -30,30 +29,30 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
 export class ContentSelectorItemComponent {
     public readonly metaFields = META_FIELDS;
 
-    @Output()
-    public selectedChange = new EventEmitter<boolean>();
+    /** Emits when the user selects or deselects the content. */
+    public readonly selectedChange = output<boolean>();
 
-    @Input({ transform: booleanAttribute })
-    public selected?: boolean | null;
+    /** Marks the content as selected. */
+    public readonly selected = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public selectable?: boolean | null = true;
+    /** Allows the user to select the content. */
+    public readonly selectable = input(true, { transform: booleanAttribute });
 
-    @Input()
-    public language!: AppLanguageDto;
+    /** The language to render localized fields in. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input()
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input()
-    public schema!: SchemaDto;
+    /** The schema of the content. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input('sqxContentSelectorItem')
-    public content!: ContentDto;
+    /** The content to render. */
+    public readonly content = input.required<ContentDto>({ alias: 'sqxContentSelectorItem' });
 
     public toggle() {
-        if (this.selectable) {
-            this.select(!this.selected);
+        if (this.selectable()) {
+            this.select(!this.selected());
         }
     }
 

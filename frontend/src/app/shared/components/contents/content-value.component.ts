@@ -6,13 +6,9 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
+import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
-
-interface State {
-    wrapping: boolean;
-}
 
 @Component({
     selector: 'sqx-content-value',
@@ -28,59 +24,62 @@ interface State {
         TranslatePipe,
     ],
 })
-export class ContentValueComponent extends StatefulComponent<State> {
-    private readonly subscriptions = new Subscriptions();
+export class ContentValueComponent {
+    /** The value to render, either plain or as HTML. */
+    public readonly value = input.required<any>();
 
-    @Input({ required: true })
-    public value!: any;
+    /** The field of the value, to decide how to render it. */
+    public readonly field = input<TableField>();
 
-    @Input()
-    public field?: TableField;
+    /** The table settings, to wrap long text. */
+    public readonly fields = input<TableSettings>();
 
-    @Input()
-    public fields?: TableSettings;
+    public readonly previewModal = new ModalModel();
 
-    public previewModal = new ModalModel();
+    public readonly wrapping = signal(false);
 
-    public get title() {
-        return this.isString && this.isPlain ? this.value : undefined;
-    }
+    public readonly isString = computed(() => {
+        return this.field()?.rootField?.properties.fieldType === 'String';
+    });
 
-    public get isString() {
-        return this.field?.rootField?.properties.fieldType === 'String';
-    }
+    public readonly isPlain = computed(() => {
+        return !Types.is(this.value(), HtmlValue);
+    });
 
-    public get isPlain() {
-        return !Types.is(this.value, HtmlValue);
-    }
+    public readonly title = computed(() => {
+        return this.isString() && this.isPlain() ? this.value() : undefined;
+    });
 
     constructor() {
-        super({ wrapping: false });
-    }
+        effect(onCleanup => {
+            const fields = this.fields();
+            if (!fields) {
+                return;
+            }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.fields) {
-            this.subscriptions.unsubscribeAll();
+            const fieldName = this.field()?.name;
+            const subscription =
+                fields.fieldWrappings
+                    .subscribe(wrappings => {
+                        this.wrapping.set(wrappings[fieldName!]);
+                    });
 
-            this.subscriptions.add(this.fields?.fieldWrappings
-                .subscribe(wrappings => {
-                    const wrapping = wrappings[this.field?.name!];
-
-                    this.next({ wrapping });
-                }));
-        }
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public toggle() {
-        if (!this.field) {
+        const field = this.field();
+        if (!field) {
             return;
         }
 
-        this.fields?.toggleWrapping(this.field?.name);
+        this.fields()?.toggleWrapping(field.name);
     }
 
     public show() {
-        if (!Types.is(this.value, HtmlValue) || !this.value.preview) {
+        const value = this.value();
+        if (!Types.is(value, HtmlValue) || !value.preview) {
             return;
         }
 

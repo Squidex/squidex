@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
@@ -28,24 +28,24 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
         TranslatePipe,
     ],
 })
-export class AssetFolderDialogComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class AssetFolderDialogComponent {
+    /** Emits when the dialog is closed or the folder has been saved. */
+    public readonly dialogClose = output();
 
-    @Input()
-    public assetFolder?: AssetFolderDto;
+    /** The folder to rename. Creates a new folder when not set. */
+    public readonly assetFolder = input<AssetFolderDto>();
 
-    public editForm = new RenameAssetFolderForm();
+    public readonly editForm = new RenameAssetFolderForm();
 
     constructor(
         private readonly assetsState: AssetsState,
     ) {
-    }
-
-    public ngOnInit() {
-        if (this.assetFolder) {
-            this.editForm.load(this.assetFolder);
-        }
+        effect(() => {
+            const assetFolder = this.assetFolder();
+            if (assetFolder) {
+                this.editForm.load(assetFolder);
+            }
+        });
     }
 
     public emitClose() {
@@ -54,29 +54,22 @@ export class AssetFolderDialogComponent implements OnInit {
 
     public createAssetFolder() {
         const value = this.editForm.submit();
-
-        if (value) {
-            if (this.assetFolder) {
-                this.assetsState.updateAssetFolder(this.assetFolder, value)
-                    .subscribe({
-                        next: () => {
-                            this.emitClose();
-                        },
-                        error: error => {
-                            this.editForm.submitFailed(error);
-                        },
-                    });
-            } else {
-                this.assetsState.createAssetFolder(value.folderName)
-                    .subscribe({
-                        next: () => {
-                            this.emitClose();
-                        },
-                        error: error => {
-                            this.editForm.submitFailed(error);
-                        },
-                    });
-            }
+        if (!value) {
+            return;
         }
+
+        const assetFolder = this.assetFolder();
+        const request = assetFolder ?
+            this.assetsState.updateAssetFolder(assetFolder, value) :
+            this.assetsState.createAssetFolder(value.folderName);
+
+        request.subscribe({
+            next: () => {
+                this.emitClose();
+            },
+            error: error => {
+                this.editForm.submitFailed(error);
+            },
+        });
     }
 }

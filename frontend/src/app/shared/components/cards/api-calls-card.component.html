@@ -1,7 +1,7 @@
 <div class="card card-lg card-chart">
     <div class="card-header">
         {{ "dashboard.apiCallsCard" | sqxTranslate }}
-        @if (app) {
+        @if (app(); as app) {
             <div class="float-end">
                 <button class="btn-inline-link" (click)="downloadLog(app)" type="button">
                     <small>{{ "dashboard.downloadLog" | sqxTranslate }}</small>
@@ -10,5 +10,5 @@
         }
     </div>
 
-    <div class="card-body"><canvas baseChart [data]="chartData" [options]="chartOptions" type="bar"></canvas></div>
+    <div class="card-body"><canvas baseChart [data]="chartData()" [options]="chartOptions" type="bar"></canvas></div>
 </div>
