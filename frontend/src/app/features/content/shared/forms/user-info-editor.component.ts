@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { disabled, form, FormField, FormValueControl, required } from '@angular/forms/signals';
-import { CodeComponent, FormHintComponent, FormRowComponent, generateApiKey, MarkdownDirective, RolesState, SignalSelectDirective, TranslatePipe, Types } from '@app/shared';
+import { disabled, form, FormField, required } from '@angular/forms/signals';
+import { CodeComponent, FormHintComponent, FormRowComponent, FormValueControlBase, generateApiKey, MarkdownDirective, RolesState, SignalSelectDirective, syncExternalValue, TranslatePipe, Types } from '@app/shared';
 
 type UserInfo = { apiKey: string; role: string };
 
@@ -28,17 +28,13 @@ type UserInfo = { apiKey: string; role: string };
         TranslatePipe,
     ],
 })
-export class UserInfoEditorComponent implements FormValueControl<UserInfo | null> {
+export class UserInfoEditorComponent extends FormValueControlBase<UserInfo | null> {
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.applyValue(value));
+
     protected readonly rolesState = inject(RolesState);
 
     /** The value of the control. */
     public readonly value = model<UserInfo | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The prefix for the IDs of the inner inputs. */
     public readonly formId = input.required<string>();
@@ -56,23 +52,9 @@ export class UserInfoEditorComponent implements FormValueControl<UserInfo | null
     });
 
     constructor() {
+        super();
+
         this.rolesState.loadIfNotLoaded();
-
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                if (Types.equals(value, this.buildValue())) {
-                    return;
-                }
-
-                if (Types.isObject(value)) {
-                    this.userInfo.set({ apiKey: value.apiKey ?? '', role: value.role ?? '' });
-                } else {
-                    this.userInfo.set({ apiKey: '', role: '' });
-                }
-            });
-        });
 
         effect(() => {
             const value = this.buildValue();
@@ -82,9 +64,17 @@ export class UserInfoEditorComponent implements FormValueControl<UserInfo | null
                     return;
                 }
 
-                this.value.set(value);
+                this.valueSetter(value);
             });
         });
+    }
+
+    private applyValue(value: UserInfo | null) {
+        if (Types.isObject(value)) {
+            this.userInfo.set({ apiKey: value.apiKey ?? '', role: value.role ?? '' });
+        } else {
+            this.userInfo.set({ apiKey: '', role: '' });
+        }
     }
 
     protected generateApiKey() {

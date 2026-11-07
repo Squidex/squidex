@@ -5,11 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, model, output, signal, untracked, viewChild } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { FormValueControl } from '@angular/forms/signals';
-import { catchError, of } from 'rxjs';
-import { HTTP, ModalDirective, ThemeService } from '@app/framework';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, model, output, signal, viewChild } from '@angular/core';
+import { FormValueControlBase, HTTP, ModalDirective, safeResource, syncExternalValue, ThemeService } from '@app/framework';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
 import { AssetSelectorComponent } from '../assets/asset-selector.component';
@@ -29,7 +26,7 @@ import { ContentSelectorComponent } from '../references/content-selector.compone
         ModalDirective,
     ],
 })
-export class RichEditorComponent implements FormValueControl<EditorValue> {
+export class RichEditorComponent extends FormValueControlBase<EditorValue> {
     private readonly apiUrl = inject(ApiUrlConfig);
     private readonly appsState = inject(AppsState);
     private readonly assetService = inject(AssetsService);
@@ -37,21 +34,15 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
     private readonly destroyRef = inject(DestroyRef);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly themeService = inject(ThemeService);
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.editorWrapper?.setValue(value));
     private currentAssets?: ResolvablePromise<any>;
     private currentChat?: ResolvablePromise<string | undefined | null>;
     private currentContents?: ResolvablePromise<any>;
-    private currentValue: EditorValue = null;
     private editorWrapper?: SquidexEditorWrapper;
     private isDestroyed = false;
 
     /** The value of the editor. */
     public readonly value = model<EditorValue>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Emits when the asset plugin is clicked. */
     public readonly assetPluginClick = output<any>();
@@ -96,10 +87,9 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
 
     protected readonly assetId = signal<string | null>(null);
 
-    protected readonly assetToEdit = rxResource({
+    protected readonly assetToEdit = safeResource({
         params: () => this.assetId() ?? undefined,
-        stream: ({ params }) => this.assetService.getAsset(this.appsState.appName, params).pipe(
-            catchError(() => of<AssetDto | null>(null))),
+        stream: ({ params }) => this.assetService.getAsset(this.appsState.appName, params),
         defaultValue: null,
     });
 
@@ -110,15 +100,9 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
     protected readonly contentsDialog = new DialogModel();
 
     constructor() {
+        super();
+
         const destroyRef = this.destroyRef;
-
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                this.applyValue(value);
-            });
-        });
 
         effect(() => {
             const annotations = this.annotations();
@@ -191,8 +175,7 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
                 return this.uploadFiles(requests);
             },
             onChange: (value: EditorValue) => {
-                this.currentValue = value ?? null;
-                this.value.set(this.currentValue);
+                this.valueSetter(value ?? null);
             },
             onEditAsset: id => {
                 this.assetId.set(id);
@@ -222,7 +205,7 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
             classNames: this.classNames(),
             ...this.editorColors(),
             isDisabled: this.disabled(),
-            value: this.currentValue || '',
+            value: this.value() || '',
         });
     }
 
@@ -245,15 +228,6 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
         setTimeout(() => {
             this.createEditor();
         });
-    }
-
-    private applyValue(value: EditorValue) {
-        if (Types.equals(value, this.currentValue)) {
-            return;
-        }
-
-        this.currentValue = value;
-        this.editorWrapper?.setValue(value);
     }
 
     protected insertText(content: string | HTTP.UploadFile | undefined | null) {

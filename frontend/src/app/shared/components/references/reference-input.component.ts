@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
-import { ModalDirective } from '@app/framework';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, model, signal } from '@angular/core';
+import { FormValueControlBase, ModalDirective, syncExternalValue } from '@app/framework';
 import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, Types } from '@app/shared/internal';
 import { ContentSelectorComponent } from './content-selector.component';
 
@@ -21,19 +20,14 @@ import { ContentSelectorComponent } from './content-selector.component';
         ModalDirective,
     ],
 })
-export class ReferenceInputComponent implements FormValueControl<ReadonlyArray<string> | string | null> {
+export class ReferenceInputComponent extends FormValueControlBase<ReadonlyArray<string> | string | null> {
     private readonly appsState = inject(AppsState);
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.applyValue(value));
 
     /** The selected content ID, or an array with the selected content ID. */
     public readonly value = model<ReadonlyArray<string> | string | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The IDs or names of the schemas to select the content from. */
     public readonly schemaIds = input<ReadonlyArray<string>>();
@@ -73,16 +67,6 @@ export class ReferenceInputComponent implements FormValueControl<ReadonlyArray<s
     });
 
     protected readonly contentSelectorDialog = new DialogModel();
-
-    constructor() {
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                this.applyValue(value);
-            });
-        });
-    }
 
     private applyValue(value: ReadonlyArray<string> | string | null) {
         let id: string | undefined;
@@ -142,12 +126,12 @@ export class ReferenceInputComponent implements FormValueControl<ReadonlyArray<s
         const isSingle = this.mode() === 'Single';
 
         if (id) {
-            this.value.set(isSingle ? id : [id]);
+            this.valueSetter(isSingle ? id : [id]);
         } else {
-            this.value.set(isSingle ? null : []);
+            this.valueSetter(isSingle ? null : []);
         }
 
-        this.touched.set(true);
+        this.markTouched();
         this.selectedContent.set(selectedContent);
     }
 }

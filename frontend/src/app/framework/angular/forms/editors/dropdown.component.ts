@@ -7,7 +7,6 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, contentChildren, effect, input, model, output, signal, TemplateRef, untracked } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
 import { FloatingPlacement, Keys, ModalModel, StringHelper, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
@@ -17,6 +16,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { TemplateWrapperDirective } from '../../template-wrapper.directive';
 import { FocusOnInitDirective } from '../focus-on-init.directive';
+import { FormValueControlBase, syncExternalValue } from '../form-value-control';
 
 @Component({
     selector: 'sqx-dropdown',
@@ -34,20 +34,13 @@ import { FocusOnInitDirective } from '../focus-on-init.directive';
         TranslatePipe,
     ],
 })
-export class DropdownComponent implements FormValueControl<any> {
-    private lastValue: any;
+export class DropdownComponent extends FormValueControlBase<any> {
+    private readonly valueSetter = syncExternalValue(() => this.value, value => {
+        this.selectIndex(this.getSelectedIndex(value), false);
+    });
 
     /** The value of the control. */
     public readonly value = model<any>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the value is invalid, provided by the form. */
-    public readonly invalid = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Emits when the dropdown is opened. */
     public readonly dropdownOpen = output();
@@ -116,19 +109,7 @@ export class DropdownComponent implements FormValueControl<any> {
     protected readonly dropdown = new ModalModel();
 
     constructor() {
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                // Values that have been set by this component are already selected.
-                if (value === this.lastValue) {
-                    return;
-                }
-
-                this.lastValue = value;
-                this.selectIndex(this.getSelectedIndex(value), false);
-            });
-        });
+        super();
 
         effect(() => {
             const items = this.items() || [];
@@ -171,7 +152,7 @@ export class DropdownComponent implements FormValueControl<any> {
             this.dropdown.show();
         }
 
-        this.touched.set(true);
+        this.markTouched();
     }
 
     protected onSearch(queryText: string) {
@@ -235,9 +216,8 @@ export class DropdownComponent implements FormValueControl<any> {
             return;
         }
 
-        this.lastValue = selectedValue;
-        this.value.set(selectedValue);
-        this.touched.set(true);
+        this.valueSetter(selectedValue);
+        this.markTouched();
     }
 
     private selectSearch(queryText: string) {

@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, Types, versioned } from '@app/shared/internal';
@@ -28,7 +29,10 @@ describe('RulesState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         rulesService = Mock.ofType<RulesService>();
-        rulesState = new RulesState(appsState.object, dialogs.object, rulesService.object);
+        rulesService.setup(x => x.getSteps())
+            .returns(() => of({}));
+
+        rulesState = TestBed.runInInjectionContext(() => new RulesState(appsState.object, dialogs.object, rulesService.object));
     });
 
     afterEach(() => {

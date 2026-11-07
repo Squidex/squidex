@@ -48,9 +48,6 @@ export class FormRowComponent {
     /** Reserves the space for the unit, even if no unit is defined. */
     public readonly showUnit = input(false, { transform: booleanAttribute });
 
-    /** Shows the errors only when the form has been submitted, if set. */
-    public readonly submitCount = input<number | null>();
-
     /** The ID of the field. Required when the control is not defined by name. */
     public readonly formId = input<string>();
 

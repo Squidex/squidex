@@ -7,9 +7,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, input, linkedSignal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { catchError, of } from 'rxjs';
-import { CodeEditorComponent } from '@app/framework';
+import { CodeEditorComponent, safeResource } from '@app/framework';
 
 @Component({
     selector: 'sqx-asset-text-editor',
@@ -34,10 +32,9 @@ export class AssetTextEditorComponent {
 
     protected readonly text = linkedSignal(() => this.textLoaded.value());
 
-    protected readonly textLoaded = rxResource({
+    protected readonly textLoaded = safeResource({
         params: () => ({ fileSource: this.fileSource() }),
-        stream: ({ params }) => this.httpClient.get(params.fileSource, { responseType: 'text' }).pipe(
-            catchError(() => of(''))),
+        stream: ({ params }) => this.httpClient.get(params.fileSource, { responseType: 'text' }),
         defaultValue: '',
     });
 

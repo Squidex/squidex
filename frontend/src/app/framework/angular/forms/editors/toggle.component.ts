@@ -6,8 +6,8 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
 import { Types } from '@app/framework/internal';
+import { FormValueControlBase } from '../form-value-control';
 
 @Component({
     selector: 'sqx-toggle',
@@ -15,15 +15,9 @@ import { Types } from '@app/framework/internal';
     templateUrl: './toggle.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ToggleComponent implements FormValueControl<boolean | null> {
+export class ToggleComponent extends FormValueControlBase<boolean | null> {
     /** The value of the control. */
     public readonly value = model<boolean | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Allows null as third state, besides checked and unchecked. */
     public readonly threeStates = input(false, { transform: booleanAttribute });
@@ -52,6 +46,6 @@ export class ToggleComponent implements FormValueControl<boolean | null> {
         }
 
         this.value.set(isChecked);
-        this.touched.set(true);
+        this.markTouched();
     }
 }

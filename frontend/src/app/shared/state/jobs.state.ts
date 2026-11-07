@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, Resource, shareSubscribed, State } from '@app/framework';
@@ -32,7 +32,7 @@ export class JobsState extends State<Snapshot> {
         this.project(x => x.jobs);
 
     public readonly maxBackupsReached =
-        this.projectFrom(this.jobs, x => x.filter(j => j.taskName === 'backup').length >= 10);
+        computed(() => this.jobs().filter(j => j.taskName === 'backup').length >= 10);
 
     public readonly isLoaded =
         this.project(x => x.isLoaded === true);

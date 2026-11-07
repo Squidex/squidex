@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, MathHelper, Mutable, shareSubscribed, State, Types } from '@app/framework';
+import { debug, DialogService, LoadingState, MathHelper, Mutable, safeResource, shareSubscribed, State, Types } from '@app/framework';
 import { DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, IDynamicFlowStepDefinitionDto } from '../model';
-import { RulesService } from '../services/rules.service';
+import { RulesService, StepsDto } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -37,6 +37,17 @@ interface Snapshot extends LoadingState {
     providedIn: 'root',
 })
 export class RulesState extends State<Snapshot> {
+    private readonly stepsResource = safeResource<StepsDto | undefined>({
+        stream: () => this.rulesService.getSteps(),
+        defaultValue: undefined,
+    });
+
+    public readonly steps =
+        computed<StepsDto>(() => this.stepsResource.value() ?? {});
+
+    public readonly isStepsLoaded =
+        computed(() => this.stepsResource.value() !== undefined);
+
     public readonly selectedRule =
         this.project(x => x.selectedRule);
 
@@ -62,7 +73,7 @@ export class RulesState extends State<Snapshot> {
         this.project(x => x.runningRuleId);
 
     public readonly runningRule =
-        this.projectFrom2(this.rules, this.runningRuleId, (r, id) => r.find(x => x.id === id));
+        computed(() => this.rules().find(x => x.id === this.runningRuleId()));
 
     public get appId() {
         return this.appsState.appId;

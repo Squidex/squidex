@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ContentDto, ContentsDto, LocalizerService, ResolveContents, TagEditorComponent, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsDto, FormValueControlBase, LocalizerService, ResolveContents, TagEditorComponent, TranslatePipe, Types } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 @Component({
@@ -21,19 +20,13 @@ import { ReferencesTagsConverter } from './references-tag-converter';
         TranslatePipe,
     ],
 })
-export class ReferencesTagsComponent implements FormValueControl<ReadonlyArray<string> | null> {
+export class ReferencesTagsComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
     private readonly contentsResolver = inject(ResolveContents);
     private readonly localizer = inject(LocalizerService);
     private isOpenedBefore = false;
 
     /** The value of the control. */
     public readonly value = model<ReadonlyArray<string> | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The ID of the schema to select the contents from. */
     public readonly schemaId = input.required<string>();
@@ -72,6 +65,8 @@ export class ReferencesTagsComponent implements FormValueControl<ReadonlyArray<s
     });
 
     constructor() {
+        super();
+
         effect(() => {
             const ids = this.selectedIds();
 
@@ -96,7 +91,7 @@ export class ReferencesTagsComponent implements FormValueControl<ReadonlyArray<s
     }
 
     protected updateValue(value: ReadonlyArray<string> | null | undefined) {
-        this.touched.set(true);
+        this.markTouched();
 
         if (value && value.length > 0) {
             this.value.set(value);

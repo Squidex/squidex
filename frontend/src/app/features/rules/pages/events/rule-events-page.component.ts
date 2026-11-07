@@ -6,9 +6,9 @@
  */
 
 import { Component, inject, signal } from '@angular/core';
-import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleElementDto, RuleEventDto, RuleEventsState, RulesService, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, RulesState, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleEventComponent } from './rule-event.component';
 
 @Component({
@@ -33,16 +33,13 @@ import { RuleEventComponent } from './rule-event.component';
 export class RuleEventsPageComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly ruleEventsRoute = inject(Router2State);
-    private readonly rulesService = inject(RulesService);
+    private readonly rulesState = inject(RulesState);
 
     protected readonly ruleEventsState = inject(RuleEventsState);
 
     protected readonly selectedEventId = signal<string | null>(null);
 
-    protected readonly availableSteps = rxResource({
-        stream: () => this.rulesService.getSteps(),
-        defaultValue: {} as Record<string, RuleElementDto>,
-    });
+    protected readonly availableSteps = this.rulesState.steps;
 
     constructor() {
         this.route.queryParams

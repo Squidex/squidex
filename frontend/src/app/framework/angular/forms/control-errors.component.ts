@@ -26,9 +26,6 @@ export class ControlErrorsComponent {
     /** The field to show the errors for. */
     public readonly for = input.required<string | FieldTree<unknown>>();
 
-    /** Shows the errors only when the form has been submitted, if set. */
-    public readonly submitCount = input<number | null>();
-
     /** The field name in the error messages. Falls back to a name derived from the control. */
     public readonly fieldName = input<string | null>();
 
@@ -62,11 +59,6 @@ export class ControlErrorsComponent {
     protected readonly errorMessages = computed(() => {
         const field = this.field();
         if (!field) {
-            return [];
-        }
-
-        const submitCount = this.submitCount();
-        if (Types.isNumber(submitCount) && submitCount === 0) {
             return [];
         }
 

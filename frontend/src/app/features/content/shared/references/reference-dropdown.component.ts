@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, FormValueControlBase, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, Types } from '@app/shared';
 
 type ContentName = { name: string; id?: string };
 
@@ -23,19 +22,13 @@ type ContentName = { name: string; id?: string };
         SafeHtmlPipe,
     ],
 })
-export class ReferenceDropdownComponent implements FormValueControl<ReadonlyArray<string> | string | null> {
+export class ReferenceDropdownComponent extends FormValueControlBase<ReadonlyArray<string> | string | null> {
     private readonly contentsResolver = inject(ResolveContents);
     private readonly localizer = inject(LocalizerService);
     private isOpenedBefore = false;
 
     /** The value of the control. */
     public readonly value = model<ReadonlyArray<string> | string | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The language to build the names of the contents. */
     public readonly language = input.required<AppLanguageDto>();
@@ -101,6 +94,8 @@ export class ReferenceDropdownComponent implements FormValueControl<ReadonlyArra
     });
 
     constructor() {
+        super();
+
         effect(() => {
             const id = this.selectedId();
 
@@ -130,7 +125,7 @@ export class ReferenceDropdownComponent implements FormValueControl<ReadonlyArra
             this.value.set(isSingle ? null : []);
         }
 
-        this.touched.set(true);
+        this.markTouched();
     }
 
     protected onOpened() {

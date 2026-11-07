@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { FormValueControl } from '@angular/forms/signals';
-import { catchError, map, of } from 'rxjs';
-import { AppLanguageDto, AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LocalizerService, UIOptions } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
+import { map } from 'rxjs';
+import { AppLanguageDto, AppsState, CheckboxGroupComponent, ContentDto, ContentsService, FormValueControlBase, LocalizerService, safeResource, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 @Component({
@@ -21,7 +19,7 @@ import { ReferencesTagsConverter } from './references-tag-converter';
         CheckboxGroupComponent,
     ],
 })
-export class ReferencesCheckboxesComponent implements FormValueControl<ReadonlyArray<string> | null> {
+export class ReferencesCheckboxesComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
     private readonly appsState = inject(AppsState);
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
@@ -30,12 +28,6 @@ export class ReferencesCheckboxesComponent implements FormValueControl<ReadonlyA
 
     /** The value of the control. */
     public readonly value = model<ReadonlyArray<string> | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The ID of the schema to select the contents from. */
     public readonly schemaId = input.required<string | undefined | null>();
@@ -66,16 +58,15 @@ export class ReferencesCheckboxesComponent implements FormValueControl<ReadonlyA
         return new ReferencesTagsConverter(this.language(), contentItems, this.localizer);
     });
 
-    protected readonly contentItems = rxResource({
+    protected readonly contentItems = safeResource({
         params: () => this.schemaId() || undefined,
         stream: ({ params: schemaId }) => this.contentsService.getContents(this.appsState.appName, schemaId, { take: this.itemCount }).pipe(
-            map(contents => contents.items as ReadonlyArray<ContentDto> | null),
-            catchError(() => of(null))),
+            map(contents => contents.items as ReadonlyArray<ContentDto> | null)),
         defaultValue: null,
     });
 
     protected updateValue(value: ReadonlyArray<string> | null | undefined) {
-        this.touched.set(true);
+        this.markTouched();
 
         if (value && value.length > 0) {
             this.value.set(value);

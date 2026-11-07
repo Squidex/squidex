@@ -70,11 +70,7 @@ export class FieldForm extends AbstractContentForm<FieldDto> {
     }
 }
 
-export class FieldValueForm extends AbstractContentForm<AnyFieldDto> {
-    constructor(args: ControlArgs, form: FieldTree<any>) {
-        super(args, form);
-    }
-}
+export class FieldValueForm extends AbstractContentForm<AnyFieldDto> {}
 
 export class FieldArrayForm extends AbstractContentForm<AnyFieldDto> {
     private readonly itemForms = new WeakMap<object, ObjectFormBase>();

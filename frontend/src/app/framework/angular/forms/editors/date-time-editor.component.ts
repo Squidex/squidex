@@ -6,11 +6,11 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, model, output, signal, viewChild } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
 import { DateHelper, DateTime, UIOptions } from '@app/framework/internal';
 import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ResizedDirective } from '../../resized.directive';
+import { FormValueControlBase } from '../form-value-control';
 import { FocusComponent } from '../forms-helper';
 
 @Component({
@@ -24,22 +24,13 @@ import { FocusComponent } from '../forms-helper';
         TranslatePipe,
     ],
 })
-export class DateTimeEditorComponent implements FormValueControl<string | null>, FocusComponent {
+export class DateTimeEditorComponent extends FormValueControlBase<string | null> implements FocusComponent {
     private readonly uiOptions = inject(UIOptions);
     private readonly hideDateTimeModeButtonSetting = !!this.uiOptions.value.hideDateTimeModeButton;
     private readonly hideDateButtonsSettings = !!this.uiOptions.value.hideDateButtons;
 
     /** The date as ISO string. */
     public readonly value = model<string | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
-
-    /** Indicates whether the value is invalid, provided by the form. */
-    public readonly invalid = input(false, { transform: booleanAttribute });
 
     /** Emits when the editor loses the focus. */
     public readonly editorBlur = output<boolean>();
@@ -103,9 +94,9 @@ export class DateTimeEditorComponent implements FormValueControl<string | null>,
         this.dateInput().nativeElement.focus();
     }
 
-    protected markTouched() {
+    public override markTouched() {
         this.editorBlur.emit(true);
-        this.touched.set(true);
+        super.markTouched();
     }
 
     protected writeToday() {

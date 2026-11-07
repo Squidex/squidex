@@ -42,7 +42,7 @@ export class TableSettings extends State<Snapshot> {
         this.project(x => x.fields);
 
     public readonly listFields =
-        this.projectFrom(this.fields, x => x.length > 0 ? x : this.schemaDefaults);
+        computed(() => this.fields().length > 0 ? this.fields() : this.schemaDefaults);
 
     constructor(
         public readonly uiState: UIState,

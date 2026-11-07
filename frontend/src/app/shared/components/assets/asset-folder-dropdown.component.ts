@@ -6,9 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectorRef, Component, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
-import { ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe, Types } from '@app/framework';
+import { ChangeDetectorRef, Component, inject, linkedSignal, model, signal } from '@angular/core';
+import { FormValueControlBase, ModalDirective, ModalModel, ModalPlacementDirective, syncExternalValue, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
 import { AssetFolderDropdownItemComponent } from './asset-folder-dropdown-item.component';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
@@ -24,20 +23,15 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
         TranslatePipe,
     ],
 })
-export class AssetFolderDropdownComponent implements FormValueControl<string | null> {
+export class AssetFolderDropdownComponent extends FormValueControlBase<string | null> {
     private readonly appsState = inject(AppsState);
     private readonly assetsService = inject(AssetsService);
     private readonly changeDetector = inject(ChangeDetectorRef);
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.loadSelection(value));
     private selectedId?: string;
 
     /** The ID of the selected folder. */
     public readonly value = model<string | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     protected readonly selection = linkedSignal(() => this.root);
 
@@ -48,16 +42,6 @@ export class AssetFolderDropdownComponent implements FormValueControl<string | n
     protected readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
 
     protected readonly dropdown = new ModalModel();
-
-    constructor() {
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                this.loadSelection(value);
-            });
-        });
-    }
 
     private loadSelection(value: string | null) {
         const id = Types.isString(value) ? value : ROOT_ITEM.id;
@@ -126,8 +110,8 @@ export class AssetFolderDropdownComponent implements FormValueControl<string | n
         this.selectionPath.set(path.filter(x => x.item !== ROOT_ITEM).map(x => x.item.folderName).join('/'));
 
         if (emit) {
-            this.value.set(selected.item.id);
-            this.touched.set(true);
+            this.valueSetter(selected.item.id);
+            this.markTouched();
 
             this.dropdown.hide();
         }

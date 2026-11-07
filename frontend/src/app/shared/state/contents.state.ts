@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { DateTime, debug, DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
@@ -80,7 +80,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.project(x => x.statuses);
 
     public readonly statusQueries =
-        this.projectFrom(this.statuses, getStatusQueries);
+        computed(() => getStatusQueries(this.statuses()));
 
     public get appId() {
         return this.appsState.appId;

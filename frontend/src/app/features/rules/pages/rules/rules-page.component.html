@@ -1,4 +1,4 @@
-@let availableSteps = this.availableSteps.value();
+@let availableSteps = this.availableSteps();
 <sqx-title message="i18n:rules.listPageTitle" />
 <sqx-layout innerWidth="54" layout="main" titleIcon="rules" titleText="i18n:common.rules">
     <ng-container menu>
@@ -20,7 +20,7 @@
                 </div>
             }
 
-            @if (availableSteps && availableTriggers && rulesState.isLoaded() && rulesState.rules(); as rules) {
+            @if (rulesState.isStepsLoaded() && availableTriggers && rulesState.isLoaded() && rulesState.rules(); as rules) {
                 @for (rule of rules; track rule.id) {
                     <sqx-rule
                         [availableSteps]="availableSteps"

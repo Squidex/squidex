@@ -4,7 +4,7 @@
             <input
                 class="form-check-input"
                 id="{{ controlId }}_{{ option }}"
-                (blur)="touched.set(true)"
+                (blur)="markTouched()"
                 (change)="select(option)"
                 [checked]="option.value === value()"
                 [disabled]="disabled()"

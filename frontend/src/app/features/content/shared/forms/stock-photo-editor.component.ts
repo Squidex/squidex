@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, model, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormValueControl } from '@angular/forms/signals';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, LoaderComponent, ModalDialogComponent, ModalDirective, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe } from '@app/shared';
+import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, FormValueControlBase, LoaderComponent, ModalDialogComponent, ModalDirective, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe } from '@app/shared';
 
 type Request = { search?: string; page: number };
 
@@ -30,18 +29,12 @@ type Request = { search?: string; page: number };
         TranslatePipe,
     ],
 })
-export class StockPhotoEditorComponent implements FormValueControl<string | null> {
+export class StockPhotoEditorComponent extends FormValueControlBase<string | null> {
     private readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
     private readonly stockPhotoService = inject(StockPhotoService);
 
     /** The value of the control. */
     public readonly value = model<string | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     protected readonly stockPhotoSearch = signal('');
 
@@ -65,6 +58,8 @@ export class StockPhotoEditorComponent implements FormValueControl<string | null
     protected readonly searchDialog = new DialogModel();
 
     constructor() {
+        super();
+
         effect(() => {
             this.stockPhotoRequests.next({ search: this.stockPhotoSearch(), page: 1 });
         });
@@ -129,6 +124,6 @@ export class StockPhotoEditorComponent implements FormValueControl<string | null
 
     private updateValue(value: string | null) {
         this.value.set(value);
-        this.touched.set(true);
+        this.markTouched();
     }
 }

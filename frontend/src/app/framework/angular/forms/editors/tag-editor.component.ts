@@ -7,7 +7,6 @@
 
 
 import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, model, output, signal, untracked, viewChild } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
 import { getTagValues, Keys, ModalModel, StringConverter, TagConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
@@ -17,6 +16,7 @@ import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { StopClickDirective } from '../../stop-click.directive';
+import { FormValueControlBase, syncExternalValue } from '../form-value-control';
 
 function convertTags(obj: any, converter: TagConverter) {
     const tags: TagValue[] = [];
@@ -56,23 +56,20 @@ function convertTags(obj: any, converter: TagConverter) {
         TranslatePipe,
     ],
 })
-export class TagEditorComponent implements FormValueControl<any> {
+export class TagEditorComponent extends FormValueControlBase<any> {
     private readonly injector = inject(Injector);
     private readonly textMeasurer = new TextMeasurer(() => this.inputElement());
-    private lastValue: any;
+
+    private readonly valueSetter = syncExternalValue(() => this.value, value => {
+        this.resetForm();
+        this.resetSize();
+        this.tags.set(convertTags(value, this.itemConverter()));
+    });
+
     private latestInput?: string;
 
     /** The value of the control. */
     public readonly value = model<any>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the value is invalid, provided by the form. */
-    public readonly invalid = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Emits when the editor loses the focus. */
     public readonly editorBlur = output<boolean>();
@@ -152,24 +149,10 @@ export class TagEditorComponent implements FormValueControl<any> {
     protected readonly itemsModal = new ModalModel();
 
     constructor() {
+        super();
+
         afterNextRender(() => {
             this.resetSize();
-        });
-
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                // Values that have been set by this component are already shown as tags.
-                if (value === this.lastValue) {
-                    return;
-                }
-
-                this.lastValue = value;
-                this.resetForm();
-                this.resetSize();
-                this.tags.set(convertTags(value, this.itemConverter()));
-            });
         });
 
         effect(() => {
@@ -205,13 +188,18 @@ export class TagEditorComponent implements FormValueControl<any> {
         }
     }
 
-    protected markTouched() {
+    public override markTouched() {
+        this.editorBlur.emit(true);
+        super.markTouched();
+    }
+
+    protected onBlur() {
         this.selectValue(this.addText(), true);
 
         this.resetAutocompletion();
         this.resetFocus();
 
-        this.setTouched();
+        this.markTouched();
     }
 
     protected remove(index: number) {
@@ -377,12 +365,6 @@ export class TagEditorComponent implements FormValueControl<any> {
         }
     }
 
-    private setTouched() {
-        this.editorBlur.emit(true);
-
-        this.touched.set(true);
-    }
-
     protected focusInput(event: Event) {
         this.inputElement()!.nativeElement.focus();
 
@@ -466,11 +448,10 @@ export class TagEditorComponent implements FormValueControl<any> {
             value = null;
         }
 
-        this.lastValue = value;
-        this.value.set(value);
+        this.valueSetter(value);
 
         if (touched) {
-            this.setTouched();
+            this.markTouched();
         }
 
         this.resetSize();

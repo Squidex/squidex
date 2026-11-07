@@ -6,9 +6,9 @@
  */
 
 import { Component, inject, signal } from '@angular/core';
-import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { LayoutComponent, ListViewComponent, MessageBus, RuleElementDto, RuleSimulatorState, RulesService, SimulatedRuleEventDto, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { LayoutComponent, ListViewComponent, MessageBus, RuleSimulatorState, RulesState, SimulatedRuleEventDto, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleConfigured } from '../messages';
 import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 
@@ -28,16 +28,13 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 export class RuleSimulatorPageComponent {
     private readonly messageBus = inject(MessageBus);
     private readonly route = inject(ActivatedRoute);
-    private readonly rulesService = inject(RulesService);
+    private readonly rulesState = inject(RulesState);
 
     protected readonly ruleSimulatorState = inject(RuleSimulatorState);
 
     protected readonly selectedRuleEvent = signal<string | null | undefined>(undefined);
 
-    protected readonly availableSteps = rxResource({
-        stream: () => this.rulesService.getSteps(),
-        defaultValue: {} as Record<string, RuleElementDto>,
-    });
+    protected readonly availableSteps = this.rulesState.steps;
 
     constructor() {
         this.messageBus.on(RuleConfigured, message => {

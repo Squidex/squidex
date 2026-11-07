@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, signal, untracked, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -81,6 +81,13 @@ export class ContentsPageComponent {
 
     protected readonly selectedItems = signal<Record<string, boolean>>({});
 
+    protected readonly language = linkedSignal<AppLanguageDto>(() => {
+        const languageKey = this.localStore.get(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
+        const languageMaster = this.languagesState.isoMasterLanguage();
+
+        return this.languages().find(x => x.iso2Code === languageKey) || languageMaster;
+    });
+
     protected readonly tableConfig = computed(() => {
         return getTableConfig(this.tableSettings());
     });
@@ -142,17 +149,6 @@ export class ContentsPageComponent {
 
     protected readonly languages = computed(() => {
         return this.languagesState.isoLanguages();
-    });
-
-    protected readonly languageStore = computed(() => {
-        return this.localStore.value(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
-    });
-
-    protected readonly language = computed<AppLanguageDto>(() => {
-        const languageKey = this.languageStore()();
-        const languageMaster = this.languagesState.isoMasterLanguage();
-
-        return this.languages().find(x => x.iso2Code === languageKey) || languageMaster;
     });
 
     protected readonly translationStatus = computed<TranslationStatuses | undefined>(() => {
@@ -270,7 +266,9 @@ export class ContentsPageComponent {
     }
 
     protected changeLanguage(language: AppLanguageDto) {
-        this.languageStore().set(language.iso2Code);
+        this.language.set(language);
+
+        this.localStore.set(Settings.Local.CONTENT_LANGUAGE(this.schema().id), language.iso2Code);
     }
 
     protected search(query: Query) {

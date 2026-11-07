@@ -46,7 +46,6 @@ describe('SignalForm', () => {
         expect(result).toBeFalsy();
         expect(action).not.toHaveBeenCalled();
         expect(form.form.name().touched()).toBeTruthy();
-        expect(form.submitCount()).toBe(1);
     });
 
     it('should disable form while submitting', async () => {

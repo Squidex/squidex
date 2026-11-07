@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, signal, untracked, viewChild } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, signal, viewChild } from '@angular/core';
 import { debounceTime, Subject } from 'rxjs';
 import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, ThemeService, Types } from '@app/framework/internal';
+import { FormValueControlBase, syncExternalValue } from '../form-value-control';
 import { FocusComponent } from '../forms-helper';
 
 type Editor = AceAjax.Editor & { completers?: AceAjax.Completer[]; completer?: { showDocTooltip: (item: any) => void } };
@@ -46,24 +46,23 @@ function getDocHTML(item: AceAjax.Completion) {
     templateUrl: './code-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodeEditorComponent implements FormValueControl<any>, FocusComponent {
+export class CodeEditorComponent extends FormValueControlBase<any> implements FocusComponent {
     private readonly destroyRef = inject(DestroyRef);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly themeService = inject(ThemeService);
     private readonly valueChanged = new Subject<boolean>();
+
+    private readonly valueSetter = syncExternalValue(() => this.value, value => {
+        this.valueText = formatValue(value, this.valueMode());
+        this.setValue(this.valueText);
+    });
+
     private aceModes?: ModeList;
     private aceTools = false;
-    private lastValue: any;
     private valueText = '';
 
     /** The value of the control. */
     public readonly value = model<any>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Renders the editor without a border. */
     public readonly borderless = input(false, { transform: booleanAttribute });
@@ -119,6 +118,8 @@ export class CodeEditorComponent implements FormValueControl<any>, FocusComponen
     });
 
     constructor() {
+        super();
+
         const valueSubscription =
             this.valueChanged.pipe(debounceTime(100))
                 .subscribe(() => {
@@ -156,22 +157,6 @@ export class CodeEditorComponent implements FormValueControl<any>, FocusComponen
         });
 
         effect(() => {
-            const value = this.value();
-            const valueMode = this.valueMode();
-
-            untracked(() => {
-                // Values that have been set by this component are already shown in the editor.
-                if (value === this.lastValue) {
-                    return;
-                }
-
-                this.lastValue = value;
-                this.valueText = formatValue(value, valueMode);
-                this.setValue(this.valueText);
-            });
-        });
-
-        effect(() => {
             this.setMode(this.aceEditor(), this.mode(), this.valueFile());
         });
 
@@ -201,7 +186,7 @@ export class CodeEditorComponent implements FormValueControl<any>, FocusComponen
 
         aceEditor.on('blur', () => {
             this.changeValue();
-            this.touched.set(true);
+            this.markTouched();
         });
 
         aceEditor.on('change', () => {
@@ -264,8 +249,7 @@ export class CodeEditorComponent implements FormValueControl<any>, FocusComponen
         }
 
         if (this.valueText !== newValueText) {
-            this.lastValue = newValueOut;
-            this.value.set(newValueOut);
+            this.valueSetter(newValueOut);
         }
 
         this.valueText = newValueText;

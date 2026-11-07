@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, linkedSignal, model, signal, untracked } from '@angular/core';
-import { disabled, form, FormField, FormValueControl } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
 import { Types } from '@app/framework/internal';
 import { Language, LanguageSelectorComponent } from '../../language-selector.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { IndeterminateValueDirective } from '../indeterminate-value.directive';
+import { CheckboxComponent } from '../checkbox.component';
+import { FormValueControlBase } from '../form-value-control';
 import { DateTimeEditorComponent } from './date-time-editor.component';
 import { TagEditorComponent } from './tag-editor.component';
 
@@ -25,22 +25,15 @@ type LocalizedValue = { [key: string]: any };
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DateTimeEditorComponent,
-        FormField,
-        IndeterminateValueDirective,
+        CheckboxComponent,
         LanguageSelectorComponent,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
-export class LocalizedInputComponent implements FormValueControl<LocalizedValue | null> {
+export class LocalizedInputComponent extends FormValueControlBase<LocalizedValue | null> {
     /** The values per language. */
     public readonly value = model<LocalizedValue | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The languages to edit a value for. */
     public readonly languages = input.required<ReadonlyArray<Language>>();
@@ -74,25 +67,6 @@ export class LocalizedInputComponent implements FormValueControl<LocalizedValue 
 
         return !value.hasOwnProperty(this.language().iso2Code);
     });
-
-    protected readonly booleanForm = form(linkedSignal<boolean | null>(() => this.valueCurrent()), path => {
-        disabled(path, () => this.disabled());
-    });
-
-    constructor() {
-        effect(() => {
-            const value = this.booleanForm().value();
-
-            untracked(() => {
-                // Only emit changes from the checkbox, not values that have been synced from the input.
-                if (value === this.valueCurrent()) {
-                    return;
-                }
-
-                this.setValue(value);
-            });
-        });
-    }
 
     protected setLanguage(language: Language) {
         this.language.set(language);

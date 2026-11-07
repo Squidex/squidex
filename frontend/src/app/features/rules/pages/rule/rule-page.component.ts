@@ -9,7 +9,7 @@ import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ALL_TRIGGERS, ConfirmClickDirective, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, ScriptCompletions, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { ALL_TRIGGERS, ConfirmClickDirective, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RulesService, RulesState, RuleTriggerDto, SchemasState, ScriptCompletions, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { RuleConfigured } from '../messages';
 import { BranchComponent } from './branch.component';
@@ -79,15 +79,12 @@ export class RulePageComponent {
         return this.rule()?.trigger?.triggerType === 'Manual';
     });
 
+    protected readonly availableSteps = this.rulesState.steps;
+
     protected readonly scriptCompletions = rxResource<ScriptCompletions | null, string | undefined>({
         params: () => this.editableRule().trigger?.triggerType || undefined,
         stream: ({ params }) => this.rulesService.getCompletions(this.rulesState.appName, params),
         defaultValue: null,
-    });
-
-    protected readonly availableSteps = rxResource({
-        stream: () => this.rulesService.getSteps(),
-        defaultValue: {} as { [name: string]: RuleElementDto },
     });
 
     protected readonly availableTriggers = ALL_TRIGGERS;

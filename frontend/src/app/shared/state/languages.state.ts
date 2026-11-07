@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, VersionTag } from '@app/framework';
@@ -55,7 +55,7 @@ export class LanguagesState extends State<Snapshot> {
         this.project(x => x.languages.map(y => y.language));
 
     public readonly isoMasterLanguage =
-        this.projectFrom(this.isoLanguages, x => x.find(l => l.isMaster)!);
+        computed(() => this.isoLanguages().find(l => l.isMaster)!);
 
     public readonly newLanguages =
         this.project(x => x.allLanguagesNew);

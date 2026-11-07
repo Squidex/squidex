@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, model, viewChild } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, input, model, viewChild } from '@angular/core';
 import { MathHelper } from '@app/framework/internal';
+import { FormValueControlBase } from '../form-value-control';
 import { FocusComponent } from '../forms-helper';
 
 let canvas: HTMLCanvasElement;
@@ -18,15 +18,9 @@ let canvas: HTMLCanvasElement;
     templateUrl: './color-picker.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ColorPickerComponent implements FormValueControl<string | null>, FocusComponent {
+export class ColorPickerComponent extends FormValueControlBase<string | null> implements FocusComponent {
     /** The color value. */
     public readonly value = model<string | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The placeholder of the text input. */
     public readonly placeholder = input('');
@@ -72,7 +66,7 @@ export class ColorPickerComponent implements FormValueControl<string | null>, Fo
             return;
         }
 
-        this.touched.set(true);
+        this.markTouched();
     }
 
     protected updateValue(value: string) {

@@ -6,9 +6,9 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, linkedSignal, model, signal, viewChild } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
 import { getTagValues, MathHelper, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
+import { FormValueControlBase } from '../form-value-control';
 
 @Component({
     selector: 'sqx-checkbox-group',
@@ -19,17 +19,11 @@ import { ResizedDirective } from '../../resized.directive';
         ResizedDirective,
     ],
 })
-export class CheckboxGroupComponent implements FormValueControl<ReadonlyArray<string> | null> {
+export class CheckboxGroupComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
 
     /** The values of the checked options. */
     public readonly value = model<ReadonlyArray<string> | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Renders the options in a single line, in multiple lines or depending on the available space. */
     public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');

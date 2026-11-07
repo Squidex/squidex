@@ -6,9 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, model, signal } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
-import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
+import { CodeEditorComponent, FormValueControlBase, ScriptCompletions, syncExternalValue, Types } from '@app/shared';
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
 
@@ -21,17 +20,12 @@ type TemplateMode = 'Text' | 'Script' | 'Liquid';
         CodeEditorComponent,
     ],
 })
-export class FormattableInputComponent implements FormValueControl<string | null> {
-    private currentValue: string | null = null;
+export class FormattableInputComponent extends FormValueControlBase<string | null> {
+    // Ignore the values we have emitted ourselves, because the text is trimmed when it is emitted.
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.applyValue(value));
 
     /** The value, optionally wrapped with the template mode, e.g. "Liquid(...)". */
     public readonly value = model<string | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Renders a single line input for text or a large editor for code. */
     public readonly type = input.required<'Text' | 'Code'>();
@@ -65,23 +59,6 @@ export class FormattableInputComponent implements FormValueControl<string | null
 
     protected readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
 
-    constructor() {
-        effect(() => {
-            const value = this.value();
-
-            // Ignore the values we have emitted ourselves, because the text is trimmed when it is emitted.
-            if (value === this.currentValue) {
-                return;
-            }
-
-            const parsed = getModeFromValue(value);
-
-            this.currentValue = value;
-            this.text.set(parsed.value ?? null);
-            this.mode.set(parsed.mode);
-        });
-    }
-
     protected setText(text: string | null) {
         this.text.set(text);
         this.emitValue();
@@ -94,12 +71,18 @@ export class FormattableInputComponent implements FormValueControl<string | null
 
         this.mode.set(mode);
         this.emitValue();
-        this.touched.set(true);
+        this.markTouched();
+    }
+
+    private applyValue(value: string | null) {
+        const parsed = getModeFromValue(value);
+
+        this.text.set(parsed.value ?? null);
+        this.mode.set(parsed.mode);
     }
 
     private emitValue() {
-        this.currentValue = getValueFromMode(this.text(), this.mode()) ?? null;
-        this.value.set(this.currentValue);
+        this.valueSetter(getValueFromMode(this.text(), this.mode()) ?? null);
     }
 }
 

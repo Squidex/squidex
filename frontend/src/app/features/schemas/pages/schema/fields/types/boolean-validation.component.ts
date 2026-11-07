@@ -8,7 +8,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
-import { AppLanguageDto, BooleanFieldFormModel, BooleanFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, IndeterminateValueDirective, LocalizedInputComponent } from '@app/shared';
+import { AppLanguageDto, BooleanFieldFormModel, BooleanFieldPropertiesDto, CheckboxComponent, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation',
@@ -18,7 +18,7 @@ import { AppLanguageDto, BooleanFieldFormModel, BooleanFieldPropertiesDto, Field
     imports: [
         FormField,
         FormRowComponent,
-        IndeterminateValueDirective,
+        CheckboxComponent,
         LocalizedInputComponent,
     ],
 })

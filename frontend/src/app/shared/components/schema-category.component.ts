@@ -51,11 +51,7 @@ export class SchemaCategoryComponent {
             return false;
         }
 
-        return this.isCollapsedStore()();
-    });
-
-    protected readonly isCollapsedStore = computed(() => {
-        return this.localStore.boolean(`squidex.schema.category.${this.schemaCategory().name}.collapsed`);
+        return this.localStore.getBoolean(getCollapsedKey(schemaCategory));
     });
 
     protected readonly forContent = computed(() => {
@@ -74,7 +70,7 @@ export class SchemaCategoryComponent {
         const isCollapsed = !this.isCollapsed();
 
         this.isCollapsed.set(isCollapsed);
-        this.isCollapsedStore().set(isCollapsed);
+        this.localStore.setBoolean(getCollapsedKey(this.schemaCategory()), isCollapsed);
     }
 
     protected schemaRoute(schema: SchemaDto) {
@@ -112,4 +108,8 @@ export class SchemaCategoryComponent {
             }
         });
     }
+}
+
+function getCollapsedKey(schemaCategory: SchemaCategory) {
+    return `squidex.schema.category.${schemaCategory.name}.collapsed`;
 }

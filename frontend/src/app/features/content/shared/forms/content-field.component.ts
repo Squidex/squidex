@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, numberAttribute, output, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
 import { AppLanguageDto, AppsState, CommentSelected, CommentsState, EditContentForm, FieldForm, FocusMarkerComponent, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, Types, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
@@ -78,20 +78,16 @@ export class ContentFieldComponent {
 
     protected readonly isSelected = signal(false);
 
+    protected readonly showAllControls = linkedSignal(() => {
+        return this.localStore.getBoolean(this.showAllControlsKey());
+    });
+
     protected readonly isHalfWidth = computed(() => {
         return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
     });
 
     protected readonly isLocalizable = computed(() => {
         return this.formModel().field.isLocalizable;
-    });
-
-    protected readonly showAllControlsStore = computed(() => {
-        return this.localStore.boolean(this.showAllControlsKey());
-    });
-
-    protected readonly showAllControls = computed(() => {
-        return this.showAllControlsStore()();
     });
 
     protected readonly isInvalid = computed(() => {
@@ -136,7 +132,9 @@ export class ContentFieldComponent {
     }
 
     protected changeShowAllControls(showAllControls: boolean) {
-        this.showAllControlsStore().set(showAllControls);
+        this.showAllControls.set(showAllControls);
+
+        this.localStore.setBoolean(this.showAllControlsKey(), showAllControls);
     }
 
     protected copy() {

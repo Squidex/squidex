@@ -20,18 +20,11 @@ export type SubmitAction<TValue, TResult> = (value: TValue) => Observable<TResul
 
 export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     private readonly isDisabled = signal(false);
-    private readonly submitCounter = signal(0);
     private readonly submitError = signal<ErrorDto | null>(null);
 
     public readonly model: WritableSignal<TModel>;
 
     public readonly form: FieldTree<TModel>;
-
-    public readonly submitCount = this.submitCounter.asReadonly();
-
-    public readonly submitted = computed(() => {
-        return this.submitCounter() > 0;
-    });
 
     public readonly submitting = computed(() => {
         return this.root().submitting();
@@ -79,7 +72,6 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     }
 
     public load(value: Partial<TIn> | undefined) {
-        this.submitCounter.set(0);
         this.submitError.set(null);
         this.setValue(value, this.initialModel);
     }
@@ -115,7 +107,6 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     private async run<TResult>(action: SubmitAction<TOut, TResult>, onSuccess: (result: TResult) => void) {
         let isSuccess = false;
 
-        this.submitCounter.update(x => x + 1);
         this.submitError.set(null);
 
         await submit(this.form, async () => {

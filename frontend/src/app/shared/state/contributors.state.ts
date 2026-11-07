@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, StringHelper, Types, VersionTag } from '@app/framework';
@@ -41,7 +41,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.query);
 
     public readonly queryRegex =
-        this.projectFrom(this.query, x => getRegex(x));
+        computed(() => getRegex(this.query()));
 
     public readonly maxContributors =
         this.project(x => x.maxContributors);

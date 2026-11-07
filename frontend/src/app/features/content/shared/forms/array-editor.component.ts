@@ -91,12 +91,8 @@ export class ArrayEditorComponent {
         return this.isDisabled() || formModel.items().length >= maxItems;
     });
 
-    protected readonly isCollapsedStore = computed(() => {
-        return this.localStore.boolean(this.isCollapsedKey());
-    });
-
     protected readonly isCollapsedInitial = computed(() => {
-        return this.isCollapsedStore()() || this.formLevel() > 0;
+        return this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel() > 0;
     });
 
     protected readonly hasField = computed(() => {
@@ -143,7 +139,7 @@ export class ArrayEditorComponent {
         }
 
         if (this.formLevel() === 0) {
-            this.isCollapsedStore().set(true);
+            this.localStore.setBoolean(this.isCollapsedKey(), true);
         }
 
         this.scroller()?.invalidateAllCachedMeasurements();
@@ -155,7 +151,7 @@ export class ArrayEditorComponent {
         }
 
         if (this.formLevel() === 0) {
-            this.isCollapsedStore().set(false);
+            this.localStore.setBoolean(this.isCollapsedKey(), false);
         }
 
         this.scroller()?.invalidateAllCachedMeasurements();

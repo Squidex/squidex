@@ -8,8 +8,7 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, effect, forwardRef, inject, input, model, signal, untracked } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
-import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, sorted, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, FormValueControlBase, ModalDirective, ResizedDirective, ResolveContents, sorted, TranslatePipe, Types } from '@app/shared';
 import { ContentCreatorComponent } from './content-creator.component';
 import { ReferenceItemComponent } from './reference-item.component';
 
@@ -34,17 +33,11 @@ import { ReferenceItemComponent } from './reference-item.component';
         '[class.expanded]': 'isExpanded()',
     },
 })
-export class ReferencesEditorComponent implements FormValueControl<ReadonlyArray<string> | null> {
+export class ReferencesEditorComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
     private readonly contentsResolver = inject(ResolveContents);
 
     /** The value of the control. */
     public readonly value = model<ReadonlyArray<string> | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Renders the references in fullscreen mode. */
     public readonly isExpanded = input(false, { transform: booleanAttribute });
@@ -78,6 +71,8 @@ export class ReferencesEditorComponent implements FormValueControl<ReadonlyArray
     protected readonly contentSelectorDialog = new DialogModel();
 
     constructor() {
+        super();
+
         effect(onCleanup => {
             const contentIds = this.value();
 
@@ -161,7 +156,7 @@ export class ReferencesEditorComponent implements FormValueControl<ReadonlyArray
             this.value.set(ids);
         }
 
-        this.touched.set(true);
+        this.markTouched();
     }
 
     protected setCompact(isCompact: boolean) {

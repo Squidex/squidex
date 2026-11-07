@@ -6,10 +6,8 @@
  */
 
 import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
-import { catchError, of } from 'rxjs';
-import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
+import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, safeResource, Settings, SupportCardComponent, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
 import { ApiCardComponent } from './cards/api-card.component';
 import { ContentSummaryCardComponent } from './cards/content-summary-card.component';
 import { GithubCardComponent } from './cards/github-card.component';
@@ -66,26 +64,26 @@ export class DashboardPageComponent {
 
     protected readonly extendedHeight = signal('');
 
-    protected readonly isStacked = this.localStore.boolean(Settings.Local.DASHBOARD_CHART_STACKED);
+    protected readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
 
     protected readonly selectedApp = this.appsState.selectedApp;
 
-    protected readonly storageCurrent = rxResource({
+    protected readonly storageCurrent = safeResource({
         params: () => this.selectedApp()?.name,
-        stream: ({ params: appName }) => this.usagesService.getTodayStorage(appName).pipe(
-            catchError(() => of(undefined))),
+        stream: ({ params: appName }) => this.usagesService.getTodayStorage(appName),
+        defaultValue: undefined,
     });
 
-    protected readonly storageUsage = rxResource({
+    protected readonly storageUsage = safeResource({
         params: () => this.selectedApp()?.name,
-        stream: ({ params: appName }) => this.usagesService.getStorageUsages(appName, this.usageDateFrom, this.usageDateTo).pipe(
-            catchError(() => of(undefined))),
+        stream: ({ params: appName }) => this.usagesService.getStorageUsages(appName, this.usageDateFrom, this.usageDateTo),
+        defaultValue: undefined,
     });
 
-    protected readonly callsUsage = rxResource({
+    protected readonly callsUsage = safeResource({
         params: () => this.selectedApp()?.name,
-        stream: ({ params: appName }) => this.usagesService.getCallsUsages(appName, this.usageDateFrom, this.usageDateTo).pipe(
-            catchError(() => of(undefined))),
+        stream: ({ params: appName }) => this.usagesService.getCallsUsages(appName, this.usageDateFrom, this.usageDateTo),
+        defaultValue: undefined,
     });
 
     protected readonly gridConfigAvailable = [...DEFAULT_CELLS, ...ADDITIONAL_CELLS];
@@ -134,6 +132,8 @@ export class DashboardPageComponent {
 
     protected changeIsStacked(value: boolean) {
         this.isStacked.set(value);
+
+        this.localStore.setBoolean(Settings.Local.DASHBOARD_CHART_STACKED, value);
     }
 
     protected changeConfig(config: GridsterItemConfig[]) {

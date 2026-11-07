@@ -17,7 +17,7 @@
             [attr.id]="id()"
             [attr.name]="name()"
             [attr.type]="type()"
-            (blur)="touched.set(true)"
+            (blur)="markTouched()"
             [disabled]="disabled()"
             (input)="setValue($any($event.target).value)"
             [value]="valueCurrent() ?? ''" />
@@ -29,33 +29,27 @@
             [attr.id]="id()"
             [attr.name]="name()"
             [attr.type]="type()"
-            (blur)="touched.set(true)"
+            (blur)="markTouched()"
             [disabled]="disabled()"
             (input)="setValue($any($event.target).value)"
             [value]="valueCurrent() ?? ''" />
     }
 
     @case ("tags") {
-        <sqx-tag-editor [disabled]="disabled()" [id]="id()" (editorBlur)="touched.set(true)" [value]="valueCurrent()" (valueChange)="setValue($event)" />
+        <sqx-tag-editor [disabled]="disabled()" [id]="id()" (editorBlur)="markTouched()" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("datetime") {
-        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="touched.set(true)" mode="DateTime" [value]="valueCurrent()" (valueChange)="setValue($event)" />
+        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="markTouched()" mode="DateTime" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("date") {
-        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="touched.set(true)" mode="Date" [value]="valueCurrent()" (valueChange)="setValue($event)" />
+        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="markTouched()" mode="Date" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("boolean") {
         <div class="form-check">
-            <input
-                class="form-check-input"
-                [attr.id]="id()"
-                (blur)="touched.set(true)"
-                [formField]="booleanForm"
-                sqxIndeterminateValue
-                type="checkbox" />
+            <sqx-checkbox [disabled]="disabled()" [inputId]="id()" (touchedChange)="markTouched()" [value]="valueCurrent()" (valueChange)="setValue($event)" />
             <label class="form-check-label" [attr.for]="id()"></label>
         </div>
     }

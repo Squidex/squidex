@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable, signal, untracked, WritableSignal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Types } from '../utils/types';
 
 @Injectable({
@@ -13,115 +13,67 @@ import { Types } from '../utils/types';
 })
 export class LocalStoreService {
     private readonly fallback: { [key: string]: string } = {};
-    private readonly signals = new Map<string, WritableSignal<string | null>>();
     private store = localStorage;
 
     public configureStore(store: any) {
         this.store = store;
     }
 
-    public value(key: string): WritableSignal<string | null> {
-        return this.getOrCreate(key);
-    }
-
-    public boolean(key: string): WritableSignal<boolean> {
-        return mapped(this.getOrCreate(key), x => x === 'true', x => (x ? 'true' : 'false'));
-    }
-
-    public int(key: string, fallback = 0): WritableSignal<number> {
-        return mapped(this.getOrCreate(key), x => parseInt(x, fallback), x => `${x}`);
-    }
-
     public get(key: string): string | null {
-        return untracked(this.getOrCreate(key));
+        try {
+            return this.store.getItem(key);
+        } catch {
+            return this.fallback[key];
+        }
     }
 
     public getBoolean(key: string): boolean {
-        return untracked(this.boolean(key));
+        const value = this.get(key);
+
+        return value === 'true';
     }
 
     public getInt(key: string, fallback = 0): number {
-        return untracked(this.int(key, fallback));
-    }
+        const value = this.get(key);
 
-    public set(key: string, value: string) {
-        this.getOrCreate(key).set(value);
-    }
+        let result = fallback;
 
-    public setBoolean(key: string, value: boolean) {
-        this.boolean(key).set(value);
-    }
+        if (Types.isString(value)) {
+            result = parseInt(value, 10);
+        }
 
-    public setInt(key: string, value: number) {
-        this.int(key).set(value);
-    }
-
-    public remove(key: string) {
-        this.getOrCreate(key).set(null);
-    }
-
-    private getOrCreate(key: string) {
-        let result = this.signals.get(key);
-        if (!result) {
-            result = signal(this.read(key));
-
-            // Every write goes to the store, so all signals for the same key stay in sync.
-            const set = result.set.bind(result);
-
-            result.set = value => {
-                this.write(key, value);
-                set(value);
-            };
-
-            result.update = fn => result!.set(fn(untracked(result!)));
-
-            this.signals.set(key, result);
+        if (!Types.isNumber(result)) {
+            result = fallback;
         }
 
         return result;
     }
 
-    private read(key: string): string | null {
+    public set(key: string, value: string) {
         try {
-            return this.store.getItem(key);
+            this.store.setItem(key, value);
         } catch {
-            return this.fallback[key] ?? null;
+            this.fallback[key] = value;
         }
     }
 
-    private write(key: string, value: string | null) {
+    public setBoolean(key: string, value: boolean) {
+        const converted = value ? 'true' : 'false';
+
+        this.store.setItem(key, converted);
+    }
+
+    public setInt(key: string, value: number) {
+        const converted = `${value}`;
+
+        this.store.setItem(key, converted);
+    }
+
+    public remove(key: string) {
         try {
-            if (value === null) {
-                this.store.removeItem(key);
-            } else {
-                this.store.setItem(key, value);
-            }
+            this.store.removeItem(key);
         } catch {
-            if (value === null) {
-                delete this.fallback[key];
-            } else {
-                this.fallback[key] = value;
-            }
+            delete this.fallback[key];
         }
     }
-}
-
-function parseInt(value: string | null, fallback: number) {
-    if (!Types.isString(value)) {
-        return fallback;
-    }
-
-    const result = Number.parseInt(value, 10);
-
-    return Types.isNumber(result) && !Number.isNaN(result) ? result : fallback;
-}
-
-function mapped<T>(source: WritableSignal<string | null>, read: (value: string | null) => T, write: (value: T) => string): WritableSignal<T> {
-    const result = computed(() => read(source())) as unknown as WritableSignal<T>;
-
-    result.set = value => source.set(write(value));
-    result.update = fn => result.set(fn(untracked(result)));
-    result.asReadonly = () => result;
-
-    return result;
 }

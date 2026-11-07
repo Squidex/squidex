@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, StringHelper, Version } from '@app/framework';
@@ -49,13 +49,13 @@ export class SchemasState extends State<Snapshot> {
         this.project(x => x.canCreate === true);
 
     public readonly publishedSchemas =
-        this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
+        computed(() => this.schemas().filter(s => s.isPublished));
 
     public readonly addedCategories =
         this.project(x => x.addedCategories);
 
     public readonly categoryNames =
-        this.projectFrom2(this.schemas, this.addedCategories, (s, c) => buildCategoryNames(c, s));
+        computed(() => buildCategoryNames(this.addedCategories(), this.schemas()));
 
     public get appId() {
         return this.appsState.appId;

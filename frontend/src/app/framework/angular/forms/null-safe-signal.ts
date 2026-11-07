@@ -10,22 +10,27 @@ import { Types } from '@app/framework/internal';
 
 export function nullSafeSignal<T>(initial: T): WritableSignal<T> {
     // Signal forms remove fields with undefined values, therefore we store null instead.
-    const result = signal(replaceUndefined(initial));
+    const result = signal(replaceUndefined(initial, undefined));
     const set = result.set.bind(result);
 
-    result.set = value => set(replaceUndefined(value));
+    result.set = value => set(replaceUndefined(value, untracked(result)));
     result.update = fn => result.set(fn(untracked(result)));
 
     return result;
 }
 
-function replaceUndefined<T>(value: T): T {
+// Signal forms only copy the objects on the path to the changed field, so unchanged branches can be skipped.
+function replaceUndefined<T>(value: T, previous: any): T {
+    if (value === previous) {
+        return value;
+    }
+
     if (Types.isArray(value)) {
         let copy: any[] | undefined;
 
         for (let i = 0; i < value.length; i++) {
             const source = value[i];
-            const target = Types.isUndefined(source) ? null : replaceUndefined(source);
+            const target = Types.isUndefined(source) ? null : replaceUndefined(source, previous?.[i]);
 
             if (target !== source) {
                 copy ??= [...value];
@@ -40,7 +45,7 @@ function replaceUndefined<T>(value: T): T {
         let copy: Record<string, any> | undefined;
 
         for (const [key, source] of Object.entries(value)) {
-            const target = Types.isUndefined(source) ? null : replaceUndefined(source);
+            const target = Types.isUndefined(source) ? null : replaceUndefined(source, previous?.[key]);
 
             if (target !== source) {
                 copy ??= { ...value };

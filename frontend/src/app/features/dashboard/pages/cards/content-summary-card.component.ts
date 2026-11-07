@@ -6,9 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { catchError, map, of } from 'rxjs';
-import { AppDto, ContentsService, TranslatePipe, Types } from '@app/shared';
+import { map } from 'rxjs';
+import { AppDto, ContentsService, safeResource, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-summary-card',
@@ -28,7 +27,7 @@ export class ContentSummaryCardComponent {
     /** The card configuration, with the name, the schema and the optional query to count the items. */
     public readonly options = input<any>();
 
-    protected readonly itemCount = rxResource({
+    protected readonly itemCount = safeResource({
         params: () => {
             const options = this.options();
             if (!Types.isString(options?.schema)) {
@@ -44,8 +43,7 @@ export class ContentSummaryCardComponent {
             return { appName: this.app().name, schema: options.schema as string, query: { ...query, take: 0 } };
         },
         stream: ({ params: { appName, schema, query } }) => this.contentsService.getContents(appName, schema, { query }).pipe(
-            map(({ total }) => total),
-            catchError(() => of(0))),
+            map(({ total }) => total)),
         defaultValue: 0,
     });
 }

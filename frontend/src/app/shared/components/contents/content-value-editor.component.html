@@ -54,7 +54,7 @@
 
                 @case ("Checkbox") {
                     <div class="form-check">
-                        <input class="form-check-input" id="{{ uniqueId }}" [formField]="control" sqxIndeterminateValue type="checkbox" />
+                        <sqx-checkbox [formField]="control" [inputId]="uniqueId" />
                         <label class="form-check-label" for="{{ uniqueId }}"></label>
                     </div>
                 }

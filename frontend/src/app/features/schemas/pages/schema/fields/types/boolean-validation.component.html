@@ -1,6 +1,6 @@
 <div>
     <sqx-form-row #defaultValueRow [for]="form().defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
-        <input class="form-check-input" [id]="defaultValueRow.fieldName()" [formField]="form().defaultValue" sqxIndeterminateValue type="checkbox" />
+        <sqx-checkbox [formField]="form().defaultValue" [inputId]="defaultValueRow.fieldName()" />
     </sqx-form-row>
 
     @if (isLocalizable()) {

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, linkedSignal, model, numberAttribute } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, model, numberAttribute } from '@angular/core';
 import { Types } from '@app/framework/internal';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { FormValueControlBase } from '../form-value-control';
 
 @Component({
     selector: 'sqx-stars',
@@ -19,15 +19,9 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         TranslatePipe,
     ],
 })
-export class StarsComponent implements FormValueControl<number | null> {
+export class StarsComponent extends FormValueControlBase<number | null> {
     /** The number of selected stars. */
     public readonly value = model<number | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The number of stars to render. Shows a hint instead of stars when greater than 15. */
     public readonly maximumStars = input(5, { transform: (value: unknown) => numberAttribute(value, 5) });
@@ -73,7 +67,7 @@ export class StarsComponent implements FormValueControl<number | null> {
 
         if (this.valueNumber()) {
             this.value.set(null);
-            this.touched.set(true);
+            this.markTouched();
         }
 
         return false;
@@ -86,7 +80,7 @@ export class StarsComponent implements FormValueControl<number | null> {
 
         if (this.valueNumber() !== value) {
             this.value.set(value);
-            this.touched.set(true);
+            this.markTouched();
         }
 
         return false;

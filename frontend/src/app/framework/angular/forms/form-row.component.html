@@ -9,7 +9,7 @@
 
 <div [class]="mainClass()">
     @if (!hideError()) {
-        <sqx-control-errors [for]="for()" [submitCount]="submitCount()" />
+        <sqx-control-errors [for]="for()" />
     }
 
     <div [class.form-check]="check()" [class.g-0]="hasUnit()" [class.row]="hasUnit()">

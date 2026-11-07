@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { effect, EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext, untracked } from '@angular/core';
+import { computed, effect, EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext, untracked } from '@angular/core';
 import { debug, State, TourService, UIOptions } from '@app/framework';
 import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
@@ -44,10 +44,10 @@ export class TourState extends State<Snapshot> {
         this.project(x => x.status);
 
     public readonly tasks =
-        this.projectFrom(this.completedTasks, x => createTasks(this.definition.tasks, x));
+        computed(() => createTasks(this.definition.tasks, this.completedTasks()));
 
     public readonly pendingTasks =
-        this.projectFrom(this.tasks, x => x.filter(t => !t.isCompleted).length);
+        computed(() => this.tasks().filter(t => !t.isCompleted).length);
 
     constructor(
         @Inject(TASK_CONFIGURATION) private readonly definition: TaskConfiguration,

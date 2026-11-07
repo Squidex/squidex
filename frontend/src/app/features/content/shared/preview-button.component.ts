@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, TranslatePipe } from '@app/shared';
@@ -36,14 +36,14 @@ export class PreviewButtonComponent {
     /** The schema of the content, with the preview URLs. */
     public readonly schema = input.required<SchemaDto>();
 
-    protected readonly previewNameStore = computed(() => {
-        return this.localStore.value(this.configKey());
+    protected readonly previewName = linkedSignal(() => {
+        return this.localStore.get(this.configKey());
     });
 
     protected readonly previewNameSelected = computed<string | undefined>(() => {
         const previewUrls = this.schema().previewUrls;
 
-        const selectedName = this.previewNameStore()();
+        const selectedName = this.previewName();
         if (!selectedName || !previewUrls[selectedName]) {
             return Object.keys(previewUrls)[0];
         }
@@ -91,7 +91,9 @@ export class PreviewButtonComponent {
     }
 
     private selectUrl(selectedName: string) {
-        this.previewNameStore().set(selectedName);
+        this.previewName.set(selectedName);
+
+        this.localStore.set(this.configKey(), selectedName);
     }
 
     private configKey() {

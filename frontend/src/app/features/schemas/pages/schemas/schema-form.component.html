@@ -39,7 +39,7 @@
             <sqx-form-error [error]="actualForm().error()" />
 
             @if (selectedTab() !== 2) {
-                <sqx-form-row [for]="createForm.form.name" hint="schemas.schemaNameHint" label="common.name" required [submitCount]="createForm.submitCount()" vertical>
+                <sqx-form-row [for]="createForm.form.name" hint="schemas.schemaNameHint" label="common.name" required vertical>
                     <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                 </sqx-form-row>
 

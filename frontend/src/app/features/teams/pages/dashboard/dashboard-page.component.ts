@@ -6,10 +6,8 @@
  */
 
 import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
-import { catchError, of } from 'rxjs';
-import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
+import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, safeResource, Settings, SupportCardComponent, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
 import { AppsCardComponent } from './cards/apps-card.component';
 
 @Component({
@@ -55,26 +53,26 @@ export class DashboardPageComponent {
 
     protected readonly extendedHeight = signal('');
 
-    protected readonly isStacked = this.localStore.boolean(Settings.Local.DASHBOARD_CHART_STACKED);
+    protected readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
 
     protected readonly selectedTeam = this.teamsState.selectedTeam;
 
-    protected readonly storageCurrent = rxResource({
+    protected readonly storageCurrent = safeResource({
         params: () => this.selectedTeam()?.id,
-        stream: ({ params: teamId }) => this.usagesService.getTodayStorageForTeam(teamId).pipe(
-            catchError(() => of(undefined))),
+        stream: ({ params: teamId }) => this.usagesService.getTodayStorageForTeam(teamId),
+        defaultValue: undefined,
     });
 
-    protected readonly storageUsage = rxResource({
+    protected readonly storageUsage = safeResource({
         params: () => this.selectedTeam()?.id,
-        stream: ({ params: teamId }) => this.usagesService.getStorageUsagesForTeam(teamId, this.usageDateFrom, this.usageDateTo).pipe(
-            catchError(() => of(undefined))),
+        stream: ({ params: teamId }) => this.usagesService.getStorageUsagesForTeam(teamId, this.usageDateFrom, this.usageDateTo),
+        defaultValue: undefined,
     });
 
-    protected readonly callsUsage = rxResource({
+    protected readonly callsUsage = safeResource({
         params: () => this.selectedTeam()?.id,
-        stream: ({ params: teamId }) => this.usagesService.getCallsUsagesForTeam(teamId, this.usageDateFrom, this.usageDateTo).pipe(
-            catchError(() => of(undefined))),
+        stream: ({ params: teamId }) => this.usagesService.getCallsUsagesForTeam(teamId, this.usageDateFrom, this.usageDateTo),
+        defaultValue: undefined,
     });
 
     protected readonly gridOptions = DEFAULT_OPTIONS;
@@ -123,6 +121,8 @@ export class DashboardPageComponent {
 
     protected changeIsStacked(value: boolean) {
         this.isStacked.set(value);
+
+        this.localStore.setBoolean(Settings.Local.DASHBOARD_CHART_STACKED, value);
     }
 
     protected changeConfig(config: GridsterItemConfig[]) {

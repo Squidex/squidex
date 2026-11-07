@@ -115,18 +115,6 @@ export class State<T extends {}> {
         }, compare ? { equal: compare } : undefined);
     }
 
-    public projectFrom<M, N>(source: Signal<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean): Signal<N> {
-        return computed(() => {
-            return project(source());
-        }, compare ? { equal: compare } : undefined);
-    }
-
-    public projectFrom2<M, N, O>(lhs: Signal<M>, rhs: Signal<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean): Signal<O> {
-        return computed(() => {
-            return project(lhs(), rhs());
-        }, compare ? { equal: compare } : undefined);
-    }
-
     constructor(
         private readonly initialState: Readonly<T>,
     ) {

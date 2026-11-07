@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { compareStrings, debug, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
@@ -67,13 +67,13 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         this.project(x => x.tagsSelected);
 
     public readonly tags =
-        this.projectFrom(this.tagsUnsorted, getTagsSorted);
+        computed(() => getTagsSorted(this.tagsUnsorted()));
 
     public readonly tagsNames =
-        this.projectFrom(this.tagsUnsorted, getTagNames);
+        computed(() => getTagNames(this.tagsUnsorted()));
 
     public readonly selectedTagNames =
-        this.projectFrom(this.tagsSelected, getTagNames);
+        computed(() => getTagNames(this.tagsSelected()));
 
     public readonly assets =
         this.project(x => x.assets);

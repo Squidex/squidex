@@ -114,13 +114,7 @@
 
                             @case ("Checkbox") {
                                 <div class="form-check">
-                                    <input
-                                        class="form-check-input"
-                                        id="{{ uniqueId }}"
-                                        [formField]="fieldForm()"
-                                        sqxIndeterminateValue
-                                        [threeStates]="!field.properties.isRequired"
-                                        type="checkbox" />
+                                    <sqx-checkbox [formField]="fieldForm()" [inputId]="uniqueId" [threeStates]="!field.properties.isRequired" />
                                     <label class="form-check-label" for="{{ uniqueId }}"></label>
                                 </div>
                             }

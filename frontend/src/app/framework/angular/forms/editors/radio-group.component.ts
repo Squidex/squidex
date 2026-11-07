@@ -6,9 +6,9 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
 import { getTagValues, MathHelper, TagValue, TextMeasurer } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
+import { FormValueControlBase } from '../form-value-control';
 
 @Component({
     selector: 'sqx-radio-group',
@@ -19,17 +19,11 @@ import { ResizedDirective } from '../../resized.directive';
         ResizedDirective,
     ],
 })
-export class RadioGroupComponent implements FormValueControl<any> {
+export class RadioGroupComponent extends FormValueControlBase<any> {
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
 
     /** The value of the selected option. */
     public readonly value = model<any>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Renders the options in a single line, in multiple lines or depending on the available space. */
     public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');

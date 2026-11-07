@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, contentChild, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, output, signal, TemplateRef, untracked, viewChild } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import getCaretCoordinates from 'textarea-caret';
@@ -20,6 +19,7 @@ import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { StopClickDirective } from '../../stop-click.directive';
 import { TemplateWrapperDirective } from '../../template-wrapper.directive';
 import { FocusOnInitDirective } from '../focus-on-init.directive';
+import { FormValueControlBase, syncExternalValue } from '../form-value-control';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
@@ -88,26 +88,22 @@ function parseQuery(text: unknown, startCharacter: string, cursor: number): Quer
         TemplateWrapperDirective,
     ],
 })
-export class AutocompleteComponent implements FormValueControl<any> {
+export class AutocompleteComponent extends FormValueControlBase<any> {
     private readonly destroyRef = inject(DestroyRef);
     private readonly modalStream = new Subject<Query>();
     private readonly queryStream = new Subject<string>();
+
+    private readonly valueSetter = syncExternalValue(() => this.value, value => {
+        this.queryText.set(this.getDisplayText(value));
+        this.resetState();
+    });
+
     private lastCursor = 0;
     private lastQuery?: Query;
-    private lastValue: any = null;
     private timer: any;
 
     /** The value of the control. */
     public readonly value = model<any>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the value is invalid, provided by the form. */
-    public readonly invalid = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** Emits when the input loses the focus. */
     public readonly editorBlur = output();
@@ -186,23 +182,10 @@ export class AutocompleteComponent implements FormValueControl<any> {
     protected readonly suggestionsModal = new ModalModel();
 
     constructor() {
+        super();
+
         this.destroyRef.onDestroy(() => {
             clearTimeout(this.timer);
-        });
-
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                // Values that have been set by this component must not override the text in progress.
-                if (value === this.lastValue) {
-                    return;
-                }
-
-                this.lastValue = value;
-                this.queryText.set(this.getDisplayText(value));
-                this.resetState();
-            });
         });
 
         effect(() => {
@@ -298,7 +281,7 @@ export class AutocompleteComponent implements FormValueControl<any> {
 
     protected blur() {
         this.resetState();
-        this.touched.set(true);
+        this.markTouched();
         this.editorBlur.emit();
     }
 
@@ -344,7 +327,7 @@ export class AutocompleteComponent implements FormValueControl<any> {
             }
 
             this.setValue(value);
-            this.touched.set(true);
+            this.markTouched();
         } finally {
             this.resetState();
         }
@@ -369,8 +352,7 @@ export class AutocompleteComponent implements FormValueControl<any> {
     private setValue(value: any) {
         value ??= null;
 
-        this.lastValue = value;
-        this.value.set(value);
+        this.valueSetter(value);
     }
 
     private getDisplayText(value: any): string {

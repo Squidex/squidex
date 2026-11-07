@@ -47,7 +47,7 @@ export class AssetsPageComponent {
 
     protected readonly editAsset = signal<AssetDto | undefined>(undefined);
 
-    protected readonly listMode = this.localStore.boolean(Settings.Local.ASSETS_MODE);
+    protected readonly listMode = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
 
     protected readonly listQueries = new Queries(this.uiState, 'assets');
 
@@ -97,5 +97,7 @@ export class AssetsPageComponent {
 
     protected changeView(isListView: boolean) {
         this.listMode.set(isListView);
+
+        this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }
 }

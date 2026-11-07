@@ -104,7 +104,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     protected readonly contentFormCompare = signal<EditContentForm | null>(null);
 
     protected readonly language = linkedSignal(() => {
-        const languageKey = this.languageStore()();
+        const languageKey = this.localStore.get(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
         const languageMaster = this.languagesState.isoMasterLanguage();
 
         return this.languages().find(x => x.iso2Code === languageKey) || languageMaster;
@@ -116,7 +116,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
         return untracked(() => this.createForm(schema));
     });
 
-    protected readonly showIdInput = this.localStore.boolean(Settings.Local.CONTENT_ID_INPUT);
+    protected readonly showIdInput = signal(this.localStore.getBoolean(Settings.Local.CONTENT_ID_INPUT));
 
     protected readonly schema = computed(() => {
         return this.schemasState.selectedSchema()!;
@@ -124,10 +124,6 @@ export class ContentPageComponent implements CanComponentDeactivate {
 
     protected readonly languages = computed(() => {
         return this.languagesState.isoLanguages();
-    });
-
-    protected readonly languageStore = computed(() => {
-        return this.localStore.value(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
     });
 
     protected readonly contentTab = queryParam<Tab>('tab', 'editor');
@@ -339,7 +335,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     }
 
     protected changeLanguage(language: AppLanguageDto) {
-        this.languageStore().set(language.iso2Code);
+        this.localStore.set(Settings.Local.CONTENT_LANGUAGE(this.schema().id), language.iso2Code);
 
         this.updateContext();
     }
@@ -421,5 +417,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
 
     protected changeShowIdInput(value: boolean) {
         this.showIdInput.set(value);
+
+        this.localStore.setBoolean(Settings.Local.CONTENT_ID_INPUT, value);
     }
 }

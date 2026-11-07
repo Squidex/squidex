@@ -6,10 +6,10 @@
  */
 
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, model, signal, untracked, viewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, model, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { disabled, form, FormField, FormValueControl } from '@angular/forms/signals';
-import { ControlErrorsComponent, ResizedDirective, SignalValidators, StringHelper, TooltipDirective, TranslatePipe } from '@app/framework';
+import { disabled, form, FormField } from '@angular/forms/signals';
+import { ControlErrorsComponent, FormValueControlBase, ResizedDirective, SignalValidators, StringHelper, syncExternalValue, TooltipDirective, TranslatePipe } from '@app/framework';
 import { LocalStoreService, ResourceLoaderService, Settings, Types, UIOptions } from '@app/shared/internal';
 
 declare const L: any;
@@ -33,24 +33,19 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
         TranslatePipe,
     ],
 })
-export class GeolocationEditorComponent implements FormValueControl<Geolocation | null> {
+export class GeolocationEditorComponent extends FormValueControlBase<Geolocation | null> {
     private readonly destroyRef = inject(DestroyRef);
     private readonly localStore = inject(LocalStoreService);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly uiOptions = inject(UIOptions);
     private readonly googleMapsKey = this.uiOptions.value.map.googleMaps.key;
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.applyValue(value));
     private current: Geolocation | null = null;
     private map: any;
     private marker: any;
 
     /** The geolocation value. */
     public readonly value = model<Geolocation | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     protected readonly editor = viewChild.required<ElementRef<HTMLElement>>('editor');
 
@@ -60,7 +55,7 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
 
     protected readonly isCompact = signal(false);
 
-    protected readonly isMapHidden = this.localStore.boolean(Settings.Local.HIDE_MAP);
+    protected readonly isMapHidden = signal(this.localStore.getBoolean(Settings.Local.HIDE_MAP));
 
     protected readonly isGoogleMaps = this.uiOptions.value.map.type !== 'OSM';
 
@@ -71,15 +66,9 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
     });
 
     constructor() {
+        super();
+
         const destroyRef = this.destroyRef;
-
-        effect(() => {
-            const value = this.value();
-
-            untracked(() => {
-                this.applyValue(value);
-            });
-        });
 
         effect(() => {
             const isDisabled = this.disabled();
@@ -111,13 +100,11 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
 
     protected hideMap(isMapHidden: boolean) {
         this.isMapHidden.set(isMapHidden);
+
+        this.localStore.setBoolean(Settings.Local.HIDE_MAP, isMapHidden);
     }
 
     private applyValue(obj: any) {
-        if (Types.equals(obj, this.current)) {
-            return;
-        }
-
         if (Types.isObject(obj) && Types.isNumber(obj.latitude) && Types.isNumber(obj.longitude)) {
             this.current = obj;
         } else {
@@ -386,7 +373,7 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
     }
 
     private emitValue() {
-        this.value.set(this.current);
-        this.touched.set(true);
+        this.valueSetter(this.current);
+        this.markTouched();
     }
 }

@@ -8,8 +8,7 @@
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
-import { FormValueControl } from '@angular/forms/signals';
-import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, TranslatePipe, Types } from '@app/shared';
+import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, FormValueControlBase, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, TranslatePipe, Types } from '@app/shared';
 
 class AssetUpdated {
     constructor(
@@ -40,19 +39,13 @@ class AssetUpdated {
         '[class.expanded]': 'isExpanded()',
     },
 })
-export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<string> | null> {
+export class AssetsEditorComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
     private readonly assetsResolver = inject(ResolveAssets);
     private readonly localStore = inject(LocalStoreService);
     private readonly messageBus = inject(MessageBus);
 
     /** The value of the control. */
     public readonly value = model<ReadonlyArray<string> | null>(null);
-
-    /** Disables the control. */
-    public readonly disabled = input(false, { transform: booleanAttribute });
-
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
 
     /** The folder to upload new assets to. */
     public readonly folderId = input<string>();
@@ -71,7 +64,7 @@ export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<str
 
     protected readonly isCompact = signal(false);
 
-    protected readonly isTileView = this.localStore.boolean(Settings.Local.ASSETS_MODE);
+    protected readonly isTileView = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
 
     protected readonly isListView = computed(() => {
         return !this.isTileView();
@@ -82,6 +75,8 @@ export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<str
     protected readonly assetsDialog = new DialogModel();
 
     constructor() {
+        super();
+
         this.messageBus.on(AssetUpdated, event => {
             this.setAssets(this.assetItems().replacedBy('id', event.asset));
         });
@@ -194,6 +189,8 @@ export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<str
 
     protected changeView(isListView: boolean) {
         this.isTileView.set(!isListView);
+
+        this.localStore.setBoolean(Settings.Local.ASSETS_MODE, !isListView);
     }
 
     protected editStart(asset: AssetDto) {
@@ -213,6 +210,6 @@ export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<str
             this.value.set(ids);
         }
 
-        this.touched.set(true);
+        this.markTouched();
     }
 }

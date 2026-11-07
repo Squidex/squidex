@@ -6,9 +6,8 @@
  */
 
 import { Component, inject } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { RuleComponent } from './rule.component';
 
 @Component({
@@ -32,14 +31,11 @@ import { RuleComponent } from './rule.component';
     ],
 })
 export class RulesPageComponent {
-    private readonly rulesService = inject(RulesService);
     private readonly schemasState = inject(SchemasState);
 
     protected readonly rulesState = inject(RulesState);
 
-    protected readonly availableSteps = rxResource({
-        stream: () => this.rulesService.getSteps(),
-    });
+    protected readonly availableSteps = this.rulesState.steps;
 
     protected readonly availableTriggers = ALL_TRIGGERS;
 
