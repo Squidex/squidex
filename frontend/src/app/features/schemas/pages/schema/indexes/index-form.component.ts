@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIndexForm, FormHintComponent, IndexesState, MarkdownDirective, ModalDialogComponent, SchemaDto, TranslatePipe } from '@app/shared';
 
@@ -14,6 +14,7 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
     selector: 'sqx-index-form',
     styleUrls: ['./index-form.component.scss'],
     templateUrl: './index-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ControlErrorsComponent,
@@ -26,27 +27,23 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
     ],
 })
 export class IndexFormComponent {
-    @Output()
-    public create = new EventEmitter();
+    /** Emits when the index has been created. */
+    public readonly create = output();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema to create the index for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public languages!: AppLanguageDto[];
+    /** The languages of the app, to provide the localized fields. */
+    public readonly languages = input.required<AppLanguageDto[]>();
 
-    public createForm = new CreateIndexForm();
-    public fieldNames: string[] = [];
+    public readonly createForm = new CreateIndexForm();
 
-    constructor(
-        private readonly indexesState: IndexesState,
-    ) {
-    }
+    public readonly fieldNames = computed(() => {
+        const languages = this.languages();
 
-    public ngOnInit() {
         const metaFields: string[] = [
             'created',
             'createdBy',
@@ -58,10 +55,10 @@ export class IndexFormComponent {
         ];
 
         const dataFields: string[] = [];
-        for (const field of this.schema.fields) {
+        for (const field of this.schema().fields) {
             if (field.properties.isContentField) {
                 if (field.isLocalizable) {
-                    for (const language of this.languages) {
+                    for (const language of languages) {
                         dataFields.push(`data.${field.name}.${language.iso2Code}`);
                     }
                 } else {
@@ -70,7 +67,12 @@ export class IndexFormComponent {
             }
         }
 
-        this.fieldNames = [...metaFields, ...dataFields.sort()];
+        return [...metaFields, ...dataFields.sort()];
+    });
+
+    constructor(
+        private readonly indexesState: IndexesState,
+    ) {
     }
 
     public emitCreate() {

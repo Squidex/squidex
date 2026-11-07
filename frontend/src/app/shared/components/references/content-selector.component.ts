@@ -6,12 +6,13 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, forwardRef, Input, numberAttribute, OnInit, Output } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, forwardRef, input, linkedSignal, numberAttribute, output, signal, untracked } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, of } from 'rxjs';
+import { of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { LanguageSelectorComponent, ListViewComponent, ModalDialogComponent, PagerComponent, SyncWidthDirective, TooltipDirective, TranslatePipe } from '@app/framework';
-import { ApiUrlConfig, AppLanguageDto, AppsState, ComponentContentsState, ContentDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState, Subscriptions } from '@app/shared/internal';
+import { AppLanguageDto, AppsState, ComponentContentsState, ContentDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
 import { ContentListCellDirective, ContentListWidthDirective } from '../contents/content-list-cell.directive';
 import { ContentListHeaderComponent } from '../contents/content-list-header.component';
 import { SearchFormComponent } from '../search/search-form.component';
@@ -41,105 +42,113 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         forwardRef(() => SearchFormComponent),
     ],
 })
-export class ContentSelectorComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-    private initialQuery?: string = undefined;
+export class ContentSelectorComponent {
+    private isInitialQueryUsed = false;
 
     public readonly metaFields = META_FIELDS;
 
-    @Output()
-    public contentSelect = new EventEmitter<ReadonlyArray<ContentDto>>();
+    /** Emits the selected contents, or an empty array when the dialog is closed. */
+    public readonly contentSelect = output<ReadonlyArray<ContentDto>>();
 
-    @Output()
-    public contentClear = new EventEmitter();
+    /** Emits when the user clears the selection. */
+    public readonly contentClear = output();
 
-    @Input({ transform: numberAttribute })
-    public maxItems = Number.MAX_VALUE;
+    /** The maximum number of contents that can be selected. */
+    public readonly maxItems = input(Number.MAX_VALUE, { transform: numberAttribute });
 
-    @Input()
-    public schemaName?: string | null;
+    /** The name of the schema. */
+    public readonly schemaName = input<string | null>();
 
-    @Input()
-    public schemaIdentifiers?: ReadonlyArray<string>;
+    /** The IDs or names of the schemas to select contents from. All schemas are used when not defined. */
+    public readonly schemaIdentifiers = input<ReadonlyArray<string>>();
 
-    @Input({ transform: booleanAttribute })
-    public canClear = false;
+    /** Shows a button to clear the selection. */
+    public readonly canClear = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public query?: string;
+    /** The initial full text query. */
+    public readonly query = input<string>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The initial language to show the contents in. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ transform: booleanAttribute })
-    public allowDuplicates?: boolean | null;
+    /** Allows to select contents that have already been selected before. */
+    public readonly allowDuplicates = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public alreadySelectedIds: ReadonlyArray<string> | undefined | null;
+    /** The IDs of the contents that have already been selected before. */
+    public readonly alreadySelectedIds = input<ReadonlyArray<string> | null>();
 
-    @Input()
-    public set alreadySelected(value: ReadonlyArray<ContentDto> | undefined | null) {
-        this.alreadySelectedIds = value?.map(x => x.id);
-    }
+    /** The contents that have already been selected before. Takes precedence over the IDs. */
+    public readonly alreadySelected = input<ReadonlyArray<ContentDto> | null>();
 
-    public schema!: SchemaDto;
-    public schemas: ReadonlyArray<SchemaDto> = [];
+    public readonly alreadySelectedIdsAll = computed(() => {
+        return this.alreadySelected()?.map(x => x.id) ?? this.alreadySelectedIds();
+    });
 
-    public selectedItems: { [id: string]: ContentDto } = {};
-    public selectionCount = 0;
-    public selectedAll = false;
+    public readonly languageSelected = linkedSignal(() => this.language());
 
-    public querySource = new BehaviorSubject<SchemaDto | null>(null);
-    public queryModel =
-        this.querySource.pipe(map(x => x?.name), distinctUntilChanged(),
-            switchMap(x => {
-                if (x) {
-                    return this.schemasService.getFilters(this.appsState.appName, x);
-                } else {
-                    return of(null);
-                }
-            }));
+    public readonly schema = signal<SchemaDto | undefined>(undefined);
 
-    constructor(
-        public readonly appsState: AppsState,
-        public readonly apiUrl: ApiUrlConfig,
+    public readonly schemas = computed(() => {
+        const schemas = this.schemasState.snapshot.schemas.filter(x => x.type === 'Default' && x.canReadContents);
+
+        const schemaIdentifiers = this.schemaIdentifiers();
+        if (!schemaIdentifiers || schemaIdentifiers.length === 0) {
+            return schemas;
+        }
+
+        return schemas.filter(x => schemaIdentifiers.includes(x.id) || schemaIdentifiers.includes(x.name));
+    });
+
+    public readonly selectedItems = signal<Record<string, ContentDto>>({});
+
+    public readonly selectionCount = computed(() => {
+        return Object.keys(this.selectedItems()).length;
+    });
+
+    public readonly selectedAll = computed(() => {
+        return this.selectionCount() === this.contentsState.snapshot.contents.length;
+    });
+
+    public readonly queryModel;
+
+    constructor(appsState: AppsState, schemasService: SchemasService,
         public readonly contentsState: ComponentContentsState,
         public readonly schemasState: SchemasState,
-        public readonly schemasService: SchemasService,
     ) {
+        this.queryModel = toSignal(
+            toObservable(this.schema).pipe(map(x => x?.name), distinctUntilChanged(),
+                switchMap(x => {
+                    if (x) {
+                        return schemasService.getFilters(appsState.appName, x);
+                    } else {
+                        return of(null);
+                    }
+                })),
+            { initialValue: null });
+
+        effect(() => {
+            const schemas = this.schemas();
+
+            untracked(() => this.selectSchema(schemas[0]));
+        });
     }
 
-    public ngOnInit() {
-        this.initialQuery = this.query;
+    public selectSchema(schema: SchemaDto | undefined) {
+        this.schema.set(schema);
 
-        this.subscriptions.add(
-            this.contentsState.statuses
-                .subscribe(() => {
-                    this.updateModel();
-                }));
-
-        this.schemas = this.schemasState.snapshot.schemas.filter(x => x.type === 'Default' && x.canReadContents);
-
-        if (this.schemaIdentifiers && this.schemaIdentifiers.length > 0) {
-            this.schemas = this.schemas.filter(x => this.schemaIdentifiers!.includes(x.id) || this.schemaIdentifiers!.includes(x.name));
+        if (!schema) {
+            return;
         }
 
-        this.selectSchema(this.schemas[0]);
-    }
+        const fullText = !this.isInitialQueryUsed ? this.query() : undefined;
 
-    public selectSchema(schema: SchemaDto) {
-        this.schema = schema;
+        this.contentsState.schema = schema;
+        this.contentsState.search({ fullText: fullText || undefined });
 
-        if (schema) {
-            this.contentsState.schema = schema;
-            this.contentsState.search({ fullText: this.initialQuery || undefined });
-            this.initialQuery = undefined;
-
-            this.updateModel();
-        }
+        this.isInitialQueryUsed = true;
     }
 
     public reload() {
@@ -155,11 +164,15 @@ export class ContentSelectorComponent implements OnInit {
     }
 
     public isItemSelected(content: ContentDto) {
-        return !!this.selectedItems[content.id];
+        return !!this.selectedItems()[content.id];
     }
 
     public isItemAlreadySelected(content: ContentDto) {
-        return !this.allowDuplicates && this.alreadySelectedIds && this.alreadySelectedIds.indexOf(content.id) >= 0;
+        if (this.allowDuplicates()) {
+            return false;
+        }
+
+        return this.alreadySelectedIdsAll()?.includes(content.id) === true;
     }
 
     public emitClose() {
@@ -171,39 +184,34 @@ export class ContentSelectorComponent implements OnInit {
     }
 
     public emitSelect() {
-        this.contentSelect.emit(Object.values(this.selectedItems));
+        this.contentSelect.emit(Object.values(this.selectedItems()));
     }
 
     public selectAll(isSelected: boolean) {
-        this.selectedItems = {};
+        const selectedItems: Record<string, ContentDto> = {};
 
         if (isSelected) {
             for (const content of this.contentsState.snapshot.contents) {
                 if (!this.isItemAlreadySelected(content)) {
-                    this.selectedItems[content.id] = content;
+                    selectedItems[content.id] = content;
                 }
             }
         }
 
-        this.updateSelectionSummary();
+        this.selectedItems.set(selectedItems);
     }
 
     public selectContent(content: ContentDto) {
-        if (this.selectedItems[content.id]) {
-            delete this.selectedItems[content.id];
-        } else {
-            this.selectedItems[content.id] = content;
-        }
+        this.selectedItems.update(s => {
+            const selectedItems = { ...s };
 
-        this.updateSelectionSummary();
-    }
+            if (selectedItems[content.id]) {
+                delete selectedItems[content.id];
+            } else {
+                selectedItems[content.id] = content;
+            }
 
-    private updateSelectionSummary() {
-        this.selectionCount = Object.keys(this.selectedItems).length;
-        this.selectedAll = this.selectionCount === this.contentsState.snapshot.contents.length;
-    }
-
-    private updateModel() {
-        this.querySource.next(this.schema);
+            return selectedItems;
+        });
     }
 }

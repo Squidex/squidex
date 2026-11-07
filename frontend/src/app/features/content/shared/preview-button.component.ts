@@ -6,18 +6,10 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, StatefulComponent, TranslatePipe } from '@app/shared';
-
-interface State {
-    // The name of the selected preview config.
-    previewNameSelected?: string;
-
-    // All other preview configs.
-    previewNamesMore: ReadonlyArray<string>;
-}
+import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-preview-button',
@@ -31,41 +23,52 @@ interface State {
         TranslatePipe,
     ],
 })
-export class PreviewButtonComponent extends StatefulComponent<State> implements OnChanges {
-    @Input()
-    public confirm?: () => Observable<boolean>;
+export class PreviewButtonComponent {
+    /** Asks the user for confirmation before the preview is opened, for example to save pending changes. */
+    public readonly confirm = input<() => Observable<boolean>>();
 
-    @Input({ required: true })
-    public content!: ContentDto;
+    /** The content to preview. */
+    public readonly content = input.required<ContentDto>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema of the content, with the preview URLs. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public dropdown = new ModalModel();
+    public readonly dropdown = new ModalModel();
+
+    public readonly previewNameSelected = linkedSignal<string | undefined>(() => {
+        const previewUrls = this.schema().previewUrls;
+
+        const selectedName = this.localStore.get(this.configKey());
+        if (!selectedName || !previewUrls[selectedName]) {
+            return Object.keys(previewUrls)[0];
+        }
+
+        return selectedName;
+    });
+
+    public readonly previewNamesMore = computed(() => {
+        const previewNameSelected = this.previewNameSelected();
+        const previewNames = Object.keys(this.schema().previewUrls);
+        if (!previewNameSelected) {
+            return previewNames.sorted();
+        }
+
+        return previewNames.removed(previewNameSelected).sorted();
+    });
 
     constructor(
         private readonly authService: AuthService,
         private readonly localStore: LocalStoreService,
     ) {
-        super({ previewNamesMore: [] });
-    }
-
-    public ngOnChanges() {
-        let selectedName = this.localStore.get(this.configKey());
-
-        if (!selectedName || !this.schema.previewUrls[selectedName]) {
-            selectedName = Object.keys(this.schema.previewUrls)[0];
-        }
-
-        this.selectUrl(selectedName);
     }
 
     public follow(name?: string) {
         if (name) {
             this.selectUrl(name);
 
-            if (this.confirm) {
-                this.confirm().pipe(take(1))
+            const confirm = this.confirm();
+            if (confirm) {
+                confirm().pipe(take(1))
                     .subscribe(confirmed => {
                         if (confirmed) {
                             this.navigateTo(name);
@@ -80,31 +83,19 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     }
 
     private navigateTo(name: string) {
-        const urlVars = { ...this.content, ...this.authService.user || {} };
-        const urlLink = interpolate(this.schema.previewUrls[name], urlVars, 'iv');
+        const urlVars = { ...this.content(), ...this.authService.user || {} };
+        const urlLink = interpolate(this.schema().previewUrls[name], urlVars, 'iv');
 
         window.open(urlLink, '_blank');
     }
 
     private selectUrl(selectedName: string) {
-        this.next(s => {
-            if (selectedName === s.previewNameSelected) {
-                return s;
-            }
+        this.previewNameSelected.set(selectedName);
 
-            const state = { ...s };
-
-            const keys = Object.keys(this.schema.previewUrls);
-            state.previewNameSelected = selectedName;
-            state.previewNamesMore = keys.removed(selectedName).sorted();
-
-            this.localStore.set(this.configKey(), selectedName);
-
-            return state;
-        });
+        this.localStore.set(this.configKey(), selectedName);
     }
 
     private configKey() {
-        return Settings.Local.SCHEMA_PREVIEW(this.schema.id);
+        return Settings.Local.SCHEMA_PREVIEW(this.schema().id);
     }
 }

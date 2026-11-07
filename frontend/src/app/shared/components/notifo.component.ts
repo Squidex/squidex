@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject, Input, OnDestroy, Renderer2, ViewChild } from '@angular/core';
-import { ResourceLoaderService, TypedSimpleChanges, UIOptions } from '@app/framework';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, Renderer2, viewChild } from '@angular/core';
+import { ResourceLoaderService, UIOptions } from '@app/framework';
 import { AuthService } from '@app/shared/internal';
 import { TourHintDirective } from './tour-hint.directive';
 
@@ -19,97 +19,112 @@ import { TourHintDirective } from './tour-hint.directive';
         TourHintDirective,
     ],
 })
-export class NotifoComponent implements AfterViewInit, OnDestroy {
+export class NotifoComponent {
     private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;
     private readonly notifoApiKey: string | undefined;
+    private readonly element = viewChild<ElementRef<Element>>('element');
+    private topicShown = '';
+    private isShown = false;
 
-    @Input()
-    public topic = '';
+    /** The topic to subscribe to. Shows all notifications when not defined. */
+    public readonly topic = input('');
 
-    @Input()
-    public position?: 'bottom-left' | 'bottom-right' = 'bottom-left';
+    /** The position of the notifications popup. */
+    public readonly position = input<'bottom-left' | 'bottom-right'>('bottom-left');
 
-    @ViewChild('element', { static: false })
-    public element!: ElementRef<Element>;
-
-    public get isConfigured() {
-        return !!this.notifoApiKey && !!this.notifoApiUrl;
-    }
-
-    public get showOnboarding() {
-        return !!this.notifoApiUrl && !!this.topic;
-    }
-
-    constructor(resourceLoader: ResourceLoaderService, authService: AuthService,
+    constructor(resourceLoader: ResourceLoaderService, authService: AuthService, destroyRef: DestroyRef,
         private readonly renderer: Renderer2,
     ) {
         this.notifoApiKey = authService.user?.notifoToken;
 
-        if (this.isConfigured) {
-            if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {
-                resourceLoader.loadScript('https://localhost:3002/notifo-sdk.js');
-            } else {
-                resourceLoader.loadScript(`${this.notifoApiUrl}/build/notifo-sdk.js`);
-            }
+        if (!this.notifoApiKey || !this.notifoApiUrl) {
+            return;
         }
-    }
 
-    public ngAfterViewInit() {
-        if (this.isConfigured) {
-            let notifo = (window as any)['notifo'];
+        if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {
+            resourceLoader.loadScript('https://localhost:3002/notifo-sdk.js');
+        } else {
+            resourceLoader.loadScript(`${this.notifoApiUrl}/build/notifo-sdk.js`);
+        }
 
+        afterNextRender(() => {
+            this.show();
+        });
+
+        effect(() => {
+            const topic = this.topic();
+            if (!this.isShown || topic === this.topicShown) {
+                return;
+            }
+
+            const element = this.element()?.nativeElement;
+            if (!element) {
+                return;
+            }
+
+            const notifo = getNotifo();
             if (!notifo) {
-                notifo = [];
-
-                const options: any = {
-                    apiUrl: this.notifoApiUrl,
-                    userKey: null,
-                    userToken: this.notifoApiKey,
-                    linkTarget: '_blank',
-                };
-
-                if (this.notifoApiUrl.includes('localhost:5002')) {
-                    options.styleUrl = 'https://localhost:3002/notifo-sdk.css';
-                }
-
-                notifo.push(['init', options]);
-                notifo.push(['subscribe']);
-
-                (window as any)['notifo'] = notifo;
+                return;
             }
 
-            const element = this.element?.nativeElement;
-
-            if (!this.topic) {
-                notifo.push(['show-notifications', element, { position: this.position, style: 'notifo' }]);
-            } else {
-                notifo.push(['show-topic', element, this.topic, { position: this.position, style: 'bell' }]);
-            }
-
-            if (element) {
-                this.renderer.addClass(element, 'notifo-container');
-            }
-        }
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        const notifo = (window as any)['notifo'];
-
-        const element = this.element?.nativeElement;
-
-        if (notifo && changes.topic && element) {
             notifo.push(['hide-topic', element]);
-            notifo.push(['show-topic', element, this.topic, { style: 'bell' }]);
-        }
+            notifo.push(['show-topic', element, topic, { style: 'bell' }]);
+
+            this.topicShown = topic;
+        });
+
+        destroyRef.onDestroy(() => {
+            const element = this.element()?.nativeElement;
+            if (!element || !this.topicShown) {
+                return;
+            }
+
+            getNotifo()?.push(['hide-topic', element]);
+        });
     }
 
-    public ngOnDestroy() {
-        const notifo = (window as any)['notifo'];
+    private show() {
+        let notifo = getNotifo();
 
-        const element = this.element?.nativeElement;
+        if (!notifo) {
+            notifo = [];
 
-        if (notifo && this.topic && element) {
-            notifo.push(['hide-topic', element]);
+            const options: any = {
+                apiUrl: this.notifoApiUrl,
+                userKey: null,
+                userToken: this.notifoApiKey,
+                linkTarget: '_blank',
+            };
+
+            if (this.notifoApiUrl.includes('localhost:5002')) {
+                options.styleUrl = 'https://localhost:3002/notifo-sdk.css';
+            }
+
+            notifo.push(['init', options]);
+            notifo.push(['subscribe']);
+
+            (window as any)['notifo'] = notifo;
+        }
+
+        const element = this.element()?.nativeElement;
+        const topic = this.topic();
+        const position = this.position();
+
+        if (!topic) {
+            notifo.push(['show-notifications', element, { position, style: 'notifo' }]);
+        } else {
+            notifo.push(['show-topic', element, topic, { position, style: 'bell' }]);
+        }
+
+        this.topicShown = topic;
+        this.isShown = true;
+
+        if (element) {
+            this.renderer.addClass(element, 'notifo-container');
         }
     }
+}
+
+function getNotifo(): any[] | undefined {
+    return (window as any)['notifo'];
 }

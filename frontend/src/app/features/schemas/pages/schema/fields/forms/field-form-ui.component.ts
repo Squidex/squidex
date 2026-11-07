@@ -6,7 +6,7 @@
  */
 
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayUIComponent } from '../types/array-ui.component';
@@ -28,6 +28,7 @@ import { UserInfoUIComponent } from '../types/user-info-ui.component';
     selector: 'sqx-field-form-ui',
     styleUrls: ['./field-form-ui.component.scss'],
     templateUrl: './field-form-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ArrayUIComponent,
         AssetsUIComponent,
@@ -49,12 +50,12 @@ import { UserInfoUIComponent } from '../types/user-info-ui.component';
     ],
 })
 export class FieldFormUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema the field belongs to. */
+    public readonly schema = input.required<SchemaDto>();
 }

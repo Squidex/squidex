@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ContributorsState, LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, RolesState, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -17,6 +17,7 @@ import { ContributorComponent } from './contributor.component';
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
     templateUrl: './contributors-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State,
     ],
@@ -40,15 +41,12 @@ import { ContributorComponent } from './contributor.component';
         TranslatePipe,
     ],
 })
-export class ContributorsPageComponent implements OnInit {
+export class ContributorsPageComponent {
     constructor(
         public readonly contributorsRoute: Router2State,
         public readonly contributorsState: ContributorsState,
         public readonly rolesState: RolesState,
     ) {
-    }
-
-    public ngOnInit() {
         this.rolesState.load();
 
         const initial =

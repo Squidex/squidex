@@ -1,11 +1,12 @@
-<div class="table-items-row table-items-row-expandable field" [class.plain]="plain" sqxTourStep="schemaField">
+@let field = this.field();
+<div class="table-items-row table-items-row-expandable field" [class.plain]="plain()" sqxTourStep="schemaField">
     <div class="table-items-row-summary">
         <div class="row align-items-center">
             <div class="col col-auto"><ng-content></ng-content></div>
 
             <div class="col">
                 <span class="field-name">
-                    @if (!plain) {
+                    @if (!plain()) {
                         <i class="field-icon icon-type-{{ field.properties.fieldType }}" [title]="field.properties.fieldType"></i>
                     }
 
@@ -21,7 +22,7 @@
                 </span>
             </div>
 
-            @if (!plain) {
+            @if (!plain()) {
                 <div class="col-4 flex-nowrap">
                     <div class="float-end">
                         @if (field.isLocked) {
@@ -41,7 +42,7 @@
 
             <div class="col col-options flex-nowrap">
                 <div class="float-end">
-                    <button class="btn btn-outline-secondary btn-expand" [class.expanded]="isEditing" (click)="toggleEditing()" type="button">
+                    <button class="btn btn-outline-secondary btn-expand" [class.expanded]="isEditing()" (click)="toggleEditing()" type="button">
                         <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                     </button>
                     <button
@@ -103,18 +104,18 @@
         </div>
     </div>
 
-    @if (isEditing) {
+    @if (isEditing()) {
         <div class="table-items-row-details">
-            <form [formGroup]="editForm.form" (ngSubmit)="save()">
+            <form [formGroup]="editForm().form" (ngSubmit)="save()">
                 <sqx-field-form
                     (dialogClose)="toggleEditing()"
                     [field]="field"
-                    [fieldForm]="editForm.form"
-                    [isEditable]="isEditable"
-                    [isLocalizable]="isLocalizable"
-                    [languages]="languages"
-                    [schema]="schema"
-                    [settings]="settings"
+                    [fieldForm]="editForm().form"
+                    [isEditable]="isEditable()"
+                    [isLocalizable]="isLocalizable()"
+                    [languages]="languages()"
+                    [schema]="schema()"
+                    [settings]="settings()"
                     showButtons="true" />
             </form>
         </div>
@@ -127,13 +128,13 @@
                 <sqx-sortable-field-list
                     [fields]="nested"
                     [fieldsEmpty]="nested.length === 0"
-                    [languages]="languages"
+                    [languages]="languages()"
                     [parent]="$any(field)"
-                    [schema]="schema"
-                    [settings]="settings"
-                    [sortable]="isEditable === true"
+                    [schema]="schema()"
+                    [settings]="settings()"
+                    [sortable]="isEditable() === true"
                     (sorted)="sortFields($event)" />
-                @if (isEditable) {
+                @if (isEditable()) {
                     <div class="nested-field nested-field-add">
                         <span class="nested-field-line-h"></span>
                         <button class="btn btn-success btn-sm" (click)="fieldWizard.show()" type="button">
@@ -141,7 +142,7 @@
                         </button>
                     </div>
                 }
-                <sqx-field-wizard (dialogClose)="fieldWizard.hide()" [parent]="$any(field)" [schema]="schema" [settings]="settings" *sqxModal="fieldWizard" />
+                <sqx-field-wizard (dialogClose)="fieldWizard.hide()" [parent]="$any(field)" [schema]="schema()" [settings]="settings()" *sqxModal="fieldWizard" />
             }
         </div>
     }

@@ -1,4 +1,5 @@
-@if (schema && schema.fields.length === 0) {
+@let schema = this.schema();
+@if (schema.fields.length === 0) {
     <div class="table-items-row table-items-row-summary table-items-row-empty">
         {{ "schemas.field.empty" | sqxTranslate }}
         @if (schema.canAddField) {
@@ -13,7 +14,7 @@
     <sqx-sortable-field-list
         [fields]="schema.fields"
         [fieldsEmpty]="schema.fields.length === 0"
-        [languages]="languages"
+        [languages]="languages()"
         [schema]="schema"
         [settings]="settings"
         [sortable]="schema.canOrderFields"

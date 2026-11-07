@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs';
 import { ApiUrlConfig, AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
@@ -15,6 +15,7 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, CreateSchemaForm, FocusOn
     selector: 'sqx-schema-form',
     styleUrls: ['./schema-form.component.scss'],
     templateUrl: './schema-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         CodeEditorComponent,
@@ -32,27 +33,31 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, CreateSchemaForm, FocusOn
         TranslatePipe,
     ],
 })
-export class SchemaFormComponent implements OnInit {
+export class SchemaFormComponent {
     public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
-    @Output()
-    public create = new EventEmitter<SchemaDto>();
+    /** Emits the created schema. */
+    public readonly create = output<SchemaDto>();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    @Input()
-    public source: any;
+    /** The exported schema to clone. Creates an empty schema when not set. */
+    public readonly source = input<any>();
 
-    public createForm = new CreateSchemaForm();
-    public generateForm = new GenerateSchemaForm();
-    public generateLog: string = '';
+    public readonly sourceActual = linkedSignal(() => this.source());
 
-    public selectedTab = 0;
+    public readonly createForm = new CreateSchemaForm();
+    public readonly generateForm = new GenerateSchemaForm();
+    public readonly generateLog = signal('');
 
-    public get actualForm() {
-        return this.selectedTab === 2 ? this.generateForm : this.createForm;
-    }
+    public readonly selectedTab = linkedSignal<number>(() => {
+        return this.source() ? 1 : 0;
+    });
+
+    public readonly actualForm = computed(() => {
+        return this.selectedTab() === 2 ? this.generateForm : this.createForm;
+    });
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
@@ -60,19 +65,14 @@ export class SchemaFormComponent implements OnInit {
         public readonly schemasState: SchemasState,
         private readonly schemasService: SchemasService,
     ) {
-    }
-
-    public ngOnInit() {
-        this.createForm.load({ type: 'Default', ...this.source, name: '' });
-
-        if (this.source) {
-            this.selectedTab = 1;
-        }
+        effect(() => {
+            this.createForm.load({ type: 'Default', ...this.source(), name: '' });
+        });
     }
 
     public selectTab(tab: number) {
-        this.selectedTab = tab;
-        this.source = null;
+        this.selectedTab.set(tab);
+        this.sourceActual.set(null);
 
         const { type, name } = this.createForm.form.value;
         this.createForm.load({ type, name });
@@ -87,7 +87,7 @@ export class SchemaFormComponent implements OnInit {
     }
 
     public createSchema() {
-        if (this.selectedTab === 2) {
+        if (this.selectedTab() === 2) {
             this.generateCore();
         } else {
             this.createCore();
@@ -100,13 +100,13 @@ export class SchemaFormComponent implements OnInit {
             return;
         }
 
-        this.generateLog = '';
+        this.generateLog.set('');
 
         const dto = new GenerateSchemaDto({ ...value, numberOfContentItems: 20, execute: false });
         this.schemasService.generateSchema(this.appsState.appName, dto)
             .subscribe({
                 next: dto => {
-                    this.generateLog = dto.log.join('\n');
+                    this.generateLog.set(dto.log.join('\n'));
                     this.generateForm.submitCompleted({ noReset: true });
                 },
                 error: error => {
@@ -117,7 +117,7 @@ export class SchemaFormComponent implements OnInit {
 
     private generateCore() {
         const value = this.generateForm.submit();
-        if (!value || !this.generateLog) {
+        if (!value || !this.generateLog()) {
             return;
         }
 

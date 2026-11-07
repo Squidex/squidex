@@ -6,9 +6,8 @@
  */
 
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, CommentSelected, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, Subscriptions, TranslateDto, TranslatePipe, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
+import { AppLanguageDto, AppsState, changed$, CommentSelected, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
@@ -17,6 +16,7 @@ import { FieldLanguagesComponent } from './field-languages.component';
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         FieldCopyButtonComponent,
@@ -28,150 +28,166 @@ import { FieldLanguagesComponent } from './field-languages.component';
         TranslatePipe,
     ],
     providers: [MenuItemRegistry],
+    host: {
+        '[class]': 'hostClass()',
+    },
 })
 export class ContentFieldComponent {
-    private readonly subscriptions = new Subscriptions();
+    private readonly appsState = inject(AppsState);
+    private readonly localStore = inject(LocalStoreService);
+    private readonly translations = inject(TranslationsService);
 
-    @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
+    /** Emits when the user selects another language. */
+    public readonly languageChange = output<AppLanguageDto>();
 
-    @Input({ transform: booleanAttribute })
-    public isCompact?: boolean | null;
+    /** Renders the field with full width, even if it is configured as half width field. */
+    public readonly isCompact = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public form!: EditContentForm;
+    /** The content form the field belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input()
-    public formCompare?: EditContentForm | null;
+    /** The content form of the other version, when comparing two versions. */
+    public readonly formCompare = input<EditContentForm | null>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** The nesting level of the field, 0 for root fields. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public formModel!: FieldForm;
+    /** The form model of the field to edit. */
+    public readonly formModel = input.required<FieldForm>();
 
-    @Input()
-    public formModelCompare?: FieldForm;
+    /** The form model of the field in the other version, when comparing two versions. */
+    public readonly formModelCompare = input<FieldForm>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema of the content. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The selected language. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public showAllControls = false;
-
-    public isDifferent?: Observable<boolean>;
-    public isInvalid?: Observable<boolean>;
-    public isCollapsed = false;
-    public isDisabled?: Observable<boolean>;
-    public isSelected = new BehaviorSubject<boolean>(false);
+    public readonly commentsState = inject(CommentsState, { optional: true });
 
     public readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
     public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
-    @HostBinding('class')
-    public get class() {
-        return this.isHalfWidth ? 'col-6 half-field' : 'col-12';
-    }
+    public readonly showAllControls = linkedSignal(() => {
+        return this.localStore.getBoolean(this.showAllControlsKey());
+    });
 
-    public get isHalfWidth() {
-        return this.formModel.field.properties.isHalfWidth && !this.isCompact && !this.formCompare;
-    }
+    public readonly isCollapsed = signal(false);
+    public readonly isSelected = signal(false);
 
-    public get isLocalizable() {
-        return this.formModel.field.isLocalizable;
-    }
+    public readonly isInvalid = computed(() => {
+        return invalid$(this.formModel().form);
+    });
 
-    public get isTranslatable() {
-        return this.formModel.field.properties.fieldType === 'String' && this.hasTranslator && this.isLocalizable && this.languages.length > 1;
-    }
-    constructor(
-        @Optional() public readonly commentsState: CommentsState,
-        private readonly appsState: AppsState,
-        private readonly localStore: LocalStoreService,
-        private readonly messageBus: MessageBus,
-        private readonly translations: TranslationsService,
-    ) {
-    }
+    public readonly isDisabled = computed(() => {
+        return disabled$(this.formModel().form);
+    });
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.messageBus.of(CommentSelected)
-                .subscribe(message => {
-                    const isSelected = message.editorId.indexOf(this.formModel.path) === 0;
-
-                    if (isSelected !== this.isSelected.value) {
-                        this.isSelected.next(isSelected);
-                    }
-                }));
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        this.showAllControls = this.localStore.getBoolean(this.showAllControlsKey());
-
-        if (changes.formModel && this.formModel) {
-            this.isInvalid = invalid$(this.formModel.form);
-            this.isDisabled = disabled$(this.formModel.form);
+    public readonly isDifferent = computed(() => {
+        const formModelCompare = this.formModelCompare();
+        if (!formModelCompare) {
+            return undefined;
         }
 
-        if ((changes.formModel || changes.formModelCompare) && this.formModelCompare) {
-            this.isDifferent = changed$(this.formModel.form, this.formModelCompare.form);
-        }
+        return changed$(this.formModel().form, formModelCompare.form);
+    });
+
+    public readonly isHalfWidth = computed(() => {
+        return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
+    });
+
+    public readonly isLocalizable = computed(() => {
+        return this.formModel().field.isLocalizable;
+    });
+
+    public readonly isTranslatable = computed(() => {
+        return this.formModel().field.properties.fieldType === 'String' && this.hasTranslator && this.isLocalizable() && this.languages().length > 1;
+    });
+
+    public readonly control = computed(() => {
+        return this.formModel().get(this.language().iso2Code);
+    });
+
+    public readonly controlCompare = computed(() => {
+        return this.formModelCompare()?.get(this.language().iso2Code);
+    });
+
+    public readonly hostClass = computed(() => {
+        return this.isHalfWidth() ? 'col-6 half-field' : 'col-12';
+    });
+
+    constructor() {
+        const messageBus = inject(MessageBus);
+
+        effect(onCleanup => {
+            const subscription =
+                messageBus.of(CommentSelected)
+                    .subscribe(message => {
+                        this.isSelected.set(message.editorId.indexOf(this.formModel().path) === 0);
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public changeShowAllControls(showAllControls: boolean) {
-        this.showAllControls = showAllControls;
+        this.showAllControls.set(showAllControls);
 
-        this.localStore.setBoolean(this.showAllControlsKey(), this.showAllControls);
+        this.localStore.setBoolean(this.showAllControlsKey(), showAllControls);
     }
 
     public copy() {
-        if (this.formModel && this.formModelCompare) {
-            if (this.showAllControls) {
-                this.formModel.setValue(this.formModelCompare.form.value);
-            } else {
-                const target = this.formModel.get(this.language.iso2Code);
+        const formModel = this.formModel();
+        const formModelCompare = this.formModelCompare();
+        if (!formModelCompare) {
+            return;
+        }
 
-                if (target) {
-                    target.setValue(this.formModelCompare.get(this.language.iso2Code)?.form.value);
-                }
-            }
+        if (this.showAllControls()) {
+            formModel.setValue(formModelCompare.form.value);
+            return;
+        }
+
+        const languageCode = this.language().iso2Code;
+
+        const target = formModel.get(languageCode);
+        if (target) {
+            target.setValue(formModelCompare.get(languageCode)?.form.value);
         }
     }
 
     public translate() {
-        const master = this.languages.find(x => x.isMaster);
+        const languages = this.languages();
 
+        const master = languages.find(x => x.isMaster);
         if (!master) {
             return;
         }
 
         const masterCode = master.iso2Code;
-        const masterValue = this.formModel.get(masterCode)!.form.value;
-
+        const masterValue = this.formModel().get(masterCode)!.form.value;
         if (!masterValue) {
             return;
         }
 
-        if (this.showAllControls) {
-            for (const language of this.languages.filter(x => !x.isMaster)) {
+        if (this.showAllControls()) {
+            for (const language of languages.filter(x => !x.isMaster)) {
                 this.translateValue(masterValue, masterCode, language.iso2Code);
             }
         } else {
-            this.translateValue(masterValue, masterCode, this.language.iso2Code);
+            this.translateValue(masterValue, masterCode, this.language().iso2Code);
         }
     }
 
     private translateValue(text: string, sourceLanguage: string, targetLanguage: string) {
-        const control = this.formModel.get(targetLanguage);
-
+        const control = this.formModel().get(targetLanguage);
         if (!control) {
             return;
         }
@@ -198,19 +214,11 @@ export class ContentFieldComponent {
         return `(${language.iso2Code})`;
     }
 
-    public getControl() {
-        return this.formModel.get(this.language.iso2Code);
-    }
-
-    public getControlCompare() {
-        return this.formModelCompare?.get(this.language.iso2Code);
-    }
-
     private showAllControlsKey() {
-        return Settings.Local.FIELD_ALL(this.schema?.id, this.formModel.field.fieldId);
+        return Settings.Local.FIELD_ALL(this.schema()?.id, this.formModel().field.fieldId);
     }
 
     public toggle() {
-        this.isCollapsed = !this.isCollapsed;
+        this.isCollapsed.update(x => !x);
     }
 }

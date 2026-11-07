@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { EditableTitleComponent, StopDragDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
 import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
@@ -33,24 +33,35 @@ const ITEM_HEIGHT = 2.5;
     ],
 })
 export class SchemaCategoryComponent {
-    @Output()
-    public remove = new EventEmitter<string>();
+    /** Emits the name of the category that should be removed. */
+    public readonly remove = output<string>();
 
-    @Input({ required: true })
-    public schemaCategory!: SchemaCategory;
+    /** The category with the schemas and the child categories. */
+    public readonly schemaCategory = input.required<SchemaCategory>();
 
-    @Input()
-    public schemaTarget?: 'Schema' | 'Contents';
+    /** Defines whether the links point to the schema editor or to the contents. */
+    public readonly schemaTarget = input<'Schema' | 'Contents'>();
 
-    public isCollapsed = false;
+    public readonly isCollapsed = linkedSignal(() => {
+        const schemaCategory = this.schemaCategory();
+        if (schemaCategory.countSchemasInSubtreeFiltered < schemaCategory.countSchemasInSubtree) {
+            return false;
+        }
 
-    public get forContent() {
-        return this.schemaTarget === 'Contents';
-    }
+        return this.localStore.getBoolean(getCollapsedKey(schemaCategory));
+    });
 
-    public get schemas() {
-        return this.schemaCategory.schemasFiltered;
-    }
+    public readonly forContent = computed(() => {
+        return this.schemaTarget() === 'Contents';
+    });
+
+    public readonly schemas = computed(() => {
+        return this.schemaCategory().schemasFiltered;
+    });
+
+    public readonly containerHeight = computed(() => {
+        return `${ITEM_HEIGHT * this.schemas().length}rem`;
+    });
 
     constructor(
         private readonly localStore: LocalStoreService,
@@ -59,21 +70,14 @@ export class SchemaCategoryComponent {
     }
 
     public toggle() {
-        this.isCollapsed = !this.isCollapsed;
+        const isCollapsed = !this.isCollapsed();
 
-        this.localStore.setBoolean(this.isCollapsedKey(), this.isCollapsed);
-    }
-
-    public ngOnChanges() {
-        if (this.schemaCategory.countSchemasInSubtreeFiltered < this.schemaCategory.countSchemasInSubtree) {
-            this.isCollapsed = false;
-        } else {
-            this.isCollapsed = this.localStore.getBoolean(this.isCollapsedKey());
-        }
+        this.isCollapsed.set(isCollapsed);
+        this.localStore.setBoolean(getCollapsedKey(this.schemaCategory()), isCollapsed);
     }
 
     public schemaRoute(schema: SchemaDto) {
-        if (schema.type === 'Singleton' && this.forContent) {
+        if (schema.type === 'Singleton' && this.forContent()) {
             return [schema.name, schema.id, 'history'];
         } else {
             return [schema.name];
@@ -81,15 +85,20 @@ export class SchemaCategoryComponent {
     }
 
     public changeName(name: string) {
-        if (name !== this.schemaCategory.displayName) {
-            this.schemasState.renameCategory(this.schemaCategory.displayName, name);
+        const displayName = this.schemaCategory().displayName;
+        if (name === displayName) {
+            return;
         }
+
+        this.schemasState.renameCategory(displayName, name);
     }
 
     public changeCategory(drag: CdkDragDrop<any>) {
-        if (drag.previousContainer !== drag.container) {
-            this.schemasState.changeCategory(drag.item.data, this.schemaCategory.name);
+        if (drag.previousContainer === drag.container) {
+            return;
         }
+
+        this.schemasState.changeCategory(drag.item.data, this.schemaCategory().name);
     }
 
     public dragStarted(event: CdkDragStart) {
@@ -102,16 +111,8 @@ export class SchemaCategoryComponent {
             }
         });
     }
+}
 
-    public getItemHeight() {
-        return `${ITEM_HEIGHT}rem`;
-    }
-
-    public getContainerHeight() {
-        return `${ITEM_HEIGHT * this.schemas.length}rem`;
-    }
-
-    private isCollapsedKey(): string {
-        return `squidex.schema.category.${this.schemaCategory.name}.collapsed`;
-    }
+function getCollapsedKey(schemaCategory: SchemaCategory) {
+    return `squidex.schema.category.${schemaCategory.name}.collapsed`;
 }

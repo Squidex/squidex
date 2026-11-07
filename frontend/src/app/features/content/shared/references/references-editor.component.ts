@@ -7,23 +7,15 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, HostBinding, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, sorted, StatefulControlComponent, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, SignalControlComponent, sorted, TranslatePipe, Types } from '@app/shared';
 import { ContentCreatorComponent } from './content-creator.component';
 import { ReferenceItemComponent } from './reference-item.component';
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true,
 };
-
-interface State {
-    // The content items to show.
-    contentItems: ReadonlyArray<ContentDto>;
-
-    // True, when width less than 600 pixels.
-    isCompact?: boolean;
-}
 
 @Component({
     selector: 'sqx-references-editor',
@@ -45,76 +37,79 @@ interface State {
         TranslatePipe,
         forwardRef(() => ContentCreatorComponent),
     ],
+    host: {
+        '[class.expanded]': 'isExpanded()',
+    },
 })
-export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
-    @Input({ transform: booleanAttribute })
-    @HostBinding('class.expanded')
-    public isExpanded = false;
+export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyArray<string>> {
+    /** Renders the references in fullscreen mode. */
+    public readonly isExpanded = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public schemaIds!: ReadonlyArray<string>;
+    /** The IDs of the schemas to select or create contents from. */
+    public readonly schemaIds = input.required<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public query?: string;
+    /** The initial full text query of the content selector. */
+    public readonly query = input.required<string | undefined>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language to render the references in. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** Additional context information that is passed to custom editors when creating contents. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ transform: booleanAttribute })
-    public allowDuplicates?: boolean | null = true;
+    /** Allows to select the same content multiple times. */
+    public readonly allowDuplicates = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly contentItems = signal<ReadonlyArray<ContentDto>>([]);
+    public readonly contentCloned = signal<ContentDto | undefined>(undefined);
 
-    public clonedContent?: ContentDto;
+    public readonly isCompact = signal(false);
 
-    public contentCreatorDialog = new DialogModel();
-    public contentSelectorDialog = new DialogModel();
+    public readonly contentCreatorDialog = new DialogModel();
+    public readonly contentSelectorDialog = new DialogModel();
 
     constructor(
         private readonly contentsResolver: ResolveContents,
     ) {
-        super({ contentItems: [] });
+        super();
     }
 
     public writeValue(obj: any) {
-        if (Types.isArrayOfString(obj)) {
-            if (!Types.equals(obj, this.snapshot.contentItems.map(x => x.id))) {
-                const contentIds: string[] = obj;
-
-                this.contentsResolver.resolveMany(contentIds)
-                    .subscribe({
-                        next: ({ items }) => {
-                            this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
-
-                            if (this.snapshot.contentItems.length !== contentIds.length) {
-                                this.updateValue();
-                            }
-                        },
-                        error: () => {
-                            this.setContentItems([]);
-                        },
-                    });
-            }
-        } else {
+        if (!Types.isArrayOfString(obj)) {
             this.setContentItems([]);
+            return;
         }
+
+        if (Types.equals(obj, this.contentItems().map(x => x.id))) {
+            return;
+        }
+
+        const contentIds: string[] = obj;
+
+        this.contentsResolver.resolveMany(contentIds)
+            .subscribe({
+                next: ({ items }) => {
+                    this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
+
+                    if (this.contentItems().length !== contentIds.length) {
+                        this.updateValue();
+                    }
+                },
+                error: () => {
+                    this.setContentItems([]);
+                },
+            });
     }
 
     public setContentItems(contentItems: ReadonlyArray<ContentDto>) {
-        this.next({ contentItems });
+        this.contentItems.set(contentItems);
     }
 
     public select(contents: ReadonlyArray<ContentDto>) {
-        this.setContentItems([...this.snapshot.contentItems, ...contents]);
+        this.setContentItems([...this.contentItems(), ...contents]);
 
         if (contents.length > 0) {
             this.updateValue();
@@ -125,29 +120,33 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     }
 
     public remove(content: ContentDto) {
-        if (content && !this.snapshot.isDisabled) {
-            this.setContentItems(this.snapshot.contentItems.removedBy('id', content));
-
-            this.updateValue();
+        if (!content || this.isDisabled()) {
+            return;
         }
+
+        this.setContentItems(this.contentItems().removedBy('id', content));
+
+        this.updateValue();
     }
 
     public sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
-        if (event && !this.snapshot.isDisabled) {
-            this.setContentItems(sorted(event));
-
-            this.updateValue();
+        if (!event || this.isDisabled()) {
+            return;
         }
+
+        this.setContentItems(sorted(event));
+
+        this.updateValue();
     }
 
     public createContent(clone?: ContentDto) {
-        this.clonedContent = clone;
+        this.contentCloned.set(clone);
 
         this.contentCreatorDialog.show();
     }
 
     private updateValue() {
-        const ids = this.snapshot.contentItems.map(x => x.id);
+        const ids = this.contentItems().map(x => x.id);
 
         if (ids.length === 0) {
             this.callChange(null);
@@ -159,6 +158,6 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     }
 
     public setCompact(isCompact: boolean) {
-        this.next({ isCompact });
+        this.isCompact.set(isCompact);
     }
 }

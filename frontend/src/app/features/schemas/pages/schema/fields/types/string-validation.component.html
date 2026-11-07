@@ -1,11 +1,11 @@
-<div [formGroup]="fieldForm">
-    @if (showUnique) {
-        <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field.fieldId">
+<div [formGroup]="fieldForm()">
+    @if (showUnique()) {
+        <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field().fieldId">
             <input class="form-check-input" [id]="isUniqueRow.fieldName()" formControlName="isUnique" type="checkbox" />
         </sqx-form-row>
     }
 
-    <sqx-form-row for="minLength" hideError label="schemas.fieldTypes.string.length" [prefix]="field.fieldId">
+    <sqx-form-row for="minLength" hideError label="schemas.fieldTypes.string.length" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input
@@ -27,7 +27,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row #patternRow for="pattern" [hint]="patternName" label="common.pattern" [prefix]="field.fieldId">
+    <sqx-form-row #patternRow for="pattern" [hint]="patternName()" label="common.pattern" [prefix]="field().fieldId">
         <input
             class="form-control"
             [id]="patternRow.fieldName()"
@@ -38,11 +38,11 @@
             (focus)="patternsModal.show()"
             formControlName="pattern"
             placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" />
-        @if (settings.patterns.length > 0 && (showPatternSuggestions | async)) {
+        @if (settings().patterns.length > 0 && showPatternSuggestions()) {
             <sqx-dropdown-menu class="control-dropdown" position="bottom-start" scrollY="true" [sqxAnchoredTo]="inputPattern" *sqxModal="patternsModal">
                 <h4>{{ "schemas.fieldTypes.string.suggestions" | sqxTranslate }}</h4>
 
-                @for (pattern of settings.patterns; track pattern) {
+                @for (pattern of settings().patterns; track pattern) {
                     <div class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
                         <div class="truncate">{{ pattern.name }}</div>
 
@@ -53,15 +53,15 @@
         }
     </sqx-form-row>
 
-    @if (showPatternMessage | async) {
-        <sqx-form-row #patternMessageRow for="patternMessage" label="schemas.fieldTypes.string.patternMessage" [prefix]="field.fieldId">
+    @if (showPatternMessage()) {
+        <sqx-form-row #patternMessageRow for="patternMessage" label="schemas.fieldTypes.string.patternMessage" [prefix]="field().fieldId">
             <input class="form-control" [id]="patternMessageRow.fieldName()" formControlName="patternMessage" />
         </sqx-form-row>
     }
 
-    <sqx-form-row check for="none" hideError hint="schemas.fieldTypes.string.wordHint" [prefix]="field.fieldId" />
+    <sqx-form-row check for="none" hideError hint="schemas.fieldTypes.string.wordHint" [prefix]="field().fieldId" />
 
-    <sqx-form-row for="contentType" label="schemas.fieldTypes.string.contentType" [prefix]="field.fieldId">
+    <sqx-form-row for="contentType" label="schemas.fieldTypes.string.contentType" [prefix]="field().fieldId">
         <select class="form-select" formControlName="contentType">
             @for (contentType of contentTypes; track contentType) {
                 <option [ngValue]="contentType">{{ contentType }}</option>
@@ -69,7 +69,7 @@
         </select>
     </sqx-form-row>
 
-    <sqx-form-row for="minCharacters" hideError label="schemas.fieldTypes.string.characters" [prefix]="field.fieldId">
+    <sqx-form-row for="minCharacters" hideError label="schemas.fieldTypes.string.characters" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input
@@ -91,7 +91,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="minWords" hideError label="schemas.fieldTypes.string.words" [prefix]="field.fieldId">
+    <sqx-form-row for="minWords" hideError label="schemas.fieldTypes.string.words" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input class="form-control" formControlName="minWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}" type="number" />
@@ -105,13 +105,13 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
         <input class="form-control" [id]="defaultValueRow.fieldName()" formControlName="defaultValue" />
     </sqx-form-row>
 
-    @if (isLocalizable) {
-        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages" />
+    @if (isLocalizable()) {
+        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field().fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages()" />
         </sqx-form-row>
     }
 </div>

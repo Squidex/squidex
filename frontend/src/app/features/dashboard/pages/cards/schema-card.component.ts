@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppDto, TranslatePipe } from '@app/shared';
 
@@ -21,6 +21,6 @@ import { AppDto, TranslatePipe } from '@app/shared';
     ],
 })
 export class SchemaCardComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    /** The app of the dashboard. */
+    public readonly app = input.required<AppDto>();
 }

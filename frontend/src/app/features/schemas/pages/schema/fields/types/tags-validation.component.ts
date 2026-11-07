@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, TagEditorComponent, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
@@ -14,6 +14,7 @@ import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, Ta
     selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormRowComponent,
         FormsModule,
@@ -24,18 +25,18 @@ import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, Ta
     ],
 })
 export class TagsValidationComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: TagsFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<TagsFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app, used to edit localized default values. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isLocalizable!: boolean;
+    /** Shows the localized default values, if the field is localizable. */
+    public readonly isLocalizable = input(false, { transform: booleanAttribute });
 }

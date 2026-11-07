@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, UserInfoFieldPropertiesDto } from '@app/shared';
 
@@ -13,14 +13,15 @@ import { FieldDto, UserInfoFieldPropertiesDto } from '@app/shared';
     selector: 'sqx-user-info-ui',
     styleUrls: ['user-info-ui.component.scss'],
     templateUrl: 'user-info-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserInfoUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: UserInfoFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<UserInfoFieldPropertiesDto>();
 }

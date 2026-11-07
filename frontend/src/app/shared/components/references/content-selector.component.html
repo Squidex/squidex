@@ -1,12 +1,16 @@
+@let schemas = this.schemas();
+@let schema = this.schema();
+@let language = languageSelected();
+@let languages = this.languages();
 <sqx-modal-dialog (dialogClose)="emitClose()" flexBody="true" fullHeight="true" hasTabs="false" size="lg">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
                 @if (schemas.length > 1) {
                     <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
-                        @for (schema of schemas; track schema) {
-                            <option [ngValue]="schema">
-                                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schema.displayName } }}
+                        @for (item of schemas; track item) {
+                            <option [ngValue]="item">
+                                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: item.displayName } }}
                             </option>
                         }
                     </select>
@@ -39,12 +43,12 @@
                         placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                         [query]="contentsState.query | async"
                         (queryChange)="search($event)"
-                        [queryModel]="queryModel | async" />
+                        [queryModel]="queryModel()" />
                 </div>
 
                 @if (languages.length > 1) {
                     <div class="col-auto">
-                        <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages" />
+                        <sqx-language-selector class="languages-buttons" [(language)]="languageSelected" [languages]="languages" />
                     </div>
                 }
             }
@@ -58,7 +62,7 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" type="checkbox" />
+                                    <input class="form-check" [ngModel]="selectedAll()" (ngModelChange)="selectAll($event)" type="checkbox" />
                                 </th>
 
                                 <th [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
@@ -110,7 +114,7 @@
         <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
 
         <div>
-            @if (canClear) {
+            @if (canClear()) {
                 <button class="btn me-2" (click)="emitClear()" type="button">
                     {{ "common.clear" | sqxTranslate: { count: 0 } }}
                 </button>
@@ -119,13 +123,9 @@
             <button
                 class="btn btn-success"
                 (click)="emitSelect()"
-                [disabled]="selectionCount === 0 || selectionCount > maxItems"
-                type="button"
-                type="button"
-                type="button"
-                type="button"
+                [disabled]="selectionCount() === 0 || selectionCount() > maxItems()"
                 type="submit">
-                {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
+                {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount() } }}
             </button>
         </div>
     </ng-container>

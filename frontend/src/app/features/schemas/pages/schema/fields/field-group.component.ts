@@ -7,19 +7,15 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, LocalStoreService, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
+import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, LocalStoreService, SchemaDto, Settings } from '@app/shared';
 import { FieldComponent } from './field.component';
-
-interface State {
-    // The when the section is collapsed.
-    isCollapsed: boolean;
-}
 
 @Component({
     selector: 'sqx-field-group',
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDragHandle,
@@ -27,71 +23,61 @@ interface State {
         FieldComponent,
     ],
 })
-export class FieldGroupComponent extends StatefulComponent<State> {
-    @Output()
-    public sorted = new EventEmitter<CdkDragDrop<FieldDto[]>>();
+export class FieldGroupComponent {
+    /** Emits when the user has moved a field within or into this group. */
+    public readonly sorted = output<CdkDragDrop<FieldDto[]>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input()
-    public parent?: FieldDto;
+    /** The parent array field, if the fields are nested fields. */
+    public readonly parent = input<FieldDto>();
 
-    @Input({ required: true })
-    public settings!: AppSettingsDto;
+    /** The settings of the app. */
+    public readonly settings = input.required<AppSettingsDto>();
 
-    @Input({ transform: booleanAttribute })
-    public sortable = false;
+    /** Allows the user to sort the fields with drag and drop. */
+    public readonly sortable = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema the fields belong to. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ transform: booleanAttribute })
-    public fieldsEmpty = false;
+    /** Hides the drop placeholder of an empty group, if there are no fields at all. */
+    public readonly fieldsEmpty = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public fieldGroup!: FieldGroup;
+    /** The group to render, with the optional separator and its fields. */
+    public readonly fieldGroup = input.required<FieldGroup>();
 
-    public trackByFieldFn: (_index: number, field: FieldDto) => any;
+    public readonly isCollapsed = linkedSignal(() => {
+        const separator = this.fieldGroup().separator;
+        if (!separator) {
+            return false;
+        }
 
-    public get hasAnyFields() {
-        return this.parent ? this.parent.nested && this.parent.nested.length > 0 : this.schema.fields.length > 0;
-    }
+        return this.localStore.getBoolean(this.isCollapsedKey(separator));
+    });
 
     constructor(
         private readonly localStore: LocalStoreService,
     ) {
-        super({ isCollapsed: false });
-
-        this.changes.subscribe(change => {
-            if (this.fieldGroup?.separator && this.schema) {
-                this.localStore.setBoolean(this.isCollapsedKey(), change.snapshot.isCollapsed);
-            }
-        });
-
-        this.trackByFieldFn = this.trackByField.bind(this);
-    }
-
-    public ngOnInit() {
-        if (this.fieldGroup?.separator && this.schema) {
-            const isCollapsed = this.localStore.getBoolean(this.isCollapsedKey());
-
-            this.next({ isCollapsed });
-        }
     }
 
     public toggle() {
-        this.next(s => ({
-            ...s,
-            isCollapsed: !s.isCollapsed,
-        }));
+        const isCollapsed = !this.isCollapsed();
+
+        this.isCollapsed.set(isCollapsed);
+
+        const separator = this.fieldGroup().separator;
+        if (separator) {
+            this.localStore.setBoolean(this.isCollapsedKey(separator), isCollapsed);
+        }
     }
 
-    public trackByField(_index: number, field: FieldDto) {
-        return field.fieldId + this.schema.id;
+    public trackByField(field: FieldDto) {
+        return field.fieldId + this.schema().id;
     }
 
-    private isCollapsedKey(): string {
-        return Settings.Local.FIELD_COLLAPSED(this.schema?.id, this.fieldGroup.separator?.fieldId);
+    private isCollapsedKey(separator: FieldDto) {
+        return Settings.Local.FIELD_COLLAPSED(this.schema().id, separator.fieldId);
     }
 }

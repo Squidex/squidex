@@ -1,14 +1,14 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row for="minValue" label="schemas.fieldTypes.dateTime.rangeMin" [prefix]="field.fieldId">
+<div [formGroup]="fieldForm()">
+    <sqx-form-row for="minValue" label="schemas.fieldTypes.dateTime.rangeMin" [prefix]="field().fieldId">
         <sqx-date-time-editor formControlName="minValue" mode="DateTime" />
     </sqx-form-row>
 
-    <sqx-form-row for="maxValue" label="schemas.fieldTypes.dateTime.rangeMax" [prefix]="field.fieldId">
+    <sqx-form-row for="maxValue" label="schemas.fieldTypes.dateTime.rangeMax" [prefix]="field().fieldId">
         <sqx-date-time-editor formControlName="maxValue" mode="DateTime" />
     </sqx-form-row>
 
-    @if (showDefaultValues | async) {
-        <sqx-form-row for="calculatedDefaultValue" label="schemas.fieldTypes.dateTime.defaultMode" [prefix]="field.fieldId">
+    @if (showDefaultValues()) {
+        <sqx-form-row for="calculatedDefaultValue" label="schemas.fieldTypes.dateTime.defaultMode" [prefix]="field().fieldId">
             <select class="form-select" formControlName="calculatedDefaultValue">
                 <option></option>
 
@@ -18,20 +18,20 @@
             </select>
         </sqx-form-row>
 
-        @if (showDefaultValue | async) {
-            <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+        @if (showDefaultValue()) {
+            <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
                 <sqx-date-time-editor [id]="defaultValueRow.fieldName()" formControlName="defaultValue" mode="DateTime" />
             </sqx-form-row>
         }
 
-        @if (isLocalizable) {
+        @if (isLocalizable()) {
             <sqx-form-row
                 #defaultValueRows
                 for="defaultValues"
                 hint="schemas.field.defaultValuesHint"
                 label="schemas.field.defaultValues"
-                [prefix]="field.fieldId">
-                <sqx-localized-input [id]="defaultValueRows.fieldName()" formControlName="defaultValues" [languages]="languages" type="datetime" />
+                [prefix]="field().fieldId">
+                <sqx-localized-input [id]="defaultValueRows.fieldName()" formControlName="defaultValues" [languages]="languages()" type="datetime" />
             </sqx-form-row>
         }
     }

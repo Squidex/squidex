@@ -1,3 +1,7 @@
+@let commentItem = this.commentItem();
+@let isSelected = this.isSelected();
+@let scrollContainer = this.scrollContainer();
+@let mode = this.mode();
 <div
     class="comment row g-0"
     [class.bounce]="isSelected"
@@ -6,7 +10,7 @@
     [sqxScrollActive]="true"
     [sqxScrollContainer]="scrollContainer"
     [sqxScrollOffset]="20">
-    @if (snapshot.mode !== "Edit") {
+    @if (mode !== "Edit") {
         <div class="comment-text row g-0" sqxSc [sqxScrollActive]="isSelected" [sqxScrollContainer]="scrollContainer" [sqxScrollOffset]="-20">
             <div class="col-auto pe-2">
                 <img class="user-picture" [src]="commentItem.comment.user | sqxUserPictureRef" title="{{ commentItem.comment.user | sqxUserNameRef }}" />
@@ -23,7 +27,7 @@
                     <div [sqxMarkdown]="commentItem.comment.text"></div>
 
                     <div class="comment-created d-flex text-muted truncate">
-                        @if (canFollow && commentItem.comment.url) {
+                        @if (canFollow() && commentItem.comment.url) {
                             <a [routerLink]="commentItem.comment.url">{{ "comments.follow" | sqxTranslate }}</a> &nbsp;
                         }
 
@@ -36,7 +40,7 @@
                 </div>
 
                 <div class="d-flex" sqxStopClick>
-                    @if (canAnswer) {
+                    @if (canAnswer()) {
                         <button
                             class="btn btn-sm btn-text-secondary"
                             attr.aria-label="{{ 'comments.reply' | sqxTranslate }}"
@@ -47,7 +51,7 @@
                         </button>
                     }
 
-                    @if (isEditable && canEdit) {
+                    @if (isMyComment() && canEdit()) {
                         <button
                             class="btn btn-sm btn-text-secondary"
                             attr.aria-label="{{ 'common.edit' | sqxTranslate }}"
@@ -58,7 +62,7 @@
                         </button>
                     }
 
-                    @if (canResolve) {
+                    @if (canResolve()) {
                         @if (!commentItem.comment.isResolved) {
                             <button
                                 class="btn btn-sm btn-text-secondary"
@@ -80,19 +84,19 @@
                         }
                     }
 
-                    @if (isDeletable || canDelete) {
+                    @if (isMyComment() || canDelete()) {
                         <button
                             class="btn btn-sm btn-text-danger"
                             attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                             confirmRememberKey="deleteComment"
-                            [confirmRequired]="confirmDelete"
+                            [confirmRequired]="confirmDelete()"
                             confirmText="i18n:comments.deleteConfirmText"
                             confirmTitle="i18n:comments.deleteConfirmTitle"
                             (sqxConfirmClick)="delete()"
                             title="{{ 'common.delete' | sqxTranslate }}"
                             type="button">
                             <i class="icon-bin3"></i>
-                            @if (isOnlyDelete) {
+                            @if (isOnlyDelete()) {
                                 {{ "common.delete" | sqxTranslate }}
                             }
                         </button>
@@ -102,14 +106,14 @@
         </div>
     }
 
-    @if (snapshot.mode === "Edit") {
+    @if (mode === "Edit") {
         <form [formGroup]="updateForm.form" (ngSubmit)="update()">
             <sqx-autocomplete
                 autoFocus="true"
                 autoSelectFirst="false"
                 (editorKeyPress)="onKeyPressUpdate($event)"
                 formControlName="text"
-                [itemsSource]="contributors"
+                [itemsSource]="contributors()"
                 startCharacter="@"
                 textArea="true">
             </sqx-autocomplete>
@@ -122,20 +126,20 @@
         </form>
     }
 
-    @if (commentItem.replies.length > 0 || snapshot.mode === "Reply") {
+    @if (commentItem.replies.length > 0 || mode === "Reply") {
         <div class="replies">
             @for (item of commentItem.replies; track $index) {
-                <sqx-comment canEdit="true" canFollow="false" [commentItem]="item" [comments]="comments" [userToken]="userToken" />
+                <sqx-comment canEdit="true" canFollow="false" [commentItem]="item" [comments]="comments()" [userToken]="userToken()" />
             }
 
-            @if (snapshot.mode === "Reply") {
+            @if (mode === "Reply") {
                 <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
                     <sqx-autocomplete
                         autoFocus="true"
                         autoSelectFirst="false"
                         (editorKeyPress)="onKeyPressReply($event)"
                         formControlName="text"
-                        [itemsSource]="contributors"
+                        [itemsSource]="contributors()"
                         sqxFocusOnInit
                         startCharacter="@"
                         textArea="true">

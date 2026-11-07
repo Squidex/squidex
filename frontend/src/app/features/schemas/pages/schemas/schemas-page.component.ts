@@ -7,12 +7,13 @@
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, value$ } from '@app/shared';
+import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, value$ } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaFormComponent } from './schema-form.component';
 
@@ -20,6 +21,7 @@ import { SchemaFormComponent } from './schema-form.component';
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         CdkDropListGroup,
@@ -37,49 +39,54 @@ import { SchemaFormComponent } from './schema-form.component';
         TranslatePipe,
     ],
 })
-export class SchemasPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class SchemasPageComponent {
+    public readonly addSchemaDialog = new DialogModel();
+    public readonly addCategoryForm = new CreateCategoryForm();
 
-    public addSchemaDialog = new DialogModel();
-    public addCategoryForm = new CreateCategoryForm();
+    public readonly schemasFilter = new UntypedFormControl();
 
-    public schemasFilter = new UntypedFormControl();
+    public readonly categories;
 
-    public categories =
-        combineLatest([
-            value$(this.schemasFilter),
-            this.schemasState.schemas,
-            this.schemasState.addedCategories,
-        ], (filter, schemas, categories) => {
-            return getCategoryTree(schemas, categories, filter);
-        });
+    public readonly source = signal<any>(null);
 
-    public source: any;
-
-    constructor(
+    constructor(messageBus: MessageBus,
         public readonly schemasState: SchemasState,
-        private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-    }
+        this.categories = toSignal(
+            combineLatest([
+                value$(this.schemasFilter),
+                this.schemasState.schemas,
+                this.schemasState.addedCategories,
+            ], (filter, schemas, categories) => {
+                return getCategoryTree(schemas, categories, filter);
+            }),
+            { initialValue: [] });
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.messageBus.of(SchemaCloning)
-                .subscribe(event => {
-                    this.source = event.schema;
+        effect(onCleanup => {
+            const subscription =
+                messageBus.of(SchemaCloning)
+                    .subscribe(event => {
+                        this.source.set(event.schema);
 
-                    this.addSchemaDialog.show();
-                }));
-
-        this.subscriptions.add(
-            this.route.params.pipe(map(q => q['showDialog']))
-                .subscribe(showDialog => {
-                    if (showDialog) {
                         this.addSchemaDialog.show();
-                    }
-                }));
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
+
+        effect(onCleanup => {
+            const subscription =
+                this.route.params.pipe(map(q => q['showDialog']))
+                    .subscribe(showDialog => {
+                        if (showDialog) {
+                            this.addSchemaDialog.show();
+                        }
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public removeCategory(name: string) {
@@ -106,7 +113,7 @@ export class SchemasPageComponent implements OnInit {
     }
 
     public createSchema(source: any = null) {
-        this.source = source;
+        this.source.set(source);
 
         this.addSchemaDialog.show();
     }

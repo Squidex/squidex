@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { ListViewComponent, ResourceLoaderService, Subscriptions, ThemeService, WorkflowView } from '@app/shared';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, signal, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ListViewComponent, ResourceLoaderService, ThemeService, WorkflowView } from '@app/shared';
 
 declare const vis: any;
 
@@ -14,50 +15,44 @@ declare const vis: any;
     selector: 'sqx-workflow-diagram',
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ListViewComponent,
     ],
 })
-export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
-    private readonly subscriptions = new Subscriptions();
+export class WorkflowDiagramComponent {
     private network: any;
 
-    @ViewChild('chartContainer', { static: false })
-    public chartContainer!: ElementRef;
+    public readonly chartContainer = viewChild<ElementRef<HTMLElement>>('chartContainer');
 
-    @Input({ required: true })
-    public workflow!: WorkflowView;
+    /** The workflow to visualize as a diagram. */
+    public readonly workflow = input.required<WorkflowView>();
 
-    public isLoaded = false;
+    public readonly isLoaded = signal(false);
 
-    constructor(
+    constructor(destroyRef: DestroyRef,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly themeService: ThemeService,
     ) {
-        this.subscriptions.add(
-            this.themeService.themeChanges
-                .subscribe(() => {
-                    this.updateNetwork();
-                }));
+        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
+
+        effect(() => {
+            theme();
+
+            const container = this.chartContainer()?.nativeElement;
+            if (!container) {
+                return;
+            }
+
+            this.updateNetwork(container, this.workflow());
+        });
+
+        destroyRef.onDestroy(() => {
+            this.network?.destroy();
+        });
     }
 
-    public ngOnDestroy() {
-        this.network?.destroy();
-    }
-
-    public ngOnChanges() {
-        this.updateNetwork();
-    }
-
-    public ngAfterViewInit() {
-        this.updateNetwork();
-    }
-
-    private async updateNetwork() {
-        if (!this.chartContainer?.nativeElement || !this.workflow) {
-            return;
-        }
-
+    private async updateNetwork(container: HTMLElement, workflow: WorkflowView) {
         await this.resourceLoader.loadLocalScript('dependencies/vis-network/vis-network.min.js');
 
         const colors = {
@@ -67,14 +62,14 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
             textStroke: this.themeService.getColor('diagram-text-stroke'),
         };
 
-        const { edges, nodes } = buildGraph(this.workflow, colors);
+        const { edges, nodes } = buildGraph(workflow, colors);
 
         this.network?.destroy();
-        this.network = new vis.Network(this.chartContainer.nativeElement, { edges, nodes }, buildOptions(colors));
+        this.network = new vis.Network(container, { edges, nodes }, buildOptions(colors));
         this.network.stabilize();
         this.network.fit();
 
-        this.isLoaded = true;
+        this.isLoaded.set(true);
     }
 }
 

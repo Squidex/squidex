@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView, WorkflowView } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTr
     selector: 'sqx-workflow-transition',
     styleUrls: ['./workflow-transition.component.scss'],
     templateUrl: './workflow-transition.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormsModule,
         TagEditorComponent,
@@ -22,20 +23,20 @@ import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTr
 export class WorkflowTransitionComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
-    @Output()
-    public update = new EventEmitter<WorkflowView>();
+    /** Emits the updated workflow when the transition is changed or removed. */
+    public readonly update = output<WorkflowView>();
 
-    @Input({ required: true })
-    public workflow!: WorkflowView;
+    /** The workflow the transition belongs to. */
+    public readonly workflow = input.required<WorkflowView>();
 
-    @Input({ required: true })
-    public transition!: WorkflowTransitionView;
+    /** The transition to show and edit. */
+    public readonly transition = input.required<WorkflowTransitionView>();
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<string>;
+    /** The roles that can be selected for the transition. */
+    public readonly roles = input.required<ReadonlyArray<string>>();
 
-    @Input({ transform: booleanAttribute })
-    public disabled?: boolean | null;
+    /** Prevents the transition from being changed. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
     public changeExpression(expression: string) {
         this.change({ expression });
@@ -46,12 +47,12 @@ export class WorkflowTransitionComponent {
     }
 
     public remove() {
-        const { from, to } = this.transition;
-        this.update.emit(this.workflow.removeTransition(from, to));
+        const { from, to } = this.transition();
+        this.update.emit(this.workflow().removeTransition(from, to));
     }
 
     private change(changes: Partial<WorkflowTransitionValues>) {
-        const { from, to } = this.transition;
-        this.update.emit(this.workflow.setTransition(from, to, changes));
+        const { from, to } = this.transition();
+        this.update.emit(this.workflow().setTransition(from, to, changes));
     }
 }

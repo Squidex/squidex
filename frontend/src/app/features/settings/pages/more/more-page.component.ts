@@ -6,10 +6,11 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, effect, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, defined, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, Subscriptions, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
+import { AppsState, AvatarComponent, ConfirmClickDirective, defined, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
@@ -37,24 +38,31 @@ import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, defined, Dia
         TranslatePipe,
     ],
 })
-export class MorePageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class MorePageComponent {
+    public readonly app = toSignal(this.appsState.selectedApp.pipe(defined()));
 
-    public app!: AppDto;
+    public readonly isEditable = computed(() => {
+        return this.app()?.canUpdateGeneral === true;
+    });
 
-    public teams: { id: string | null; name: string }[] = [];
+    public readonly isEditableImage = computed(() => {
+        return this.app()?.canUpdateImage === true;
+    });
 
-    public isEditable = false;
-    public isEditableImage = false;
-    public isDeletable = false;
-    public isTransferable = false;
+    public readonly isDeletable = computed(() => {
+        return this.app()?.canDelete === true;
+    });
 
-    public uploading = false;
-    public uploadProgress = 10;
+    public readonly isTransferable = computed(() => {
+        return this.app()?.canUpdateTeam === true;
+    });
 
-    public transferForm = new TransferAppForm();
+    public readonly uploading = signal(false);
+    public readonly uploadProgress = signal(10);
 
-    public updateForm = new UpdateAppForm();
+    public readonly transferForm = new TransferAppForm();
+
+    public readonly updateForm = new UpdateAppForm();
 
     constructor(
         private readonly appsState: AppsState,
@@ -62,31 +70,25 @@ export class MorePageComponent implements OnInit {
         private readonly router: Router,
         public readonly teamsState: TeamsState,
     ) {
-    }
+        effect(() => {
+            const app = this.app();
+            if (!app) {
+                return;
+            }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.appsState.selectedApp.pipe(defined())
-                .subscribe(app => {
-                    this.app = app;
+            this.updateForm.load(app);
+            this.updateForm.setEnabled(this.isEditable());
 
-                    this.isDeletable = app.canDelete;
-                    this.isEditable = app.canUpdateGeneral;
-                    this.isEditableImage = app.canUpdateImage;
-                    this.isTransferable = app.canUpdateTeam;
-
-                    this.updateForm.load(app);
-                    this.updateForm.setEnabled(this.isEditable);
-
-                    this.transferForm.load(app);
-                    this.transferForm.setEnabled(this.isTransferable);
-                }));
+            this.transferForm.load(app);
+            this.transferForm.setEnabled(this.isTransferable());
+        });
 
         this.appsState.reloadApps();
     }
 
     public save() {
-        if (!this.isEditable) {
+        const app = this.app();
+        if (!app || !this.isEditable()) {
             return;
         }
 
@@ -95,10 +97,10 @@ export class MorePageComponent implements OnInit {
             return;
         }
 
-        this.appsState.update(this.app, value)
+        this.appsState.update(app, value)
             .subscribe({
-                next: app => {
-                    this.updateForm.submitCompleted({ newValue: app });
+                next: updated => {
+                    this.updateForm.submitCompleted({ newValue: updated });
                 },
                 error: error => {
                     this.dialogs.notifyError(error);
@@ -109,7 +111,8 @@ export class MorePageComponent implements OnInit {
     }
 
     public transfer() {
-        if (!this.isTransferable) {
+        const app = this.app();
+        if (!app || !this.isTransferable()) {
             return;
         }
 
@@ -118,10 +121,10 @@ export class MorePageComponent implements OnInit {
             return;
         }
 
-        this.appsState.transfer(this.app, value)
+        this.appsState.transfer(app, value)
             .subscribe({
-                next: app => {
-                    this.transferForm.submitCompleted({ newValue: app });
+                next: updated => {
+                    this.transferForm.submitCompleted({ newValue: updated });
                 },
                 error: error => {
                     this.dialogs.notifyError(error);
@@ -132,43 +135,46 @@ export class MorePageComponent implements OnInit {
     }
 
     public uploadImage(file: ReadonlyArray<File>) {
-        if (!this.isEditableImage) {
+        const app = this.app();
+        if (!app || !this.isEditableImage()) {
             return;
         }
 
-        this.uploading = true;
-        this.uploadProgress = 0;
+        this.uploading.set(true);
+        this.uploadProgress.set(0);
 
-        this.appsState.uploadImage(this.app, file[0])
+        this.appsState.uploadImage(app, file[0])
             .subscribe({
                 next: value => {
-                if (Types.isNumber(value)) {
-                        this.uploadProgress = value;
+                    if (Types.isNumber(value)) {
+                        this.uploadProgress.set(value);
                     }
                 },
                 error: () => {
-                    this.uploading = false;
+                    this.uploading.set(false);
                 },
                 complete: () => {
-                    this.uploading = false;
+                    this.uploading.set(false);
                 },
             });
     }
 
     public removeImage() {
-        if (!this.isEditableImage) {
+        const app = this.app();
+        if (!app || !this.isEditableImage()) {
             return;
         }
 
-        this.appsState.removeImage(this.app);
+        this.appsState.removeImage(app);
     }
 
     public deleteApp() {
-        if (!this.isDeletable) {
+        const app = this.app();
+        if (!app || !this.isDeletable()) {
             return;
         }
 
-        this.appsState.delete(this.app)
+        this.appsState.delete(app)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             });

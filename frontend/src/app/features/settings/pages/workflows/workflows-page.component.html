@@ -30,7 +30,7 @@
 
                 @if (schemasSource && (workflowsState.isLoaded | async) && (workflowsState.workflows | async); as workflows) {
                     @for (workflow of workflows; track workflow.id) {
-                        <sqx-workflow [roles]="roles" [schemasSource]="schemasSource" [workflow]="workflow" />
+                        <sqx-workflow [roles]="roles()" [schemasSource]="schemasSource" [workflow]="workflow" />
                     } @empty {
                         <div class="table-items-row table-items-row-summary table-items-row-empty">
                             {{ "workflows.empty" | sqxTranslate }}

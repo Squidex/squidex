@@ -6,7 +6,7 @@
  */
 
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, TranslatePipe } from '@app/shared';
 
@@ -14,6 +14,7 @@ import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, Tr
     selector: 'sqx-schema-export-form',
     styleUrls: ['./schema-export-form.component.scss'],
     templateUrl: './schema-export-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormsModule,
@@ -22,26 +23,25 @@ import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, Tr
     ],
 })
 export class SchemaExportFormComponent {
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema to export and synchronize. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public synchronizeForm = new SynchronizeSchemaForm();
+    public readonly synchronizeForm = new SynchronizeSchemaForm();
 
-    public isEditable = false;
+    public readonly isEditable = computed(() => {
+        return this.schema().canUpdateScripts;
+    });
 
     constructor(
         private readonly schemasState: SchemasState,
     ) {
-    }
-
-    public ngOnChanges() {
-        this.isEditable = this.schema.canUpdateScripts;
-
-        this.synchronizeForm.loadSchema(this.schema);
+        effect(() => {
+            this.synchronizeForm.loadSchema(this.schema());
+        });
     }
 
     public synchronize() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 
@@ -50,7 +50,7 @@ export class SchemaExportFormComponent {
             return;
         }
 
-        this.schemasState.synchronize(this.schema, value)
+        this.schemasState.synchronize(this.schema(), value)
             .subscribe({
                 next: () => {
                     this.synchronizeForm.submitCompleted({ noReset: true });

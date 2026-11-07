@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfigureUIFieldsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 import { FieldListComponent } from './field-list.component';
@@ -14,6 +14,7 @@ import { FieldListComponent } from './field-list.component';
     selector: 'sqx-schema-ui-form',
     styleUrls: ['./schema-ui-form.component.scss'],
     templateUrl: './schema-ui-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FieldListComponent,
         FormsModule,
@@ -21,50 +22,50 @@ import { FieldListComponent } from './field-list.component';
     ],
 })
 export class SchemaUIFormComponent {
-    @Input()
-    public schema!: SchemaDto;
+    /** The schema to configure the list and reference fields for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public selectedTab = 0;
+    public readonly selectedTab = signal(0);
 
-    public isEditable = false;
+    public readonly isEditable = computed(() => {
+        return this.schema().canUpdate;
+    });
 
-    public fieldsInLists: string[] = [];
-    public fieldsInReferences: string[] = [];
+    public readonly fieldsInLists = linkedSignal<string[]>(() => {
+        return this.schema().fieldsInLists;
+    });
+
+    public readonly fieldsInReferences = linkedSignal<string[]>(() => {
+        return this.schema().fieldsInReferences;
+    });
 
     constructor(
         private readonly schemasState: SchemasState,
     ) {
     }
 
-    public ngOnChanges() {
-        this.isEditable = this.schema.canUpdate;
-
-        this.fieldsInLists = this.schema.fieldsInLists;
-        this.fieldsInReferences = this.schema.fieldsInReferences;
-    }
-
     public setFieldsInLists(names: string[]) {
-        this.fieldsInLists = names;
+        this.fieldsInLists.set(names);
     }
 
     public setFieldsInReferences(names: string[]) {
-        this.fieldsInReferences = names;
+        this.fieldsInReferences.set(names);
     }
 
     public selectTab(tab: number) {
-        this.selectedTab = tab;
+        this.selectedTab.set(tab);
     }
 
     public saveSchema() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 
         const request = new ConfigureUIFieldsDto({
-            fieldsInLists: this.fieldsInLists,
-            fieldsInReferences: this.fieldsInReferences,
+            fieldsInLists: this.fieldsInLists(),
+            fieldsInReferences: this.fieldsInReferences(),
         });
 
-        this.schemasState.configureUIFields(this.schema, request);
+        this.schemasState.configureUIFields(this.schema(), request);
     }
 }

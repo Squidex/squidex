@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownDirective, NotifoComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
@@ -16,6 +16,7 @@ import { PlanComponent } from './plan.component';
     selector: 'sqx-plans-page',
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         ExternalLinkDirective,
@@ -36,20 +37,17 @@ import { PlanComponent } from './plan.component';
         TranslatePipe,
     ],
 })
-export class PlansPageComponent implements OnInit {
-    private overridePlanId?: string;
+export class PlansPageComponent {
+    private readonly overridePlanId?: string;
 
-    public portalUrl = this.apiUrl.buildUrl('/portal/');
+    public readonly portalUrl;
 
-    constructor(
+    constructor(apiUrl: ApiUrlConfig, route: ActivatedRoute,
         public readonly plansState: TeamPlansState,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly route: ActivatedRoute,
     ) {
-    }
+        this.portalUrl = apiUrl.buildUrl('/portal/');
 
-    public ngOnInit() {
-        this.overridePlanId = this.route.snapshot.queryParams['planId'];
+        this.overridePlanId = route.snapshot.queryParams['planId'];
 
         this.plansState.load(false, this.overridePlanId);
     }

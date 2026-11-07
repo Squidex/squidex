@@ -12,7 +12,7 @@
         </ng-container>
         <ng-container menu>
             @if (usersState.selectedUser | async; as user) {
-                @if (isEditable) {
+                @if (isEditable()) {
                     <button class="btn btn-primary" shortcut="CTRL + SHIFT + S" type="submit">{{ "common.save" | sqxTranslate }}</button>
                 }
             } @else {

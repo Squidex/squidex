@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } from '@app/shared';
 
@@ -14,6 +14,7 @@ import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } fr
     selector: 'sqx-user-info-validation',
     styleUrls: ['user-info-validation.component.scss'],
     templateUrl: 'user-info-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         FormRowComponent,
@@ -21,22 +22,19 @@ import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } fr
         ReactiveFormsModule,
     ],
 })
-export class UserInfoValidationComponent implements OnInit {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+export class UserInfoValidationComponent {
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: UserInfoFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<UserInfoFieldPropertiesDto>();
 
     constructor(
         public readonly rolesState: RolesState,
     ) {
-    }
-
-    public ngOnInit() {
         this.rolesState.loadIfNotLoaded();
     }
 }

@@ -6,26 +6,9 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, ThemeMode, ThemeService, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
-
-interface State {
-    // The display name of the user.
-    profileDisplayName: string;
-
-    // The id of the user.
-    profileId: string;
-
-    // The email address of the user.
-    profileEmail: string;
-
-    // The url to the user profile.
-    profileUrl: string;
-
-    // The submenu that is open.
-    submenu: 'language' | 'theme' | null;
-}
+import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, ThemeMode, ThemeService, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-profile-menu',
@@ -44,9 +27,7 @@ interface State {
         UserIdPicturePipe,
     ],
 })
-export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-
+export class ProfileMenuComponent {
     public readonly modalMenu = new ModalModel();
 
     public readonly language = inject(UIOptions).value.culture;
@@ -58,37 +39,32 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
         { mode: 'system', label: 'common.themeSystem' },
     ];
 
+    public readonly profileId = signal('');
+    public readonly profileEmail = signal('');
+    public readonly profileUrl: string;
+
+    public readonly submenu = signal<'language' | 'theme' | null>(null);
+
     constructor(apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,
         public readonly uiOptions: UIOptions,
         public readonly authService: AuthService,
         public readonly themeService: ThemeService,
     ) {
-        super({
-            profileDisplayName: '',
-            profileEmail: '',
-            profileId: '',
-            profileUrl: apiUrl.buildUrl('/identity-server/account/profile'),
-            submenu: null,
+        this.profileUrl = apiUrl.buildUrl('/identity-server/account/profile');
+
+        effect(onCleanup => {
+            const subscription =
+                this.authService.userChanges
+                    .subscribe(user => {
+                        if (user) {
+                            this.profileId.set(user.id);
+                            this.profileEmail.set(user.email);
+                        }
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
         });
-    }
-
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.authService.userChanges
-                .subscribe(user => {
-                    if (user) {
-                        const profileId = user.id;
-                        const profileEmail = user.email;
-                        const profileDisplayName = user.displayName;
-
-                        this.next({
-                            profileId,
-                            profileEmail,
-                            profileDisplayName,
-                        });
-                    }
-                }));
     }
 
     public changeLanguage(code: string) {
@@ -104,17 +80,11 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     public toggleProfile() {
         this.modalMenu.toggle();
 
-        this.next(s => ({
-            ...s,
-            submenu: null,
-        }));
+        this.submenu.set(null);
     }
 
     public toggleSubmenu(submenu: 'language' | 'theme') {
-        this.next(s => ({
-            ...s,
-            submenu: s.submenu === submenu ? null : submenu,
-        }));
+        this.submenu.update(x => x === submenu ? null : submenu);
     }
 
     public logout() {

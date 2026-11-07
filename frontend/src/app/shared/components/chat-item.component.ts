@@ -6,29 +6,12 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { afterRenderEffect, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { lastValueFrom, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { ApiUrlConfig, HTTP, LoaderComponent, MarkdownDirective, markdownExtractImage, markdownHasImage, markdownTransformImages, ResizedDirective, StatefulComponent, TranslatePipe, Types } from '@app/framework';
+import { ApiUrlConfig, HTTP, LoaderComponent, MarkdownDirective, markdownExtractImage, markdownHasImage, markdownTransformImages, ResizedDirective, TranslatePipe, Types } from '@app/framework';
 import { AssetDto, AssetUploaderState, ChatEventDto, Profile } from '../internal';
 import { UserIdPicturePipe } from './pipes';
-
-interface State {
-    // True, when running
-    isRunning: boolean;
-
-    // True, when failed
-    isFailed: boolean;
-
-    // True, when a copy is in process.
-    isCopying: boolean;
-
-    // The content.
-    content: string;
-
-    // The running tools.
-    runningTools: string[];
-}
 
 @Component({
     selector: 'sqx-chat-item',
@@ -43,105 +26,107 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChatItemComponent extends StatefulComponent<State> {
-    @ViewChild('focusElement', { static: false })
-    public focusElement!: ElementRef<HTMLElement>;
+export class ChatItemComponent {
+    private readonly focusElement = viewChild<ElementRef<HTMLElement>>('focusElement');
 
-    @Input({ required: true })
-    public type: 'Assistant' | 'User' | 'System' = 'Assistant';
+    /** Emits when the answer has been completely received or has failed. */
+    public readonly done = output();
 
-    @Input({ required: true })
-    public folderId?: string;
+    /** Emits the content (text or image) the user wants to use. */
+    public readonly contentSelect = output<string | HTTP.UploadFile | undefined | null>();
 
-    @Input({ required: true })
-    public user!: Profile;
+    /** The author of the message. */
+    public readonly type = input.required<'Assistant' | 'User' | 'System'>();
 
-    @Input({ required: true })
-    public isLast: boolean = false;
+    /** The ID of the folder to upload images to, when the content is used. */
+    public readonly folderId = input.required<string | undefined>();
 
-    @Input({ required: true })
-    public isFirst: boolean = false;
+    /** The current user, to show the profile picture of user messages. */
+    public readonly user = input.required<Profile>();
 
-    @Input({ required: true })
-    public copyMode?: 'Text' | 'Image';
+    /** Indicates that this is the last message. */
+    public readonly isLast = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public set content(value: string | Observable<ChatEventDto>) {
-        if (Types.isString(value)) {
-            this.next({ content: value });
-        } else {
-            this.next({ isRunning: true });
+    /** Indicates that this is the first message, which cannot be used. */
+    public readonly isFirst = input(false, { transform: booleanAttribute });
 
-            value.subscribe({
-                next: event => {
-                    if (event.type === 'Chunk') {
-                        this.next(s => ({
-                            ...s,
-                            content: s.content + event.content,
-                        }));
-                    } else if (event.type === 'ToolStart') {
-                        this.next(s => ({
-                            ...s,
-                            runningTools: [...s.runningTools, event.tool],
-                        }));
-                    }
-                },
-                error: () => {
-                    this.next({ isRunning: false, isFailed: true });
-                    this.done.emit();
-                },
-                complete: () => {
-                    this.next(s => ({
-                        ...s,
-                        isRunning: false,
-                        isFailed: !s.content,
-                    }));
+    /** Defines what is copied when the content is used. */
+    public readonly copyMode = input<'Text' | 'Image'>();
 
-                    this.done.emit();
-                },
-            });
-        }
-    }
+    /** The text of the message, or the stream of the answer. */
+    public readonly content = input.required<string | Observable<ChatEventDto>>();
 
-    @Output()
-    public done = new EventEmitter();
+    public readonly contentText = signal('');
+    public readonly contentTools = signal<ReadonlyArray<string>>([]);
 
-    @Output()
-    public contentSelect = new EventEmitter<string | HTTP.UploadFile | undefined | null>();
+    public readonly isRunning = signal(false);
+    public readonly isFailed = signal(false);
+    public readonly isCopying = signal(false);
 
     constructor(
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
     ) {
-        super({
-            content: '',
-            isCopying: false,
-            isFailed: false,
-            isRunning: false,
-            runningTools: [],
+        effect(onCleanup => {
+            const content = this.content();
+            if (Types.isString(content)) {
+                this.contentText.set(content);
+                return;
+            }
+
+            this.isRunning.set(true);
+
+            const subscription = content.subscribe({
+                next: event => {
+                    if (event.type === 'Chunk') {
+                        this.contentText.update(s => s + event.content);
+                    } else if (event.type === 'ToolStart') {
+                        this.contentTools.update(s => [...s, event.tool]);
+                    }
+                },
+                error: () => {
+                    this.isRunning.set(false);
+                    this.isFailed.set(true);
+                    this.done.emit();
+                },
+                complete: () => {
+                    this.isRunning.set(false);
+                    this.isFailed.set(!this.contentText());
+                    this.done.emit();
+                },
+            });
+
+            onCleanup(() => subscription.unsubscribe());
         });
 
-        this.changes.subscribe(() => {
-            this.focusElement.nativeElement?.scrollIntoView();
+        afterRenderEffect(() => {
+            this.contentText();
+            this.contentTools();
+            this.isRunning();
+            this.isFailed();
+            this.isCopying();
+
+            this.scrollIntoView();
         });
     }
 
     public scrollIntoView() {
-        this.focusElement.nativeElement?.scrollIntoView();
+        this.focusElement()?.nativeElement.scrollIntoView();
     }
 
     public async selectContent() {
-        let markdown = this.snapshot.content;
+        let markdown = this.contentText();
 
         if (!markdownHasImage(markdown)) {
             this.contentSelect.emit(markdown);
+            return;
         }
 
-        this.next({ isCopying: true });
+        this.isCopying.set(true);
         try {
             markdown = await markdownTransformImages(markdown, async img => {
                 const asset = await lastValueFrom(
-                    this.assetUploader.uploadFile(img, this.folderId)
+                    this.assetUploader.uploadFile(img, this.folderId())
                         .pipe(filter(x => Types.is(x, AssetDto)))) as AssetDto;
 
                 return asset.fullUrl(this.apiUrl);
@@ -149,13 +134,12 @@ export class ChatItemComponent extends StatefulComponent<State> {
 
             this.contentSelect.emit(markdown);
         } finally {
-            this.next({ isCopying: false });
+            this.isCopying.set(false);
         }
     }
 
     public selectImage() {
-        const image = markdownExtractImage(this.snapshot.content);
-
+        const image = markdownExtractImage(this.contentText());
         if (!image) {
             return;
         }

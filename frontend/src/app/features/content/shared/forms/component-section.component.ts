@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, numberAttribute, viewChildren } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldDto, FieldSection, FormHintComponent, MarkdownDirective } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
@@ -23,39 +23,38 @@ import { FieldEditorComponent } from './field-editor.component';
     ],
 })
 export class ComponentSectionComponent {
-    @Input({ required: true })
-    public hasChatBot!: boolean;
+    private readonly editors = viewChildren(FieldEditorComponent);
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** Enables the AI features of the editors. */
+    public readonly hasChatBot = input.required<boolean>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** The content form the section belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true })
-    public formSection!: FieldSection<FieldDto, any>;
+    /** The nesting level of the section. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isComparing = false;
+    /** The section with the separator and the fields to render. */
+    public readonly formSection = input.required<FieldSection<FieldDto, any>>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** Renders the editors next to the editors of another version. */
+    public readonly isComparing = input.required<boolean, unknown>({ transform: booleanAttribute });
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The language of the field values. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ transform: numberAttribute })
-    public index: number | null | undefined;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @ViewChildren(FieldEditorComponent)
-    public editors!: QueryList<FieldEditorComponent>;
+    /** The index of the array item the section belongs to. */
+    public readonly index = input<number | null | undefined, unknown>(undefined, { transform: numberAttribute });
 
     public reset() {
-        this.editors.forEach(editor => {
+        for (const editor of this.editors()) {
             editor.reset();
-        });
+        }
     }
 }

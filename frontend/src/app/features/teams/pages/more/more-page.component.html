@@ -15,7 +15,7 @@
                         </div>
 
                         <div class="card-footer">
-                            <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
+                            <button class="float-end btn btn-primary" [disabled]="!isEditable()" type="submit">
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         </div>
@@ -36,7 +36,7 @@
                                 class="btn btn-danger"
                                 confirmText="i18n:teams.deleteConfirmText"
                                 confirmTitle="i18n:teams.deleteConfirmTitle"
-                                [disabled]="!isDeletable"
+                                [disabled]="!isDeletable()"
                                 (sqxConfirmClick)="deleteTeam()"
                                 type="button">
                                 {{ "teams.delete" | sqxTranslate }}

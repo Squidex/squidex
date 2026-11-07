@@ -1,3 +1,7 @@
+@let schema = this.schema();
+@let language = this.language();
+@let languages = this.languages();
+@let selection = this.selection();
 <sqx-title [message]="schema.displayName" />
 <sqx-layout layout="main">
     <ng-container menu>
@@ -22,11 +26,11 @@
                     [language]="(languagesState.isoMasterLanguage | async)!"
                     [languages]="languages"
                     placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
-                    [queries]="queries | async"
+                    [queries]="queries()"
                     [queriesTypes]="'common.contents' | sqxTranslate"
                    
                     (queryChange)="search($event)"
-                    [queryModel]="queryModel | async" />
+                    [queryModel]="queryModel()" />
             </div>
 
             @if (languages.length > 1) {
@@ -36,7 +40,7 @@
                         [language]="language"
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
-                        [percents]="translationStatus" />
+                        [percents]="translationStatus()" />
                 </div>
             }
 
@@ -68,20 +72,20 @@
         </div>
     </ng-container>
     <ng-container>
-        @if (tableSettings | async; as tableSettings) {
-            @if (tableSettings.listFields | async; as tableFields) {
+        @if (tableSettings(); as settings) {
+            @if (settings.listFields | async; as tableFields) {
                 <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" tableNoPadding="true">
                     <ng-container topHeader>
-                        @if (selectionCount > 0) {
+                        @if (selection.selectedCount > 0) {
                             <div class="selection">
-                                {{ "contents.selectionCount" | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
-                                @for (status of selectionStatuses | sqxEntries; track status.key) {
+                                {{ "contents.selectionCount" | sqxTranslate: { count: selection.selectedCount } }}&nbsp;&nbsp;
+                                @for (status of selection.selectedStatuses | sqxEntries; track status.key) {
                                     <button class="btn btn-outline-secondary btn-status me-2" (click)="changeSelectedStatus(status.key)" type="button">
                                         <sqx-content-status layout="text" [status]="status.key" [statusColor]="status.value" />
                                     </button>
                                 }
 
-                                @if (selectionCanDelete) {
+                                @if (selection.selectedCanDelete) {
                                     <button
                                         class="btn btn-danger"
                                         confirmRememberKey="deleteContents"
@@ -101,15 +105,15 @@
                             </button>
                             <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonSettings" *sqxModal="tableViewModal">
                                 <sqx-custom-view-editor
-                                    [allFields]="tableSettings.schemaFields"
+                                    [allFields]="settings.schemaFields"
                                     [listFields]="$any(tableFields)"
-                                    (listFieldsChange)="tableSettings.updateFields($event)"
-                                    (listFieldsReset)="tableSettings.reset()" />
+                                    (listFieldsChange)="settings.updateFields($event)"
+                                    (listFieldsReset)="settings.reset()" />
                             </sqx-dropdown-menu>
                         </div>
                     </ng-container>
                     <ng-container header>
-                        <table class="table table-items table-fixed" #header [fields]="tableSettings" [sqxContentListWidth]="tableFields">
+                        <table class="table table-items table-fixed" #header [fields]="settings" [sqxContentListWidth]="tableFields">
                             <thead>
                                 <tr>
                                     <th class="cell-select">
@@ -117,7 +121,7 @@
                                             <input
                                                 class="form-check-input"
                                                 id="all_selected"
-                                                [ngModel]="selectedAll"
+                                                [ngModel]="selection.selectedAll"
                                                 (ngModelChange)="selectAll($event)"
                                                 type="checkbox" />
                                             <label class="form-check-label" for="all_selected"></label>
@@ -129,7 +133,7 @@
                                     </th>
 
                                     @for (field of tableFields; track field) {
-                                        <th [field]="field" [fields]="tableSettings" sqxContentListCell sqxContentListCellResize>
+                                        <th [field]="field" [fields]="settings" sqxContentListCell sqxContentListCellResize>
                                             <sqx-content-list-header
                                                 [field]="field"
                                                 [language]="language"
@@ -145,7 +149,7 @@
                     </ng-container>
                     <ng-container>
                         <div class="table-container">
-                            <table class="table table-center table-fixed" [fields]="tableSettings" [sqxContentListWidth]="tableFields" [sqxSyncWidth]="header">
+                            <table class="table table-center table-fixed" [fields]="settings" [sqxContentListWidth]="tableFields" [sqxSyncWidth]="header">
                                 @for (content of contentsState.contents | async; track content.id) {
                                     <tbody
                                         (clone)="clone(content)"
@@ -160,7 +164,7 @@
                                         [sqxContent]="content"
                                         (statusChange)="changeStatus(content, $event)"
                                         [tableFields]="tableFields"
-                                        [tableSettings]="tableSettings"></tbody>
+                                        [tableSettings]="settings"></tbody>
                                 }
                             </table>
                         </div>
@@ -204,5 +208,5 @@
     </ng-template>
 </sqx-layout>
 <router-outlet />
-<sqx-due-time-selector #dueTimeSelector [disabled]="disableScheduler" />
+<sqx-due-time-selector #dueTimeSelector [disabled]="disableScheduler()" />
 <sqx-contents-export-dialog (dialogClose)="exportDialog.hide()" [languages]="languages" [schema]="schema" *sqxModal="exportDialog" />

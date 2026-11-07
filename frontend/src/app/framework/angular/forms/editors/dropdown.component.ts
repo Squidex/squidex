@@ -6,10 +6,9 @@
  */
 
 
-import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, contentChildren, effect, forwardRef, input, output, signal, TemplateRef, untracked } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { map } from 'rxjs/operators';
-import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, StringHelper, Subscriptions, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { FloatingPlacement, Keys, ModalModel, SignalControlComponent, StringHelper, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -24,19 +23,7 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
 };
 
-interface State {
-    // The suggested item.
-    suggestedItems: ReadonlyArray<any>;
-
-    // The selected suggested index.
-    suggestedIndex: number;
-
-    // The selected item.
-    selectedItem?: any;
-
-    // The current search query.
-    query?: RegExp;
-}
+const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-dropdown',
@@ -60,140 +47,106 @@ interface State {
         TranslatePipe,
     ],
 })
-export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>> {
     private value: any;
 
-    @Output()
-    public dropdownOpen = new EventEmitter();
+    /** Emits when the dropdown is opened. */
+    public readonly dropdownOpen = output();
 
-    @Output()
-    public dropdownClose = new EventEmitter();
+    /** Emits when the dropdown is closed. */
+    public readonly dropdownClose = output();
 
-    @Input({ transform: booleanAttribute })
-    public itemsLoading?: boolean | null;
+    /** Shows a loading indicator instead of the empty text when there are no items. */
+    public readonly itemsLoading = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public itemsEmptyText = 'i18n:common.empty';
+    /** The text to show when there are no items. */
+    public readonly itemsEmptyText = input('i18n:common.empty');
 
-    @Input()
-    public items: ReadonlyArray<any> | undefined | null = [];
+    /** The items to choose from. */
+    public readonly items = input<ReadonlyArray<any> | undefined | null>([]);
 
-    @Input({ transform: booleanAttribute })
-    public itemSeparator?: boolean | null;
+    /** Renders a separator between the items. */
+    public readonly itemSeparator = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public formId?: string;
+    /** The ID of the inner input. */
+    public readonly formId = input<string>();
 
-    @Input()
-    public formName?: string;
+    /** The name of the inner input. */
+    public readonly formName = input<string>();
 
-    @Input()
-    public searchProperty = 'name';
+    /** The property of complex items to search in. */
+    public readonly searchProperty = input('name');
 
-    @Input()
-    public valueProperty?: string;
+    /** The property of the selected item to use as value. */
+    public readonly valueProperty = input<string>();
 
-    @Input({ transform: booleanAttribute })
-    public canSearch?: boolean | null = true;
+    /** Shows a search input in the dropdown. */
+    public readonly canSearch = input(true, { transform: booleanAttribute });
 
-    @Input()
-    public dropdownPosition: FloatingPlacement = 'bottom-start';
+    /** The position of the dropdown. */
+    public readonly dropdownPosition = input<FloatingPlacement>('bottom-start');
 
-    @Input({ transform: booleanAttribute })
-    public dropdownFullWidth = false;
+    /** Makes the dropdown as wide as the input. */
+    public readonly dropdownFullWidth = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public dropdownStyles: any = {};
+    /** Additional styles for the dropdown. */
+    public readonly dropdownStyles = input<any>({});
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly templates = contentChildren(TemplateRef);
 
-    @ContentChildren(TemplateRef)
-    public templates!: QueryList<any>;
+    public readonly templateItem = computed(() => {
+        return this.templates()[0];
+    });
 
-    public dropdown = new ModalModel();
+    public readonly templateSelection = computed(() => {
+        const templates = this.templates();
 
-    public templateSelection!: TemplateRef<any>;
-    public templateItem!: TemplateRef<any>;
+        return templates[templates.length - 1];
+    });
 
-    public queryInput = new UntypedFormControl();
+    public readonly dropdown = new ModalModel();
+    public readonly suggestedItems = signal<ReadonlyArray<any>>([]);
+    public readonly suggestedIndex = signal(-1);
+    public readonly selectedItem = signal<any>(undefined);
+    public readonly query = signal<RegExp | undefined>(undefined);
+
+    public readonly queryInput = new UntypedFormControl();
 
     constructor() {
-        super({
-            selectedItem: undefined,
-            suggestedIndex: -1,
-            suggestedItems: [],
+        super();
+
+        effect(() => {
+            if (this.isDisabled()) {
+                this.queryInput.disable(NO_EMIT);
+            } else {
+                this.queryInput.enable(NO_EMIT);
+            }
         });
-    }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.queryInput.valueChanges.pipe(
-                map((queryText: string) => {
-                    if (!this.items || !queryText) {
-                        return { query: undefined, items: this.items };
-                    } else {
-                        const query = StringHelper.searchRegex(queryText);
+        effect(onCleanup => {
+            const subscription = this.queryInput.valueChanges.subscribe((queryText: string) => {
+                this.search(queryText);
+            });
 
-                        const items = this.items.filter(x => {
-                            if (Types.isString(x)) {
-                                return query.test(x);
-                            } else {
-                                return query.test(x[this.searchProperty]);
-                            }
-                        });
+            onCleanup(() => subscription.unsubscribe());
+        });
 
-                        return { query, items };
-                    }
-                }))
-                .subscribe(({ query, items }) => {
-                    this.next({
-                        suggestedItems: items || [],
-                        query,
-                    });
-                }));
-    }
+        effect(() => {
+            const items = this.items() || [];
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.items) {
-            this.items = this.items || [];
+            untracked(() => {
+                this.suggestedItems.set(items);
 
-            this.next({ suggestedItems: this.items });
-
-            this.selectSearch('');
-            this.selectIndex(this.getSelectedIndex(this.value), false);
-        }
-    }
-
-    public ngAfterContentInit() {
-        if (this.templates.length === 1) {
-            this.templateItem = this.templates.first;
-            this.templateSelection = this.templates.first;
-        } else {
-            this.templateItem = this.templates.first;
-            this.templateSelection = this.templates.last;
-        }
-
-        if (this.templateItem) {
-            this.detectChanges();
-        }
+                this.selectSearch('');
+                this.selectIndex(this.getSelectedIndex(this.value), false);
+            });
+        });
     }
 
     public writeValue(obj: any) {
         this.value = obj;
 
         this.selectIndex(this.getSelectedIndex(obj), false);
-    }
-
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.queryInput.disable({ emitEvent: false });
-        } else {
-            this.queryInput.enable({ emitEvent: false });
-        }
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -207,7 +160,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
             this.selectNextIndex();
             return false;
         } else if (Keys.isEnter(event)) {
-            this.selectIndexAndClose(this.snapshot.suggestedIndex);
+            this.selectIndexAndClose(this.suggestedIndex());
             return false;
         }
 
@@ -242,20 +195,16 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         }
     }
 
-    private selectSearch(value: string) {
-        this.queryInput.setValue(value);
-    }
-
     public selectPrevIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex - 1, true);
+        this.selectIndex(this.suggestedIndex() - 1, true);
     }
 
     public selectNextIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex + 1, true);
+        this.selectIndex(this.suggestedIndex() + 1, true);
     }
 
     public selectIndex(suggestedIndex: number, fromUserAction: boolean) {
-        const items = this.snapshot.suggestedItems || [];
+        const items = this.suggestedItems();
 
         const selectedItem = items[suggestedIndex];
 
@@ -268,38 +217,73 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         }
 
         if (fromUserAction) {
-            let selectedValue = selectedItem;
-
-            if (this.valueProperty && this.valueProperty.length > 0 && selectedValue) {
-                selectedValue = selectedValue[this.valueProperty];
-            }
-
-            if (this.value !== selectedValue) {
-                this.value = selectedValue;
-
-                this.callChange(selectedValue);
-                this.callTouched();
-            }
+            this.selectValue(selectedItem);
         }
 
-        this.next({ suggestedIndex, selectedItem });
+        this.suggestedIndex.set(suggestedIndex);
+        this.selectedItem.set(selectedItem);
+    }
+
+    private selectValue(selectedItem: any) {
+        const valueProperty = this.valueProperty();
+
+        let selectedValue = selectedItem;
+        if (valueProperty && valueProperty.length > 0 && selectedValue) {
+            selectedValue = selectedValue[valueProperty];
+        }
+
+        if (this.value === selectedValue) {
+            return;
+        }
+
+        this.value = selectedValue;
+
+        this.callChange(selectedValue);
+        this.callTouched();
+    }
+
+    private selectSearch(value: string) {
+        this.queryInput.setValue(value);
+    }
+
+    private search(queryText: string) {
+        const items = this.items();
+        if (!items || !queryText) {
+            this.query.set(undefined);
+            this.suggestedItems.set(items || []);
+            return;
+        }
+
+        const query = StringHelper.searchRegex(queryText);
+        const searchProperty = this.searchProperty();
+
+        this.query.set(query);
+        this.suggestedItems.set(items.filter(x => {
+            if (Types.isString(x)) {
+                return query.test(x);
+            } else {
+                return query.test(x[searchProperty]);
+            }
+        }));
     }
 
     private getSelectedIndex(value: any) {
-        if (!value || !this.items) {
+        const items = this.items();
+        if (!value || !items) {
             return -1;
         }
 
-        if (this.valueProperty && this.valueProperty.length > 0) {
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
+        const valueProperty = this.valueProperty();
+        if (!valueProperty || valueProperty.length === 0) {
+            return items.indexOf(value);
+        }
 
-                if (item && item[this.valueProperty] === value) {
-                    return i;
-                }
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            if (item && item[valueProperty] === value) {
+                return i;
             }
-        } else {
-            return this.items.indexOf(value);
         }
 
         return -1;

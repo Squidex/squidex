@@ -6,11 +6,12 @@
  */
 
 import { AsyncPipe, LowerCasePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { BehaviorSubject, debounceTime, map, switchMap } from 'rxjs';
-import { ALL_TRIGGERS, ConfirmClickDirective, defined, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { map, switchMap } from 'rxjs';
+import { ALL_TRIGGERS, ConfirmClickDirective, defined, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { RuleConfigured } from '../messages';
 import { BranchComponent } from './branch.component';
@@ -30,6 +31,7 @@ type Snapshot = {
     selector: 'sqx-rule-page',
     styleUrls: ['./rule-page.component.scss'],
     templateUrl: './rule-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         BranchComponent,
@@ -53,75 +55,79 @@ type Snapshot = {
         TriggerDialogComponent,
     ],
 })
-export class RulePageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class RulePageComponent {
+    public readonly availableTriggers = ALL_TRIGGERS;
+    public readonly availableSteps;
 
-    public availableTriggers = ALL_TRIGGERS;
-    public availableSteps: { [name: string]: RuleElementDto } = {};
+    public readonly error = signal<ErrorDto | undefined>(undefined);
 
-    public error?: ErrorDto;
+    public readonly stepDialog = new DialogModel();
+    public readonly stepToUpsert = signal<{ step?: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd } | undefined>(undefined);
 
-    public stepDialog = new DialogModel();
-    public stepToUpsert?: { step?: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd };
+    public readonly triggerToEdit = signal<RuleTriggerDto | undefined>(undefined);
+    public readonly triggerDialog = new DialogModel();
 
-    public triggerToEdit?: RuleTriggerDto;
-    public triggerDialog = new DialogModel();
+    public readonly rule = signal<DynamicRuleDto | null | undefined>(undefined);
 
-    public rule?: DynamicRuleDto | null;
-
-    public readonly editableRule = new BehaviorSubject<Snapshot>({
+    public readonly editableRule = signal<Snapshot>({
         flow: new FlowView(new DynamicFlowDefinitionDto({ initialStepId: null!, steps: {} })),
         isEditable: true,
         isEnabled: true,
     });
 
-    public scriptCompletions =
-        this.editableRule.pipe(
-            map(x => x.trigger?.triggerType!),
-            defined(),
-            switchMap(x => this.rulesService.getCompletions(this.rulesState.appName, x)));
+    public readonly scriptCompletions;
 
-    public get isManual() {
-        return this.rule?.trigger?.triggerType === 'Manual';
-    }
+    public readonly isManual = computed(() => {
+        return this.rule()?.trigger?.triggerType === 'Manual';
+    });
 
     constructor(
         public readonly rulesState: RulesState,
         public readonly rulesService: RulesService,
         public readonly schemasState: SchemasState,
         private readonly dialogs: DialogService,
-        private readonly messageBus: MessageBus,
+        messageBus: MessageBus,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-    }
+        this.availableSteps = toSignal(rulesService.getSteps(), { initialValue: {} as { [name: string]: RuleElementDto } });
 
-    public ngOnInit() {
-        this.rulesService.getSteps()
-            .subscribe(steps => {
-                this.availableSteps = steps;
-            });
+        this.scriptCompletions = toSignal(
+            toObservable(this.editableRule).pipe(
+                map(x => x.trigger?.triggerType!),
+                defined(),
+                switchMap(x => rulesService.getCompletions(rulesState.appName, x))),
+            { initialValue: null });
 
-        this.subscriptions.add(
-            this.editableRule.pipe(debounceTime(100))
-                .subscribe(() => {
-                    this.publishState();
-                }));
+        effect(onCleanup => {
+            const { trigger, flow } = this.editableRule();
 
-        this.subscriptions.add(
-            this.rulesState.selectedRule
+            const timer = setTimeout(() => {
+                if (trigger) {
+                    messageBus.emit(new RuleConfigured(trigger, flow.dto));
+                }
+            }, 100);
+
+            onCleanup(() => clearTimeout(timer));
+        });
+
+        effect(onCleanup => {
+            const subscription = rulesState.selectedRule
                 .subscribe(rule => {
                     this.initFromRule(rule);
-                }));
+                });
 
-        this.schemasState.loadIfNotLoaded();
+            onCleanup(() => subscription.unsubscribe());
+        });
+
+        schemasState.loadIfNotLoaded();
     }
 
     private initFromRule(rule?: DynamicRuleDto | null) {
-        this.rule = rule;
+        this.rule.set(rule);
 
         if (rule) {
-            this.editableRule.next({
+            this.editableRule.set({
                 flow: new FlowView(rule.flow),
                 name: rule.name,
                 isEditable: rule.canUpdate,
@@ -132,21 +138,22 @@ export class RulePageComponent implements OnInit {
     }
 
     public save() {
-        const { flow, isEditable, isEnabled, name, trigger } = this.editableRule.value;
+        const { flow, isEditable, isEnabled, name, trigger } = this.editableRule();
         if (!isEditable || !trigger || !flow?.dto.steps || Object.entries(flow.dto.steps).length === 0) {
             return;
         }
 
-        if (this.rule) {
+        const rule = this.rule();
+        if (rule) {
             const request = new DynamicUpdateRuleDto({ flow: flow.dto, isEnabled, name, trigger });
 
-            this.rulesState.update(this.rule, request)
+            this.rulesState.update(rule, request)
                 .subscribe({
                     complete: () => {
                         this.dialogs.notifyInfo('i18n:rules.updated');
                     },
                     error: error => {
-                        this.error = error;
+                        this.error.set(error);
                     },
                 });
         } else {
@@ -161,22 +168,14 @@ export class RulePageComponent implements OnInit {
                         this.dialogs.notifyInfo('i18n:rules.created');
                     },
                     error: error => {
-                        this.error = error;
+                        this.error.set(error);
                     },
                 });
         }
     }
 
-    private publishState() {
-        const { trigger, flow } = this.editableRule.value;
-
-        if (trigger) {
-            this.messageBus.emit(new RuleConfigured(trigger, flow.dto));
-        }
-    }
-
     public changeStep(values: Mutable<IDynamicFlowStepDefinitionDto>) {
-        const target = this.stepToUpsert!.target;
+        const target = this.stepToUpsert()!.target;
         this.update(s => ({
             ...s,
             flow: Types.isString(target) ?
@@ -191,17 +190,17 @@ export class RulePageComponent implements OnInit {
             return;
         }
 
-        this.triggerToEdit = update;
+        this.triggerToEdit.set(update);
         this.triggerDialog.show();
     }
 
     public startUpdateStep(update: FlowStepUpdate) {
-        this.stepToUpsert = { target: update.id, step: update.values };
+        this.stepToUpsert.set({ target: update.id, step: update.values });
         this.stepDialog.show();
     }
 
     public startAddStep(target: FlowStepAdd) {
-        this.stepToUpsert = { target };
+        this.stepToUpsert.set({ target });
         this.stepDialog.show();
     }
 
@@ -230,15 +229,15 @@ export class RulePageComponent implements OnInit {
     }
 
     private update(action: (value: Snapshot) => Snapshot) {
-        this.editableRule.next(action(this.editableRule.value));
-        this.stepToUpsert = undefined;
+        this.editableRule.update(action);
+        this.stepToUpsert.set(undefined);
         this.stepDialog.hide();
-        this.triggerToEdit = undefined;
+        this.triggerToEdit.set(undefined);
         this.triggerDialog.hide();
     }
 
     public trigger() {
-        this.rulesState.trigger(this.rule!);
+        this.rulesState.trigger(this.rule()!);
     }
 
     public back() {

@@ -1,5 +1,5 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
+<div [formGroup]="fieldForm()">
+    <sqx-form-row for="schemaIds" label="common.schemas" [prefix]="field().fieldId">
         <sqx-tag-editor
             id="schemaIds"
             formControlName="schemaIds"

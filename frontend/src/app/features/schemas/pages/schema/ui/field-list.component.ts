@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormAlertComponent, META_FIELDS, SchemaDto, TableField, TranslatePipe } from '@app/shared';
 
 const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
@@ -25,34 +25,42 @@ const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELD
     ],
 })
 export class FieldListComponent {
-    @Input()
-    public emptyText = '';
+    /** The text to show when no field has been added. */
+    public readonly emptyText = input('');
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema to provide the fields. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public fieldNames!: ReadonlyArray<string>;
+    /** The names of the added fields, in the configured order. */
+    public readonly fieldNames = input.required<ReadonlyArray<string>>();
 
-    @Input({ transform: booleanAttribute })
-    public withMetaFields = false;
+    /** Also provides the meta fields like the creation date. */
+    public readonly withMetaFields = input(false, { transform: booleanAttribute });
 
-    @Output()
-    public fieldNamesChange = new EventEmitter<string[]>();
+    /** Emits the new field names when fields are added, removed or reordered. */
+    public readonly fieldNamesChange = output<string[]>();
 
-    public fieldsAdded!: TableField[];
-    public fieldsNotAdded!: TableField[];
+    private readonly fieldsAll = computed<ReadonlyArray<TableField>>(() => {
+        const fields = this.schema().contentFields;
 
-    public ngOnChanges() {
-        let allFields = this.schema.contentFields;
-
-        if (this.withMetaFields) {
-            allFields = [...allFields, ...META_FIELD_NAMES];
+        if (this.withMetaFields()) {
+            return [...fields, ...META_FIELD_NAMES];
         }
 
-        this.fieldsAdded = this.fieldNames.map(x => allFields.find(z => z.name === x)).defined() as any;
-        this.fieldsNotAdded = allFields.filter(x => !this.fieldNames.includes(x.name));
-    }
+        return fields;
+    });
+
+    public readonly fieldsAdded = computed<TableField[]>(() => {
+        const fieldsAll = this.fieldsAll();
+
+        return [...this.fieldNames().map(x => fieldsAll.find(z => z.name === x)).defined()];
+    });
+
+    public readonly fieldsNotAdded = computed<TableField[]>(() => {
+        const fieldNames = this.fieldNames();
+
+        return this.fieldsAll().filter(x => !fieldNames.includes(x.name));
+    });
 
     public drop(event: CdkDragDrop<TableField[]>) {
         if (event.previousContainer === event.container) {
@@ -65,7 +73,7 @@ export class FieldListComponent {
                 event.currentIndex);
         }
 
-        const newNames = this.fieldsAdded.map(x => x.name);
+        const newNames = this.fieldsAdded().map(x => x.name);
 
         this.fieldNamesChange.emit(newNames);
     }

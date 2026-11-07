@@ -1,1 +1,1 @@
-<iframe #iframe [attr.scrollable]="scrollable ? 'yes' : 'no'" [attr.src]="computedUrl | sqxSafeResourceUrl" width="100%"></iframe>
+<iframe #iframe [attr.scrollable]="scrollable() ? 'yes' : 'no'" [attr.src]="computedUrl() | sqxSafeResourceUrl" width="100%"></iframe>

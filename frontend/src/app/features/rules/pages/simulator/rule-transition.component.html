@@ -1,3 +1,6 @@
+@let text = this.text();
+@let isLast = this.isLast();
+@let filteredErrors = this.filteredErrors();
 @if (text) {
     <sqx-history-step [isLast]="isLast && filteredErrors.length === 0" small="true">
         <ng-container summary>

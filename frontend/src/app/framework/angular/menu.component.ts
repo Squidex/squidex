@@ -6,8 +6,8 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, Injectable, input, Optional, signal, SkipSelf, viewChild } from '@angular/core';
-import { ModalModel, ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, Injectable, input, Optional, signal, SkipSelf, viewChild } from '@angular/core';
+import { ModalModel, ResizeListener, ResizeService } from '@app/framework/internal';
 import { DropdownMenuComponent } from './dropdown-menu.component';
 import { MenuItemComponent } from './menu-item.component';
 import { ModalPlacementDirective } from './modals/modal-placement.directive';
@@ -54,12 +54,11 @@ export class MenuItemRegistry {
     }]
 })
 export class MenuComponent implements ResizeListener {
-    private readonly subscriptions = new Subscriptions();
     private readonly menuItemsRegistry: MenuItemRegistry;
     private readonly measuredContainer = signal(-1);
     private readonly measuredMenu = signal(-1);
-    private readonly container = viewChild.required<ElementRef<HTMLDivElement>>('container');
-    private readonly menu = viewChild.required<ElementRef<HTMLDivElement>>('menu');
+    private readonly container = viewChild<ElementRef<HTMLDivElement>>('container');
+    private readonly menu = viewChild<ElementRef<HTMLDivElement>>('menu');
 
     /** Aligns the menu items and the overflow button to the left or right. */
     public readonly alignment = input<'left' | 'right'>('left');
@@ -92,14 +91,29 @@ export class MenuComponent implements ResizeListener {
     ) {
         this.menuItemsRegistry = parentMenuItemRegistry ?? new MenuItemRegistry();
 
-        afterNextRender(() => {
-            this.subscriptions.add(resizeService.listen(this.container().nativeElement, this));
-            this.subscriptions.add(resizeService.listen(this.menu().nativeElement, this));
+        effect(onCleanup => {
+            const container = this.container();
+            if (!container) {
+                return;
+            }
+
+            const unlistenContainer = resizeService.listen(container.nativeElement, this);
+            onCleanup(unlistenContainer);
+        });
+
+        effect(onCleanup => {
+            const menu = this.menu();
+            if (!menu) {
+                return;
+            }
+
+            const unlistenMenu = resizeService.listen(menu.nativeElement, this);
+            onCleanup(unlistenMenu);
         });
     }
 
     public onResize(rect: DOMRect, element: Element): void {
-        if (element === this.container().nativeElement) {
+        if (element === this.container()?.nativeElement) {
             this.measuredContainer.set(rect.width);
         } else {
             this.measuredMenu.set(Math.max(rect.width, element.scrollWidth));

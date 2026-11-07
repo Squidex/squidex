@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 
@@ -27,14 +27,14 @@ import { AssignContributorDto, ConfirmClickDirective, ContributorDto, Contributo
     ],
 })
 export class ContributorComponent {
-    @Input()
-    public roles!: ReadonlyArray<RoleDto>;
+    /** The roles that can be assigned to the contributor. */
+    public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    @Input()
-    public search?: string | RegExp | null;
+    /** The search term to highlight in the contributor name. */
+    public readonly search = input<string | RegExp | null>();
 
-    @Input('sqxContributor')
-    public contributor!: ContributorDto;
+    /** The contributor to show. */
+    public readonly contributor = input.required<ContributorDto>({ alias: 'sqxContributor' });
 
     constructor(
         private readonly contributorsState: ContributorsState,
@@ -42,11 +42,11 @@ export class ContributorComponent {
     }
 
     public remove() {
-        this.contributorsState.revoke(this.contributor);
+        this.contributorsState.revoke(this.contributor());
     }
 
     public changeRole(role: string) {
-        const request = new AssignContributorDto({ contributorId: this.contributor.contributorId, role });
+        const request = new AssignContributorDto({ contributorId: this.contributor().contributorId, role });
 
         this.contributorsState.assign(request);
     }

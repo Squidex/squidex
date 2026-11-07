@@ -1,11 +1,11 @@
-<div [formGroup]="fieldForm">
-    @if (showUnique) {
-        <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field.fieldId">
+<div [formGroup]="fieldForm()">
+    @if (showUnique()) {
+        <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field().fieldId">
             <input class="form-check-input" [id]="isUniqueRow.fieldName()" formControlName="isUnique" type="checkbox" />
         </sqx-form-row>
     }
 
-    <sqx-form-row for="minValue" hideError label="schemas.fieldTypes.number.range" [prefix]="field.fieldId">
+    <sqx-form-row for="minValue" hideError label="schemas.fieldTypes.number.range" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input class="form-control" formControlName="minValue" placeholder="{{ 'schemas.fieldTypes.number.rangeMin' | sqxTranslate }}" type="number" />
@@ -19,13 +19,13 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
         <input class="form-control" [id]="defaultValueRow.fieldName()" formControlName="defaultValue" type="number" />
     </sqx-form-row>
 
-    @if (isLocalizable) {
-        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages" type="number" />
+    @if (isLocalizable()) {
+        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field().fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages()" type="number" />
         </sqx-form-row>
     }
 </div>

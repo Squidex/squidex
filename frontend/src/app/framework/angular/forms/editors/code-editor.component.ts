@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, Input, numberAttribute, ViewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, forwardRef, inject, input, numberAttribute, signal, viewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
-import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, StatefulControlComponent, Subscriptions, ThemeService, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, SignalControlComponent, ThemeService, Types } from '@app/framework/internal';
 import { FocusComponent } from '../forms-helper';
 
 export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -16,6 +16,33 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 type Editor = AceAjax.Editor & { completers?: AceAjax.Completer[]; completer?: { showDocTooltip: (item: any) => void } };
+
+type Completion = { name: string; value: string };
+
+function getDocHTML(item: AceAjax.Completion) {
+    const source = item as unknown as ScriptCompletion;
+    if (!source.path || !source.description) {
+        return;
+    }
+
+    let docHTML = `<b>${item.value}</b><hr></hr>${source.description}`;
+
+    if (source.allowedValues) {
+        docHTML += '<div class="mt-3 mb-0">Allowed Values:<ul class="mt-2 mb-2">';
+
+        for (const value of source.allowedValues) {
+            docHTML += `<li><code>${value}</code></li>`;
+        }
+
+        docHTML += '</ul></div>';
+    }
+
+    if (source.deprecationReason) {
+        docHTML += `<div class="mt-2 mb-2"><strong>Deprecated</strong>: ${source.deprecationReason}</div>`;
+    }
+
+    item.docHTML = docHTML;
+}
 
 @Component({
     selector: 'sqx-code-editor',
@@ -26,99 +53,129 @@ type Editor = AceAjax.Editor & { completers?: AceAjax.Completer[]; completer?: {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodeEditorComponent extends StatefulControlComponent<{}, any> implements AfterViewInit, FocusComponent {
-    private readonly subscriptions = new Subscriptions();
+export class CodeEditorComponent extends SignalControlComponent<any> implements FocusComponent {
     private readonly themeService = inject(ThemeService);
+    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly editor = viewChild.required<ElementRef<HTMLDivElement>>('editor');
+    private readonly aceEditor = signal<Editor | undefined>(undefined);
+    private readonly valueChanged = new Subject<boolean>();
     private aceModes?: ModeList;
-    private aceEditor?: Editor;
     private aceTools = false;
-    private valueChanged = new Subject();
     private value = '';
-    private completions: ReadonlyArray<{ name: string; value: string }> = [];
 
-    @ViewChild('editor', { static: false })
-    public editor!: ElementRef;
+    /** Renders the editor without a border. */
+    public readonly borderless = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public borderless?: boolean | null;
+    /** The ace mode, for example "ace/mode/javascript". Ignored when a value file is set. */
+    public readonly mode = input('ace/mode/javascript');
 
-    @Input()
-    public mode = 'ace/mode/javascript';
+    /** A file name to derive the ace mode from, for example "file.json". */
+    public readonly valueFile = input('');
 
-    @Input()
-    public valueFile = '';
+    /** Handles the value as string, as parsed JSON or as JSON string. */
+    public readonly valueMode = input<'String' | 'Json' | 'JsonString'>('String');
 
-    @Input()
-    public valueMode: 'String' | 'Json' | 'JsonString' = 'String';
+    /** Disables autocompletion and snippets. */
+    public readonly disableTools = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disableTools = false;
+    /** The maximum number of lines when the height is "auto". */
+    public readonly maxLines = input<number | undefined, unknown>(undefined, { transform: numberAttribute });
 
-    @Input({ transform: numberAttribute })
-    public maxLines: number | undefined;
+    /** The minimum number of lines when the height is "auto". */
+    public readonly minLines = input<number | undefined, unknown>(undefined, { transform: numberAttribute });
 
-    @Input({ transform: numberAttribute })
-    public minLines: number | undefined;
+    /** Renders a single line editor like a text input. */
+    public readonly singleLine = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public singleLine = false;
+    /** Enables snippets in autocompletion. */
+    public readonly snippets = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public snippets = true;
+    /** Wraps long lines. */
+    public readonly wordWrap = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public wordWrap = false;
+    /** The height in pixels, "auto" to grow with the content or "full" to fill the container. */
+    public readonly height = input<number | 'auto' | 'full'>('full');
 
-    @Input()
-    public height: number | 'auto' | 'full' = 'full';
+    /** The suggestions for autocompletion. */
+    public readonly completion = input<ScriptCompletions | undefined | null>();
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    private readonly completions = computed<ReadonlyArray<Completion>>(() => {
+        const completion = this.completion();
+        if (!completion) {
+            return [];
+        }
 
-    @Input()
-    public set completion(value: ScriptCompletions | undefined | null) {
-        if (value) {
-            this.completions = value.map(source => {
-                const { path, description, type, ...other } = source;
+        return completion.map(source => {
+            const { path, description, type, ...other } = source;
 
-                return { value: path, name: path, description, meta: type?.toLowerCase(), path, ...other };
+            return { value: path, name: path, description, meta: type?.toLowerCase(), path, ...other };
+        });
+    });
+
+    constructor() {
+        super();
+
+        const valueSubscription =
+            this.valueChanged.pipe(debounceTime(100))
+                .subscribe(() => {
+                    this.changeValue();
+                });
+
+        let isDestroyed = false;
+
+        inject(DestroyRef).onDestroy(() => {
+            isDestroyed = true;
+            valueSubscription.unsubscribe();
+        });
+
+        afterNextRender(async () => {
+            await Promise.all([
+                this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
+                this.resourceLoader.loadLocalScript('dependencies/ace/ext-modelist.js'),
+                this.resourceLoader.loadLocalScript('dependencies/ace/ext-language_tools.js'),
+            ]);
+
+            if (!isDestroyed) {
+                this.initEditor();
+            }
+        });
+
+        effect(onCleanup => {
+            const aceEditor = this.aceEditor();
+            if (!aceEditor) {
+                return;
+            }
+
+            const subscription = this.themeService.themeChanges.subscribe(theme => {
+                aceEditor.setTheme(theme === 'dark' ? 'ace/theme/one_dark' : 'ace/theme/textmate');
             });
-        } else {
-            this.completions = [];
-        }
-    }
 
-    constructor(
-        private readonly resourceLoader: ResourceLoaderService,
-    ) {
-        super({});
-    }
+            onCleanup(() => subscription.unsubscribe());
+        });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.valueFile || changes.mode) {
-            this.setMode();
-        }
+        effect(() => {
+            this.setMode(this.aceEditor(), this.mode(), this.valueFile());
+        });
 
-        if (changes.disabled || changes.height || changes.maxLines || changes.minLines || changes.singleLine || changes.snippets) {
-            this.setOptions();
-        }
+        effect(() => {
+            this.setOptions(this.aceEditor());
+        });
 
-        if (changes.wordWrap) {
-            this.setWordWrap();
-        }
+        effect(() => {
+            this.setWordWrap(this.aceEditor(), this.wordWrap());
+        });
     }
 
     public writeValue(obj: any) {
+        const valueMode = this.valueMode();
         try {
             if (Types.isNull(obj) || Types.isUndefined(obj)) {
                 this.value = '';
-            } else if (Types.isString(obj) && this.valueMode === 'JsonString') {
+            } else if (Types.isString(obj) && valueMode === 'JsonString') {
                 this.value = JSON.stringify(JSON.parse(obj), undefined, 4);
             } else if (Types.isString(obj)) {
                 this.value = obj;
-            } else if (this.valueMode === 'Json') {
+            } else if (valueMode === 'Json') {
                 this.value = JSON.stringify(obj, undefined, 4);
             } else {
                 this.value = '';
@@ -127,124 +184,74 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             this.value = '';
         }
 
-        if (this.aceEditor) {
-            this.setValue(this.value);
-        }
-    }
-
-    public onDisabled(isDisabled: boolean) {
-        if (!this.aceEditor) {
-            return;
-        }
-
-        this.aceEditor.setReadOnly(isDisabled);
+        this.setValue(this.value);
     }
 
     public focus() {
-        if (!this.aceEditor) {
-            return;
-        }
-
-        this.aceEditor.focus();
+        this.aceEditor()?.focus();
     }
 
-    public async ngAfterViewInit() {
-        this.valueChanged.pipe(debounceTime(100))
-            .subscribe(() => {
-                this.changeValue();
-            });
+    private initEditor() {
+        const aceEditor: Editor = ace.edit(this.editor().nativeElement);
+        aceEditor.setFontSize('14px');
 
-        await Promise.all([
-            this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext-modelist.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext-language_tools.js'),
-        ]);
-
-        this.aceEditor = ace.edit(this.editor.nativeElement);
-        this.aceEditor.setFontSize('14px');
         this.aceModes = ace.require('ace/ext/modelist');
         this.aceTools = !!ace.require('ace/ext/language_tools');
 
-        this.setValue(this.value);
-        this.setMode();
-        this.setOptions();
-        this.setWordWrap();
-        this.onDisabled(this.snapshot.isDisabled);
-
-        this.subscriptions.add(
-            this.themeService.themeChanges
-                .subscribe(theme => {
-                    this.aceEditor?.setTheme(theme === 'dark' ? 'ace/theme/one_dark' : 'ace/theme/textmate');
-                }));
-
-        if (this.aceTools && !this.disableTools) {
-            const originalCompleter = this.aceEditor.completer!;
-            const originalShowDocTooltip = originalCompleter.showDocTooltip;
-            originalCompleter.showDocTooltip = item => {
-                requestAnimationFrame(() => {
-                    originalShowDocTooltip.apply(originalCompleter, [item]);
-                });
-            };
-
-            const completer: AceAjax.Completer = {
-                getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
-                    callback(null, this.completions);
-                },
-                getDocTooltip: (item: AceAjax.Completion) => {
-                    const source = item as unknown as ScriptCompletion;
-
-                    if (source.path && source.description) {
-                        item.docHTML = `<b>${item.value}</b><hr></hr>${source.description}`;
-
-                        if (source.allowedValues) {
-                            item.docHTML += '<div class="mt-3 mb-0">Allowed Values:<ul class="mt-2 mb-2">';
-
-                            for (const value of source.allowedValues) {
-                                item.docHTML += `<li><code>${value}</code></li>`;
-                            }
-
-                            item.docHTML += '</ul></div>';
-                        }
-
-                        if (source.deprecationReason) {
-                            item.docHTML += `<div class="mt-2 mb-2"><strong>Deprecated</strong>: ${source.deprecationReason}</div>`;
-                        }
-                    }
-                },
-            };
-
-            const previous = this.aceEditor.completers || [];
-            this.aceEditor.completers = [...previous, completer];
+        if (this.aceTools && !this.disableTools()) {
+            this.setupCompleter(aceEditor);
         }
 
-        this.aceEditor.on('blur', () => {
+        aceEditor.on('blur', () => {
             this.changeValue();
             this.callTouched();
         });
 
-        this.aceEditor.on('change', () => {
+        aceEditor.on('change', () => {
             this.valueChanged.next(true);
         });
 
-        this.aceEditor.on('paste', (event: any) => {
-            if (this.singleLine) {
+        aceEditor.on('paste', (event: any) => {
+            if (this.singleLine()) {
                 event.text = event.text.replace(/[\r\n]+/g, ' ');
             }
         });
 
-        this.detach();
+        this.aceEditor.set(aceEditor);
+        this.setValue(this.value);
+    }
+
+    private setupCompleter(aceEditor: Editor) {
+        const originalCompleter = aceEditor.completer!;
+        const originalShowDocTooltip = originalCompleter.showDocTooltip;
+        originalCompleter.showDocTooltip = item => {
+            requestAnimationFrame(() => {
+                originalShowDocTooltip.apply(originalCompleter, [item]);
+            });
+        };
+
+        const completer: AceAjax.Completer = {
+            getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
+                callback(null, this.completions());
+            },
+            getDocTooltip: getDocHTML,
+        };
+
+        const previous = aceEditor.completers || [];
+        aceEditor.completers = [...previous, completer];
     }
 
     private changeValue() {
-        if (!this.aceEditor) {
+        const aceEditor = this.aceEditor();
+        if (!aceEditor) {
             return;
         }
 
-        let newValueText = this.aceEditor.getValue();
+        let newValueText = aceEditor.getValue();
         let newValueOut: string | null = newValueText;
 
-        if (this.valueMode === 'Json') {
-            const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
+        if (this.valueMode() === 'Json') {
+            const isValid = aceEditor.getSession().getAnnotations().length === 0;
 
             if (isValid) {
                 try {
@@ -266,74 +273,81 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
         this.value = newValueText;
     }
 
-    private setWordWrap() {
-        if (!this.aceEditor || this.singleLine) {
+    private setWordWrap(aceEditor: Editor | undefined, wordWrap: boolean) {
+        if (!aceEditor || this.singleLine()) {
             return;
         }
 
-        this.aceEditor.getSession().setUseWrapMode(this.wordWrap);
+        aceEditor.getSession().setUseWrapMode(wordWrap);
     }
 
-    private setMode() {
-        if (!this.aceEditor) {
+    private setMode(aceEditor: Editor | undefined, mode: string, valueFile: string) {
+        if (!aceEditor) {
             return;
         }
 
-        if (this.valueFile && this.aceModes) {
-            const mode = this.aceModes.getModeForPath(this.valueFile).mode;
-
-            this.aceEditor.getSession().setMode(mode);
+        if (valueFile && this.aceModes) {
+            aceEditor.getSession().setMode(this.aceModes.getModeForPath(valueFile).mode);
         } else {
-            this.aceEditor.getSession().setMode(this.mode);
+            aceEditor.getSession().setMode(mode);
         }
     }
 
-    private setOptions() {
-        if (!this.aceEditor) {
+    private setOptions(aceEditor: Editor | undefined) {
+        if (!aceEditor) {
             return;
         }
+
+        const height = this.height();
+        const isDisabled = this.isDisabled();
+        const singleLine = this.singleLine();
 
         let maxLines = undefined;
         let minLines = undefined;
 
-        if (!this.singleLine) {
-            if (Types.isNumber(this.height)) {
-                const lines = this.height / 15;
-
-                maxLines = lines;
-                minLines = lines;
-            } else if (this.height === 'auto') {
-                maxLines = this.maxLines || 500;
-                minLines = Math.max(this.minLines || 0, Math.min(3, maxLines));
-            }
-        } else {
+        if (singleLine) {
             maxLines = 1;
             minLines = 1;
+        } else if (Types.isNumber(height)) {
+            const lines = height / 15;
+
+            maxLines = lines;
+            minLines = lines;
+        } else if (height === 'auto') {
+            maxLines = this.maxLines() || 500;
+            minLines = Math.max(this.minLines() || 0, Math.min(3, maxLines));
         }
 
-        this.aceEditor.setOptions({
-            autoScrollEditorIntoView: this.singleLine,
+        aceEditor.setOptions({
+            autoScrollEditorIntoView: singleLine,
             enableBasicAutocompletion: this.aceTools,
             enableLiveAutocompletion: this.aceTools,
-            enableSnippets: this.aceTools && !this.singleLine && this.snippets,
-            highlightActiveLine: !this.singleLine,
+            enableSnippets: this.aceTools && !singleLine && this.snippets(),
+            highlightActiveLine: !singleLine,
             maxLines,
             minLines,
-            printMargin: !this.singleLine,
-            showGutter: !this.singleLine,
-            useWorker: !this.snapshot.isDisabled,
+            printMargin: !singleLine,
+            showGutter: !singleLine,
+            useWorker: !isDisabled,
         });
 
-        if (this.snapshot.isDisabled) {
-            this.aceEditor.getSession().setAnnotations([]);
+        aceEditor.setReadOnly(isDisabled);
+
+        if (isDisabled) {
+            aceEditor.getSession().setAnnotations([]);
         }
 
-        this.aceEditor.commands.bindKey('Enter|Shift-Enter', this.singleLine ? 'null' : undefined as any);
+        aceEditor.commands.bindKey('Enter|Shift-Enter', singleLine ? 'null' : undefined as any);
     }
 
     private setValue(value: string) {
-        this.aceEditor?.setValue(value);
-        this.aceEditor?.clearSelection();
+        const aceEditor = this.aceEditor();
+        if (!aceEditor) {
+            return;
+        }
+
+        aceEditor.setValue(value);
+        aceEditor.clearSelection();
     }
 }
 

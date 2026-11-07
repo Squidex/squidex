@@ -5,18 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, SchemaDto, SchemasService, SchemasState, ScriptCompletions, ScriptNamePipe, TranslatePipe } from '@app/shared';
+import { switchMap } from 'rxjs';
+import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, SchemaDto, SchemasService, SchemasState, ScriptNamePipe, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         FormsModule,
         KeysPipe,
@@ -26,38 +26,39 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, Schema
     ],
 })
 export class SchemaScriptsFormComponent {
-    @Input()
-    public schema!: SchemaDto;
+    /** The schema to edit the scripts for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public schemaScript = 'query';
-    public schemaCompletions: Observable<ScriptCompletions> = EMPTY;
+    public readonly schemaScript = signal('query');
+    public readonly schemaCompletions;
 
-    public editForm = new EditSchemaScriptsForm();
+    public readonly editForm = new EditSchemaScriptsForm();
 
-    public isEditable = false;
+    public readonly isEditable = computed(() => {
+        return this.schema().canUpdateScripts;
+    });
 
-    constructor(
-        private readonly appsState: AppsState,
+    constructor(appsState: AppsState, schemasService: SchemasService,
         private readonly schemasState: SchemasState,
-        private readonly schemasService: SchemasService,
     ) {
-    }
+        this.schemaCompletions = toSignal(
+            toObservable(this.schema).pipe(
+                switchMap(schema => schemasService.getContentScriptsCompletion(appsState.appName, schema.name))));
 
-    public ngOnChanges() {
-        this.isEditable = this.schema.canUpdateScripts;
+        effect(() => {
+            const schema = this.schema();
 
-        this.editForm.load(this.schema.scripts);
-        this.editForm.setEnabled(this.isEditable);
-
-        this.schemaCompletions = this.schemasService.getContentScriptsCompletion(this.appsState.appName, this.schema.name).pipe(shareReplay(1));
+            this.editForm.load(schema.scripts);
+            this.editForm.setEnabled(schema.canUpdateScripts);
+        });
     }
 
     public selectField(field: string) {
-        this.schemaScript = field;
+        this.schemaScript.set(field);
     }
 
     public saveSchema() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 
@@ -66,7 +67,7 @@ export class SchemaScriptsFormComponent {
             return;
         }
 
-        this.schemasState.configureScripts(this.schema, value)
+        this.schemasState.configureScripts(this.schema(), value)
             .subscribe({
                 next: () => {
                     this.editForm.submitCompleted({ noReset: true });

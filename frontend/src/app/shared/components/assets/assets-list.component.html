@@ -1,3 +1,6 @@
+@let assetsState = this.assetsState();
+@let isDisabled = this.isDisabled();
+@let isListView = this.isListView();
 @if (!isDisabled && (assetsState.canCreate | async)) {
     <div class="file-drop" (sqxDropFile)="addFiles($event)" sqxTourStep="upload">
         <h3 class="file-drop-header">{{ "assets.uploadByDrop" | sqxTranslate }}</h3>
@@ -54,12 +57,12 @@
         }
 
         @if (assetsState.assets | async; as assets) {
-            @if (assets.length > 0 || snapshot.newFiles.length > 0) {
+            @if (assets.length > 0 || newFiles().length > 0) {
                 <h5>{{ "common.files" | sqxTranslate }}</h5>
             }
 
             <div class="row g-0" cdkDropList cdkDropListSortingDisabled [class.unrow]="isListView">
-                @for (file of snapshot.newFiles; track file) {
+                @for (file of newFiles(); track file) {
                     <sqx-asset
                         [assetFile]="file"
                         [folderId]="assetsState.parentId"
@@ -77,11 +80,11 @@
                         [cdkDragDisabled]="isDisabled || !asset.canMove"
                         (delete)="deleteAsset(asset)"
                         (edit)="edit.emit($event)"
-                        [folderIcon]="showFolderIcon && path.length === 0"
+                        [folderIcon]="showFolderIcon() && path.length === 0"
                         [isDisabled]="isDisabled"
                         [isListView]="isListView"
-                        [isSelectable]="!!selectedIds"
-                        [isSelected]="!!isSelected(asset)"
+                        [isSelectable]="!!selectedIds()"
+                        [isSelected]="isSelected(asset)"
                         (loadDone)="replaceAsset($event)"
                         (selectAsset)="assetSelect.emit(asset)"
                         (selectFolder)="selectFolder(asset)" />

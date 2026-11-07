@@ -1,33 +1,33 @@
-@if (formModel.itemChanges | async; as items) {
+@if (formModel().itemChanges | async; as items) {
     @if (items.length > 0 && items.length <= 20) {
         <div
             class="array-container static"
             cdkDropList
             [cdkDropListData]="items"
-            [cdkDropListDisabled]="isDisabled | async"
+            [cdkDropListDisabled]="isDisabled() | async"
             (cdkDropListDropped)="sort($event)"
-            [cdkDropListSortingDisabled]="isDisabled | async"
-            [class.expanded]="isExpanded">
+            [cdkDropListSortingDisabled]="isDisabled() | async"
+            [class.expanded]="isExpanded()">
             @for (itemForm of items; track itemForm; let i = $index; let isLast = $last; let isFirst = $first) {
                 <div class="table-drag item" cdkDrag cdkDragLockAxis="y" [class.first]="isFirst" [class.last]="isLast">
                     <sqx-array-item
                         (clone)="addCopy(itemForm)"
-                        [form]="form"
-                        [formContext]="formContext"
-                        [formLevel]="formLevel + 1"
+                        [form]="form()"
+                        [formContext]="formContext()"
+                        [formLevel]="formLevel() + 1"
                         [formModel]="itemForm"
-                        [hasChatBot]="hasChatBot"
+                        [hasChatBot]="hasChatBot()"
                         [index]="i"
-                        [isCollapsedInitial]="isCollapsedInitial"
-                        [isComparing]="isComparing"
-                        [isDisabled]="isDisabled | async"
+                        [isCollapsedInitial]="isCollapsedInitial()"
+                        [isComparing]="isComparing()"
+                        [isDisabled]="isDisabled() | async"
                         [isFirst]="isFirst"
                         [isLast]="isLast"
                         (itemMove)="move(itemForm, $event)"
                         (itemRemove)="removeItem(i)"
-                        [language]="language"
-                        [languages]="languages">
-                        <i class="icon-drag2" cdkDragHandle [class.disabled]="isDisabled | async"></i>
+                        [language]="language()"
+                        [languages]="languages()">
+                        <i class="icon-drag2" cdkDragHandle [class.disabled]="isDisabled() | async"></i>
                     </sqx-array-item>
                 </div>
             }
@@ -35,7 +35,7 @@
     }
 
     @if (items.length > 20) {
-        <div class="array-container" [class.expanded]="isExpanded">
+        <div class="array-container" [class.expanded]="isExpanded()">
             <virtual-scroller #scroll [enableUnequalChildrenSizes]="true" [items]="$any(items)">
                 @for (itemForm of scroll.viewPortItems; track itemForm; let i = $index) {
                     <div
@@ -44,64 +44,64 @@
                         [class.last]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1">
                         <sqx-array-item
                             (clone)="addCopy(itemForm)"
-                            [form]="form"
-                            [formContext]="formContext"
-                            [formLevel]="formLevel + 1"
+                            [form]="form()"
+                            [formContext]="formContext()"
+                            [formLevel]="formLevel() + 1"
                             [formModel]="itemForm"
-                            [hasChatBot]="hasChatBot"
+                            [hasChatBot]="hasChatBot()"
                             [index]="scroll.viewPortInfo.startIndexWithBuffer + i"
-                            [isCollapsedInitial]="isCollapsedInitial"
-                            [isComparing]="isComparing"
-                            [isDisabled]="isDisabled | async"
+                            [isCollapsedInitial]="isCollapsedInitial()"
+                            [isComparing]="isComparing()"
+                            [isDisabled]="isDisabled() | async"
                             [isFirst]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
                             [isLast]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1"
                             (itemExpanded)="scroll.invalidateCachedMeasurementAtIndex(scroll.viewPortInfo.startIndexWithBuffer + i)"
                             (itemMove)="move(itemForm, $event)"
                             (itemRemove)="removeItem(scroll.viewPortInfo.startIndexWithBuffer + i)"
-                            [language]="language"
-                            [languages]="languages" />
+                            [language]="language()"
+                            [languages]="languages()" />
                     </div>
                 }
             </virtual-scroller>
         </div>
     }
 
-    <div class="array-buttons row g-0 align-items-center" [class.expanded]="isExpanded">
+    <div class="array-buttons row g-0 align-items-center" [class.expanded]="isExpanded()">
         <div class="col-auto">
-            @if (isArray) {
-                @if (hasField) {
-                    <button class="btn btn-outline-success" (click)="addItem()" [disabled]="isDisabledOrFull | async" type="button">
+            @if (isArray()) {
+                @if (hasField()) {
+                    <button class="btn btn-outline-success" (click)="addItem()" [disabled]="isDisabledOrFull() | async" type="button">
                         {{ "contents.arrayAddItem" | sqxTranslate }}
                     </button>
                 }
 
-                @if (!hasField) {
+                @if (!hasField()) {
                     <sqx-form-hint> {{ "contents.arrayNoFields" | sqxTranslate }}</sqx-form-hint>
                 }
             } @else {
-                @if (schemasList.length > 1) {
+                @if (schemasList().length > 1) {
                     <button
                         class="btn btn-outline-success dropdown-toggle"
                         #buttonSelect
                         (click)="schemasDropdown.show()"
-                        [disabled]="isDisabledOrFull | async"
+                        [disabled]="isDisabledOrFull() | async"
                         type="button">
                         {{ "contents.addComponent" | sqxTranslate }}
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
-                        @for (schema of schemasList; track schema) {
+                        @for (schema of schemasList(); track schema) {
                             <button class="dropdown-item" (click)="addComponent(schema)" type="button">{{ schema.displayName }}</button>
                         }
                     </sqx-dropdown-menu>
                 }
 
-                @if (schemasList.length === 1) {
-                    <button class="btn btn-outline-success" (click)="addComponent(schemasList[0])" [disabled]="isDisabledOrFull | async" type="button">
+                @if (schemasList().length === 1) {
+                    <button class="btn btn-outline-success" (click)="addComponent(schemasList()[0])" [disabled]="isDisabledOrFull() | async" type="button">
                         {{ "contents.addComponent" | sqxTranslate }}
                     </button>
                 }
 
-                @if (schemasList.length === 0) {
+                @if (schemasList().length === 0) {
                     <sqx-form-hint> {{ "contents.componentsNoSchema" | sqxTranslate }}</sqx-form-hint>
                 }
             }
@@ -114,7 +114,7 @@
                     confirmRememberKey="leaveApp"
                     confirmText="i18n:contents.arrayClearConfirmText"
                     confirmTitle="i18n:contents.arrayClearConfirmTitle"
-                    [disabled]="isDisabled | async"
+                    [disabled]="isDisabled() | async"
                     (sqxConfirmClick)="clear()"
                     type="button">
                     {{ "contents.arrayClear" | sqxTranslate }}

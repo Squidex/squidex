@@ -1,59 +1,61 @@
 <sqx-modal-dialog (dialogClose)="emitClose()" showFooter="false" size="lg">
     <ng-container title>
-        @if (schemas.length > 1) {
-            <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
-                @for (schema of schemas; track schema) {
-                    <option [ngValue]="schema">
-                        {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schema.displayName } }}
+        @let schemaItems = schemas();
+        @if (schemaItems.length > 1) {
+            <select class="form-select" [ngModel]="schema()" (ngModelChange)="selectSchema($event)">
+                @for (schemaItem of schemaItems; track schemaItem) {
+                    <option [ngValue]="schemaItem">
+                        {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemaItem.displayName } }}
                     </option>
                 }
             </select>
         }
 
-        @if (schemas.length === 1) {
-            <div>{{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }}</div>
+        @if (schemaItems.length === 1) {
+            <div>{{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemaItems[0].displayName } }}</div>
         }
     </ng-container>
     <ng-container tabs>
         <div class="row gx-2 mt-3 mb-3">
             <div class="col-auto">
-                @if (schema && languages.length > 1) {
+                @if (schema() && contentForm() && languages().length > 1) {
                     <div>
                         <sqx-language-selector
                             class="languages-buttons"
                             dropdownPosition="bottom-end"
-                            [language]="language"
-                            (languageChange)="language = $event"
-                            [languages]="languages"
-                            [percents]="contentForm.translationStatus | async" />
+                            [(language)]="languageSelected"
+                            [languages]="languages()"
+                            [percents]="contentForm()!.translationStatus | async" />
                     </div>
                 }
             </div>
 
             <div class="col text-end">
                 <button class="btn btn-outline-success" (click)="save()" type="button">{{ "common.create" | sqxTranslate }}</button>
-                @if (schema.canContentsCreateAndPublish) {
+                @if (schema()?.canContentsCreateAndPublish) {
                     <button class="btn btn-success ms-2" (click)="saveAndPublish()" type="button">
                         {{ "contents.referencesCreatePublish" | sqxTranslate }}
                     </button>
                 }
-                <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async" />
+                <sqx-form-error bubble="true" closeable="true" [error]="contentForm()?.error | async" />
             </div>
         </div>
     </ng-container>
     <ng-container content>
-        @if (schema && contentForm) {
-            <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-                @for (section of contentForm.sections; track section) {
+        @let schemaSelected = schema();
+        @let form = contentForm();
+        @if (schemaSelected && form) {
+            <form [formGroup]="form.form" (ngSubmit)="saveAndPublish()">
+                @for (section of form.sections; track section) {
                     <sqx-content-section
-                        [form]="contentForm"
-                        [formContext]="formContext"
+                        [form]="form"
+                        [formContext]="formContext()"
                         [formLevel]="0"
                         [formSection]="section"
                         [isCompact]="true"
-                        [(language)]="language"
-                        [languages]="languages"
-                        [schema]="schema" />
+                        [(language)]="languageSelected"
+                        [languages]="languages()"
+                        [schema]="schemaSelected" />
                 }
             </form>
         }

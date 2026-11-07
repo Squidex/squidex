@@ -1,24 +1,24 @@
 <ul class="nav navbar-nav align-items-center">
     <li class="nav-item nav-icon dropdown" #button>
         <span class="nav-link dropdown-toggle" (click)="toggleProfile()">
-            <span class="user"> <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture" /> </span>
+            <span class="user"> <img class="user-picture" [src]="profileId() | sqxUserIdPicture" /> </span>
         </span>
     </li>
 </ul>
 <sqx-dropdown-menu offset="8" [sqxAnchoredTo]="button" *sqxModal="modalMenu; closeAlways: true; onRoot: false">
-    <a class="dropdown-item dropdown-info" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon">
+    <a class="dropdown-item dropdown-info" href="{{ profileUrl }}" sqxExternalLink="noicon">
         <div>{{ "profile.userEmail" | sqxTranslate }}</div>
-        <strong>{{ snapshot.profileEmail }}</strong>
+        <strong>{{ profileEmail() }}</strong>
     </a>
     <div class="dropdown-divider"></div>
 
     @if (uiState.canUseAdminResource | async) {
         <button class="dropdown-item" routerLink="/app/administration" type="button">{{ "common.administration" | sqxTranslate }}</button>
     }
-    <a class="dropdown-item" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon"> {{ "profile.title" | sqxTranslate }}</a>
+    <a class="dropdown-item" href="{{ profileUrl }}" sqxExternalLink="noicon"> {{ "profile.title" | sqxTranslate }}</a>
     <div class="dropdown-submenu">
         <button class="dropdown-item dropdown-toggle" (click)="toggleSubmenu('language')" sqxStopClick type="button">{{ "common.language" | sqxTranslate }}</button>
-        <div class="dropdown-menu" [class.open]="snapshot.submenu === 'language'">
+        <div class="dropdown-menu" [class.open]="submenu() === 'language'">
             @for (availableLanguage of languages; track availableLanguage) {
                 <button
                     class="dropdown-item"
@@ -32,7 +32,7 @@
     </div>
     <div class="dropdown-submenu">
         <button class="dropdown-item dropdown-toggle" (click)="toggleSubmenu('theme')" sqxStopClick type="button">{{ "common.theme" | sqxTranslate }}</button>
-        <div class="dropdown-menu" [class.open]="snapshot.submenu === 'theme'">
+        <div class="dropdown-menu" [class.open]="submenu() === 'theme'">
             @for (themeMode of themeModes; track themeMode.mode) {
                 <button class="dropdown-item" [class.active]="themeMode.mode === (themeService.modeChanges | async)" (click)="changeTheme(themeMode.mode)" type="button">
                     {{ themeMode.label | sqxTranslate }}

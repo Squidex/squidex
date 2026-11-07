@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FromNowPipe, ScriptLogDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { FromNowPipe, ScriptLogDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-script-log',
@@ -19,28 +19,26 @@ import { FromNowPipe, ScriptLogDto, TranslatePipe, TypedSimpleChanges } from '@a
     ],
 })
 export class ScriptLogComponent {
-    @Input({ required: true })
-    public scriptLog!: ScriptLogDto;
+    /** The script log to show, including its log entries. */
+    public readonly scriptLog = input.required<ScriptLogDto>();
 
-    public lines: ReadonlyArray<{ time: string; level: string; message: string }> = [];
+    public readonly lines = computed(() => {
+        return this.scriptLog().entries.map(x => ({
+            time: x.timestamp?.toStringFormat('yyyy-MM-dd HH:mm:ss.SSS') ?? '',
+            level: x.level,
+            message: x.message,
+        }));
+    });
 
-    public omitted = 0;
+    public readonly omitted = computed(() => {
+        const scriptLog = this.scriptLog();
 
-    public isExpanded = false;
+        return Math.max(0, scriptLog.totalEntries - scriptLog.entries.length);
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.scriptLog) {
-            this.lines = this.scriptLog.entries.map(x => ({
-                time: x.timestamp?.toStringFormat('yyyy-MM-dd HH:mm:ss.SSS') ?? '',
-                level: x.level,
-                message: x.message,
-            }));
-
-            this.omitted = Math.max(0, this.scriptLog.totalEntries - this.scriptLog.entries.length);
-        }
-    }
+    public readonly isExpanded = signal(false);
 
     public toggleExpanded() {
-        this.isExpanded = !this.isExpanded;
+        this.isExpanded.update(x => !x);
     }
 }

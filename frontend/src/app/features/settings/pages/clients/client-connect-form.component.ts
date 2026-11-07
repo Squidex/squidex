@@ -6,13 +6,14 @@
  */
 
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
     templateUrl: './client-connect-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         CodeComponent,
@@ -25,93 +26,95 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
         TranslatePipe,
     ],
 })
-export class ClientConnectFormComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class ClientConnectFormComponent {
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    @Input({ required: true })
-    public client!: ClientDto;
+    /** The client to show the connection instructions for. */
+    public readonly client = input.required<ClientDto>();
 
-    public sdks = this.helpService.getSDKs();
-    public sdk?: SDKEntry;
+    public readonly sdks = this.helpService.getSDKs();
+    public readonly sdk = signal<SDKEntry | undefined>(undefined);
 
-    public appName!: string;
-    public appToken?: AccessTokenDto;
+    public readonly appName: string;
+    public readonly appToken = signal<AccessTokenDto | undefined>(undefined);
 
-    public step = 'Start';
+    public readonly step = signal('Start');
 
-    public get mcpUrl() {
+    public readonly mcpUrl = computed(() => {
         return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
-    }
+    });
 
-    public get mcpServerName() {
+    public readonly mcpServerName = computed(() => {
         return `squidex-${this.appName}`;
-    }
+    });
 
-    public get mcpCommand() {
-        return `claude mcp add --transport http ${this.mcpServerName} ${this.mcpUrl} --header "Authorization: ${this.mcpAuthorization}"`;
-    }
+    public readonly mcpCommand = computed(() => {
+        return `claude mcp add --transport http ${this.mcpServerName()} ${this.mcpUrl()} --header "Authorization: ${this.mcpAuthorization()}"`;
+    });
 
-    public get mcpConfig() {
+    public readonly mcpConfig = computed(() => {
         const config = {
             mcpServers: {
-                [this.mcpServerName]: {
+                [this.mcpServerName()]: {
                     type: 'http',
-                    url: this.mcpUrl,
+                    url: this.mcpUrl(),
                     headers: {
-                        Authorization: this.mcpAuthorization,
+                        Authorization: this.mcpAuthorization(),
                     },
                 },
             },
         };
 
         return JSON.stringify(config, undefined, 4);
-    }
+    });
 
-    private get mcpAuthorization() {
+    private readonly mcpAuthorization = computed(() => {
+        const client = this.client();
+
         // The client secret does not expire, unlike the access token.
-        return `Basic ${btoa(`${this.appName}:${this.client.id}:${this.client.secret}`)}`;
-    }
+        return `Basic ${btoa(`${this.appName}:${client.id}:${client.secret}`)}`;
+    });
 
     constructor(
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,
-        private readonly changeDetector: ChangeDetectorRef,
         private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService,
         private readonly helpService: HelpService,
-        private readonly messageBus: MessageBus,
+        messageBus: MessageBus,
     ) {
-    }
+        this.appName = appsState.appName;
 
-    public ngOnInit() {
-        this.appName = this.appsState.appName;
+        effect(onCleanup => {
+            const subscription = this.clientsService.createToken(this.appName, this.client())
+                .subscribe({
+                    next: dto => {
+                        this.appToken.set(dto);
+                    },
+                    error: error => {
+                        this.dialogs.notifyError(error);
+                    },
+                });
 
-        this.clientsService.createToken(this.appsState.appName, this.client)
-            .subscribe({
-                next: dto => {
-                    this.appToken = dto;
+            onCleanup(() => subscription.unsubscribe());
+        });
 
-                    this.changeDetector.detectChanges();
-                },
-                error: error => {
-                    this.dialogs.notifyError(error);
-                },
-            });
-
-        this.messageBus.emit(new ClientTourStated());
+        messageBus.emit(new ClientTourStated());
     }
 
     public select(sdk: SDKEntry) {
+        const client = this.client();
+
         sdk.instructions = sdk.instructions.replace(/<APP_NAME>/g, this.appName);
-        sdk.instructions = sdk.instructions.replace(/<CLIENT_ID>/g, `${this.appName}:${this.client.id}`);
-        sdk.instructions = sdk.instructions.replace(/<CLIENT_SECRET>/g, this.client.secret);
+        sdk.instructions = sdk.instructions.replace(/<CLIENT_ID>/g, `${this.appName}:${client.id}`);
+        sdk.instructions = sdk.instructions.replace(/<CLIENT_SECRET>/g, client.secret);
         sdk.instructions = sdk.instructions.replace(/<URL>/g, this.apiUrl.value);
 
-        this.sdk = sdk;
+        this.sdk.set(sdk);
     }
 
     public go(step: string) {
-        this.step = step;
+        this.step.set(step);
     }
 }

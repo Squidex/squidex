@@ -1,15 +1,15 @@
-@if (config) {
+@if (config()) {
     <button
         class="btn settings-button"
         #buttonSettings
-        [class.btn-primary]="needsAttention"
-        [class.focused]="needsAttention"
+        [class.btn-primary]="needsAttention()"
+        [class.focused]="needsAttention()"
         (click)="dropdownModal.toggle()"
         type="button">
         <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
     </button>
     <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonSettings" *sqxModal="dropdownModal">
-        @for (item of configOptions; track item) {
+        @for (item of configOptions(); track item) {
             <div class="dropdown-item">
                 <div class="form-check">
                     <input

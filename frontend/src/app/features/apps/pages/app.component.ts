@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Settings, StopClickDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -28,23 +28,25 @@ import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, 
     ],
 })
 export class AppComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    /** The app to show in the card. */
+    public readonly app = input.required<AppDto>();
 
-    @Output()
-    public leave = new EventEmitter<AppDto>();
+    /** Emits the app when the user confirms to leave it. */
+    public readonly leave = output<AppDto>();
 
-    public dropdown = new ModalModel();
+    public readonly dropdown = new ModalModel();
 
-    public get canShowContents() {
-        return this.app.canAccessContent;
-    }
+    public readonly canShowContents = computed(() => {
+        return this.app().canAccessContent;
+    });
 
-    public get canShowAssets() {
-        return this.app.canReadAssets && this.app.roleProperties[Settings.AppProperties.HIDE_ASSETS] !== true;
-    }
+    public readonly canShowAssets = computed(() => {
+        const app = this.app();
 
-    public get canShowSettings() {
-        return this.app.roleProperties[Settings.AppProperties.HIDE_SETTINGS] !== true;
-    }
+        return app.canReadAssets && app.roleProperties[Settings.AppProperties.HIDE_ASSETS] !== true;
+    });
+
+    public readonly canShowSettings = computed(() => {
+        return this.app().roleProperties[Settings.AppProperties.HIDE_SETTINGS] !== true;
+    });
 }

@@ -1,13 +1,15 @@
-<div class="row gx-3 {{ size }} root" [class.align-items-center]="!showDescription" [class.disabled]="disabled">
+@let elementInfo = this.elementInfo();
+@let size = this.size();
+<div class="row gx-3 {{ size }} root" [class.align-items-center]="!showDescription()" [class.disabled]="disabled()">
     <div class="col-auto">
         <div
             class="icon relative d-flex align-items-center justify-content-center"
             (click)="iconClick.emit()"
             [style.background]="elementInfo.iconColor! | sqxDarken: 5"
             [style.border]="'none'"
-            [title]="label || elementInfo.title">
+            [title]="label() || elementInfo.title">
             <sqx-rule-icon [elementInfo]="elementInfo" [size]="size" />
-            @if (showRemove) {
+            @if (showRemove()) {
                 <button
                     class="btn btn-sm rounded-full btn-outline-danger"
                     attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
@@ -22,11 +24,11 @@
         </div>
     </div>
 
-    @if (showName) {
+    @if (showName()) {
         <div class="col">
-            <div class="title">{{ elementInfo.title || elementType }}</div>
+            <div class="title">{{ elementInfo.title || elementType() }}</div>
 
-            @if (showDescription) {
+            @if (showDescription()) {
                 <div class="text text-muted">{{ elementInfo.description }}</div>
 
                 @if (elementInfo.readMore) {

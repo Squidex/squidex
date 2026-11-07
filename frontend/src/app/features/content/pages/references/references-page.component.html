@@ -8,9 +8,9 @@
                 </button>
             </div>
 
-            @if (languages.length > 1) {
+            @if (languages().length > 1) {
                 <div class="col-auto">
-                    <sqx-language-selector class="languages-buttons" [language]="language" (languageChange)="changeLanguage($event)" [languages]="languages" />
+                    <sqx-language-selector class="languages-buttons" [language]="language()" (languageChange)="changeLanguage($event)" [languages]="languages()" />
                 </div>
             }
         </div>
@@ -26,8 +26,8 @@
                                 [columns]="contents | sqxContentsColumns"
                                 [isCompact]="false"
                                 [isDisabled]="false"
-                                [language]="language"
-                                [languages]="languages"
+                                [language]="language()"
+                                [languages]="languages()"
                                 [sqxReferenceItem]="content"
                                 [validations]="(contentsState.validationResults | async)!"
                                 [validityVisible]="true"></tbody>

@@ -6,17 +6,18 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, ConfirmClickDirective, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ApiUrlConfig, ConfirmClickDirective, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { JobComponent } from './job.component';
 
 @Component({
     selector: 'sqx-jobs-page',
     styleUrls: ['./jobs-page.component.scss'],
     templateUrl: './jobs-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         ConfirmClickDirective,
@@ -34,21 +35,21 @@ import { JobComponent } from './job.component';
         TranslatePipe,
     ],
 })
-export class JobsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-
+export class JobsPageComponent {
     constructor(
         public readonly apiUrl: ApiUrlConfig,
         public readonly jobsState: JobsState,
     ) {
-    }
-
-    public ngOnInit() {
         this.jobsState.load();
 
-        this.subscriptions.add(
-            timer(3000, 3000).pipe(
-                switchMap(() => this.jobsState.load(false, true))));
+        effect(onCleanup => {
+            const subscription =
+                timer(3000, 3000).pipe(
+                    switchMap(() => this.jobsState.load(false, true)))
+                .subscribe();
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public reload() {

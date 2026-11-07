@@ -6,15 +6,17 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamDto, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
+import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         ConfirmClickDirective,
@@ -34,40 +36,41 @@ import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, 
         TranslatePipe,
     ],
 })
-export class MorePageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class MorePageComponent {
+    public readonly team;
 
-    public team!: TeamDto;
+    public readonly isEditable = computed(() => {
+        return !!this.team()?.canUpdateGeneral;
+    });
 
-    public isEditable = false;
-    public isDeletable = false;
+    public readonly isDeletable = computed(() => {
+        return !!this.team()?.canDelete;
+    });
 
-    public updateForm = new UpdateTeamForm();
+    public readonly updateForm = new UpdateTeamForm();
 
     constructor(
         private readonly router: Router,
         private readonly teamsState: TeamsState,
     ) {
-    }
+        this.team = toSignal(this.teamsState.selectedTeam.pipe(defined()));
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.teamsState.selectedTeam.pipe(defined())
-                .subscribe(team => {
-                    this.team = team;
+        effect(() => {
+            const team = this.team();
+            if (!team) {
+                return;
+            }
 
-                    this.isEditable = team.canUpdateGeneral;
-                    this.isDeletable = team.canDelete;
-
-                    this.updateForm.load(team);
-                    this.updateForm.setEnabled(this.isEditable);
-                }));
+            this.updateForm.load(team);
+            this.updateForm.setEnabled(team.canUpdateGeneral);
+        });
 
         this.teamsState.reloadTeams();
     }
 
     public save() {
-        if (!this.isEditable) {
+        const team = this.team();
+        if (!team || !this.isEditable()) {
             return;
         }
 
@@ -76,7 +79,7 @@ export class MorePageComponent implements OnInit {
             return;
         }
 
-        this.teamsState.update(this.team, value)
+        this.teamsState.update(team, value)
             .subscribe({
                 next: team => {
                     this.updateForm.submitCompleted({ newValue: team });
@@ -88,11 +91,12 @@ export class MorePageComponent implements OnInit {
     }
 
     public deleteTeam() {
-        if (!this.isDeletable) {
+        const team = this.team();
+        if (!team || !this.isDeletable()) {
             return;
         }
 
-        this.teamsState.delete(this.team)
+        this.teamsState.delete(team)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             });

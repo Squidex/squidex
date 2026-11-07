@@ -10,7 +10,7 @@
                     <div class="col">
                         <sqx-control-errors for="name" />
                         <select class="form-select" formControlName="name">
-                            @for (fieldName of fieldNames; track fieldName) {
+                            @for (fieldName of fieldNames(); track fieldName) {
                                 <option [ngValue]="fieldName">{{ fieldName }}</option>
                             }
                         </select>

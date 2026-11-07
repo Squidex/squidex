@@ -6,8 +6,8 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDirective, TranslatePipe, TypedSimpleChanges, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-event',
@@ -24,26 +24,26 @@ import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDi
     ],
 })
 export class ContentEventComponent {
-    @Output()
-    public dataLoad = new EventEmitter();
+    /** Emits when the user wants to load the version of this event. */
+    public readonly dataLoad = output();
 
-    @Output()
-    public dataCompare = new EventEmitter();
+    /** Emits when the user wants to compare the version of this event with the current version. */
+    public readonly dataCompare = output();
 
-    @Input({ required: true })
-    public event!: HistoryEventDto;
+    /** The history event to render. */
+    public readonly event = input.required<HistoryEventDto>();
 
-    @Input({ required: true })
-    public content!: ContentDto;
+    /** The current content. */
+    public readonly content = input.required<ContentDto>();
 
-    public canLoadOrCompare = false;
+    public readonly canLoadOrCompare = computed(() => {
+        const event = this.event();
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.event) {
-            this.canLoadOrCompare =
-               (this.event.eventType === 'ContentUpdatedEvent' ||
-                this.event.eventType === 'ContentCreatedEventV2') &&
-                this.event.version !== this.content.version;
+        const isContentEvent = event.eventType === 'ContentUpdatedEvent' || event.eventType === 'ContentCreatedEventV2';
+        if (!isContentEvent) {
+            return false;
         }
-    }
+
+        return event.version !== this.content().version;
+    });
 }

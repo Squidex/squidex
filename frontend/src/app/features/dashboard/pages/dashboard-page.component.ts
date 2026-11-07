@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { afterEveryRender, Component, effect, NgZone, Renderer2, signal, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
-import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, StorageUsagePerDateDto, Subscriptions, SupportCardComponent, switchSafe, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
+import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, defined, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, switchSafe, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
 import { ApiCardComponent } from './cards/api-card.component';
 import { ContentSummaryCardComponent } from './cards/content-summary-card.component';
 import { GithubCardComponent } from './cards/github-card.component';
@@ -30,7 +30,6 @@ import { DashboardConfigComponent } from './dashboard-config.component';
         AssetUploadsCountCardComponent,
         AssetUploadsSizeCardComponent,
         AssetUploadsSizeSummaryCardComponent,
-        AsyncPipe,
         ContentSummaryCardComponent,
         DashboardConfigComponent,
         GithubCardComponent,
@@ -48,95 +47,97 @@ import { DashboardConfigComponent } from './dashboard-config.component';
         TranslatePipe,
     ],
 })
-export class DashboardPageComponent implements AfterViewInit, OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class DashboardPageComponent {
+    private readonly grid = viewChild<Gridster>('grid');
 
-    @ViewChild('grid')
-    public grid!: Gridster;
+    public readonly selectedApp;
 
-    public selectedApp = this.appsState.selectedApp.pipe(defined());
+    public readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
+    public readonly isScrolled = signal(false);
 
-    public isStacked = false;
-    public isScrolled = false;
+    public readonly storageCurrent;
+    public readonly storageUsage;
 
-    public storageCurrent?: CurrentStorageDto;
-    public storageUsage?: ReadonlyArray<StorageUsagePerDateDto>;
+    public readonly callsUsage;
 
-    public callsUsage?: CallsUsageDto;
+    public readonly gridConfig = signal<GridsterItemConfig[] | undefined>(undefined);
+    public readonly gridConfigAvailable = [...DEFAULT_CELLS, ...ADDITIONAL_CELLS];
+    public readonly gridConfigDefaults = DEFAULT_CELLS;
+    public readonly gridOptions = DEFAULT_OPTIONS;
 
-    public gridConfig?: GridsterItemConfig[];
-    public gridConfigAvailable = [...DEFAULT_CELLS, ...ADDITIONAL_CELLS];
-    public gridConfigDefaults = DEFAULT_CELLS;
-    public gridOptions = DEFAULT_OPTIONS;
+    public readonly extendedHeight = signal('');
 
-    public extendedHeight: string = '';
-
-    public user = this.authState.user?.displayName;
+    public readonly user = this.authState.user?.displayName;
 
     constructor(
         private readonly appsState: AppsState,
         private readonly authState: AuthService,
         private readonly localStore: LocalStoreService,
-        private readonly renderer: Renderer2,
-        private readonly usagesService: UsagesService,
-        private readonly zone: NgZone,
+        renderer: Renderer2,
+        usagesService: UsagesService,
+        zone: NgZone,
     ) {
-        this.isStacked = localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED);
-    }
-
-    public ngOnInit() {
         const dateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
         const dateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
 
-        this.subscriptions.add(
-            this.selectedApp.pipe(switchSafe(app => this.usagesService.getTodayStorage(app.name)))
-                .subscribe(dto => {
-                    this.storageCurrent = dto;
-                }));
+        const selectedApp = this.appsState.selectedApp.pipe(defined());
 
-        this.subscriptions.add(
-            this.selectedApp.pipe(switchSafe(app => this.usagesService.getStorageUsages(app.name, dateFrom, dateTo)))
-                .subscribe(dtos => {
-                    this.storageUsage = dtos;
-                }));
+        this.selectedApp = toSignal(selectedApp);
 
-        this.subscriptions.add(
-            this.selectedApp.pipe(switchSafe(app => this.usagesService.getCallsUsages(app.name, dateFrom, dateTo)))
-                .subscribe(dto => {
-                    this.callsUsage = dto;
-                }));
-    }
+        this.storageCurrent = toSignal(
+            selectedApp.pipe(switchSafe(app => usagesService.getTodayStorage(app.name))));
 
-    public ngAfterViewInit() {
-        this.zone.runOutsideAngular(() => {
-            const gridElement = this.grid.el;
+        this.storageUsage = toSignal(
+            selectedApp.pipe(switchSafe(app => usagesService.getStorageUsages(app.name, dateFrom, dateTo))));
 
-            this.renderer.listen(gridElement, 'scroll', () => {
-                const isScrolled = gridElement.scrollTop > 0;
+        this.callsUsage = toSignal(
+            selectedApp.pipe(switchSafe(app => usagesService.getCallsUsages(app.name, dateFrom, dateTo))));
 
-                if (isScrolled !== this.isScrolled) {
-                    this.zone.run(() => {
-                        this.isScrolled = isScrolled;
-                    });
-                }
+        effect(onCleanup => {
+            const grid = this.grid();
+            if (!grid) {
+                return;
+            }
+
+            const gridElement = grid.el;
+
+            const unlisten = zone.runOutsideAngular(() => {
+                return renderer.listen(gridElement, 'scroll', () => {
+                    const isScrolled = gridElement.scrollTop > 0;
+
+                    if (isScrolled !== this.isScrolled()) {
+                        zone.run(() => {
+                            this.isScrolled.set(isScrolled);
+                        });
+                    }
+                });
             });
-        });
-    }
 
-    public ngAfterViewChecked() {
-        this.extendedHeight = `${this.grid.gridRows.length * this.grid.curRowHeight - (this.gridOptions.margin || 0)}px`;
+            onCleanup(unlisten);
+        });
+
+        afterEveryRender({
+            write: () => {
+                const grid = this.grid();
+                if (!grid) {
+                    return;
+                }
+
+                this.extendedHeight.set(`${grid.gridRows.length * grid.curRowHeight - (this.gridOptions.margin || 0)}px`);
+            },
+        });
     }
 
     public changeIsStacked(value: boolean) {
         this.localStore.setBoolean(Settings.Local.DASHBOARD_CHART_STACKED, value);
 
-        this.isStacked = value;
+        this.isStacked.set(value);
     }
 
     public changeConfig(config: GridsterItemConfig[]) {
-        this.gridConfig = config;
+        this.gridConfig.set(config);
 
-        this.grid?.updateGrid();
+        this.grid()?.updateGrid();
     }
 }
 

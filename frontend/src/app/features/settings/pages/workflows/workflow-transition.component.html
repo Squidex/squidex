@@ -1,8 +1,9 @@
+@let transitionValue = transition();
 <div class="row transition g-0 align-items-center">
     <div class="col col-arrow"><i class="icon-corner-down-right text-decent"></i></div>
 
     <div class="col col-step">
-        <div class="transition-to"><i class="icon-circle" [style.color]="transition.step.values.color"></i> {{ transition.to }}</div>
+        <div class="transition-to"><i class="icon-circle" [style.color]="transitionValue.step.values.color"></i> {{ transitionValue.to }}</div>
     </div>
 
     <div class="col-auto col-label">
@@ -12,9 +13,9 @@
     <div class="col">
         <input
             class="form-control"
-            [class.dashed]="!transition.values.expression"
-            [disabled]="!!disabled"
-            [ngModel]="transition.values.expression"
+            [class.dashed]="!transitionValue.values.expression"
+            [disabled]="disabled()"
+            [ngModel]="transitionValue.values.expression"
             (ngModelChange)="changeExpression($event)"
             [ngModelOptions]="onBlur"
             placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
@@ -28,9 +29,9 @@
     <div class="col col-roles">
         <sqx-tag-editor
             allowDuplicates="false"
-            [disabled]="!!disabled"
-            [itemsSource]="roles"
-            [ngModel]="transition.values.roles"
+            [disabled]="disabled()"
+            [itemsSource]="roles()"
+            [ngModel]="transitionValue.values.roles"
             (ngModelChange)="changeRole($event)"
             [ngModelOptions]="onBlur"
             placeholder="{{ 'common.role' | sqxTranslate }}"
@@ -39,7 +40,7 @@
     </div>
 
     <div class="col col-button ps-2">
-        <button class="btn btn-text-danger" attr.aria-label="{{ 'common.remove' | sqxTranslate }}" (click)="remove()" [disabled]="disabled" type="button">
+        <button class="btn btn-text-danger" attr.aria-label="{{ 'common.remove' | sqxTranslate }}" (click)="remove()" [disabled]="disabled()" type="button">
             <i class="icon-bin3"></i>
         </button>
     </div>

@@ -1,14 +1,17 @@
-@if (!isListView) {
+@let asset = this.asset();
+@let progress = this.progress();
+@let isDisabled = this.isDisabled();
+@if (!isListView()) {
     <div
         class="card"
-        [class.border-primary]="isSelected"
-        [class.selectable]="isSelectable"
+        [class.border-primary]="isSelected()"
+        [class.selectable]="isSelectable()"
         (click)="selectAsset.emit()"
         [sqxDropDisabled]="!asset || !asset.canUpload"
         (sqxDropFile)="updateFile($event)"
         sqxDropNoPaste="true">
         <div class="card-body">
-            @if (asset && snapshot.progress === 0) {
+            @if (asset && progress === 0) {
                 <div class="file-preview">
                     @if (asset.fileType) {
                         <span class="file-type"> {{ asset.fileType }} </span>
@@ -37,7 +40,7 @@
                                 sqxStopClick>
                                 <i class="icon-download"></i>
                             </a>
-                            @if (folderIcon) {
+                            @if (folderIcon()) {
                                 <button
                                     class="file-folder ms-2"
                                     attr.aria-label="{{ 'assets.openFolder' | sqxTranslate }}"
@@ -47,7 +50,7 @@
                                 </button>
                             }
 
-                            @if (!isDisabled && !removeMode && asset.canDelete) {
+                            @if (!isDisabled && !removeMode() && asset.canDelete) {
                                 <button
                                     class="file-delete ms-2"
                                     attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
@@ -60,7 +63,7 @@
                                 </button>
                             }
 
-                            @if (!isDisabled && removeMode) {
+                            @if (!isDisabled && removeMode()) {
                                 <button
                                     class="file-delete ms-2"
                                     attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
@@ -91,8 +94,8 @@
                         <div class="drop-overlay-text">{{ "assets.dropToUpdate" | sqxTranslate }}</div>
                     </div>
                 </div>
-            } @else if (snapshot.progress > 0) {
-                <div class="upload-progress"><sqx-progress-bar mode="Circle" [value]="snapshot.progress" /></div>
+            } @else if (progress > 0) {
+                <div class="upload-progress"><sqx-progress-bar mode="Circle" [value]="progress" /></div>
             }
         </div>
 
@@ -120,20 +123,20 @@
 } @else {
     <div
         class="table-items-row table-items-row-summary"
-        [class.selectable]="isSelectable"
+        [class.selectable]="isSelectable()"
         (click)="selectAsset.emit()"
         [sqxDropDisabled]="!asset || !asset.canUpload"
         (sqxDropFile)="updateFile($event)"
         [sqxDropNoPaste]="true">
-        <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected"></div>
+        <div class="left-border" [class.hidden]="!isSelectable()" [class.selected]="isSelected()"></div>
 
-        @if (asset && snapshot.progress === 0) {
+        @if (asset && progress === 0) {
             @if (asset.canPreview) {
-                <div class="image" [class.image-left]="!isSelectable">
+                <div class="image" [class.image-left]="!isSelectable()">
                     <img class="bg2" layoutKey="asset-small" [sqxImageSource]="asset | sqxAssetPreviewUrl" />
                 </div>
             } @else {
-                <div class="image image-padded" [class.image-left]="!isSelectable"><img class="icon" [src]="asset | sqxFileIcon" /></div>
+                <div class="image image-padded" [class.image-left]="!isSelectable()"><img class="icon" [src]="asset | sqxFileIcon" /></div>
             }
 
             <table class="table-fixed">
@@ -147,7 +150,7 @@
                         </div>
                     </td>
 
-                    @if (!isCompact) {
+                    @if (!isCompact()) {
                         <td class="col-info">
                             <div class="truncate">{{ asset.metadataText }}</div>
                         </td>
@@ -165,7 +168,7 @@
                                 sqxStopClick>
                                 <i class="icon-download"></i
                             ></a>
-                            @if (folderIcon) {
+                            @if (folderIcon()) {
                                 <button
                                     class="btn btn-text-secondary"
                                     attr.aria-label="{{ 'assets.openFolder' | sqxTranslate }}"
@@ -178,7 +181,7 @@
                     }
 
                     <td class="col-delete text-end">
-                        @if (!isDisabled && !removeMode && asset.canDelete) {
+                        @if (!isDisabled && !removeMode() && asset.canDelete) {
                             <button
                                 class="btn btn-text-danger"
                                 attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
@@ -192,7 +195,7 @@
                             </button>
                         }
 
-                        @if (!isDisabled && removeMode) {
+                        @if (!isDisabled && removeMode()) {
                             <button
                                 class="btn btn-text-secondary"
                                 attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
@@ -216,9 +219,9 @@
             </div>
         }
 
-        @if (snapshot.progress > 0) {
+        @if (progress > 0) {
             <div class="upload-progress">
-                <sqx-progress-bar [showText]="false" [strokeWidth]="0.8" [trailWidth]="0.8" [value]="snapshot.progress" />
+                <sqx-progress-bar [showText]="false" [strokeWidth]="0.8" [trailWidth]="0.8" [value]="progress" />
             </div>
         }
     </div>

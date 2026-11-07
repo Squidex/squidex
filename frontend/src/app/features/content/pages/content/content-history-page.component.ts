@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Observable, timer } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { timer } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppsState, ConfirmClickDirective, ContentDto, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, Subscriptions, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, ConfirmClickDirective, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
 import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentEventComponent } from './content-event.component';
 import { ContentPageComponent } from './content-page.component';
@@ -18,8 +18,8 @@ import { ContentPageComponent } from './content-page.component';
     selector: 'sqx-history',
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         ContentEventComponent,
         ContentStatusComponent,
@@ -35,21 +35,27 @@ import { ContentPageComponent } from './content-page.component';
         TranslatePipe,
     ],
 })
-export class ContentHistoryPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ContentHistoryPageComponent {
+    private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
 
-    @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector!: DueTimeSelectorComponent;
+    public readonly content = toSignal(this.contentsState.selectedContent.pipe(defined()));
 
-    public content!: ContentDto;
-    public contentEvents?: Observable<ReadonlyArray<HistoryEventDto>>;
+    public readonly contentEvents = toSignal(
+        this.contentsState.selectedContent.pipe(
+            defined(),
+            map(content => `schemas.${this.schemasState.schemaId}.contents.${content.id}`),
+            switchSafe(channel => timer(0, 5000).pipe(map(() => channel))),
+            switchSafe(channel => this.historyService.getHistory(this.appsState.appName, channel))),
+        { initialValue: [] });
 
-    public dropdown = new ModalModel();
-    public dropdownNew = new ModalModel();
+    public readonly dropdown = new ModalModel();
+    public readonly dropdownNew = new ModalModel();
 
-    public get disableScheduler() {
-        return this.appsState.snapshot.selectedSettings?.hideScheduler === true;
-    }
+    public readonly settings = toSignal(this.appsState.selectedSettings, { initialValue: this.appsState.snapshot.selectedSettings });
+
+    public readonly disableScheduler = computed(() => {
+        return this.settings()?.hideScheduler === true;
+    });
 
     constructor(
         private readonly appsState: AppsState,
@@ -60,46 +66,31 @@ export class ContentHistoryPageComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.contentsState.selectedContent.pipe(defined())
-                .subscribe(content => {
-                    this.content = content;
-                }));
-
-        this.contentEvents =
-            this.contentsState.selectedContent.pipe(
-                defined(),
-                map(content => `schemas.${this.schemasState.schemaId}.contents.${content.id}`),
-                switchSafe(channel => timer(0, 5000).pipe(map(() => channel))),
-                switchSafe(channel => this.historyService.getHistory(this.appsState.appName, channel)));
-    }
-
     public changeStatus(status: string) {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
                 defined(),
-                switchSafe(_ => this.dueTimeSelector.selectDueTime(status)),
-                switchSafe(d => this.contentsState.changeManyStatus([this.content], status, d)))
+                switchSafe(_ => this.dueTimeSelector().selectDueTime(status)),
+                switchSafe(d => this.contentsState.changeManyStatus([this.content()!], status, d)))
             .subscribe();
     }
 
     public createDraft() {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(
                 defined(),
-                switchSafe(() => this.contentsState.createDraft(this.content)))
+                switchSafe(() => this.contentsState.createDraft(this.content()!)))
             .subscribe();
     }
 
     public cancelStatus() {
-        this.contentsState.cancelStatus(this.content);
+        this.contentsState.cancelStatus(this.content()!);
     }
 
     public delete() {
-        this.contentsState.deleteMany([this.content]);
+        this.contentsState.deleteMany([this.content()!]);
     }
 
     public deleteDraft() {
-        this.contentsState.deleteDraft(this.content);
+        this.contentsState.deleteDraft(this.content()!);
     }
 
     public loadVersion(event: HistoryEventDto) {

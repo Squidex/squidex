@@ -1,7 +1,7 @@
-<form [formGroup]="actualForm.form" (ngSubmit)="createSchema()">
+<form [formGroup]="actualForm().form" (ngSubmit)="createSchema()">
     <sqx-modal-dialog (dialogClose)="emitClose()" hasTabs="true" size="lg" tourId="schemaForm">
         <ng-container title>
-            @if (source) {
+            @if (sourceActual()) {
                 {{ "schemas.clone" | sqxTranslate }}
             } @else {
                 {{ "schemas.create" | sqxTranslate }}
@@ -12,20 +12,20 @@
                 <div class="col">
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
+                            <button class="nav-link" [class.active]="selectedTab() === 0" (click)="selectTab(0)" type="button">
                                 {{ "schemas.createCustom" | sqxTranslate }}
                             </button>
                         </li>
 
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
+                            <button class="nav-link" [class.active]="selectedTab() === 1" (click)="selectTab(1)" type="button">
                                 {{ "schemas.createFromJson" | sqxTranslate }}
                             </button>
                         </li>
 
                         @if (hasChatBot) {
                             <li class="nav-item">
-                                <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)" type="button">
+                                <button class="nav-link" [class.active]="selectedTab() === 2" (click)="selectTab(2)" type="button">
                                     {{ "schemas.createAI" | sqxTranslate }}
                                     <span class="badge rounded-pill badge-primary">New</span>
                                 </button>
@@ -36,9 +36,9 @@
             </div>
         </ng-container>
         <ng-container content>
-            <sqx-form-error [error]="actualForm.error | async" />
+            <sqx-form-error [error]="actualForm().error | async" />
 
-            @if (selectedTab !== 2) {
+            @if (selectedTab() !== 2) {
                 <sqx-form-row for="name" hint="schemas.schemaNameHint" label="common.name" required [submitCount]="createForm.submitCount | async" vertical>
                     <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                 </sqx-form-row>
@@ -46,7 +46,7 @@
                 <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }}</sqx-form-alert>
             }
 
-            @if (selectedTab === 0) {
+            @if (selectedTab() === 0) {
                 <div class="form-group mt-4">
                     <div class="row">
                         <div class="col-12 col-md-4 type">
@@ -121,9 +121,9 @@
                         </sqx-form-row>
                     }
                 }
-            } @else if (selectedTab === 1) {
+            } @else if (selectedTab() === 1) {
                 <sqx-code-editor formControlName="importing" height="auto" minLines="50" valueMode="Json" />
-            } @else if (selectedTab === 2) {
+            } @else if (selectedTab() === 2) {
                 <sqx-form-row for="prompt" label="common.prompt">
                     <div class="row g-2 form-group">
                         <div class="col">
@@ -146,14 +146,14 @@
 
                 <sqx-form-alert> {{ "schemas.promptExample" | sqxTranslate }}</sqx-form-alert>
 
-                <sqx-code-editor disabled="true" [height]="1000" [ngModel]="generateLog" [ngModelOptions]="{ standalone: true }" />
+                <sqx-code-editor disabled="true" [height]="1000" [ngModel]="generateLog()" [ngModelOptions]="{ standalone: true }" />
             }
         </ng-container>
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" [disabled]="selectedTab === 2 && !generateLog" type="submit">
+            <button class="btn btn-success" [disabled]="selectedTab() === 2 && !generateLog()" type="submit">
                 {{ "common.create" | sqxTranslate }}
             </button>
         </ng-container>

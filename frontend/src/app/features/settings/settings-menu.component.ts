@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppDto, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -23,6 +23,6 @@ import { AppDto, TourStepDirective, TranslatePipe } from '@app/shared';
     ],
 })
 export class SettingsMenuComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    /** The app whose settings pages are listed in the menu. */
+    public readonly app = input.required<AppDto>();
 }

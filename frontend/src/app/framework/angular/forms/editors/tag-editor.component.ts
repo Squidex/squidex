@@ -6,10 +6,10 @@
  */
 
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, forwardRef, input, output, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, Subscriptions, TagValue, TextMeasurer, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { getTagValues, Keys, ModalModel, SignalControlComponent, StringConverter, TagConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -24,18 +24,32 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
 };
 
-interface State {
-    // True, when the item has the focus.
-    hasFocus: boolean;
+const NO_EMIT = { emitEvent: false };
 
-    // The suggested items.
-    suggestedItems: ReadonlyArray<any>;
+function normalizeQuery(query: unknown) {
+    return Types.isString(query) ? query.trim().toLowerCase() : '';
+}
 
-    // The selected suggest item index.
-    suggestedIndex: number;
+function convertTags(obj: any, converter: TagConverter) {
+    const tags: TagValue[] = [];
 
-    // All available tag values.
-    tags: ReadonlyArray<TagValue>;
+    if (!converter || !Types.isArray(obj)) {
+        return tags;
+    }
+
+    for (const value of obj) {
+        if (Types.is(value, TagValue)) {
+            tags.push(value);
+        } else {
+            const converted = converter.convertValue(value);
+
+            if (converted) {
+                tags.push(converted);
+            }
+        }
+    }
+
+    return tags;
 }
 
 @Component({
@@ -60,132 +74,126 @@ interface State {
         TranslatePipe,
     ],
 })
-export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
-    private readonly subscriptions = new Subscriptions();
-    private readonly textMeasurer: TextMeasurer;
+export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any>> {
+    private readonly formElement = viewChild.required<ElementRef<HTMLElement>>('form');
+    private readonly inputElement = viewChild<ElementRef<HTMLInputElement>>('input');
+    private readonly textMeasurer = new TextMeasurer(() => this.inputElement());
     private latestValue: any;
     private latestInput?: string;
 
-    @ViewChild('form', { static: false })
-    public formElement!: ElementRef<HTMLElement>;
+    /** Emits when the editor loses the focus. */
+    public readonly editorBlur = output<boolean>();
 
-    @ViewChild('input', { static: false })
-    public inputElement!: ElementRef<HTMLInputElement>;
+    /** Emits when the dropdown with the suggestions is opened. */
+    public readonly dropdownOpen = output();
 
-    @Output()
-    public dropdownOpen = new EventEmitter();
+    /** Emits when the dropdown with the suggestions is closed. */
+    public readonly dropdownClose = output();
 
-    @Output()
-    public dropdownClose = new EventEmitter();
+    /** The ID of the inner input. */
+    public readonly id = input('');
 
-    @Output()
-    public editorBlur = new EventEmitter();
+    /** Converts between the values and the tags. */
+    public readonly itemConverter = input<TagConverter>(StringConverter.INSTANCE);
 
-    @Input()
-    public id = '';
+    /** Emits undefined instead of an empty array when all tags are removed. */
+    public readonly undefinedWhenEmpty = input(true, { transform: booleanAttribute });
 
-    @Input()
-    public itemConverter = StringConverter.INSTANCE;
+    /** Adds the typed text as tag when enter is pressed. */
+    public readonly acceptEnter = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public undefinedWhenEmpty?: boolean | null = true;
+    /** Shows a button to open a dropdown with all suggestions. */
+    public readonly allowOpen = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public acceptEnter?: boolean | null;
+    /** Allows to add the same tag multiple times. */
+    public readonly allowDuplicates = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public allowOpen?: boolean | null = false;
+    /** Renders the editor in read-only style and hides the dropdown button. */
+    public readonly readonly = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public allowDuplicates?: boolean | null = true;
+    /** Renders a dashed border when there are no tags. */
+    public readonly styleDashed = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public readonly?: boolean | null;
+    /** Renders the editor without a border. */
+    public readonly styleBlank = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public styleDashed?: boolean | null;
+    /** Renders the tags in a single scrollable line. */
+    public readonly styleScrollable = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public styleBlank?: boolean | null;
+    /** The placeholder of the input. */
+    public readonly placeholder = input('i18n:common.tagAdd');
 
-    @Input({ transform: booleanAttribute })
-    public styleScrollable?: boolean | null;
+    /** The minimum width of the suggestions dropdown. */
+    public readonly dropdownWidth = input('18rem');
 
-    @Input()
-    public placeholder = 'i18n:common.tagAdd';
+    /** Renders a separator between the suggestions. */
+    public readonly itemSeparator = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public dropdownWidth = '18rem';
+    /** Shows a loading indicator in the dropdown when there are no suggestions. */
+    public readonly itemsSourceLoading = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public itemSeparator?: boolean | null;
+    /** The text to show in the dropdown when there are no suggestions. */
+    public readonly itemsSourceEmptyText = input('i18n:common.empty');
 
-    @Input({ transform: booleanAttribute })
-    public itemsSourceLoading?: boolean | null;
+    /** The suggested tags. */
+    public readonly itemsSource = input<ReadonlyArray<string | TagValue> | undefined | null>();
 
-    @Input()
-    public itemsSourceEmptyText = 'i18n:common.empty';
+    public readonly itemsSorted = computed(() => {
+        return getTagValues(this.itemsSource());
+    });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly itemsModal = new ModalModel();
+    public readonly hasFocus = signal(false);
+    public readonly suggestedItems = signal<ReadonlyArray<TagValue>>([]);
+    public readonly suggestedIndex = signal(0);
+    public readonly tags = signal<ReadonlyArray<TagValue>>([]);
 
-    @Input()
-    public set itemsSource(value: ReadonlyArray<string | TagValue> | undefined | null) {
-        this.itemsSorted = getTagValues(value);
-
-        if (this.addInput.value) {
-            const query = this.addInput.value;
-
-            const items = this.itemsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.tags.find(x => x.id === s.id));
-
-            this.next({
-                suggestedIndex: -1,
-                suggestedItems: items || [],
-            });
-        }
-    }
-
-    public itemsSorted: ReadonlyArray<TagValue> = [];
-    public itemsModal = new ModalModel();
-
-    public addInput = new UntypedFormControl();
+    public readonly addInput = new UntypedFormControl();
 
     constructor() {
-        super({
-            hasFocus: false,
-            suggestedIndex: 0,
-            suggestedItems: [],
-            tags: [],
+        super();
+
+        afterNextRender(() => {
+            this.resetSize();
         });
 
-        this.textMeasurer = new TextMeasurer(() => this.inputElement);
-    }
+        effect(() => {
+            if (this.isDisabled()) {
+                this.addInput.disable(NO_EMIT);
+            } else {
+                this.addInput.enable(NO_EMIT);
+            }
+        });
 
-    public ngAfterViewInit() {
-        this.resetSize();
-    }
+        effect(() => {
+            const converter = this.itemConverter();
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.itemConverter) {
-            this.writeValue(this.latestValue, true);
-        }
-    }
+            untracked(() => {
+                this.tags.set(convertTags(this.latestValue, converter));
+            });
+        });
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.addInput.valueChanges.pipe(
+        effect(() => {
+            const itemsSorted = this.itemsSorted();
+
+            untracked(() => {
+                const query = this.addInput.value;
+                if (!query) {
+                    return;
+                }
+
+                this.suggestedIndex.set(-1);
+                this.suggestedItems.set(this.findSuggestions(itemsSorted, query));
+            });
+        });
+
+        effect(onCleanup => {
+            const subscription =
+                this.addInput.valueChanges.pipe(
                     tap(() => {
                         this.resetSize();
                     }),
-                    map(query => {
-                        if (Types.isString(query)) {
-                            return query.trim().toLowerCase();
-                        } else {
-                            return '';
-                        }
-                    }),
+                    map(normalizeQuery),
                     tap(query => {
                         if (!query) {
                             this.resetAutocompletion();
@@ -199,58 +207,31 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                     map(query => {
                         if (!query) {
                             return [];
-                        } else if (Types.isArray(this.itemsSorted)) {
-                            return this.itemsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.tags.find(x => x.id === s.id));
-                        } else {
-                            return [];
                         }
+
+                        return this.findSuggestions(this.itemsSorted(), query);
                     }))
                 .subscribe(suggestedItems => {
-                    this.next({
-                        suggestedIndex: -1,
-                        suggestedItems,
-                    });
-                }));
+                    this.suggestedIndex.set(-1);
+                    this.suggestedItems.set(suggestedItems);
+                });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
-    public writeValue(obj: any, noForm = false) {
+    public writeValue(obj: any) {
         this.latestValue = obj;
 
-        if (!noForm) {
-            this.resetForm();
-            this.resetSize();
-        }
+        this.resetForm();
+        this.resetSize();
 
-        const tags: any[] = [];
-
-        if (this.itemConverter && Types.isArray(obj)) {
-            for (const value of obj) {
-                if (Types.is(value, TagValue)) {
-                    tags.push(value);
-                } else {
-                    const converted = this.itemConverter.convertValue(value);
-
-                    if (converted) {
-                        tags.push(converted);
-                    }
-                }
-            }
-        }
-
-        this.next({ tags });
-    }
-
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.addInput.disable({ emitEvent: false });
-        } else {
-            this.addInput.enable({ emitEvent: false });
-        }
+        this.tags.set(convertTags(obj, this.itemConverter()));
     }
 
     public focus() {
         if (this.addInput.enabled) {
-            this.next({ hasFocus: true });
+            this.hasFocus.set(true);
         }
     }
 
@@ -264,30 +245,30 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public remove(index: number) {
-        this.updateItems(this.snapshot.tags.filter((_, i) => i !== index), true);
+        this.updateItems(this.tags().filter((_, i) => i !== index), true);
     }
 
     public resetSize() {
-        if (!this.inputElement?.nativeElement) {
+        const input = this.inputElement()?.nativeElement;
+        if (!input) {
             return;
         }
 
-        const textValue = this.inputElement.nativeElement.value;
-
-        const widthTextValue = this.textMeasurer.getTextSize(textValue);
-        const widthPlaceholder = this.textMeasurer.getTextSize(this.placeholder);
+        const widthTextValue = this.textMeasurer.getTextSize(input.value);
+        const widthPlaceholder = this.textMeasurer.getTextSize(this.placeholder());
 
         const width = Math.max(widthTextValue, widthPlaceholder);
-
         if (width < 0) {
             return;
         }
 
-        this.inputElement.nativeElement.style.width = `${width + 5}px`;
+        input.style.width = `${width + 5}px`;
 
-        if (this.styleScrollable) {
+        if (this.styleScrollable()) {
             setTimeout(() => {
-                this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
+                const form = this.formElement().nativeElement;
+
+                form.scrollLeft = form.scrollWidth;
             }, 0);
         }
     }
@@ -299,7 +280,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             const value = this.addInput.value as string;
 
             if (!value || value.length === 0) {
-                this.updateItems(this.snapshot.tags.slice(0, this.snapshot.tags.length - 1), false);
+                this.updateItems(this.tags().slice(0, this.tags().length - 1), false);
 
                 return false;
             }
@@ -307,21 +288,26 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             this.closeModal();
             return false;
         } else if (Keys.isUp(event)) {
-            this.selectPrevIndex();
+            this.selectIndex(this.suggestedIndex() - 1);
             return false;
         } else if (Keys.isDown(event)) {
-            this.selectNextIndex();
+            this.selectIndex(this.suggestedIndex() + 1);
             return false;
         } else if (Keys.isEnter(event)) {
-            if (this.snapshot.suggestedIndex >= 0) {
-                if (this.selectValue(this.snapshot.suggestedItems[this.snapshot.suggestedIndex])) {
-                    return false;
-                }
-            } else if (this.acceptEnter) {
-                if (this.selectValue(this.addInput.value)) {
-                    return false;
-                }
-            }
+            return this.onEnter();
+        }
+
+        return true;
+    }
+
+    private onEnter() {
+        const suggestedIndex = this.suggestedIndex();
+        if (suggestedIndex >= 0) {
+            return !this.selectValue(this.suggestedItems()[suggestedIndex]);
+        }
+
+        if (this.acceptEnter()) {
+            return !this.selectValue(this.addInput.value);
         }
 
         return true;
@@ -329,72 +315,57 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public selectValue(value: TagValue | string, noFocus?: boolean) {
         if (!noFocus) {
-            this.inputElement.nativeElement.focus();
+            this.inputElement()!.nativeElement.focus();
         }
 
         let tagValue: TagValue | null;
-
         if (Types.isString(value)) {
-            tagValue = this.itemConverter.convertInput(value);
+            tagValue = this.itemConverter().convertInput(value);
         } else {
             tagValue = value;
         }
 
-        if (tagValue) {
-            if (this.allowDuplicates || !this.isSelected(tagValue)) {
-                this.updateItems([...this.snapshot.tags, tagValue], true);
-            }
-
-            this.resetForm();
-            this.resetAutocompletion();
-            return true;
+        if (!tagValue) {
+            return false;
         }
 
-        return false;
+        if (this.allowDuplicates() || !this.isSelected(tagValue)) {
+            this.updateItems([...this.tags(), tagValue], true);
+        }
+
+        this.resetForm();
+        this.resetAutocompletion();
+        return true;
     }
 
     public toggleValue(isSelected: boolean, tagValue: TagValue) {
         if (isSelected) {
-            this.updateItems([...this.snapshot.tags, tagValue], true);
+            this.updateItems([...this.tags(), tagValue], true);
         } else {
-            this.updateItems(this.snapshot.tags.filter(x => x.id !== tagValue.id), true);
+            this.updateItems(this.tags().filter(x => x.id !== tagValue.id), true);
         }
     }
 
-    public selectPrevIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex - 1);
-    }
-
-    public selectNextIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex + 1);
-    }
-
     public selectIndex(suggestedIndex: number) {
+        const suggestedItems = this.suggestedItems();
+
         if (suggestedIndex < 0) {
             suggestedIndex = 0;
         }
 
-        if (suggestedIndex >= this.snapshot.suggestedItems.length) {
-            suggestedIndex = this.snapshot.suggestedItems.length - 1;
+        if (suggestedIndex >= suggestedItems.length) {
+            suggestedIndex = suggestedItems.length - 1;
         }
 
-        this.next({ suggestedIndex });
+        this.suggestedIndex.set(suggestedIndex);
     }
 
-    public resetFocus(): any {
-        this.next({ hasFocus: false });
-    }
-
-    private resetAutocompletion() {
-        this.next({ suggestedItems: [], suggestedIndex: -1 });
-    }
-
-    private resetForm() {
-        this.addInput.reset();
+    public resetFocus() {
+        this.hasFocus.set(false);
     }
 
     public isSelected(tagValue: TagValue) {
-        return this.snapshot.tags.find(x => x.id === tagValue.id);
+        return this.tags().find(x => x.id === tagValue.id);
     }
 
     public closeModal() {
@@ -414,13 +385,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public callTouched() {
-        this.editorBlur.next(true);
+        this.editorBlur.emit(true);
 
         super.callTouched();
     }
 
     public focusInput(event: Event) {
-        this.inputElement.nativeElement.focus();
+        this.inputElement()!.nativeElement.focus();
 
         event?.preventDefault();
     }
@@ -436,7 +407,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public onCopy(event: ClipboardEvent) {
         if (!this.hasSelection()) {
             if (event.clipboardData) {
-                event.clipboardData.setData('text/plain', this.snapshot.tags.map(x => x.name).join(','));
+                event.clipboardData.setData('text/plain', this.tags().map(x => x.name).join(','));
             }
 
             event.preventDefault();
@@ -444,40 +415,60 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public onPaste(event: ClipboardEvent) {
-        if (event.clipboardData) {
-            const value = event.clipboardData.getData('text/plain');
+        if (!event.clipboardData) {
+            return;
+        }
 
-            if (value) {
-                this.resetForm();
+        const value = event.clipboardData.getData('text/plain');
+        if (value) {
+            this.resetForm();
 
-                const values = [...this.snapshot.tags];
+            const values = [...this.tags()];
 
-                for (const part of value.split(',')) {
-                    const converted = this.itemConverter.convertInput(part);
+            for (const part of value.split(',')) {
+                const converted = this.itemConverter().convertInput(part);
 
-                    if (converted) {
-                        values.push(converted);
-                    }
+                if (converted) {
+                    values.push(converted);
                 }
-
-                this.updateItems(values, false);
             }
 
-            event.preventDefault();
+            this.updateItems(values, false);
         }
+
+        event.preventDefault();
+    }
+
+    private findSuggestions(itemsSorted: ReadonlyArray<TagValue>, query: string) {
+        if (!Types.isArray(itemsSorted)) {
+            return [];
+        }
+
+        const tags = this.tags();
+
+        return itemsSorted.filter(s => s.lowerCaseName.includes(query) && !tags.find(x => x.id === s.id));
+    }
+
+    private resetAutocompletion() {
+        this.suggestedItems.set([]);
+        this.suggestedIndex.set(-1);
+    }
+
+    private resetForm() {
+        this.addInput.reset();
     }
 
     private hasSelection() {
-        const s = this.inputElement.nativeElement.selectionStart;
-        const e = this.inputElement.nativeElement.selectionEnd;
+        const s = this.inputElement()!.nativeElement.selectionStart;
+        const e = this.inputElement()!.nativeElement.selectionEnd;
 
         return s && e && (e - s) > 0;
     }
 
     private updateItems(tags: ReadonlyArray<TagValue>, touched: boolean) {
-        this.next({ tags });
+        this.tags.set(tags);
 
-        if (tags.length === 0 && this.undefinedWhenEmpty) {
+        if (tags.length === 0 && this.undefinedWhenEmpty()) {
             this.callChange(undefined);
         } else {
             this.callChange(tags.map(x => x.value));

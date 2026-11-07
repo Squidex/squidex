@@ -1,4 +1,4 @@
-<div [formGroup]="fieldForm">
+<div [formGroup]="fieldForm()">
     <sqx-form-row for="calculatedDefaultValue" label="schemas.field.defaultValue">
         <select class="form-select" formControlName="calculatedDefaultValue">
             @for (value of calculatedDefaultValues; track value) {

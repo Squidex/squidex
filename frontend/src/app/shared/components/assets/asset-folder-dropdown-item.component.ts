@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, input, numberAttribute, output } from '@angular/core';
 import { LoaderComponent, StopClickDirective, TranslatePipe } from '@app/framework';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
@@ -22,21 +22,21 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     ],
 })
 export class AssetFolderDropdownItemComponent {
-    @Input({ required: true })
-    public appName!: string;
+    /** The name of the app to load the child folders from. */
+    public readonly appName = input.required<string>();
 
-    @Input({ required: true })
-    public nodeModel!: AssetFolderDropdowNode;
+    /** The folder node to render. Its children are loaded on demand. */
+    public readonly nodeModel = input.required<AssetFolderDropdowNode>();
 
-    @Input({ transform: numberAttribute })
-    public nodeLevel = 0;
+    /** The depth of the node in the tree, used for the indentation. */
+    public readonly nodeLevel = input(0, { transform: numberAttribute });
 
-    @Output()
-    public selectNode = new EventEmitter<AssetFolderDropdowNode>();
+    /** Emits when a node is clicked. */
+    public readonly selectNode = output<AssetFolderDropdowNode>();
 
-    public get paddingLeft() {
-        return `${this.nodeLevel}rem`;
-    }
+    public readonly paddingLeft = computed(() => {
+        return `${this.nodeLevel()}rem`;
+    });
 
     constructor(
         private readonly assetsService: AssetsService,
@@ -45,7 +45,8 @@ export class AssetFolderDropdownItemComponent {
     }
 
     public toggle() {
-        if (this.nodeModel.isExpanded && this.nodeModel.isLoaded) {
+        const nodeModel = this.nodeModel();
+        if (nodeModel.isExpanded && nodeModel.isLoaded) {
             this.collapse();
         } else {
             this.expand();
@@ -53,43 +54,42 @@ export class AssetFolderDropdownItemComponent {
     }
 
     public collapse() {
-        this.nodeModel.isExpanded = false;
+        this.nodeModel().isExpanded = false;
     }
 
     public expand() {
-        this.nodeModel.isExpanded = true;
+        this.nodeModel().isExpanded = true;
 
         this.loadChildren();
     }
 
     public loadChildren() {
-        if (this.nodeModel.isLoading || this.nodeModel.isLoaded) {
+        const nodeModel = this.nodeModel();
+        if (nodeModel.isLoading || nodeModel.isLoaded) {
             return;
         }
 
-        this.nodeModel.isLoading = true;
+        nodeModel.isLoading = true;
 
-        this.assetsService.getAssetFolders(this.appName, this.nodeModel.item.id, 'Items')
+        this.assetsService.getAssetFolders(this.appName(), nodeModel.item.id, 'Items')
             .subscribe({
                 next: dto => {
                     if (dto.items.length > 0) {
-                        const parent = this.nodeModel;
-
                         for (const item of dto.items) {
-                            if (!parent.children.find(x => x.item.id === item.id)) {
-                                parent.children.push({ item, children: [], parent });
+                            if (!nodeModel.children.find(x => x.item.id === item.id)) {
+                                nodeModel.children.push({ item, children: [], parent: nodeModel });
                             }
                         }
 
-                        parent.children.sortByString(x => x.item.folderName);
+                        nodeModel.children.sortByString(x => x.item.folderName);
                     }
 
-                    this.nodeModel.isLoaded = true;
+                    nodeModel.isLoaded = true;
                     this.changeDetector.detectChanges();
                 },
                 complete: () => {
                     setTimeout(() => {
-                        this.nodeModel.isLoading = false;
+                        nodeModel.isLoading = false;
                         this.changeDetector.detectChanges();
                     }, 250);
                 },

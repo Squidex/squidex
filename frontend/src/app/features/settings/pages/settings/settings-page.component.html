@@ -4,7 +4,7 @@
         <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:appSettings.refreshTooltip" type="button">
             <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-        <button class="float-end btn btn-primary" (click)="save()" [disabled]="!isEditable" type="submit">
+        <button class="float-end btn btn-primary" (click)="save()" [disabled]="!isEditable()" type="submit">
             {{ "common.save" | sqxTranslate }}
         </button>
     </ng-container>
@@ -14,7 +14,7 @@
             <sqx-form-hint> {{ "appSettings.patterns.description" | sqxTranslate }}</sqx-form-hint>
             <div class="card card-body mb-4" data-testid="patterns">
                 <div class="content">
-                    @if (!isEditable && editForm.patternsControls.length === 0) {
+                    @if (!isEditable() && editForm.patternsControls.length === 0) {
                         <div>{{ "appSettings.patterns.empty" | sqxTranslate }}</div>
                     }
 
@@ -42,7 +42,7 @@
                                     confirmRememberKey="deletePattern"
                                     confirmText="i18n:appSettings.patterns.deleteConfirmText"
                                     confirmTitle="i18n:appSettings.patterns.deleteConfirmTitle"
-                                    [disabled]="!isEditable"
+                                    [disabled]="!isEditable()"
                                     (sqxConfirmClick)="editForm.patterns.removeAt(i)"
                                     type="button">
                                     <i class="icon-bin3"></i>
@@ -51,7 +51,7 @@
                         </div>
                     }
 
-                    @if (isEditable) {
+                    @if (isEditable()) {
                         <div class="form-group row gx-2">
                             <div class="col-3">
                                 <div class="form-control preview">{{ "common.name" | sqxTranslate }}</div>
@@ -83,7 +83,7 @@
             <sqx-form-hint> {{ "appSettings.editors.description" | sqxTranslate }}</sqx-form-hint>
             <div class="card card-body mb-4">
                 <div class="content" data-testid="pattern">
-                    @if (!isEditable && editForm.editorsControls.length === 0) {
+                    @if (!isEditable() && editForm.editorsControls.length === 0) {
                         <div>{{ "appSettings.editors.empty" | sqxTranslate }}</div>
                     }
 
@@ -106,7 +106,7 @@
                                     confirmRememberKey="deleteEditor"
                                     confirmText="i18n:appSettings.editors.deleteConfirmText"
                                     confirmTitle="i18n:appSettings.editors.deleteConfirmTitle"
-                                    [disabled]="!isEditable"
+                                    [disabled]="!isEditable()"
                                     (sqxConfirmClick)="editForm.editors.removeAt(i)"
                                     type="button">
                                     <i class="icon-bin3"></i>
@@ -115,7 +115,7 @@
                         </div>
                     }
 
-                    @if (isEditable) {
+                    @if (isEditable()) {
                         <div class="form-group row gx-2">
                             <div class="col-3">
                                 <div class="form-control preview">{{ "common.name" | sqxTranslate }}</div>

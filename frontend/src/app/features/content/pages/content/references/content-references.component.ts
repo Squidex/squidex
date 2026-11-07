@@ -6,8 +6,8 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ToolbarService, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, effect, inject, input } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ToolbarService, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../../shared/references/reference-item.component';
 
 @Component({
@@ -28,18 +28,18 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
         TranslatePipe,
     ],
 })
-export class ContentReferencesComponent implements OnInit, OnDestroy {
-    @Input({ required: true })
-    public content!: ContentDto;
+export class ContentReferencesComponent {
+    /** The content to show the references for. */
+    public readonly content = input.required<ContentDto>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language to render the contents in. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input()
-    public mode: 'references' | 'referencing' = 'references';
+    /** Shows the contents referenced by the content or the contents referencing the content. */
+    public readonly mode = input<'references' | 'referencing'>('references');
 
     constructor(
         public readonly contentsRoute: Router2State,
@@ -47,13 +47,6 @@ export class ContentReferencesComponent implements OnInit, OnDestroy {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly toolbar: ToolbarService,
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.toolbar.remove(this);
-    }
-
-    public ngOnInit() {
         this.toolbar.addButton(this, 'i18n:contents.validate', () => {
             this.validate();
 
@@ -65,11 +58,15 @@ export class ContentReferencesComponent implements OnInit, OnDestroy {
 
             this.changeDetector.detectChanges();
         });
-    }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.content || changes.mode) {
-            this.contentsState.schema = { name: this.content.schemaName };
+        inject(DestroyRef).onDestroy(() => {
+            this.toolbar.remove(this);
+        });
+
+        effect(() => {
+            const content = this.content();
+
+            this.contentsState.schema = { name: content.schemaName };
 
             const initial =
                 this.contentsRoute.mapTo(this.contentsState)
@@ -77,14 +74,14 @@ export class ContentReferencesComponent implements OnInit, OnDestroy {
                     .withSynchronizer(QuerySynchronizer.INSTANCE)
                     .getInitial();
 
-            if (this.mode === 'references') {
-                this.contentsState.loadReferences(this.content.id, initial);
+            if (this.mode() === 'references') {
+                this.contentsState.loadReferences(content.id, initial);
             } else {
-                this.contentsState.loadReferencing(this.content.id, initial);
+                this.contentsState.loadReferencing(content.id, initial);
             }
 
             this.contentsRoute.listen();
-        }
+        });
     }
 
     private validate() {

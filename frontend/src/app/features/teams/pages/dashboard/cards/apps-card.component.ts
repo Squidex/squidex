@@ -6,14 +6,11 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { AppDto, AppsService, StatefulComponent, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
-
-interface State {
-    // The apps for this team.
-    apps?: ReadonlyArray<AppDto>;
-}
+import { switchMap } from 'rxjs/operators';
+import { AppsService, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-card',
@@ -26,20 +23,15 @@ interface State {
         TranslatePipe,
     ],
 })
-export class AppsCardComponent extends StatefulComponent<State> implements OnInit {
-    @Input({ required: true })
-    public team!: TeamDto;
+export class AppsCardComponent {
+    /** The team to show the apps for. */
+    public readonly team = input.required<TeamDto>();
 
-    constructor(
-        private readonly appsService: AppsService,
-    ) {
-        super({});
-    }
+    public readonly apps;
 
-    public ngOnInit() {
-        this.appsService.getTeamApps(this.team.id)
-            .subscribe(apps => {
-                this.next({ apps });
-            });
+    constructor(appsService: AppsService) {
+        this.apps = toSignal(
+            toObservable(this.team).pipe(
+                switchMap(team => appsService.getTeamApps(team.id))));
     }
 }

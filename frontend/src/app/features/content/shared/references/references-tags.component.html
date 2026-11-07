@@ -3,7 +3,7 @@
     allowOpen="true"
     (dropdownOpen)="onOpened()"
     [formControl]="control"
-    [itemConverter]="snapshot.converter"
-    [itemsSource]="snapshot.converter.tags"
-    [itemsSourceLoading]="snapshot.isLoading"
+    [itemConverter]="converter()"
+    [itemsSource]="converter().tags"
+    [itemsSourceLoading]="contentsLoading()"
     placeholder="{{ 'common.tagAddReference' | sqxTranslate }}" />

@@ -1,9 +1,10 @@
+@let contributor = this.contributor();
 <tr>
     <td class="cell-user">
         <img class="user-picture" [src]="contributor.contributorId | sqxUserPicture" title="{{ contributor.contributorName }}" />
     </td>
 
-    <td class="cell-auto"><span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight: search"></span></td>
+    <td class="cell-auto"><span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight: search()"></span></td>
 
     <td class="cell-actions">
         <button

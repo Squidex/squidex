@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/internal';
@@ -27,22 +27,21 @@ import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/i
         TranslatePipe,
     ],
 })
-export class AssetTagDialogComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class AssetTagDialogComponent {
+    /** Emits when the dialog is closed, after a rename or when canceled. */
+    public readonly dialogClose = output();
 
-    @Input({ required: true })
-    public tagName!: string;
+    /** The name of the tag to rename. */
+    public readonly tagName = input.required<string>();
 
-    public editForm = new RenameAssetTagForm();
+    public readonly editForm = new RenameAssetTagForm();
 
     constructor(
         private readonly assetsState: AssetsState,
     ) {
-    }
-
-    public ngOnInit() {
-        this.editForm.load({ tagName: this.tagName });
+        effect(() => {
+            this.editForm.load({ tagName: this.tagName() });
+        });
     }
 
     public emitClose() {
@@ -55,11 +54,12 @@ export class AssetTagDialogComponent implements OnInit {
             return;
         }
 
-        if (value.tagName === this.tagName) {
+        if (value.tagName === this.tagName()) {
             this.emitClose();
+            return;
         }
 
-        this.assetsState.renameTag(this.tagName, value?.tagName)
+        this.assetsState.renameTag(this.tagName(), value.tagName)
             .subscribe({
                 next: () => {
                     this.emitClose();

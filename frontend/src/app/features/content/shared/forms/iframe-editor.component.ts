@@ -5,15 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, StatefulComponent, Subscriptions, ThemeService, TypedSimpleChanges, Types, value$ } from '@app/shared';
-
-interface State {
-    // True, when the editor is shown as fullscreen.
-    isFullscreen: boolean;
-}
+import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, ThemeService, Types, value$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-iframe-editor',
@@ -26,73 +22,72 @@ interface State {
         ModalDirective,
         SafeResourceUrlPipe,
     ],
+    host: {
+        '(window:message)': 'onWindowMessage($event)',
+    },
 })
-export class IFrameEditorComponent extends StatefulComponent<State> implements OnDestroy {
-    private readonly subscriptions = new Subscriptions();
-    private readonly themeSubscriptions = new Subscriptions();
+export class IFrameEditorComponent {
+    private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
+    private readonly container = viewChild.required<ElementRef<HTMLElement>>('container');
+    private readonly inner = viewChild.required<ElementRef<HTMLElement>>('inner');
+    private readonly isDisabledByControl = signal(false);
     private value: any;
     private isInitialized = false;
-    private isDisabled = false;
 
-    @ViewChild('iframe', { static: false })
-    public iframe!: ElementRef<HTMLIFrameElement>;
+    /** Emits when the editor wants to toggle the expanded mode. */
+    public readonly isExpandedChange = output();
 
-    @ViewChild('container', { static: false })
-    public container!: ElementRef<HTMLElement>;
+    /** Renders the editor in expanded mode. */
+    public readonly isExpanded = input(false, { transform: booleanAttribute });
 
-    @ViewChild('inner', { static: false })
-    public inner!: ElementRef<HTMLElement>;
+    /** The schemas to pick contents from, if the editor does not define them. */
+    public readonly schemaIds = input.required<ReadonlyArray<string> | undefined>();
 
-    @Output()
-    public isExpandedChange = new EventEmitter();
+    /** Additional context information that is passed to the editor. */
+    public readonly context = input.required<any>();
 
-    @Input({ transform: booleanAttribute })
-    public isExpanded = false;
+    /** The value of the whole content form. */
+    public readonly formValue = input.required<any>();
 
-    @Input({ required: true })
-    public schemaIds?: ReadonlyArray<string>;
+    /** The name of the field. */
+    public readonly formField = input.required<string>();
 
-    @Input({ required: true })
-    public context: any = {};
+    /** The index of the field when it is part of an array. */
+    public readonly formIndex = input.required<number | null | undefined, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public formValue!: any;
+    /** The language of the field value. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public formField = '';
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formIndex?: number | null;
+    /** The form control with the value of the field. */
+    public readonly formControlBinding = input.required<AbstractControl>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** Disables the editor, in addition to the disabled state of the form control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The URL of the editor. */
+    public readonly url = input<string | null>();
 
-    @Input({ required: true })
-    public formControlBinding!: AbstractControl;
+    public readonly computedUrl = computed(() => {
+        return computeEditorUrl(this.url(), this.appsState.snapshot.selectedSettings);
+    });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.updatedisabled(value === true);
-    }
+    public readonly isDisabled = computed(() => {
+        return this.disabled() || this.isDisabledByControl();
+    });
 
-    @Input()
-    public set url(value: string | undefined | null) {
-        this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
-    }
-
-    public computedUrl = '';
+    public readonly isFullscreen = signal(false);
 
     public assetsCorrelationId: any;
-    public assetsDialog = new DialogModel();
+    public readonly assetsDialog = new DialogModel();
 
-    public contentsQuery?: string = undefined;
     public contentsCorrelationId: any;
-    public contentsSchemas?: ReadonlyArray<string>;
-    public contentsDialog = new DialogModel();
-    public contentsSelectedIds?: ReadonlyArray<string>;
+    public readonly contentsQuery = signal<string | undefined>(undefined);
+    public readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
+    public readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
+    public readonly contentsDialog = new DialogModel();
 
     constructor(
         private readonly appsState: AppsState,
@@ -101,158 +96,163 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         private readonly router: Router,
         private readonly themeService: ThemeService,
     ) {
-        super({ isFullscreen: false });
+        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
 
-        this.themeSubscriptions.add(
-            this.themeService.themeChanges
-                .subscribe(() => {
-                    this.sendTheme();
-                }));
-    }
+        effect(() => {
+            this.sendMessage('themeChanged', { theme: theme() });
+        });
 
-    public ngOnDestroy() {
-        super.ngOnDestroy();
-
-        this.toggleFullscreen(false);
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formValue) {
+        effect(() => {
             this.sendFormValue();
-        }
+        });
 
-        if (changes.formIndex) {
+        effect(() => {
             this.sendMoved();
-        }
+        });
 
-        if (changes.isExpanded) {
+        effect(() => {
             this.sendExpanded();
-        }
+        });
 
-        if (changes.language) {
+        effect(() => {
             this.sendLanguage();
-        }
+        });
 
-        if (changes.context) {
+        effect(() => {
             this.sendContext();
-        }
+        });
 
-        if (changes.formControlBinding) {
-            this.subscriptions.unsubscribeAll();
+        effect(() => {
+            this.sendDisabled();
+        });
 
-            const control = this.formControlBinding;
+        effect(onCleanup => {
+            const control = this.formControlBinding();
+            if (!control) {
+                return;
+            }
 
-            if (control) {
-                this.subscriptions.add(value$(control)
+            const subscriptions = [
+                value$(control)
                     .subscribe(value => {
                         this.updateValue(value);
-                    }));
-
-                this.subscriptions.add(disabled$(control)
+                    }),
+                disabled$(control)
                     .subscribe(isDisabled => {
-                        this.updatedisabled(isDisabled);
-                    }));
-            }
-        }
+                        this.isDisabledByControl.set(isDisabled);
+                    }),
+            ];
+
+            onCleanup(() => {
+                for (const subscription of subscriptions) {
+                    subscription.unsubscribe();
+                }
+            });
+        });
+
+        inject(DestroyRef).onDestroy(() => {
+            this.toggleFullscreen(false);
+        });
     }
 
-    @HostListener('window:message', ['$event'])
     public onWindowMessage(event: MessageEvent) {
-        if (event.source === this.iframe.nativeElement.contentWindow) {
-            const { type } = event.data;
+        const iframe = this.iframe()?.nativeElement;
+        if (!iframe || event.source !== iframe.contentWindow) {
+            return;
+        }
 
-            if (type === 'started') {
-                this.isInitialized = true;
+        const { type } = event.data;
 
-                this.sendTheme();
-                this.sendInit();
-                this.sendFullscreen();
-                this.sendExpanded();
-                this.sendFormValue();
-                this.sendLanguage();
-                this.sendDisabled();
-                this.sendMoved();
-                this.sendValue();
-            } else if (type === 'resize') {
-                const { height } = event.data;
+        if (type === 'started') {
+            this.isInitialized = true;
 
-                this.renderer.setStyle(this.iframe.nativeElement, 'height', `${height}px`);
-            } else if (type === 'navigate') {
-                const { url } = event.data;
+            this.sendTheme();
+            this.sendInit();
+            this.sendFullscreen();
+            this.sendExpanded();
+            this.sendFormValue();
+            this.sendLanguage();
+            this.sendDisabled();
+            this.sendMoved();
+            this.sendValue();
+        } else if (type === 'resize') {
+            const { height } = event.data;
 
-                this.router.navigateByUrl(url);
-            } else if (type === 'fullscreen') {
-                const { mode } = event.data;
+            this.renderer.setStyle(iframe, 'height', `${height}px`);
+        } else if (type === 'navigate') {
+            const { url } = event.data;
 
-                if (mode !== this.snapshot.isFullscreen) {
-                    this.toggleFullscreen(mode);
-                }
-            } else if (type === 'expanded') {
-                const { mode } = event.data;
+            this.router.navigateByUrl(url);
+        } else if (type === 'fullscreen') {
+            const { mode } = event.data;
 
-                if (mode !== this.isExpanded) {
-                    this.isExpandedChange.emit();
-                }
-            } else if (type === 'valueChanged') {
-                const { value } = event.data;
-
-                if (!Types.equals(this.value, value)) {
-                    this.value = value;
-
-                    this.formControlBinding?.reset(value);
-                }
-            } else if (type === 'touched') {
-                this.formControlBinding?.markAsTouched();
-            } else if (type === 'notifyInfo') {
-                const { text } = event.data;
-
-                if (Types.isString(text)) {
-                    this.dialogs.notifyInfo(text);
-                }
-            } else if (type === 'notifyError') {
-                const { text } = event.data;
-
-                if (Types.isString(text)) {
-                    this.dialogs.notifyError(text);
-                }
-            } else if (type === 'confirm') {
-                const { text, title, correlationId } = event.data;
-
-                if (Types.isString(text) && Types.isString(title) && correlationId) {
-                    this.dialogs.confirm(title, text).subscribe(result => {
-                        this.sendMessage('confirmResult', { correlationId, result });
-                    });
-                }
-            } else if (type === 'pickAssets') {
-                const { correlationId } = event.data;
-
-                if (correlationId) {
-                    this.assetsCorrelationId = correlationId;
-                    this.assetsDialog.show();
-                    this.detectChanges();
-                }
-            } else if (type === 'pickContents') {
-                const { correlationId, schemas, query, selectedIds } = event.data;
-
-                if (correlationId) {
-                    let schemaIds: ReadonlyArray<string> | undefined = undefined;
-
-                    if (Types.isArrayOfString(schemas) && schemas.length > 0) {
-                        schemaIds = schemas;
-                    } if (this.schemaIds && this.schemaIds.length > 0) {
-                        schemaIds = this.schemaIds;
-                    }
-
-                    this.contentsQuery = query;
-                    this.contentsCorrelationId = correlationId;
-                    this.contentsSelectedIds = Types.isArrayOfString(selectedIds) ? selectedIds : undefined;
-                    this.contentsSchemas = schemaIds;
-                    this.contentsDialog.show();
-                    this.detectChanges();
-                }
+            if (mode !== this.isFullscreen()) {
+                this.toggleFullscreen(mode);
             }
+        } else if (type === 'expanded') {
+            const { mode } = event.data;
 
-            this.detectChanges();
+            if (mode !== this.isExpanded()) {
+                this.isExpandedChange.emit();
+            }
+        } else if (type === 'valueChanged') {
+            const { value } = event.data;
+
+            if (!Types.equals(this.value, value)) {
+                this.value = value;
+
+                this.formControlBinding()?.reset(value);
+            }
+        } else if (type === 'touched') {
+            this.formControlBinding()?.markAsTouched();
+        } else if (type === 'notifyInfo') {
+            const { text } = event.data;
+
+            if (Types.isString(text)) {
+                this.dialogs.notifyInfo(text);
+            }
+        } else if (type === 'notifyError') {
+            const { text } = event.data;
+
+            if (Types.isString(text)) {
+                this.dialogs.notifyError(text);
+            }
+        } else if (type === 'confirm') {
+            const { text, title, correlationId } = event.data;
+
+            if (Types.isString(text) && Types.isString(title) && correlationId) {
+                this.dialogs.confirm(title, text).subscribe(result => {
+                    this.sendMessage('confirmResult', { correlationId, result });
+                });
+            }
+        } else if (type === 'pickAssets') {
+            const { correlationId } = event.data;
+
+            if (correlationId) {
+                this.assetsCorrelationId = correlationId;
+                this.assetsDialog.show();
+            }
+        } else if (type === 'pickContents') {
+            const { correlationId, schemas, query, selectedIds } = event.data;
+
+            if (correlationId) {
+                let schemaIds: ReadonlyArray<string> | undefined = undefined;
+
+                if (Types.isArrayOfString(schemas) && schemas.length > 0) {
+                    schemaIds = schemas;
+                }
+
+                const schemaIdsField = this.schemaIds();
+                if (schemaIdsField && schemaIdsField.length > 0) {
+                    schemaIds = schemaIdsField;
+                }
+
+                this.contentsCorrelationId = correlationId;
+                this.contentsQuery.set(query);
+                this.contentsSelectedIds.set(Types.isArrayOfString(selectedIds) ? selectedIds : undefined);
+                this.contentsSchemas.set(schemaIds);
+                this.contentsDialog.show();
+            }
         }
     }
 
@@ -284,20 +284,12 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         }
     }
 
-    public updatedisabled(isDisabled: boolean) {
-        if (this.isDisabled !== isDisabled) {
-            this.isDisabled = isDisabled;
-
-            this.sendDisabled();
-        }
-    }
-
     public reset() {
         this.sendInit();
     }
 
     private sendInit() {
-        this.sendMessage('init', { context: { ...this.context || {}, field: this.formField } });
+        this.sendMessage('init', { context: { ...this.context() || {}, field: this.formField() } });
     }
 
     private sendTheme() {
@@ -309,59 +301,61 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     }
 
     private sendFullscreen() {
-        this.sendMessage('fullscreenChanged', { fullscreen: this.snapshot.isFullscreen });
+        this.sendMessage('fullscreenChanged', { fullscreen: this.isFullscreen() });
     }
 
     private sendExpanded() {
-        this.sendMessage('expandedChanged', { expanded: this.isExpanded });
+        this.sendMessage('expandedChanged', { expanded: this.isExpanded() });
     }
 
     private sendContext() {
-        this.sendMessage('contextChanged', { context: this.context });
+        this.sendMessage('contextChanged', { context: this.context() });
     }
 
     private sendDisabled() {
-        this.sendMessage('disabled', { isDisabled: this.isDisabled });
+        this.sendMessage('disabled', { isDisabled: this.isDisabled() });
     }
 
     private sendFormValue() {
-        if (this.formValue) {
-            this.sendMessage('formValueChanged', { formValue: this.formValue });
+        const formValue = this.formValue();
+        if (formValue) {
+            this.sendMessage('formValueChanged', { formValue });
         }
     }
 
     private sendLanguage() {
-        if (this.language) {
-            this.sendMessage('languageChanged', { language: this.language });
+        const language = this.language();
+        if (language) {
+            this.sendMessage('languageChanged', { language });
         }
     }
 
     private sendMoved() {
-        if (Types.isNumber(this.formIndex)) {
-            this.sendMessage('moved', { index: this.formIndex });
+        const formIndex = this.formIndex();
+        if (Types.isNumber(formIndex)) {
+            this.sendMessage('moved', { index: formIndex });
         }
     }
 
     private toggleFullscreen(isFullscreen: boolean) {
-        this.next({ isFullscreen });
+        this.isFullscreen.set(isFullscreen);
 
-        let target = this.container.nativeElement;
+        let target = this.container().nativeElement;
 
         if (isFullscreen) {
             target = document.body;
         }
 
-        this.renderer.appendChild(target, this.inner.nativeElement);
+        this.renderer.appendChild(target, this.inner().nativeElement);
 
         this.sendFullscreen();
     }
 
     private sendMessage(type: string, payload: any) {
-        if (!this.iframe?.nativeElement) {
+        const iframe = this.iframe()?.nativeElement;
+        if (!iframe) {
             return;
         }
-
-        const iframe = this.iframe.nativeElement;
 
         if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
             const message = { type, ...payload };

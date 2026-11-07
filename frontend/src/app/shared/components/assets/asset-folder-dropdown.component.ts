@@ -6,9 +6,9 @@
  */
 
 
-import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, signal } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalDirective, ModalModel, ModalPlacementDirective, StatefulControlComponent, TranslatePipe, Types } from '@app/framework';
+import { ModalDirective, ModalModel, ModalPlacementDirective, SignalControlComponent, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
 import { AssetFolderDropdownItemComponent } from './asset-folder-dropdown-item.component';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
@@ -31,28 +31,23 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
         TranslatePipe,
     ],
 })
-export class AssetFolderDropdownComponent extends StatefulControlComponent<any, string> {
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+export class AssetFolderDropdownComponent extends SignalControlComponent<string> {
+    public readonly appName: string;
 
-    public get appName() {
-        return this.appsState.appName;
-    }
+    public readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
 
-    public root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
+    public readonly selection = signal(this.root);
+    public readonly selectionPath = signal('');
 
-    public selection = this.root;
-    public selectionPath = '';
+    public readonly dropdown = new ModalModel();
 
-    public dropdown = new ModalModel();
-
-    constructor(
-        private readonly appsState: AppsState,
+    constructor(appsState: AppsState,
         private readonly assetsService: AssetsService,
+        private readonly changeDetector: ChangeDetectorRef,
     ) {
-        super({});
+        super();
+
+        this.appName = appsState.appName;
     }
 
     public writeValue(obj: string) {
@@ -61,7 +56,6 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
         }
 
         const node = this.findNode(this.root, obj);
-
         if (node?.isLoaded) {
             this.select(node, false);
             return;
@@ -111,9 +105,10 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
             current = current.parent;
         }
 
-        this.selection = selected;
-        this.selection.isSelected = true;
-        this.selectionPath = path.filter(x => x.item !== ROOT_ITEM).map(x => x.item.folderName).join('/');
+        selected.isSelected = true;
+
+        this.selection.set(selected);
+        this.selectionPath.set(path.filter(x => x.item !== ROOT_ITEM).map(x => x.item.folderName).join('/'));
 
         if (emit) {
             this.callChange(selected.item.id);
@@ -122,7 +117,7 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
             this.dropdown.hide();
         }
 
-        this.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     private resetSelected(node: AssetFolderDropdowNode) {

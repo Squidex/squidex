@@ -1,29 +1,30 @@
-@if (fieldGroup.separator) {
+@let group = fieldGroup();
+@if (group.separator) {
     <div class="nested-field">
         <span class="nested-field-line-h"></span>
-        <sqx-field [field]="$any(fieldGroup.separator)" [languages]="languages" [parent]="parent" plain="true" [schema]="schema" [settings]="settings">
+        <sqx-field [field]="$any(group.separator)" [languages]="languages()" [parent]="parent()" plain="true" [schema]="schema()" [settings]="settings()">
             <div class="d-flex align-items-center">
                 <ng-content></ng-content>
                 <button class="btn btn-sm btn-square btn-text-secondary ms-2" (click)="toggle()" type="button">
-                    <i [class.icon-caret-down]="!snapshot.isCollapsed" [class.icon-caret-right]="snapshot.isCollapsed"></i>
+                    <i [class.icon-caret-down]="!isCollapsed()" [class.icon-caret-right]="isCollapsed()"></i>
                 </button>
             </div>
         </sqx-field>
     </div>
 }
 
-@if (!snapshot.isCollapsed) {
+@if (!isCollapsed()) {
     <div
         class="field-group nested-field"
         cdkDropList
-        [cdkDropListData]="fieldGroup.fields"
-        [cdkDropListDisabled]="!sortable"
+        [cdkDropListData]="group.fields"
+        [cdkDropListDisabled]="!sortable()"
         (cdkDropListDropped)="sorted.emit($event)"
-        [class.field-placeholder]="fieldGroup.fields.length === 0 && !fieldsEmpty">
-        @for (field of fieldGroup.fields; track trackByFieldFn($index, field)) {
+        [class.field-placeholder]="group.fields.length === 0 && !fieldsEmpty()">
+        @for (field of group.fields; track trackByField(field)) {
             <div class="nested-field table-drag" cdkDrag cdkDragLockAxis="y">
                 <span class="nested-field-line-h"></span>
-                <sqx-field [field]="$any(field)" [languages]="languages" [parent]="parent" [schema]="schema" [settings]="settings">
+                <sqx-field [field]="$any(field)" [languages]="languages()" [parent]="parent()" [schema]="schema()" [settings]="settings()">
                     <i class="icon-drag2 drag-handle" cdkDragHandle></i>
                 </sqx-field>
             </div>

@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, Subscriptions, ThemeService, TypedSimpleChanges, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, ThemeService, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-extension',
@@ -17,86 +18,88 @@ import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, Saf
     imports: [
         SafeResourceUrlPipe,
     ],
+    host: {
+        '(window:message)': 'onWindowMessage($event)',
+    },
 })
 export class ContentExtensionComponent {
-    private readonly subscriptions = new Subscriptions();
-    private readonly context: any;
+    private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
     private isInitialized = false;
 
-    @ViewChild('iframe', { static: false })
-    public iframe!: ElementRef<HTMLIFrameElement>;
+    /** The content that is passed to the extension. */
+    public readonly contentItem = input.required<ContentDto | null | undefined>();
 
-    @Input({ required: true })
-    public contentItem?: ContentDto | null;
+    /** The schema of the content. */
+    public readonly contentSchema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public contentSchema!: SchemaDto;
+    /** Lets the iframe scroll instead of resizing it to the height of the extension. */
+    public readonly scrollable = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public scrollable?: boolean = false;
+    /** The URL of the extension. */
+    public readonly editorUrl = input<string | null>();
 
-    @Input()
-    public set editorUrl(value: string | undefined | null) {
-        this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
-    }
+    public readonly computedUrl = computed(() => {
+        return computeEditorUrl(this.editorUrl(), this.appsState.snapshot.selectedSettings);
+    });
 
-    public computedUrl = '';
+    private readonly context = computed(() => {
+        const schema = this.contentSchema();
 
-    constructor(apiUrl: ApiUrlConfig, authService: AuthService,
+        return {
+            apiUrl: this.apiUrl.buildUrl('api'),
+            appId: this.appsState.snapshot.selectedApp!.id,
+            appName: this.appsState.snapshot.selectedApp!.name,
+            user: this.authService.user,
+            schemaName: schema?.name,
+            schemaId: schema?.id,
+        };
+    });
+
+    constructor(
+        private readonly apiUrl: ApiUrlConfig,
         private readonly appsState: AppsState,
+        private readonly authService: AuthService,
         private readonly router: Router,
         private readonly themeService: ThemeService,
     ) {
-        this.subscriptions.add(
-            this.themeService.themeChanges
-                .subscribe(() => {
-                    this.sendTheme();
-                }));
+        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
 
-        this.context = {
-            apiUrl: apiUrl.buildUrl('api'),
-            appId: appsState.snapshot.selectedApp!.id,
-            appName: appsState.snapshot.selectedApp!.name,
-            user: authService.user,
-        };
-    }
+        effect(() => {
+            this.sendMessage('themeChanged', { theme: theme() });
+        });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.contentSchema) {
-            this.context['schemaName'] = this.contentSchema?.name;
-            this.context['schemaId'] = this.contentSchema?.id;
-        }
-
-        if (changes.contentItem) {
+        effect(() => {
             this.sendContent();
-        }
+        });
     }
 
-    @HostListener('window:message', ['$event'])
     public onWindowMessage(event: MessageEvent) {
-        if (event.source === this.iframe.nativeElement.contentWindow) {
-            const { type } = event.data;
+        const iframe = this.iframe()?.nativeElement;
+        if (!iframe || event.source !== iframe.contentWindow) {
+            return;
+        }
 
-            if (type === 'started') {
-                this.isInitialized = true;
+        const { type } = event.data;
 
-                this.sendTheme();
-                this.sendInit();
-                this.sendContent();
-            } else if (type === 'resize' && !this.scrollable) {
-                const { height } = event.data;
+        if (type === 'started') {
+            this.isInitialized = true;
 
-                this.iframe.nativeElement.height = `${height}px`;
-            } else if (type === 'navigate') {
-                const { url } = event.data;
+            this.sendTheme();
+            this.sendInit();
+            this.sendContent();
+        } else if (type === 'resize' && !this.scrollable()) {
+            const { height } = event.data;
 
-                this.router.navigateByUrl(url);
-            }
+            iframe.height = `${height}px`;
+        } else if (type === 'navigate') {
+            const { url } = event.data;
+
+            this.router.navigateByUrl(url);
         }
     }
 
     private sendInit() {
-        this.sendMessage('init', { context: this.context });
+        this.sendMessage('init', { context: this.context() });
     }
 
     private sendTheme() {
@@ -104,15 +107,14 @@ export class ContentExtensionComponent {
     }
 
     private sendContent() {
-        this.sendMessage('contentChanged', { content: this.contentItem });
+        this.sendMessage('contentChanged', { content: this.contentItem() });
     }
 
     private sendMessage(type: string, payload: any) {
-        if (!this.iframe) {
+        const iframe = this.iframe()?.nativeElement;
+        if (!iframe) {
             return;
         }
-
-        const iframe = this.iframe.nativeElement;
 
         if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
             const message = { type, ...payload };

@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, Component, effect, input, output, signal, untracked } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -37,38 +37,42 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
         UsageTriggerComponent,
     ],
 })
-export class TriggerDialogComponent implements OnInit {
-    @Input({ required: true })
-    public trigger?: RuleTriggerDto | null;
+export class TriggerDialogComponent {
+    /** The trigger to edit, or null to add a new trigger. */
+    public readonly trigger = input.required<RuleTriggerDto | null | undefined>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isEditable = true;
+    /** Allows the user to change and save the trigger. */
+    public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    @Input({ required: true })
-    public availableTriggers: Record<string, RuleTriggerMetadataDto> = {};
+    /** The available triggers by type, which the user can choose from. */
+    public readonly availableTriggers = input.required<Record<string, RuleTriggerMetadataDto>>();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed without saving. */
+    public readonly dialogClose = output();
 
-    @Output()
-    public dialogSave = new EventEmitter<RuleTriggerDto>();
+    /** Emits the validated trigger when the user saves it or selects a trigger without properties. */
+    public readonly dialogSave = output<RuleTriggerDto>();
 
-    public currentTrigger?: TriggerForm;
+    public readonly currentTrigger = signal<TriggerForm | undefined>(undefined);
 
     constructor(
         public readonly schemasState: SchemasState,
         private readonly rulesService: RulesService,
     ) {
-    }
+        effect(() => {
+            const trigger = this.trigger();
+            if (!trigger) {
+                return;
+            }
 
-    public ngOnInit() {
-        if (this.trigger) {
-            this.selectTrigger(this.trigger.triggerType, this.trigger);
-        }
+            untracked(() => {
+                this.selectTrigger(trigger.triggerType, trigger);
+            });
+        });
     }
 
     public selectTrigger(type: string, values?: any) {
-        const metadata = this.availableTriggers[type];
+        const metadata = this.availableTriggers()[type];
 
         if (!metadata) {
             return;
@@ -79,22 +83,25 @@ export class TriggerDialogComponent implements OnInit {
             return;
         }
 
-        if (this.currentTrigger?.triggerType !== type) {
-            this.currentTrigger = new TriggerForm(type);
-            this.currentTrigger.setEnabled(this.isEditable);
+        if (this.currentTrigger()?.triggerType !== type) {
+            const currentTrigger = new TriggerForm(type);
+            currentTrigger.setEnabled(this.isEditable());
+
+            this.currentTrigger.set(currentTrigger);
         }
 
         if (values) {
-            this.currentTrigger?.load(values || {});
+            this.currentTrigger()?.load(values || {});
         }
     }
 
     public save() {
-        if (!this.isEditable || !this.currentTrigger) {
+        const currentTrigger = this.currentTrigger();
+        if (!this.isEditable() || !currentTrigger) {
             return;
         }
 
-        const values = this.currentTrigger.submit();
+        const values = currentTrigger.submit();
         if (!values) {
             return;
         }
@@ -102,7 +109,7 @@ export class TriggerDialogComponent implements OnInit {
         this.rulesService.validateTrigger(this.schemasState.appName, values)
             .subscribe({
                 error: error =>{
-                    this.currentTrigger?.submitFailed(error);
+                    currentTrigger.submitFailed(error);
                 },
                 complete: () => {
                     this.dialogSave.emit(values);

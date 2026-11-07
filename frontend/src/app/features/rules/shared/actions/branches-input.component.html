@@ -1,4 +1,6 @@
-@for (form of branchesControls; track form; let i = $index) {
+@let control = this.control();
+@let isEditable = this.isEditable();
+@for (form of branchesControls(); track form; let i = $index) {
     <div class="form-group row gx-2" [formGroup]="form">
         <div class="col">
             <sqx-control-errors for="condition" />

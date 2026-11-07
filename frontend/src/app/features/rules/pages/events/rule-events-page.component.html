@@ -43,10 +43,10 @@
 
                 @for (event of ruleEventsState.ruleEvents | async; track event.id) {
                     <tbody
-                        [availableSteps]="availableSteps"
+                        [availableSteps]="availableSteps()"
                         (cancel)="cancel(event)"
                         (enqueue)="enqueue(event)"
-                        [expanded]="event.id === selectedEventId"
+                        [expanded]="event.id === selectedEventId()"
                         (expandedChange)="selectEvent(event.id)"
                         [sqxRuleEvent]="event"></tbody>
                 }

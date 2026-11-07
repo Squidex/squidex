@@ -1,3 +1,8 @@
+@let field = this.field();
+@let content = this.content();
+@let language = this.language();
+@let languages = this.languages();
+@let schema = this.schema();
 @switch (field) {
     @case (metaFields.id) {
         <small class="truncate">{{ content.id }}</small>
@@ -83,10 +88,11 @@
     }
 
     @default {
-        @if (field.rootField && isInlineEditable && patchAllowed && patchForm) {
+        @let patchForm = this.patchForm();
+        @if (field.rootField && isInlineEditable() && patchAllowed() && patchForm) {
             <sqx-content-value-editor [field]="field.rootField" [form]="patchForm" />
         } @else {
-            <sqx-content-value [field]="field" [fields]="fields" [value]="snapshot.formatted" />
+            <sqx-content-value [field]="field" [fields]="fields()" [value]="formatted()" />
         }
     }
 }

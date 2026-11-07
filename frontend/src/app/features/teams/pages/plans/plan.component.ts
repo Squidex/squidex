@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
 
@@ -25,8 +25,8 @@ import { TeamPlansState } from '../../internal';
     ],
 })
 export class PlanComponent {
-    @Input({ required: true })
-    public planInfo!: PlanInfo;
+    /** The plan to show, including whether it is selected. */
+    public readonly planInfo = input.required<PlanInfo>();
 
     constructor(
         public readonly plansState: TeamPlansState,
@@ -34,10 +34,10 @@ export class PlanComponent {
     }
 
     public changeMonthly() {
-        this.plansState.change(this.planInfo.plan.id);
+        this.plansState.change(this.planInfo().plan.id);
     }
 
     public changeYearly() {
-        this.plansState.change(this.planInfo.plan.yearlyId!);
+        this.plansState.change(this.planInfo().plan.yearlyId!);
     }
 }

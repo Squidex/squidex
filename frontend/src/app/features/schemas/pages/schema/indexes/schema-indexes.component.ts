@@ -7,9 +7,9 @@
 
 
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { switchMap, timer } from 'rxjs';
-import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, Subscriptions, TranslatePipe, UIOptions } from '@app/shared';
+import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, TranslatePipe, UIOptions } from '@app/shared';
 import { IndexFormComponent } from './index-form.component';
 import { IndexComponent } from './index.component';
 
@@ -17,6 +17,7 @@ import { IndexComponent } from './index.component';
     selector: 'sqx-schema-indexes',
     styleUrls: ['./schema-indexes.component.scss'],
     templateUrl: './schema-indexes.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         CodeComponent,
@@ -28,28 +29,28 @@ import { IndexComponent } from './index.component';
         TranslatePipe,
     ],
 })
-export class SchemaIndexesComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-
+export class SchemaIndexesComponent {
     public readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema to manage the indexes for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public addIndexDialog = new DialogModel();
+    public readonly addIndexDialog = new DialogModel();
 
     constructor(
         public readonly indexesState: IndexesState,
         public readonly languagesState: LanguagesState,
     ) {
-    }
-
-    public ngOnInit() {
         this.indexesState.load();
 
-        this.subscriptions.add(
-            timer(3000, 3000).pipe(
-                switchMap(() => this.indexesState.load(false, true))));
+        effect(onCleanup => {
+            const subscription =
+                timer(3000, 3000).pipe(
+                    switchMap(() => this.indexesState.load(false, true)))
+                .subscribe();
+
+            onCleanup(() => subscription.unsubscribe());
+        });
 
         this.languagesState.load();
     }

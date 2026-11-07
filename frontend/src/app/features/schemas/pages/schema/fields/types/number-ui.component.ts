@@ -5,67 +5,76 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, effect, input, untracked } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { FieldDto, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, Subscriptions, TagEditorComponent, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { switchMap } from 'rxjs/operators';
+import { FieldDto, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, TagEditorComponent, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
     imports: [
-        AsyncPipe,
         FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TagEditorComponent,
     ],
 })
-export class NumberUIComponent  {
-    private readonly subscriptions = new Subscriptions();
-
+export class NumberUIComponent {
     public readonly converter = FloatConverter.INSTANCE;
     public readonly editors = NumberFieldEditorValues;
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: NumberFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<NumberFieldPropertiesDto>();
 
-    public hideAllowedValues?: Observable<boolean>;
-    public hideInlineEditable?: Observable<boolean>;
+    public readonly hideAllowedValues = toSignal(
+        toObservable(this.fieldForm).pipe(
+            switchMap(form => valueProjection$(form.controls['editor'], hidesAllowedValues))),
+        { initialValue: false });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.fieldForm) {
-            this.subscriptions.unsubscribeAll();
+    constructor() {
+        effect(onCleanup => {
+            const fieldForm = this.fieldForm();
 
-            const editor = this.fieldForm.controls['editor'];
+            const subscription = untracked(() =>
+                valueProjection$(fieldForm.controls['editor'], hidesAllowedValues)
+                    .subscribe(isHidden => {
+                        if (isHidden) {
+                            fieldForm.controls['allowedValues'].setValue(undefined);
+                        }
+                    }));
 
-            this.hideAllowedValues =
-                valueProjection$(editor, x => !(x && (x === 'Radio' || x === 'Dropdown')));
+            onCleanup(() => subscription.unsubscribe());
+        });
 
-            this.hideInlineEditable =
-                valueProjection$(editor, x => x === 'Radio');
+        effect(onCleanup => {
+            const fieldForm = this.fieldForm();
 
-            this.subscriptions.add(
-                this.hideAllowedValues.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['allowedValues'].setValue(undefined);
-                    }
-                }));
+            const subscription = untracked(() =>
+                valueProjection$(fieldForm.controls['editor'], hidesInlineEditable)
+                    .subscribe(isHidden => {
+                        if (isHidden) {
+                            fieldForm.controls['inlineEditable'].setValue(false);
+                        }
+                    }));
 
-            this.subscriptions.add(
-                this.hideInlineEditable.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['inlineEditable'].setValue(false);
-                    }
-                }));
-        }
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
+}
+
+function hidesAllowedValues(editor: string) {
+    return !(editor && (editor === 'Radio' || editor === 'Dropdown'));
+}
+
+function hidesInlineEditable(editor: string) {
+    return editor === 'Radio';
 }

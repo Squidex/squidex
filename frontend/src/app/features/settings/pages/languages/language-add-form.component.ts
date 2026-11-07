@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { AddLanguageForm, AutocompleteComponent, AutocompleteSource, FormHintComponent, LanguageDto, LanguagesState, StringHelper, TranslatePipe } from '@app/shared';
@@ -53,13 +53,14 @@ class LanguageSource implements AutocompleteSource {
     ],
 })
 export class LanguageAddFormComponent {
-    @Input()
-    public set newLanguages(value: ReadonlyArray<LanguageDto>) {
-        this.addLanguagesSource = new LanguageSource(value);
-    }
+    /** The languages that can still be added to the app. */
+    public readonly newLanguages = input<ReadonlyArray<LanguageDto>>([]);
 
-    public addLanguagesSource = new LanguageSource([]);
-    public addLanguageForm = new AddLanguageForm();
+    public readonly addLanguagesSource = computed(() => {
+        return new LanguageSource(this.newLanguages());
+    });
+
+    public readonly addLanguageForm = new AddLanguageForm();
 
     constructor(
         private readonly languagesState: LanguagesState,

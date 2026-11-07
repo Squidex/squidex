@@ -6,9 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RuleElementDto, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { RuleComponent } from './rule.component';
 
 @Component({
@@ -32,26 +33,20 @@ import { RuleComponent } from './rule.component';
         TranslatePipe,
     ],
 })
-export class RulesPageComponent implements OnInit {
-    public availableTriggers = ALL_TRIGGERS;
-    public availableSteps?: { [name: string]: RuleElementDto };
+export class RulesPageComponent {
+    public readonly availableTriggers = ALL_TRIGGERS;
+    public readonly availableSteps;
 
     constructor(
         public readonly rulesState: RulesState,
         public readonly rulesService: RulesService,
         public readonly schemasState: SchemasState,
     ) {
-    }
+        this.availableSteps = toSignal(rulesService.getSteps());
 
-    public ngOnInit() {
-        this.rulesState.load();
+        rulesState.load();
 
-        this.rulesService.getSteps()
-            .subscribe(steps => {
-                this.availableSteps = steps;
-            });
-
-        this.schemasState.loadIfNotLoaded();
+        schemasState.loadIfNotLoaded();
     }
 
     public reload() {

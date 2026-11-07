@@ -6,9 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleElementDto, RuleEventDto, RuleEventsState, RulesService, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleElementDto, RuleEventDto, RuleEventsState, RulesService, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleEventComponent } from './rule-event.component';
 
 @Component({
@@ -31,28 +32,21 @@ import { RuleEventComponent } from './rule-event.component';
         TranslatePipe,
     ],
 })
-export class RuleEventsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class RuleEventsPageComponent {
+    public readonly availableSteps;
 
-    public availableSteps: Record<string, RuleElementDto> = {};
-
-    public selectedEventId: string | null = null;
+    public readonly selectedEventId = signal<string | null>(null);
 
     constructor(
         public readonly ruleEventsRoute: Router2State,
         public readonly ruleEventsState: RuleEventsState,
-        private readonly route: ActivatedRoute,
-        private readonly rulesService: RulesService,
+        route: ActivatedRoute,
+        rulesService: RulesService,
     ) {
-    }
+        this.availableSteps = toSignal(rulesService.getSteps(), { initialValue: {} as Record<string, RuleElementDto> });
 
-    public ngOnInit() {
-        this.rulesService.getSteps().subscribe((steps) => {
-            this.availableSteps = steps;
-        });
-
-        this.subscriptions.add(
-            this.route.queryParams
+        effect(onCleanup => {
+            const subscription = route.queryParams
                 .subscribe(() => {
                     const initial =
                         this.ruleEventsRoute.mapTo(this.ruleEventsState)
@@ -62,7 +56,10 @@ export class RuleEventsPageComponent implements OnInit {
                             .getInitial();
 
                     this.ruleEventsState.load(false, initial);
-                }));
+                });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public reload() {
@@ -82,10 +79,6 @@ export class RuleEventsPageComponent implements OnInit {
     }
 
     public selectEvent(id: string) {
-        if (this.selectedEventId === id) {
-            this.selectedEventId = null;
-        } else {
-            this.selectedEventId = id;
-        }
+        this.selectedEventId.update(x => x === id ? null : id);
     }
 }

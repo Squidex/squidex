@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { AppLanguageDto, DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormRowComponent, hasNoValue$, LocalizedInputComponent, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { switchMap } from 'rxjs/operators';
+import { AppLanguageDto, DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormRowComponent, hasNoValue$, LocalizedInputComponent, valueProjection$ } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
@@ -17,8 +17,8 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
     selector: 'sqx-date-time-validation',
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         DateTimeEditorComponent,
         FormRowComponent,
         FormsModule,
@@ -27,33 +27,30 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
     ],
 })
 export class DateTimeValidationComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: DateTimeFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<DateTimeFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app, used to edit localized default values. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isLocalizable!: boolean;
+    /** Shows the localized default values, if the field is localizable. */
+    public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    public showDefaultValues?: Observable<boolean>;
-    public showDefaultValue?: Observable<boolean>;
+    public readonly showDefaultValues = toSignal(
+        toObservable(this.fieldForm).pipe(
+            switchMap(form => valueProjection$(form.controls['isRequired'], x => x !== true))),
+        { initialValue: false });
 
-    public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
+    public readonly showDefaultValue = toSignal(
+        toObservable(this.fieldForm).pipe(
+            switchMap(form => hasNoValue$(form.controls['calculatedDefaultValue']))),
+        { initialValue: false });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.fieldForm) {
-            this.showDefaultValues =
-                valueProjection$(this.fieldForm.controls['isRequired'], x => x !== true);
-
-            this.showDefaultValue =
-                hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);
-        }
-    }
+    public readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

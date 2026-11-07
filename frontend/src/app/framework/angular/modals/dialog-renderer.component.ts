@@ -6,10 +6,10 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { timer } from 'rxjs';
-import { DialogModel, DialogRequest, DialogService, Notification, StatefulComponent, Subscriptions, Tooltip } from '@app/framework/internal';
+import { Subscription, timer } from 'rxjs';
+import { DialogModel, DialogRequest, DialogService, Notification, Tooltip } from '@app/framework/internal';
 import { FocusOnInitDirective } from '../forms/focus-on-init.directive';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
@@ -18,15 +18,20 @@ import { ModalPlacementDirective } from './modal-placement.directive';
 import { ModalDirective } from './modal.directive';
 import { TooltipDirective } from './tooltip.directive';
 
-interface State {
-    // The pending dialog request.
-    dialogRequest?: DialogRequest | null;
+function addTooltip(tooltips: ReadonlyArray<Tooltip>, tooltip: Tooltip) {
+    if (tooltip.multiple || !tooltip.text) {
+        tooltips = tooltips.filter(x => x.target !== tooltip.target);
+    }
 
-    // The list of open notifications.
-    notifications: ReadonlyArray<Notification>;
+    if (!tooltip.text) {
+        return tooltips;
+    }
 
-    // The current tooltip.
-    tooltips: ReadonlyArray<Tooltip>;
+    if (tooltip.multiple) {
+        return [tooltip, ...tooltips];
+    }
+
+    return [tooltip];
 }
 
 @Component({
@@ -45,70 +50,51 @@ interface State {
         TranslatePipe,
     ],
 })
-export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class DialogRendererComponent {
+    public readonly dialogView = new DialogModel();
+    public readonly dialogRequest = signal<DialogRequest | null | undefined>(undefined);
+    public readonly notifications = signal<ReadonlyArray<Notification>>([]);
+    public readonly tooltips = signal<ReadonlyArray<Tooltip>>([]);
 
-    public dialogView = new DialogModel();
+    constructor(dialogs: DialogService) {
+        effect(onCleanup => {
+            const subscriptions = new Subscription();
 
-    constructor(
-        private readonly dialogs: DialogService,
-    ) {
-        super({ notifications: [], tooltips: [] });
-    }
-
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.dialogView.isOpenChanges.subscribe(isOpen => {
-                if (!isOpen) {
-                    this.finishRequest(false);
-                }
-            }));
-
-        this.subscriptions.add(
-            this.dialogs.notifications.subscribe(notification => {
-                this.next(s => ({
-                    ...s,
-                    notifications: [...s.notifications, notification],
-                }));
-
-                if (notification.displayTime > 0) {
-                    this.subscriptions.add(timer(notification.displayTime).subscribe(() => {
-                        this.close(notification);
+            untracked(() => {
+                subscriptions.add(
+                    this.dialogView.isOpenChanges.subscribe(isOpen => {
+                        if (!isOpen) {
+                            this.finishRequest(false);
+                        }
                     }));
-                }
-            }));
 
-        this.subscriptions.add(
-            this.dialogs.dialogs
-                .subscribe(dialogRequest => {
-                    this.cancel();
+                subscriptions.add(
+                    dialogs.notifications.subscribe(notification => {
+                        this.notifications.update(x => [...x, notification]);
 
-                    this.dialogView.show();
-
-                    this.next({ dialogRequest });
-                }));
-
-        this.subscriptions.add(
-            this.dialogs.tooltips
-                .subscribe(tooltip => {
-                    this.next(s => {
-                        let tooltips = s.tooltips;
-
-                        if (tooltip.multiple || !tooltip.text) {
-                            tooltips = tooltips.filter(x => x.target !== tooltip.target);
+                        if (notification.displayTime > 0) {
+                            subscriptions.add(timer(notification.displayTime).subscribe(() => {
+                                this.close(notification);
+                            }));
                         }
+                    }));
 
-                        if (tooltip.text) {
-                            if (tooltip.multiple) {
-                                tooltips = [tooltip, ...tooltips];
-                            } else {
-                                tooltips = [tooltip];
-                            }
-                        }
+                subscriptions.add(
+                    dialogs.dialogs.subscribe(dialogRequest => {
+                        this.cancel();
 
-                        return { ...s, tooltips };
-                    });
-                }));
+                        this.dialogView.show();
+                        this.dialogRequest.set(dialogRequest);
+                    }));
+
+                subscriptions.add(
+                    dialogs.tooltips.subscribe(tooltip => {
+                        this.tooltips.update(x => addTooltip(x, tooltip));
+                    }));
+            });
+
+            onCleanup(() => subscriptions.unsubscribe());
+        });
     }
 
     public cancel() {
@@ -123,16 +109,12 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
         this.dialogView.hide();
     }
 
-    private finishRequest(value: boolean) {
-        this.snapshot.dialogRequest?.complete(value);
-
-        this.next({ dialogRequest: null });
+    public close(notification: Notification) {
+        this.notifications.update(x => x.filter(n => notification !== n));
     }
 
-    public close(notification: Notification) {
-        this.next(s => ({
-            ...s,
-            notifications: s.notifications.filter(n => notification !== n),
-        }));
+    private finishRequest(value: boolean) {
+        this.dialogRequest()?.complete(value);
+        this.dialogRequest.set(null);
     }
 }

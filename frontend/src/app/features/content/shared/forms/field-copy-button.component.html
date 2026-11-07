@@ -1,4 +1,4 @@
-@if (isLocalized) {
+@if (isLocalized()) {
     <button
         class="btn btn-outline-secondary btn-sm dropdown-toggle"
         #button
@@ -20,8 +20,8 @@
             <div class="row">
                 <label class="col-auto col-form-label" for="languageSource">{{ "common.from" | sqxTranslate }}</label>
                 <div class="col">
-                    <select class="form-select" id="languagesSource" [ngModel]="copySource" (ngModelChange)="setCopySource($event)">
-                        @for (language of languages; track language) {
+                    <select class="form-select" id="languagesSource" [(ngModel)]="copySource">
+                        @for (language of languages(); track language) {
                             <option [ngValue]="language.iso2Code">{{ language.iso2Code }}</option>
                         }
                     </select>
@@ -33,7 +33,7 @@
 
         <div class="section">
             <label>{{ "common.to" | sqxTranslate }}</label>
-            <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes" />
+            <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes()" />
         </div>
     </sqx-dropdown-menu>
 }

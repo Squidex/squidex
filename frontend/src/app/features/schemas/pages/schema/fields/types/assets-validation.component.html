@@ -1,5 +1,5 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row for="minItems" hideError label="schemas.fieldTypes.assets.count" [prefix]="field.fieldId" showUnit="true">
+<div [formGroup]="fieldForm()">
+    <sqx-form-row for="minItems" hideError label="schemas.fieldTypes.assets.count" [prefix]="field().fieldId" showUnit="true">
         <div class="row g-0">
             <div class="col">
                 <input class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.assets.countMin' | sqxTranslate }}" type="number" />
@@ -13,7 +13,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="minSize" hideError label="schemas.fieldTypes.assets.size" [prefix]="field.fieldId" unit="common.bytes">
+    <sqx-form-row for="minSize" hideError label="schemas.fieldTypes.assets.size" [prefix]="field().fieldId" unit="common.bytes">
         <div class="row g-0">
             <div class="col">
                 <input class="form-control" formControlName="minSize" placeholder="{{ 'schemas.fieldTypes.assets.sizeMin' | sqxTranslate }}" type="number" />
@@ -29,7 +29,7 @@
 
     <hr />
 
-    <sqx-form-row for="minSize" label="schemas.fieldTypes.assets.expectedType" [prefix]="field.fieldId" showUnit="true">
+    <sqx-form-row for="minSize" label="schemas.fieldTypes.assets.expectedType" [prefix]="field().fieldId" showUnit="true">
         <select class="form-select" formControlName="expectedType">
             <option></option>
             <option ngValue="Image">Image</option>
@@ -39,7 +39,7 @@
         </select>
     </sqx-form-row>
 
-    <sqx-form-row for="minWidth" hideError label="common.width" [prefix]="field.fieldId" unit="px">
+    <sqx-form-row for="minWidth" hideError label="common.width" [prefix]="field().fieldId" unit="px">
         <div class="row g-0">
             <div class="col"><input class="form-control" formControlName="minWidth" type="number" /></div>
 
@@ -49,7 +49,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="minHeight" hideError label="common.height" [prefix]="field.fieldId" unit="px">
+    <sqx-form-row for="minHeight" hideError label="common.height" [prefix]="field().fieldId" unit="px">
         <div class="row g-0">
             <div class="col"><input class="form-control" formControlName="minHeight" type="number" /></div>
 
@@ -59,7 +59,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="aspectRatio" hideError label="common.aspectRatio" [prefix]="field.fieldId" unit="px">
+    <sqx-form-row for="aspectRatio" hideError label="common.aspectRatio" [prefix]="field().fieldId" unit="px">
         <div class="row g-0">
             <div class="col"><input class="form-control" formControlName="aspectWidth" type="number" /></div>
 
@@ -71,27 +71,27 @@
 
     <hr />
 
-    <sqx-form-row #allowDuplicatesRow check for="allowDuplicates" hideError label="schemas.fieldTypes.assets.allowDuplicates" [prefix]="field.fieldId">
+    <sqx-form-row #allowDuplicatesRow check for="allowDuplicates" hideError label="schemas.fieldTypes.assets.allowDuplicates" [prefix]="field().fieldId">
         <input class="form-check-input" [id]="allowDuplicatesRow.fieldName()" formControlName="allowDuplicates" type="checkbox" />
     </sqx-form-row>
 
-    <sqx-form-row #allowedExtensionsRow for="allowedExtensions" hideError label="schemas.fieldTypes.assets.fileExtensions" [prefix]="field.fieldId">
+    <sqx-form-row #allowedExtensionsRow for="allowedExtensions" hideError label="schemas.fieldTypes.assets.fileExtensions" [prefix]="field().fieldId">
         <sqx-tag-editor [id]="allowedExtensionsRow.fieldName()" formControlName="allowedExtensions" />
     </sqx-form-row>
 
-    <sqx-form-row #defaultValueRow for="defaultValue" hideError label="schemas.field.defaultValue" [prefix]="field.fieldId">
+    <sqx-form-row #defaultValueRow for="defaultValue" hideError label="schemas.field.defaultValue" [prefix]="field().fieldId">
         <sqx-tag-editor [id]="defaultValueRow.fieldName()" formControlName="defaultValue" />
     </sqx-form-row>
 
-    @if (isLocalizable) {
+    @if (isLocalizable()) {
         <sqx-form-row
             #defaultValuesRow
             for="defaultValues"
             hideError
             hint="schemas.field.defaultValuesHint"
             label="schemas.field.defaultValues"
-            [prefix]="field.fieldId">
-            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages" type="tags" />
+            [prefix]="field().fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages()" type="tags" />
         </sqx-form-row>
     }
 </div>

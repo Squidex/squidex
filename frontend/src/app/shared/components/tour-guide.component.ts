@@ -6,9 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
+import { map, merge } from 'rxjs';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
-import { Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
+import { TaskSnapshot, TourService, TourState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-tour-guide',
@@ -22,25 +23,23 @@ import { Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared
     ],
 })
 export class TourGuideComponent {
-    private readonly subscriptions = new Subscriptions();
-
     public readonly isCollapsed = signal(false);
 
     constructor(
         public readonly tourState: TourState,
         public readonly tourService: TourService,
     ) {
-        this.subscriptions.add(
-            tourService.stepShow$
-                .subscribe(() => {
-                    this.isCollapsed.set(true);
-                }));
+        effect(onCleanup => {
+            const subscription =
+                merge(
+                    tourService.stepShow$.pipe(map(() => true)),
+                    tourService.end$.pipe(map(() => false)),
+                ).subscribe(isCollapsed => {
+                    this.isCollapsed.set(isCollapsed);
+                });
 
-        this.subscriptions.add(
-            tourService.end$
-                .subscribe(() => {
-                    this.isCollapsed.set(false);
-                }));
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public toggle() {

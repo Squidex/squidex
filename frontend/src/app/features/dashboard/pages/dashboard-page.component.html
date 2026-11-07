@@ -1,7 +1,7 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
-@if (selectedApp | async; as app) {
+@if (selectedApp(); as app) {
     <div class="dashboard" animate.enter="fade-in" animate.leave="fade-out">
-        @if (!isScrolled) {
+        @if (!isScrolled()) {
             <div class="dashboard-summary" animate.enter="fade-in" animate.leave="fade-out" sqxTourStep="appDashboard">
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
 
@@ -9,7 +9,7 @@
             </div>
         }
         <gridster #grid [options]="gridOptions">
-            @for (item of gridConfig; track item) {
+            @for (item of gridConfig(); track item) {
                 <gridster-item [item]="item">
                     @switch (item.type) {
                         @case ("schemas") {
@@ -25,36 +25,35 @@
                         }
 
                         @case ("api-calls") {
-                            animate.enter="fade-in" animate.leave="fade-out"
-                            <sqx-api-calls-card [app]="app" [usage]="callsUsage" />
+                            <sqx-api-calls-card [app]="app" [usage]="callsUsage()" />
                         }
 
                         @case ("api-traffic-summary") {
-                            <sqx-api-traffic-summary-card [usage]="callsUsage" />
+                            <sqx-api-traffic-summary-card [usage]="callsUsage()" />
                         }
 
                         @case ("api-calls-summary") {
-                            <sqx-api-calls-summary-card [usage]="callsUsage" />
+                            <sqx-api-calls-summary-card [usage]="callsUsage()" />
                         }
 
                         @case ("asset-uploads-count") {
-                            <sqx-asset-uploads-count-card [usage]="storageUsage" />
+                            <sqx-asset-uploads-count-card [usage]="storageUsage()" />
                         }
 
                         @case ("asset-uploads-size-summary") {
-                            <sqx-asset-uploads-size-summary-card [usage]="storageCurrent" />
+                            <sqx-asset-uploads-size-summary-card [usage]="storageCurrent()" />
                         }
 
                         @case ("asset-uploads-size") {
-                            <sqx-asset-uploads-size-card [usage]="storageUsage" />
+                            <sqx-asset-uploads-size-card [usage]="storageUsage()" />
                         }
 
                         @case ("api-traffic") {
-                            <sqx-api-traffic-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
+                            <sqx-api-traffic-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage()" />
                         }
 
                         @case ("api-performance") {
-                            <sqx-api-performance-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
+                            <sqx-api-performance-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage()" />
                         }
 
                         @case ("random-dog") {
@@ -84,17 +83,17 @@
                 </gridster-item>
             }
 
-            <div [style.height]="extendedHeight" [style.width]="'0px'"></div>
+            <div [style.height]="extendedHeight()" [style.width]="'0px'"></div>
         </gridster>
         @if (grid) {
             <div class="dashboard-settings">
                 <sqx-dashboard-config
                     [app]="app"
-                    [config]="gridConfig!"
+                    [config]="gridConfig()!"
                     [configAvailable]="gridConfigAvailable"
                     (configChange)="changeConfig($event)"
                     [configDefaults]="gridConfigDefaults"
-                    [needsAttention]="isScrolled" />
+                    [needsAttention]="isScrolled()" />
             </div>
         }
     </div>

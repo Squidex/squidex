@@ -6,11 +6,12 @@
  */
 
 
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { GridsterItemConfig } from 'angular-gridster2';
-import { take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, UIState } from '@app/shared';
+import { switchMap, take } from 'rxjs/operators';
+import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, Types, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-dashboard-config',
@@ -29,30 +30,36 @@ import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirect
     ],
 })
 export class DashboardConfigComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    /** The app of the dashboard. The stored grid configuration is loaded when it changes. */
+    public readonly app = input.required<AppDto>();
 
-    @Input({ required: true })
-    public config!: GridsterItemConfig[];
+    /** The current grid configuration. Selecting or unselecting cards changes it in place. */
+    public readonly config = input.required<GridsterItemConfig[]>();
 
-    @Input()
-    public configDefaults!: GridsterItemConfig[];
+    /** The grid configuration to use when nothing is stored or the user resets it. */
+    public readonly configDefaults = input.required<GridsterItemConfig[]>();
 
-    @Input()
-    public configAvailable!: GridsterItemConfig[];
+    /** All cards the user can add to the dashboard. */
+    public readonly configAvailable = input.required<GridsterItemConfig[]>();
 
-    @Input({ transform: booleanAttribute })
-    public needsAttention?: boolean | null;
+    /** Highlights the settings button, for example when the dashboard is scrolled. */
+    public readonly needsAttention = input(false, { transform: booleanAttribute });
 
-    @Output()
-    public configChange = new EventEmitter<GridsterItemConfig[]>();
+    /** Emits the new grid configuration when it is loaded, reset or edited in expert mode. */
+    public readonly configChange = output<GridsterItemConfig[]>();
 
-    public configOptions: ReadonlyArray<GridsterItemConfig> = [];
+    public readonly configOptions = computed<ReadonlyArray<GridsterItemConfig>>(() => {
+        return this.configAvailable().map(item => {
+            const name = this.localizer.getOrKey(item.name);
 
-    public expertDialog = new DialogModel();
-    public expertConfig?: GridsterItemConfig[];
+            return { ...item, name };
+        }).sortByString(x => x.name);
+    });
 
-    public dropdownModal = new ModalModel();
+    public readonly expertDialog = new DialogModel();
+    public readonly expertConfig = signal<GridsterItemConfig[] | undefined>(undefined);
+
+    public readonly dropdownModal = new ModalModel();
 
     constructor(
         public readonly appsState: AppsState,
@@ -61,28 +68,17 @@ export class DashboardConfigComponent {
         private readonly dialogs: DialogService,
         private readonly uiState: UIState,
     ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.configAvailable) {
-            this.configOptions = this.configAvailable.map(item => {
-                const name = this.localizer.getOrKey(item.name);
-
-                return { ...item, name };
-            }).sortByString(x => x.name);
-        }
-
-        if (changes.app) {
-            this.uiState.getAppShared('dashboard.grid', this.configDefaults).pipe(take(1))
-                .subscribe(dto => {
-                    this.setConfig(dto);
-                });
-        }
+        toObservable(this.app).pipe(
+            switchMap(() => this.uiState.getAppShared('dashboard.grid', this.configDefaults()).pipe(take(1))),
+            takeUntilDestroyed())
+            .subscribe(dto => {
+                this.setConfig(dto);
+            });
     }
 
     private setConfig(config: any) {
         if (!Types.isArrayOfObject(config)) {
-            config = this.configDefaults;
+            config = this.configDefaults();
         }
 
         this.configChange.emit(Types.clone(config));
@@ -91,37 +87,38 @@ export class DashboardConfigComponent {
     public startExpertMode() {
         this.dropdownModal.hide();
 
-        this.expertConfig = Types.clone(this.config);
+        this.expertConfig.set(Types.clone(this.config()));
         this.expertDialog.show();
     }
 
     public completeExpertMode() {
-        this.setConfig(this.expertConfig);
+        this.setConfig(this.expertConfig());
 
-        this.expertConfig = null!;
+        this.expertConfig.set(undefined);
         this.expertDialog.hide();
     }
 
     public resetConfig() {
-        this.setConfig(Types.clone(this.configDefaults));
+        this.setConfig(Types.clone(this.configDefaults()));
         this.saveConfig();
     }
 
     public saveConfig() {
-        this.uiState.setAppShared('dashboard.grid', this.config);
+        this.uiState.setAppShared('dashboard.grid', this.config());
 
         this.dialogs.notifyInfo('i18n:dashboard.configSaved');
     }
 
     public addOrRemove(item: GridsterItemConfig) {
-        const current = this.config.find(x => x.type === item.type);
+        const config = this.config();
+        const current = config.find(x => x.type === item.type);
 
         if (current) {
-            this.config.splice(this.config.indexOf(current), 1);
+            config.splice(config.indexOf(current), 1);
         } else {
             let y = 0;
 
-            for (const item of this.config) {
+            for (const item of config) {
                 y = Math.max(item.y, y);
             }
 
@@ -129,11 +126,11 @@ export class DashboardConfigComponent {
             newOption.x = 0;
             newOption.y = y + 1;
 
-            this.config.push(newOption);
+            config.push(newOption);
         }
     }
 
     public isSelected(item: GridsterItemConfig) {
-        return this.config.find(x => x.type === item.type);
+        return this.config().find(x => x.type === item.type);
     }
 }

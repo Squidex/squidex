@@ -1,5 +1,6 @@
 <sqx-title [message]="schemasState.schemaName" />
-@if (schemaTab | async; as tab) {
+@if (schema(); as schema) {
+    @let tab = schemaTab();
     <sqx-layout innerWidth="50" layout="main">
         <ng-container title>
             <ul class="nav nav-tabs2">
@@ -74,7 +75,7 @@
                 <i class="icon-dots"></i>
             </button>
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editOptionsDropdown; closeAlways: true">
-                @if (schemasState.canCreate) {
+                @if (schemasState.canCreate | async) {
                     <div class="dropdown-divider"></div>
                     <button class="dropdown-item" (click)="cloneSchema()" type="button">{{ "common.clone" | sqxTranslate }}</button>
                 }

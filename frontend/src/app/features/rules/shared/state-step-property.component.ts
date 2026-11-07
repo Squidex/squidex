@@ -6,9 +6,11 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, FormRowComponent, RuleElementPropertyDto, Types } from '@app/shared';
+
+type ValueType = 'Raw' | 'Singleline' | 'MultilineAny' | 'MultilineJson';
 
 @Component({
     selector: 'sqx-state-step-property',
@@ -22,42 +24,51 @@ import { CodeEditorComponent, FormRowComponent, RuleElementPropertyDto, Types } 
     ],
 })
 export class StateStepPropertyComponent {
-    @Input()
-    public property!: RuleElementPropertyDto;
+    /** The property definition, which provides the name and label. */
+    public readonly property = input.required<RuleElementPropertyDto>();
 
-    @Input()
-    public set value(value: any) {
-        if (Types.isNull(value) || Types.isUndefined(value)) {
-            this.valueType = 'Raw';
-            this.valueFormatted = '-';
-        } else if (Types.isNumber(value) || Types.isBoolean(value)) {
-            this.valueType = 'Raw';
-            this.valueFormatted = value;
-        } else if (Types.isString(value)) {
-            const truncated = value.trim();
+    /** The configured value of the property. */
+    public readonly value = input<any>();
 
-            const hasNewLine = value.indexOf('\n') >= 0;
-            if (!hasNewLine) {
-                this.valueType = 'Singleline';
-                this.valueFormatted = value;
-            } else if (truncated.indexOf('{') === 0 || truncated.indexOf('[') === 0) {
-                try {
-                    this.valueType = 'MultilineJson';
-                    this.valueFormatted = JSON.stringify(JSON.parse(value), undefined, 2);
-                } catch {
-                    this.valueType = 'MultilineAny';
-                    this.valueFormatted = value;
-                }
-            } else {
-                this.valueType = 'MultilineAny';
-                this.valueFormatted = value;
-            }
-        } else {
-            this.valueType = 'MultilineJson';
-            this.valueFormatted = JSON.stringify(value, undefined, 2);
-        }
+    public readonly valueParsed = computed(() => {
+        return parseValue(this.value());
+    });
+
+    public readonly valueFormatted = computed(() => {
+        return this.valueParsed().formatted;
+    });
+
+    public readonly valueType = computed(() => {
+        return this.valueParsed().type;
+    });
+}
+
+function parseValue(value: any): { type: ValueType; formatted: any } {
+    if (Types.isNull(value) || Types.isUndefined(value)) {
+        return { type: 'Raw', formatted: '-' };
     }
 
-    public valueFormatted: any;
-    public valueType: 'Raw' | 'Singleline' | 'MultilineAny' | 'MultilineJson' = 'Raw';
+    if (Types.isNumber(value) || Types.isBoolean(value)) {
+        return { type: 'Raw', formatted: value };
+    }
+
+    if (!Types.isString(value)) {
+        return { type: 'MultilineJson', formatted: JSON.stringify(value, undefined, 2) };
+    }
+
+    const hasNewLine = value.indexOf('\n') >= 0;
+    if (!hasNewLine) {
+        return { type: 'Singleline', formatted: value };
+    }
+
+    const truncated = value.trim();
+    if (truncated.indexOf('{') !== 0 && truncated.indexOf('[') !== 0) {
+        return { type: 'MultilineAny', formatted: value };
+    }
+
+    try {
+        return { type: 'MultilineJson', formatted: JSON.stringify(JSON.parse(value), undefined, 2) };
+    } catch {
+        return { type: 'MultilineAny', formatted: value };
+    }
 }

@@ -1,11 +1,11 @@
-<div class="editor-container" [class.compact]="snapshot.isCompact" (sqxResizeCondition)="setCompact($event)" sqxResizeMaxWidth="0" sqxResizeMinWidth="600">
-    <form [class.hidden]="snapshot.isMapHidden">
+<div class="editor-container" [class.compact]="isCompact()" (sqxResizeCondition)="setCompact($event)" sqxResizeMaxWidth="0" sqxResizeMinWidth="600">
+    <form [class.hidden]="isMapHidden()">
         <div class="editor" #editor></div>
         <input
             class="form-control search-control"
             #searchBox
             [class.hidden]="!isGoogleMaps"
-            [disabled]="snapshot.isDisabled"
+            [disabled]="isDisabled()"
             placeholder="{{ 'common.searchGoogleMaps' | sqxTranslate }}" />
     </form>
 
@@ -16,7 +16,7 @@
                     <sqx-control-errors for="latitude" style="z-index: 10000" />
                     <input class="form-control" id="latitude" formControlName="latitude" step="any" type="number" />
 
-                    @if (!snapshot.isCompact) {
+                    @if (!isCompact()) {
                         <label for="latitude">{{ "common.latitudeShort" | sqxTranslate }}</label>
                     }
                 </div>
@@ -25,14 +25,14 @@
                     <sqx-control-errors for="longitude" style="z-index: 10000" />
                     <input class="form-control" id="longitude" formControlName="longitude" step="any" type="number" />
 
-                    @if (!snapshot.isCompact) {
+                    @if (!isCompact()) {
                         <label for="longitude">{{ "common.longitudeShort" | sqxTranslate }}</label>
                     }
                 </div>
 
-                @if (!snapshot.isCompact) {
+                @if (!isCompact()) {
                     <div class="col col-auto">
-                        <button class="btn btn-text clear" (click)="clearValue()" [disabled]="snapshot.isDisabled" type="button">
+                        <button class="btn btn-text clear" (click)="clearValue()" [disabled]="isDisabled()" type="button">
                             {{ "common.clear" | sqxTranslate }}
                         </button>
                     </div>
@@ -44,7 +44,7 @@
             <button
                 class="btn btn-text-secondary"
                 attr.aria-label="{{ 'common.mapShow' | sqxTranslate }}"
-                [class.hidden]="!snapshot.isMapHidden"
+                [class.hidden]="!isMapHidden()"
                 (click)="hideMap(false)"
                 title="i18n:common.mapShow"
                 type="button">
@@ -53,7 +53,7 @@
             <button
                 class="btn btn-text-secondary"
                 attr.aria-label="{{ 'common.mapHide' | sqxTranslate }}"
-                [class.hidden]="snapshot.isMapHidden"
+                [class.hidden]="isMapHidden()"
                 (click)="hideMap(true)"
                 title="i18n:common.mapHide"
                 type="button">

@@ -6,7 +6,7 @@
  */
 
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FeatureDto, HelpMarkdownPipe, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -21,9 +21,9 @@ import { FeatureDto, HelpMarkdownPipe, ModalDialogComponent, TooltipDirective, T
     ],
 })
 export class NewsDialogComponent {
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the user closes the dialog. */
+    public readonly dialogClose = output();
 
-    @Input({ required: true })
-    public features!: ReadonlyArray<FeatureDto>;
+    /** The new features to present to the user. */
+    public readonly features = input.required<ReadonlyArray<FeatureDto>>();
 }

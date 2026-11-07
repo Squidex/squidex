@@ -6,7 +6,7 @@
  */
 
 
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormRowComponent } from '@app/shared';
 
@@ -24,12 +24,12 @@ export class DateTimeUIComponent {
     public readonly converter = FloatConverter.INSTANCE;
     public readonly editors = DateTimeFieldEditorValues;
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: DateTimeFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<DateTimeFieldPropertiesDto>();
 }

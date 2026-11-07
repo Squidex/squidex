@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, ExportContentsDto, ExportFormat, FormRowComponent, MarkdownDirective, ModalDialogComponent, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
@@ -15,6 +15,7 @@ type FieldPaths = { label: string; paths: ReadonlyArray<string> };
     selector: 'sqx-contents-export-dialog',
     styleUrls: ['./contents-export-dialog.component.scss'],
     templateUrl: './contents-export-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormRowComponent,
         FormsModule,
@@ -23,58 +24,59 @@ type FieldPaths = { label: string; paths: ReadonlyArray<string> };
         TranslatePipe,
     ],
 })
-export class ContentsExportDialogComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class ContentsExportDialogComponent {
+    /** Emits when the dialog is closed or the export has been started. */
+    public readonly dialogClose = output();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema to export the contents for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input()
-    public languages: ReadonlyArray<AppLanguageDto> = [];
+    /** All languages of the app, to build the paths of localized fields. */
+    public readonly languages = input<ReadonlyArray<AppLanguageDto>>([]);
 
     public readonly metaPaths = ['id', 'created', 'createdBy', 'lastModified', 'lastModifiedBy', 'status', 'newStatus', 'version'];
 
-    public fieldPaths: ReadonlyArray<FieldPaths> = [];
+    public readonly fieldPaths = computed<ReadonlyArray<FieldPaths>>(() => {
+        const languages = this.languages();
 
-    public format: ExportFormat = 'Csv';
-    public fields = '';
-    public unpublished = false;
+        return this.schema().fields.filter(x => x.properties.isContentField).map(field => {
+            const paths =
+                field.isLocalizable ?
+                languages.map(x => `data.${field.name}.${x.iso2Code}`) :
+                [`data.${field.name}`];
+
+            return { label: field.displayName, paths };
+        });
+    });
+
+    public readonly format = signal<ExportFormat>('Csv');
+    public readonly fields = signal('');
+    public readonly unpublished = signal(false);
 
     constructor(
         private readonly schemasState: SchemasState,
     ) {
     }
 
-    public ngOnInit() {
-        this.fieldPaths = this.schema.fields.filter(x => x.properties.isContentField).map(field => {
-            const paths =
-                field.isLocalizable ?
-                this.languages.map(x => `data.${field.name}.${x.iso2Code}`) :
-                [`data.${field.name}`];
-
-            return { label: field.displayName, paths };
-        });
-    }
-
     public addPath(path: string) {
-        const current = this.fields.trim();
+        const current = this.fields().trim();
 
-        this.fields = current ? `${current}, ${path}` : path;
+        this.fields.set(current ? `${current}, ${path}` : path);
     }
 
     public export() {
-        if (!this.schema.canContentsExport) {
+        const schema = this.schema();
+        if (!schema.canContentsExport) {
             return;
         }
 
         const request = new ExportContentsDto({
-            format: this.format,
-            fields: this.fields.trim() || undefined,
-            unpublished: this.unpublished,
+            format: this.format(),
+            fields: this.fields().trim() || undefined,
+            unpublished: this.unpublished(),
         });
 
-        this.schemasState.exportContents(this.schema, request)
+        this.schemasState.exportContents(schema, request)
             .subscribe(() => {
                 this.dialogClose.emit();
             });

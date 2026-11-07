@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EMPTY, Observable, switchMap } from 'rxjs';
-import { CodeEditorComponent, ConfirmClickDirective, ControlErrorsComponent, SchemaDto, ScriptCompletions, TranslatePipe, TypedSimpleChanges, value$ } from '@app/shared';
+import { switchMap } from 'rxjs';
+import { CodeEditorComponent, ConfirmClickDirective, ControlErrorsComponent, SchemaDto, TranslatePipe, value$ } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 
 @Component({
@@ -17,7 +17,6 @@ import { CompletionsCache } from './completions-cache';
     styleUrls: ['./content-changed-schema.component.scss'],
     templateUrl: './content-changed-schema.component.html',
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
@@ -27,27 +26,22 @@ import { CompletionsCache } from './completions-cache';
     ],
 })
 export class ContentChangedSchemaComponent {
-    @Input({ required: true })
-    public schemas?: ReadonlyArray<SchemaDto> | null;
+    /** The schemas the user can choose from. */
+    public readonly schemas = input.required<ReadonlyArray<SchemaDto> | null | undefined>();
 
-    @Input({ required: true })
-    public form!: FormGroup;
+    /** The form group with the schema and the condition. */
+    public readonly form = input.required<FormGroup>();
 
-    @Output()
-    public remove = new EventEmitter<any>();
+    /** Emits when the user confirms to remove the schema. */
+    public readonly remove = output();
 
-    public completions: Observable<ScriptCompletions> = EMPTY;
+    public readonly completions;
 
-    constructor(
-        private readonly completionsCache: CompletionsCache,
-    ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.form) {
-            this.completions =
-                value$(this.form.controls['schemaId']).pipe(
-                    switchMap(x => this.completionsCache.getCompletions(x, true)));
-        }
+    constructor(completionsCache: CompletionsCache) {
+        this.completions = toSignal(
+            toObservable(this.form).pipe(
+                switchMap(form => value$(form.controls['schemaId'])),
+                switchMap(schemaId => completionsCache.getCompletions(schemaId, true))),
+            { initialValue: null });
     }
 }

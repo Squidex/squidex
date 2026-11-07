@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ClientsState, LayoutComponent, ListViewComponent, RolesState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ClientAddFormComponent } from './client-add-form.component';
@@ -16,6 +16,7 @@ import { ClientComponent } from './client.component';
     selector: 'sqx-clients-page',
     styleUrls: ['./clients-page.component.scss'],
     templateUrl: './clients-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         ClientAddFormComponent,
@@ -33,14 +34,11 @@ import { ClientComponent } from './client.component';
         TranslatePipe,
     ],
 })
-export class ClientsPageComponent implements OnInit {
+export class ClientsPageComponent {
     constructor(
         public readonly clientsState: ClientsState,
         public readonly rolesState: RolesState,
     ) {
-    }
-
-    public ngOnInit() {
         this.rolesState.load();
 
         this.clientsState.load();

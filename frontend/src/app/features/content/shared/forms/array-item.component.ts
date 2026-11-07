@@ -6,10 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, numberAttribute, output, viewChildren } from '@angular/core';
+import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, invalid$, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, invalid$, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -27,97 +27,98 @@ import { ComponentSectionComponent } from './component-section.component';
     ],
 })
 export class ArrayItemComponent {
-    @Output()
-    public itemRemove = new EventEmitter();
+    private readonly sections = viewChildren(ComponentSectionComponent);
 
-    @Output()
-    public itemMove = new EventEmitter<number>();
+    /** Emits when the user removes the item. */
+    public readonly itemRemove = output();
 
-    @Output()
-    public itemExpanded = new EventEmitter<number>();
+    /** Emits the new index when the user moves the item. */
+    public readonly itemMove = output<number>();
 
-    @Output()
-    public clone = new EventEmitter();
+    /** Emits when the item has been expanded or collapsed and therefore changed its size. */
+    public readonly itemExpanded = output();
 
-    @Input({ required: true })
-    public hasChatBot!: boolean;
+    /** Emits when the user clones the item. */
+    public readonly clone = output();
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** Enables the AI features of the editors. */
+    public readonly hasChatBot = input.required<boolean>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** The content form the item belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true })
-    public formModel!: ObjectFormBase;
+    /** The nesting level of the item. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isComparing = false;
+    /** The form model of the item. */
+    public readonly formModel = input.required<ObjectFormBase>();
 
-    @Input({ transform: booleanAttribute })
-    public isCollapsedInitial = false;
+    /** Renders the editor next to the editor of another version. */
+    public readonly isComparing = input.required<boolean, unknown>({ transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isFirst?: boolean | null;
+    /** Collapses the item initially, if the user has not expanded or collapsed it before. */
+    public readonly isCollapsedInitial = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isLast?: boolean | null;
+    /** Disables the buttons to move the item up. */
+    public readonly isFirst = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isDisabled?: boolean | null;
+    /** Disables the buttons to move the item down. */
+    public readonly isLast = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true, transform: numberAttribute })
-    public index!: number;
+    /** Disables all buttons of the item. */
+    public readonly isDisabled = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The index of the item in the array. */
+    public readonly index = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The language of the field values. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @ViewChildren(ComponentSectionComponent)
-    public sections!: QueryList<ComponentSectionComponent>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public isInvalidForm?: Observable<boolean>;
-    public isInvalidComponent?: Observable<boolean>;
+    public readonly isInvalidForm = computed(() => {
+        return invalid$(this.formModel().form);
+    });
 
-    public title?: Observable<string>;
-
-    public get isCollapsed() {
-        return this.formModel.collapsedChanges;
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formModel) {
-            this.isInvalidForm = invalid$(this.formModel.form);
-
-            if (Types.is(this.formModel, ComponentForm)) {
-                this.isInvalidComponent = this.formModel.schemaChanges.pipe(map(x => !x));
-            } else {
-                this.isInvalidComponent = of(false);
-            }
-
-            this.title = valueProjection$(this.formModel.form, () => getTitle(this.formModel));
+    public readonly isInvalidComponent = computed(() => {
+        const formModel = this.formModel();
+        if (!Types.is(formModel, ComponentForm)) {
+            return of(false);
         }
 
-        if (changes.formModel || changes.isCollapsedInitial) {
-            if (this.isCollapsedInitial && this.formModel.collapsed === null) {
+        return formModel.schemaChanges.pipe(map(x => !x));
+    });
+
+    public readonly title = computed(() => {
+        const formModel = this.formModel();
+
+        return valueProjection$(formModel.form, () => getTitle(formModel));
+    });
+
+    public readonly isCollapsed = computed(() => {
+        return this.formModel().collapsedChanges;
+    });
+
+    constructor() {
+        effect(() => {
+            if (this.isCollapsedInitial() && this.formModel().collapsed === null) {
                 this.collapse();
             }
-        }
+        });
     }
 
     public collapse() {
-        this.formModel.collapse();
+        this.formModel().collapse();
 
         this.itemExpanded.emit();
     }
 
     public expand() {
-        this.formModel.expand();
+        this.formModel().expand();
 
         this.itemExpanded.emit();
     }
@@ -127,11 +128,11 @@ export class ArrayItemComponent {
     }
 
     public moveUp() {
-        this.itemMove.emit(this.index - 1);
+        this.itemMove.emit(this.index() - 1);
     }
 
     public moveDown() {
-        this.itemMove.emit(this.index + 1);
+        this.itemMove.emit(this.index() + 1);
     }
 
     public moveBottom() {
@@ -139,7 +140,7 @@ export class ArrayItemComponent {
     }
 
     public reset() {
-        this.sections.forEach(section => {
+        this.sections().forEach(section => {
             section.reset();
         });
     }

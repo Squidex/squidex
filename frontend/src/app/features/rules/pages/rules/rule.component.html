@@ -1,3 +1,5 @@
+@let rule = this.rule();
+@let availableSteps = this.availableSteps();
 <div class="card">
     <div class="card-header">
         <div class="row">
@@ -88,7 +90,7 @@
             <div class="col-auto">
                 <sqx-rule-element
                     disabled="true"
-                    [elementInfo]="availableTriggers[rule.trigger.triggerType]"
+                    [elementInfo]="availableTriggers()[rule.trigger.triggerType]"
                     [elementType]="rule.trigger.triggerType"
                     showDescription="false"
                     showName="false" />
@@ -100,7 +102,7 @@
 
             <div class="col col-flow">
                 <div class="d-flex flex-row align-items-center">
-                    @for (item of flow; track item.id) {
+                    @for (item of flow(); track item.id) {
                         <sqx-rule-element
                             disabled="true"
                             [elementInfo]="$any(availableSteps[item.step.step.stepType])"

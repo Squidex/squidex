@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-auto">
-                                <sqx-toggle [disabled]="!isEditable" [ngModel]="isEditing" (ngModelChange)="toggle($event)" />
+                                <sqx-toggle [disabled]="!isEditable()" [ngModel]="isEditing()" (ngModelChange)="toggle($event)" />
                             </div>
 
                             <div class="col">
@@ -16,7 +16,7 @@
                         </div>
                     </div>
 
-                    @if (isEditing) {
+                    @if (isEditing()) {
                         <form [formGroup]="updateForm.form" (ngSubmit)="save()">
                             <div class="card-body">
                                 <sqx-form-error [error]="updateForm.error | async" />
@@ -52,7 +52,7 @@
 
                                 <sqx-form-row for="redirectUrl" label="teams.auth.redirectUrl">
                                     <div class="input-group">
-                                        <input class="form-control" #redirectUri readonly value="{{ urlToRedirect }}" />
+                                        <input class="form-control" #redirectUri readonly value="{{ urlToRedirect() }}" />
                                         <button
                                             class="btn btn-outline-secondary"
                                             attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
@@ -69,7 +69,7 @@
                                     <a class="float-end btn btn-success" href="{{ urlToTest }}?{{ updateForm.url | async }}" target="_blank" type="type">
                                         {{ "teams.auth.testLogin" | sqxTranslate }}
                                     </a>
-                                    <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
+                                    <button class="float-end btn btn-primary" [disabled]="!isEditable()" type="submit">
                                         {{ "common.save" | sqxTranslate }}
                                     </button>
                                 </div>

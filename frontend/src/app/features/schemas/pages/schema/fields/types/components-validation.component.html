@@ -1,5 +1,5 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row for="minItems" hideError label="schemas.fieldTypes.references.count" [prefix]="field.fieldId">
+<div [formGroup]="fieldForm()">
+    <sqx-form-row for="minItems" hideError label="schemas.fieldTypes.references.count" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input
@@ -21,7 +21,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
+    <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field().fieldId">
         <sqx-tag-editor
             [id]="schemaIdsRow.fieldName()"
             formControlName="schemaIds"
@@ -30,7 +30,7 @@
             placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
     </sqx-form-row>
 
-    <sqx-form-row #uniqueFieldsRow for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
+    <sqx-form-row #uniqueFieldsRow for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field().fieldId">
         <sqx-tag-editor [id]="uniqueFieldsRow.fieldName()" formControlName="uniqueFields" />
     </sqx-form-row>
 </div>

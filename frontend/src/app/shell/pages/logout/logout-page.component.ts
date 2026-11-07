@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/shared';
 
@@ -13,14 +13,15 @@ import { AuthService } from '@app/shared';
     selector: 'sqx-logout',
     template: '',
 })
-export class LogoutPageComponent implements OnInit {
+export class LogoutPageComponent {
     constructor(
         private readonly authService: AuthService,
         private readonly router: Router,
     ) {
+        this.completeRedirect();
     }
 
-    public async ngOnInit() {
+    private async completeRedirect() {
         try {
             const path = await this.authService.logoutRedirectComplete() || '/';
 

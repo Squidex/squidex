@@ -22,7 +22,7 @@
 
             <sqx-form-row
                 for="exportFields"
-                [hint]="format === 'Json' ? 'contents.exportFieldsHintJson' : 'contents.exportFieldsHintCsv'"
+                [hint]="format() === 'Json' ? 'contents.exportFieldsHintJson' : 'contents.exportFieldsHintCsv'"
                 label="contents.exportFields"
                 vertical>
                 <input class="form-control" id="exportFields" [(ngModel)]="fields" [ngModelOptions]="{ standalone: true }" placeholder="id, Title=data.title.en" />
@@ -43,7 +43,7 @@
                                 }
                             </td>
                         </tr>
-                        @for (field of fieldPaths; track field.label) {
+                        @for (field of fieldPaths(); track field.label) {
                             <tr>
                                 <td class="path-label">{{ field.label }}</td>
                                 <td>

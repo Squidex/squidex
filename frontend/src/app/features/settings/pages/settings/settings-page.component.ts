@@ -6,15 +6,17 @@
  */
 
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, ConfirmClickDirective, ControlErrorsComponent, defined, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-settings-page',
     styleUrls: ['./settings-page.component.scss'],
     templateUrl: './settings-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ControlErrorsComponent,
@@ -34,34 +36,28 @@ import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponen
         TranslatePipe,
     ],
 })
-export class SettingsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class SettingsPageComponent {
+    public readonly editForm = new EditAppSettingsForm();
+    public readonly editingSettings = toSignal(this.appsState.selectedSettings.pipe(defined()));
 
-    public isEditable = false;
-
-    public editForm = new EditAppSettingsForm();
-    public editingSettings?: AppSettingsDto;
+    public readonly isEditable = computed(() => {
+        return this.editingSettings()?.canUpdate === true;
+    });
 
     constructor(
         private readonly appsState: AppsState,
     ) {
-    }
-
-    public ngOnInit() {
         this.appsState.loadSettings();
 
-        this.subscriptions.add(
-            this.appsState.selectedSettings
-                .subscribe(settings => {
-                    if (settings) {
-                        this.isEditable = settings.canUpdate;
+        effect(() => {
+            const settings = this.editingSettings();
+            if (!settings) {
+                return;
+            }
 
-                        this.editForm.load(settings);
-                        this.editForm.setEnabled(settings.canUpdate);
-
-                        this.editingSettings = settings;
-                    }
-                }));
+            this.editForm.load(settings);
+            this.editForm.setEnabled(settings.canUpdate);
+        });
     }
 
     public reload() {
@@ -69,7 +65,12 @@ export class SettingsPageComponent implements OnInit {
     }
 
     public save() {
-        if (!this.isEditable || !this.editingSettings) {
+        const settings = this.editingSettings();
+        if (!settings) {
+            return;
+        }
+
+        if (!this.isEditable()) {
             return;
         }
 
@@ -78,7 +79,7 @@ export class SettingsPageComponent implements OnInit {
             return;
         }
 
-        this.appsState.updateSettings(this.editingSettings, value)
+        this.appsState.updateSettings(settings, value)
             .subscribe({
                 next: () => {
                     this.editForm.submitCompleted({ noReset: true });

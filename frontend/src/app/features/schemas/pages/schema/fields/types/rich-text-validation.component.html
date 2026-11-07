@@ -1,5 +1,5 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row for="minLength" hideError label="schemas.fieldTypes.string.length" [prefix]="field.fieldId">
+<div [formGroup]="fieldForm()">
+    <sqx-form-row for="minLength" hideError label="schemas.fieldTypes.string.length" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input
@@ -21,7 +21,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="minCharacters" hideError label="schemas.fieldTypes.string.characters" [prefix]="field.fieldId">
+    <sqx-form-row for="minCharacters" hideError label="schemas.fieldTypes.string.characters" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input
@@ -43,7 +43,7 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="minWords" hideError label="schemas.fieldTypes.string.words" [prefix]="field.fieldId">
+    <sqx-form-row for="minWords" hideError label="schemas.fieldTypes.string.words" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
                 <input class="form-control" formControlName="minWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}" type="number" />

@@ -1,4 +1,6 @@
-@if (showEvent) {
+@let state = this.state();
+@let availableSteps = this.availableSteps();
+@if (showEvent()) {
     <sqx-history-step isExpandable="true">
         <ng-container summary>
             <div class="col">
@@ -12,7 +14,7 @@
     </sqx-history-step>
 }
 
-@for (item of branchItems; track item.id) {
+@for (item of branchItems(); track item.id) {
     <sqx-state-step
         [branchItem]="item"
         [isFirst]="$first"

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 
@@ -13,14 +13,15 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
     selector: 'sqx-component-ui',
     styleUrls: ['component-ui.component.scss'],
     templateUrl: 'component-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: ReferencesFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<ReferencesFieldPropertiesDto>();
 }

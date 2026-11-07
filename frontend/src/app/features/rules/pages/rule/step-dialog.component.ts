@@ -6,9 +6,9 @@
  */
 
 import { AsyncPipe, LowerCasePipe } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, effect, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -36,66 +36,75 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     ],
 })
 export class StepDialogComponent {
-    @Input({ required: true })
-    public stepDefinition?: DynamicFlowStepDefinitionDto;
+    /** The step to edit, or undefined to add a new step. */
+    public readonly stepDefinition = input.required<DynamicFlowStepDefinitionDto | undefined>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isEditable = true;
+    /** Allows the user to change and save the step. */
+    public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    @Input({ required: true })
-    public availableSteps: { [name: string]: RuleElementDto } = {};
+    /** The available steps by type, which the user can choose from. */
+    public readonly availableSteps = input.required<{ [name: string]: RuleElementDto }>();
 
-    @Input({ required: true })
-    public scriptCompletions: ScriptCompletions | null = [];
+    /** The suggestions for autocompletion in script and code properties. */
+    public readonly scriptCompletions = input.required<ScriptCompletions | null>();
 
-    @Output()
-    public remove = new EventEmitter();
+    /** Emits when the user removes the step. */
+    public readonly remove = output();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed without saving. */
+    public readonly dialogClose = output();
 
-    @Output()
-    public dialogSave = new EventEmitter<DynamicFlowStepDefinitionDto>();
+    /** Emits the validated step when the user saves it. */
+    public readonly dialogSave = output<DynamicFlowStepDefinitionDto>();
 
-    public currentStep?: StepForm;
+    public readonly currentStep = signal<StepForm | undefined>(undefined);
 
-    public stepName?: string;
-    public stepIgnoreError = false;
+    public readonly stepName = linkedSignal(() => {
+        return this.stepDefinition()?.name;
+    });
+
+    public readonly stepIgnoreError = linkedSignal(() => {
+        return this.stepDefinition()?.ignoreError || false;
+    });
 
     constructor(
-        public appsState: AppsState,
-        private rulesService: RulesService,
+        private readonly appsState: AppsState,
+        private readonly rulesService: RulesService,
     ) {
-    }
+        effect(() => {
+            const stepDefinition = this.stepDefinition();
+            if (!stepDefinition) {
+                return;
+            }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.stepDefinition && this.stepDefinition) {
-            this.selectStep(this.stepDefinition.step.stepType, this.stepDefinition.step);
-
-            this.stepIgnoreError = this.stepDefinition.ignoreError || false;
-            this.stepName = this.stepDefinition?.name;
-        }
+            untracked(() => {
+                this.selectStep(stepDefinition.step.stepType, stepDefinition.step);
+            });
+        });
     }
 
     public selectStep(type: string, values?: any) {
-        if (this.currentStep?.stepType !== type) {
-            const element = this.availableSteps[type];
+        if (this.currentStep()?.stepType !== type) {
+            const element = this.availableSteps()[type];
 
-            this.currentStep = new StepForm(element, type);
-            this.currentStep.setEnabled(this.isEditable);
+            const currentStep = new StepForm(element, type);
+            currentStep.setEnabled(this.isEditable());
+
+            this.currentStep.set(currentStep);
         }
 
         if (values) {
-            this.currentStep?.load(values || {});
+            this.currentStep()?.load(values || {});
         }
     }
 
     public save() {
-        if (!this.isEditable || !this.currentStep) {
+        const currentStep = this.currentStep();
+        if (!this.isEditable() || !currentStep) {
             return;
         }
 
-        const values = this.currentStep.submit();
+        const values = currentStep.submit();
         if (!values) {
             return;
         }
@@ -103,10 +112,10 @@ export class StepDialogComponent {
         this.rulesService.validateStep(this.appsState.appName, values)
             .subscribe({
                 error: error =>{
-                    this.currentStep?.submitFailed(error);
+                    currentStep.submitFailed(error);
                 },
                 complete: () => {
-                    this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName, ignoreError: this.stepIgnoreError, step: values }));
+                    this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName(), ignoreError: this.stepIgnoreError(), step: values }));
                 },
             });
 

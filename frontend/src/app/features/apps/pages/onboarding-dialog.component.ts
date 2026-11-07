@@ -6,7 +6,7 @@
  */
 
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, output, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormRowComponent, MarkdownDirective, ModalDialogComponent, TourState, TranslatePipe, UsersService } from '@app/shared';
 
@@ -24,18 +24,17 @@ import { FormRowComponent, MarkdownDirective, ModalDialogComponent, TourState, T
     ],
 })
 export class OnboardingDialogComponent {
+    /** Emits when the user closes the dialog, by skipping or starting the tour. */
+    public readonly dialogClose = output();
 
-    @Output()
-    public dialogClose = new EventEmitter();
-
-    public answersForm =
+    public readonly answersForm =
         this.formBuilder.group({
             companySize: '',
             companyRole: '',
             project: '',
         });
 
-    public step = 0;
+    public readonly step = signal(0);
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -60,6 +59,6 @@ export class OnboardingDialogComponent {
     }
 
     public next() {
-        this.step += 1;
+        this.step.update(x => x + 1);
     }
 }

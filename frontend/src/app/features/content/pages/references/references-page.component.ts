@@ -6,10 +6,11 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, linkedSignal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../shared/references/reference-item.component';
 
 @Component({
@@ -35,11 +36,14 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
         TranslatePipe,
     ],
 })
-export class ReferencesPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ReferencesPageComponent {
+    private readonly languageMaster = toSignal(this.languagesState.isoMasterLanguage, { initialValue: null! });
 
-    public language!: AppLanguageDto;
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    public readonly language = linkedSignal<AppLanguageDto>(() => {
+        return this.languageMaster()!;
+    });
+
+    public readonly languages = toSignal(this.languagesState.isoLanguages, { initialValue: [] });
 
     constructor(
         public readonly contentsRoute: Router2State,
@@ -47,34 +51,23 @@ export class ReferencesPageComponent implements OnInit {
         public readonly languagesState: LanguagesState,
         private readonly route: ActivatedRoute,
     ) {
-    }
+        effect(onCleanup => {
+            const subscription =
+                getReferenceId(this.route)
+                    .subscribe(referenceId => {
+                        const initial =
+                            this.contentsRoute.mapTo(this.contentsState)
+                                .withPaging('contents', 10)
+                                .withSynchronizer(QuerySynchronizer.INSTANCE)
+                                .getInitial();
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.languagesState.isoMasterLanguage
-                .subscribe(language => {
-                    this.language = language;
-                }));
+                        this.contentsState.schema = { name: null! };
+                        this.contentsState.loadReferences(referenceId, initial);
+                        this.contentsRoute.listen();
+                    });
 
-        this.subscriptions.add(
-            this.languagesState.isoLanguages
-                .subscribe(languages => {
-                    this.languages = languages;
-                }));
-
-        this.subscriptions.add(
-            getReferenceId(this.route)
-                .subscribe(referenceId => {
-                    const initial =
-                        this.contentsRoute.mapTo(this.contentsState)
-                            .withPaging('contents', 10)
-                            .withSynchronizer(QuerySynchronizer.INSTANCE)
-                            .getInitial();
-
-                    this.contentsState.schema = { name: null! };
-                    this.contentsState.loadReferences(referenceId, initial);
-                    this.contentsRoute.listen();
-                }));
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public reload() {
@@ -82,7 +75,7 @@ export class ReferencesPageComponent implements OnInit {
     }
 
     public changeLanguage(language: AppLanguageDto) {
-        this.language = language;
+        this.language.set(language);
     }
 }
 

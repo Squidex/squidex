@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, forwardRef, input, output, signal, viewChild } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
-import { HTTP, ModalDirective, Subscriptions, ThemeService, TypedSimpleChanges } from '@app/framework';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
+import { catchError, of, switchMap } from 'rxjs';
+import { HTTP, ModalDirective, SignalControlComponent, ThemeService } from '@app/framework';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
 import { AssetSelectorComponent } from '../assets/asset-selector.component';
 import { ChatDialogComponent } from '../chat-dialog.component';
@@ -31,84 +31,68 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     imports: [
         AssetDialogComponent,
         AssetSelectorComponent,
-        AsyncPipe,
         ChatDialogComponent,
         ContentSelectorComponent,
         ModalDirective,
     ],
 })
-export class RichEditorComponent extends StatefulControlComponent<{}, EditorValue> implements AfterViewInit, OnDestroy {
-    private readonly subscriptions = new Subscriptions();
-    private readonly assetId = new BehaviorSubject<string | null>(null);
+export class RichEditorComponent extends SignalControlComponent<EditorValue> {
+    private readonly editor = viewChild.required<ElementRef>('editor');
+    private readonly assetId = signal<string | null>(null);
     private editorWrapper?: SquidexEditorWrapper;
     private value?: string;
+    private isDestroyed = false;
     private currentContents?: ResolvablePromise<any>;
     private currentAssets?: ResolvablePromise<any>;
     private currentChat?: ResolvablePromise<string | undefined | null>;
 
-    @Output()
-    public assetPluginClick = new EventEmitter<any>();
+    /** Emits when the asset plugin is clicked. */
+    public readonly assetPluginClick = output<any>();
 
-    @Output()
-    public annotationsCreate = new EventEmitter<AnnotationSelection>();
+    /** Emits when the user creates an annotation for the selected text. */
+    public readonly annotationsCreate = output<AnnotationSelection>();
 
-    @Output()
-    public annotationsUpdate = new EventEmitter<ReadonlyArray<Annotation>>();
+    /** Emits when the annotations have been moved or removed by editing the text. */
+    public readonly annotationsUpdate = output<ReadonlyArray<Annotation>>();
 
-    @Output()
-    public annotationsSelect = new EventEmitter<ReadonlyArray<string>>();
+    /** Emits the IDs of the annotations at the cursor position. */
+    public readonly annotationsSelect = output<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public hasChatBot = false;
+    /** Allows the user to generate text with the chat bot. */
+    public readonly hasChatBot = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public hasAnnotations = false;
+    /** Allows the user to create annotations. */
+    public readonly hasAnnotations = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public annotations?: ReadonlyArray<Annotation> | null;
+    /** The annotations to highlight in the text. */
+    public readonly annotations = input<ReadonlyArray<Annotation> | null>();
 
-    @Input()
-    public schemaIds?: ReadonlyArray<string>;
+    /** The IDs of the schemas to select contents from. Contents cannot be selected when not defined. */
+    public readonly schemaIds = input<ReadonlyArray<string>>();
 
-    @Input()
-    public language!: AppLanguageDto;
+    /** The language to build the titles of selected contents. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input()
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app, for the content selector. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input()
-    public folderId = '';
+    /** The ID of the folder to upload assets to. */
+    public readonly folderId = input('');
 
-    @Input({ required: true })
-    public classNames?: ReadonlyArray<string>;
+    /** The CSS classes the user can apply to elements. */
+    public readonly classNames = input.required<ReadonlyArray<string> | undefined>();
 
-    @Input({ required: true })
-    public mode: SquidexEditorMode = 'Html';
+    /** The format of the value. */
+    public readonly mode = input.required<SquidexEditorMode>();
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly chatDialog = new DialogModel();
 
-    @ViewChild('editor', { static: false })
-    public editor!: ElementRef;
+    public readonly assetsDialog = new DialogModel();
+    public readonly assetToEdit;
 
-    public chatDialog = new DialogModel();
+    public readonly contentsDialog = new DialogModel();
 
-    public assetsDialog = new DialogModel();
-    public assetToEdit = this.assetId.pipe(
-        switchMap(id => {
-            if (id) {
-                return this.assetService.getAsset(this.appsState.appName, id);
-            } else {
-                return of<AssetDto | null>(null);
-            }
-        }),
-        catchError(() => of<AssetDto | null>(null)));
-
-    public contentsDialog = new DialogModel();
-
-    constructor(
+    constructor(destroyRef: DestroyRef,
         private readonly apiUrl: ApiUrlConfig,
         private readonly appsState: AppsState,
         private readonly assetUploader: AssetUploaderState,
@@ -116,30 +100,64 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
         private readonly resourceLoader: ResourceLoaderService,
         private readonly themeService: ThemeService,
     ) {
-        super({});
+        super();
+
+        this.assetToEdit = toSignal(
+            toObservable(this.assetId).pipe(
+                switchMap(id => {
+                    if (id) {
+                        return this.assetService.getAsset(this.appsState.appName, id);
+                    } else {
+                        return of<AssetDto | null>(null);
+                    }
+                }),
+                catchError(() => of<AssetDto | null>(null))),
+            { initialValue: null });
+
+        effect(() => {
+            const annotations = this.annotations();
+
+            this.editorWrapper?.setAnnotations(annotations);
+        });
+
+        effect(() => {
+            const isDisabled = this.isDisabled();
+
+            this.editorWrapper?.setIsDisabled(isDisabled);
+        });
+
+        effect(onCleanup => {
+            const subscription =
+                this.themeService.themeChanges
+                    .subscribe(() => {
+                        this.editorWrapper?.update(this.editorColors());
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
+
+        afterNextRender(() => {
+            this.createEditor();
+        });
+
+        destroyRef.onDestroy(() => {
+            this.isDestroyed = true;
+            this.destroyEditor();
+        });
     }
 
-    public ngOnDestroy() {
-        if (this.editorWrapper) {
-            this.editorWrapper.destroy?.();
-            this.editorWrapper = undefined;
-        }
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<RichEditorComponent>) {
-        if (changes.annotations) {
-            this.editorWrapper?.setAnnotations(this.annotations);
-        }
-    }
-
-    public async ngAfterViewInit() {
+    private async createEditor() {
         await Promise.all([
             this.resourceLoader.loadLocalScript('editor/squidex-editor.js'),
         ]);
 
-        this.editorWrapper = new SquidexEditorWrapper(this.editor.nativeElement, {
+        if (this.isDestroyed) {
+            return;
+        }
+
+        this.editorWrapper = new SquidexEditorWrapper(this.editor().nativeElement, {
             onSelectAIText: async () => {
-                if (this.snapshot.isDisabled) {
+                if (this.isDisabled()) {
                     return;
                 }
 
@@ -149,7 +167,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
                 return await this.currentChat.promise;
             },
             onSelectAssets: async () => {
-                if (this.snapshot.isDisabled) {
+                if (this.isDisabled()) {
                     return;
                 }
 
@@ -159,7 +177,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
                 return await this.currentAssets.promise;
             },
             onSelectContents: async () => {
-                if (this.snapshot.isDisabled) {
+                if (this.isDisabled()) {
                     return;
                 }
 
@@ -175,7 +193,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
                 this.callChange(value);
             },
             onEditAsset: id => {
-                this.assetId.next(id);
+                this.assetId.set(id);
             },
             onAnnotationCreate: event => {
                 this.annotationsCreate.emit(event);
@@ -191,25 +209,24 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
 
                 window.open(url, '_blank');
             },
-            mode: this.mode,
-            annotations: this.annotations,
+            mode: this.mode(),
+            annotations: this.annotations(),
             appName: this.appsState.appName,
             baseUrl: this.apiUrl.buildUrl(''),
-            canAddAnnotation: this.hasAnnotations,
-            canSelectAIText: this.hasChatBot,
+            canAddAnnotation: this.hasAnnotations(),
+            canSelectAIText: this.hasChatBot(),
             canSelectAssets: true,
-            canSelectContents: !!this.schemaIds,
-            classNames: this.classNames,
+            canSelectContents: !!this.schemaIds(),
+            classNames: this.classNames(),
             ...this.editorColors(),
-            isDisabled: this.snapshot.isDisabled,
+            isDisabled: this.isDisabled(),
             value: this.value || '',
         });
+    }
 
-        this.subscriptions.add(
-            this.themeService.themeChanges
-                .subscribe(() => {
-                    this.editorWrapper?.update(this.editorColors());
-                }));
+    private destroyEditor() {
+        this.editorWrapper?.destroy?.();
+        this.editorWrapper = undefined;
     }
 
     private editorColors() {
@@ -221,24 +238,18 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
     }
 
     public reset() {
-        this.ngOnDestroy();
+        this.destroyEditor();
 
         setTimeout(() => {
-            this.ngAfterViewInit();
+            this.createEditor();
         });
     }
 
     public writeValue(obj: any) {
         if (this.editorWrapper) {
-            this.editorWrapper?.setValue(obj);
+            this.editorWrapper.setValue(obj);
         } else {
             this.value = obj;
-        }
-    }
-
-    public onDisabled() {
-        if (this.editorWrapper) {
-            this.editorWrapper?.setIsDisabled(this.snapshot.isDisabled);
         }
     }
 
@@ -281,7 +292,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
     private uploadFiles(requests: UploadRequest[]) {
         const uploadFile = (request: UploadRequest) => {
             return new Promise<any>((resolve, reject) => {
-                this.assetUploader.uploadFile(request.file, this.folderId)
+                this.assetUploader.uploadFile(request.file, this.folderId())
                     .subscribe({
                         next: value => {
                             if (Types.is(value, AssetDto)) {
@@ -303,11 +314,11 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
     }
 
     private buildContent(content: ContentDto): Content {
-        return { ...content, title: buildContentTitle(content, this.language) };
+        return { ...content, title: buildContentTitle(content, this.language()) };
     }
 
     public closeAssetDialog() {
-        this.assetId.next(null);
+        this.assetId.set(null);
     }
 }
 

@@ -6,23 +6,12 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ListViewComponent, ModalDialogComponent, PagerComponent, TagEditorComponent, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
+import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings } from '@app/shared/internal';
 import { SearchFormComponent } from '../search/search-form.component';
 import { AssetsListComponent } from './assets-list.component';
-
-interface State {
-    // The selected assets.
-    selectedAssets: { [id: string]: AssetDto };
-
-    // The number of selected items.
-    selectionCount: number;
-
-    // True, when rendering the assets as list.
-    isListView: boolean;
-}
 
 @Component({
     selector: 'sqx-asset-selector',
@@ -45,25 +34,27 @@ interface State {
         TranslatePipe,
     ],
 })
-export class AssetSelectorComponent extends StatefulComponent<State> implements OnInit {
-    @Output()
-    public assetSelect = new EventEmitter<ReadonlyArray<AssetDto>>();
+export class AssetSelectorComponent {
+    private readonly localStore = inject(LocalStoreService);
 
-    constructor(localStore: LocalStoreService,
+    /** Emits the selected assets, or an empty array when the dialog is closed. */
+    public readonly assetSelect = output<ReadonlyArray<AssetDto>>();
+
+    public readonly selectedAssets = signal<Record<string, AssetDto>>({});
+
+    public readonly selectionCount = computed(() => {
+        return Object.keys(this.selectedAssets()).length;
+    });
+
+    public readonly isListView = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
+
+    constructor(
         public readonly assetsState: ComponentAssetsState,
     ) {
-        super({
-            selectedAssets: {},
-            selectionCount: 0,
-            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
+        effect(() => {
+            this.localStore.setBoolean(Settings.Local.ASSETS_MODE, this.isListView());
         });
 
-        this.project(x => x.isListView).subscribe(value => {
-            localStore.setBoolean(Settings.Local.ASSETS_MODE, value);
-        });
-    }
-
-    public ngOnInit() {
         this.assetsState.load();
     }
 
@@ -84,7 +75,7 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
     }
 
     public emitSelect() {
-        this.assetSelect.emit(Object.values(this.snapshot.selectedAssets));
+        this.assetSelect.emit(Object.values(this.selectedAssets()));
     }
 
     public selectTags(tags: ReadonlyArray<string>) {
@@ -92,8 +83,8 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
     }
 
     public selectAsset(asset: AssetDto) {
-        this.next(s => {
-            const selectedAssets = { ...s.selectedAssets };
+        this.selectedAssets.update(s => {
+            const selectedAssets = { ...s };
 
             if (selectedAssets[asset.id]) {
                 delete selectedAssets[asset.id];
@@ -101,13 +92,11 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
                 selectedAssets[asset.id] = asset;
             }
 
-            const selectionCount = Object.keys(selectedAssets).length;
-
-            return { ...s, selectedAssets, selectionCount };
+            return selectedAssets;
         });
     }
 
     public changeView(isListView: boolean) {
-        this.next({ isListView });
+        this.isListView.set(isListView);
     }
 }

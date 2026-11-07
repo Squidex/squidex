@@ -1,12 +1,12 @@
-<input class="form-control" [class.form-control-sm]="small" (click)="openDialog()" [ngModel]="snapshot.selectedName" readonly />
+<input class="form-control" [class.form-control-sm]="small()" (click)="openDialog()" [ngModel]="selectedName()" readonly />
 
 <sqx-content-selector
     canClear="true"
     (contentClear)="select([], true)"
     (contentSelect)="select($event)"
-    [language]="language"
-    [languages]="languages"
+    [language]="language()"
+    [languages]="languages()"
     maxItems="1"
-    [query]="query"
-    [schemaIdentifiers]="schemaIds"
+    [query]="query()"
+    [schemaIdentifiers]="schemaIds()"
     *sqxModal="contentSelectorDialog" />

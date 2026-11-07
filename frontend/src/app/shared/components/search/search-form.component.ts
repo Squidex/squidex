@@ -6,12 +6,12 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, Type } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, linkedSignal, output, Type } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, SelectValue, StringValue } from 'ngx-inline-filter';
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, FormErrorComponent, FormRowComponent, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/framework';
-import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
+import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm } from '@app/shared/internal';
 import { UserDtoPicture } from '../pipes';
 import { ReferenceInputComponent } from '../references/reference-input.component';
 import { TourHintDirective } from '../tour-hint.directive';
@@ -44,40 +44,51 @@ import { TourHintDirective } from '../tour-hint.directive';
     ],
 })
 export class SearchFormComponent {
-    @Output()
-    public queryChange = new EventEmitter<Query>();
+    /** Emits the query when the user starts a search. */
+    public readonly queryChange = output<Query>();
 
-    @Input()
-    public placeholder = '';
+    /** The placeholder of the search input. */
+    public readonly placeholder = input('');
 
-    @Input()
-    public language!: AppLanguageDto;
+    /** The language for reference fields. */
+    public readonly language = input<AppLanguageDto>();
 
-    @Input()
-    public languages: ReadonlyArray<AppLanguageDto> = [];
+    /** All languages of the app, for reference fields. */
+    public readonly languages = input<ReadonlyArray<AppLanguageDto>>([]);
 
-    @Input()
-    public queryModel?: QueryModel | null;
+    /** The model with the fields and operators that can be used in filters. */
+    public readonly queryModel = input<QueryModel | null>();
 
-    @Input()
-    public query?: Query | null;
+    /** The current query. */
+    public readonly query = input<Query | null>();
 
-    @Input()
-    public queries?: Queries | null;
+    /** The saved queries, used to bookmark the current query. */
+    public readonly queries = input<Queries | null>();
 
-    @Input()
-    public queriesTypes = '';
+    /** The name of the type of the queries. */
+    public readonly queriesTypes = input('');
 
-    @Input({ transform: booleanAttribute })
-    public enableShortcut?: boolean | null;
+    /** Focuses the search input when CTRL + I is pressed. */
+    public readonly enableShortcut = input(false, { transform: booleanAttribute });
 
-    public filterModel = EMPTY_FILTER_MODEL;
+    public readonly filterModel = computed(() => {
+        return this.buildFilterModel(this.queryModel());
+    });
 
-    public saveKey!: Observable<string | undefined>;
-    public saveQueryDialog = new DialogModel();
-    public saveQueryForm = new SaveQueryForm();
+    public readonly saveKey = computed(() => {
+        const queries = this.queries();
+        const query = this.query();
+        if (!queries || !query) {
+            return of(undefined);
+        }
 
-    public cleanedQuery: Query = sanitize();
+        return queries.getSaveKey(query);
+    });
+
+    public readonly saveQueryDialog = new DialogModel();
+    public readonly saveQueryForm = new SaveQueryForm();
+
+    public readonly cleanedQuery = linkedSignal(() => sanitize(this.query()));
 
     public readonly options: FilterOptions;
 
@@ -116,31 +127,15 @@ export class SearchFormComponent {
         };
     }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.query) {
-            this.cleanedQuery = sanitize(this.query);
-        }
-
-        if (changes.query || changes.queries) {
-            this.updateSaveKey();
-        }
-
-        if (changes.queryModel) {
-            this.updateFilterModel();
-        }
-    }
-
-    private updateFilterModel() {
-        const model = this.queryModel;
+    private buildFilterModel(model: QueryModel | null | undefined) {
         if (!model) {
-            this.filterModel = EMPTY_FILTER_MODEL;
-            return;
+            return EMPTY_FILTER_MODEL;
         }
 
         const filterModel: FilterModel = { fields: [], operators: [] };
 
         const uniqueOperators = new Set<string>();
-        for (var operators of Object.values(model.operators)) {
+        for (const operators of Object.values(model.operators)) {
             for (const operator of operators) {
                 uniqueOperators.add(operator);
             }
@@ -202,7 +197,7 @@ export class SearchFormComponent {
             filterModel.fields.push(filterField);
         }
 
-        this.filterModel = filterModel;
+        return filterModel;
     }
 
     public bookmark(value: boolean) {
@@ -217,29 +212,26 @@ export class SearchFormComponent {
     }
 
     public saveQueryComplete() {
+        const queries = this.queries();
+        const query = this.query();
+
         const value = this.saveQueryForm.submit();
-        if (!value || !this.queries) {
+        if (!value || !queries) {
             return;
         }
 
-        if (!this.query) {
-            this.saveQueryForm.submitFailed('i18n:search.queryNotUsed')
+        if (!query) {
+            this.saveQueryForm.submitFailed('i18n:search.queryNotUsed');
             return;
         }
 
         if (value.user) {
-            this.queries.addUser(value.name, this.query);
+            queries.addUser(value.name, query);
         } else {
-            this.queries.addShared(value.name, this.query);
+            queries.addShared(value.name, query);
         }
 
         this.saveQueryForm.submitCompleted();
         this.saveQueryDialog.hide();
-    }
-
-    private updateSaveKey() {
-        if (this.queries && this.query) {
-            this.saveKey = this.queries.getSaveKey(this.query);
-        }
     }
 }

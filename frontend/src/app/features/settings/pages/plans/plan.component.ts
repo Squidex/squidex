@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, PlansState, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -24,8 +24,8 @@ import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, Pl
     ],
 })
 export class PlanComponent {
-    @Input({ required: true })
-    public planInfo!: PlanInfo;
+    /** The plan to show, including whether it is currently selected. */
+    public readonly planInfo = input.required<PlanInfo>();
 
     constructor(
         public readonly plansState: PlansState,
@@ -33,10 +33,10 @@ export class PlanComponent {
     }
 
     public changeMonthly() {
-        this.plansState.change(this.planInfo.plan.id);
+        this.plansState.change(this.planInfo().plan.id);
     }
 
     public changeYearly() {
-        this.plansState.change(this.planInfo.plan.yearlyId!);
+        this.plansState.change(this.planInfo().plan.yearlyId!);
     }
 }

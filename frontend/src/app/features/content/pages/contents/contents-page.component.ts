@@ -8,12 +8,12 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, Signal, signal, untracked, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DialogModel, DropdownMenuComponent, EntriesPipe, getTableConfig, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DialogModel, DropdownMenuComponent, EntriesPipe, getTableConfig, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentComponent } from '../../shared/list/content.component';
 import { ContentsExportDialogComponent } from './contents-export-dialog.component';
@@ -23,6 +23,7 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State,
     ],
@@ -61,43 +62,87 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         TranslatePipe,
     ],
 })
-export class ContentsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ContentsPageComponent {
+    private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
+    private readonly languageMaster = toSignal(this.languagesState.isoMasterLanguage, { initialValue: null! });
+    private readonly settings = toSignal(this.appsState.selectedSettings, { initialValue: this.appsState.snapshot.selectedSettings });
 
-    @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector!: DueTimeSelectorComponent;
+    public readonly schema = signal<SchemaDto>(null!);
 
-    public schema!: SchemaDto;
+    public readonly tableSettings: Signal<TableSettings | undefined>;
+    public readonly tableViewModal = new ModalModel();
 
-    public tableSettings!: Observable<TableSettings>;
-    public tableViewModal = new ModalModel();
+    public readonly exportDialog = new DialogModel();
 
-    public exportDialog = new DialogModel();
+    public readonly searchModal = new ModalModel();
 
-    public searchModal = new ModalModel();
+    public readonly contents = toSignal(this.contentsState.contents, { initialValue: [] });
 
-    public selectedItems: { [id: string]: boolean } = {};
-    public selectedAll = false;
-    public selectionCount = 0;
-    public selectionCanDelete = false;
-    public selectionStatuses: { [name: string]: string } = {};
+    public readonly selectedItems = signal<Record<string, boolean>>({});
 
-    public language!: AppLanguageDto;
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    public readonly selection = computed(() => {
+        const contents = this.contents();
+        const selectedItems = this.selectedItems();
 
-    public translationStatus?: TranslationStatuses;
+        let selectedAll = contents.length > 0;
+        let selectedCount = 0;
+        let selectedCanDelete = true;
 
-    public get disableScheduler() {
-        return this.appsState.snapshot.selectedSettings?.hideScheduler === true;
-    }
+        const selectedStatuses: { [name: string]: string } = {};
 
-    public queryModel =
+        for (const content of contents) {
+            for (const info of content.statusUpdates) {
+                selectedStatuses[info.status] = info.color;
+            }
+        }
+
+        for (const content of contents) {
+            if (selectedItems[content.id]) {
+                selectedCount++;
+
+                for (const action of Object.keys(selectedStatuses)) {
+                    if (!content.statusUpdates.find(x => x.status === action)) {
+                        delete selectedStatuses[action];
+                    }
+                }
+
+                if (!content.canDelete) {
+                    selectedCanDelete = false;
+                }
+            } else {
+                selectedAll = false;
+            }
+        }
+
+        return { selectedAll, selectedCount, selectedCanDelete, selectedStatuses };
+    });
+
+    public readonly language = linkedSignal<AppLanguageDto>(() => {
+        return this.languageMaster()!;
+    });
+
+    public readonly languages = toSignal(this.languagesState.isoLanguages, { initialValue: [] });
+
+    public readonly translationStatus = computed<TranslationStatuses | undefined>(() => {
+        const schema = this.schema();
+        if (!schema) {
+            return undefined;
+        }
+
+        return contentsTranslationStatus(this.contents().map(x => x.data), schema, this.languages());
+    });
+
+    public readonly disableScheduler = computed(() => {
+        return this.settings()?.hideScheduler === true;
+    });
+
+    public readonly queryModel = toSignal(
         this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
-            switchMap(x => this.schemasService.getFilters(this.appsState.appName, x)));
+            switchMap(x => this.schemasService.getFilters(this.appsState.appName, x))));
 
-    public queries =
+    public readonly queries = toSignal(
         this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
-            map(x => new Queries(this.uiState, `schemas.${x}`)));
+            map(x => new Queries(this.uiState, `schemas.${x}`))));
 
     constructor(
         public readonly contentsRoute: Router2State,
@@ -114,24 +159,9 @@ export class ContentsPageComponent implements OnInit {
         private readonly tempService: TempService,
         private readonly uiState: UIState,
     ) {
-    }
-
-    public ngOnInit() {
         if (this.appsState.snapshot.selectedApp?.canReadContributors) {
             this.contributorsState.loadIfNotLoaded();
         }
-
-        this.subscriptions.add(
-            this.languagesState.isoMasterLanguage
-                .subscribe(language => {
-                    this.language = language;
-                }));
-
-        this.subscriptions.add(
-            this.languagesState.isoLanguages
-                .subscribe(languages => {
-                    this.languages = languages;
-                }));
 
         const schema$ =
             getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1), shareReplay(1))));
@@ -142,15 +172,15 @@ export class ContentsPageComponent implements OnInit {
         const tableConfig$ =
             tableSetting$.pipe(switchMap(getTableConfig));
 
-        this.tableSettings = tableSetting$;
+        this.tableSettings = toSignal(tableSetting$);
 
-        this.subscriptions.add(
-            tableConfig$
+        effect(onCleanup => {
+            const subscription = untracked(() => tableConfig$
                 .subscribe(({ fieldNames, schema }) => {
-                    if (this.schema?.id !== schema.id) {
+                    if (this.schema()?.id !== schema.id) {
                         this.resetSelection();
 
-                        this.schema = schema;
+                        this.schema.set(schema);
 
                         const initial =
                             this.contentsRoute.mapTo(this.contentsState)
@@ -162,10 +192,10 @@ export class ContentsPageComponent implements OnInit {
                         this.contentsRoute.listen();
 
                         const languageKey = this.localStore.get(this.languageKey());
-                        const languageItem = this.languages.find(x => x.iso2Code === languageKey);
+                        const languageItem = this.languages().find(x => x.iso2Code === languageKey);
 
                         if (languageItem) {
-                            this.language = languageItem;
+                            this.language.set(languageItem);
                         }
                     } else {
                         this.contentsState.setFieldNames(fieldNames);
@@ -173,13 +203,8 @@ export class ContentsPageComponent implements OnInit {
                     }
                 }));
 
-        this.subscriptions.add(
-            this.contentsState.contents
-                .subscribe(contents => {
-                    this.updateSelectionSummary();
-
-                    this.translationStatus = contentsTranslationStatus(contents.map(x => x.data), this.schema, this.languages);
-                }));
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public reload() {
@@ -211,7 +236,7 @@ export class ContentsPageComponent implements OnInit {
             return;
         }
 
-        this.dueTimeSelector.selectDueTime(action).pipe(
+        this.dueTimeSelector().selectDueTime(action).pipe(
                 tap(() => {
                     this.resetSelection();
                 }),
@@ -232,7 +257,7 @@ export class ContentsPageComponent implements OnInit {
     }
 
     public changeLanguage(language: AppLanguageDto) {
-        this.language = language;
+        this.language.set(language);
 
         this.localStore.set(this.languageKey(), language.iso2Code);
     }
@@ -242,70 +267,37 @@ export class ContentsPageComponent implements OnInit {
     }
 
     public isItemSelected(content: ContentDto): boolean {
-        return this.selectedItems[content.id] === true;
+        return this.selectedItems()[content.id] === true;
     }
 
     public resetSelection() {
-        this.selectedItems = {};
-
-        this.updateSelectionSummary();
+        this.selectedItems.set({});
     }
 
     public selectItem(content: ContentDto, isSelected: boolean) {
-        this.selectedItems[content.id] = isSelected;
-
-        this.updateSelectionSummary();
+        this.selectedItems.update(x => ({ ...x, [content.id]: isSelected }));
     }
 
     public selectAll(isSelected: boolean) {
-        this.selectedItems = {};
+        const selectedItems: Record<string, boolean> = {};
 
         if (isSelected) {
             for (const content of this.contentsState.snapshot.contents) {
-                this.selectedItems[content.id] = true;
+                selectedItems[content.id] = true;
             }
         }
 
-        this.updateSelectionSummary();
-    }
-
-    private updateSelectionSummary() {
-        this.selectedAll = this.contentsState.snapshot.contents.length > 0;
-        this.selectionCount = 0;
-        this.selectionCanDelete = true;
-        this.selectionStatuses = {};
-
-        for (const content of this.contentsState.snapshot.contents) {
-            for (const info of content.statusUpdates) {
-                this.selectionStatuses[info.status] = info.color;
-            }
-        }
-
-        for (const content of this.contentsState.snapshot.contents) {
-            if (this.selectedItems[content.id]) {
-                this.selectionCount++;
-
-                for (const action of Object.keys(this.selectionStatuses)) {
-                    if (!content.statusUpdates.find(x => x.status === action)) {
-                        delete this.selectionStatuses[action];
-                    }
-                }
-
-                if (!content.canDelete) {
-                    this.selectionCanDelete = false;
-                }
-            } else {
-                this.selectedAll = false;
-            }
-        }
+        this.selectedItems.set(selectedItems);
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {
-        return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
+        const selectedItems = this.selectedItems();
+
+        return this.contentsState.snapshot.contents.filter(c => selectedItems[c.id] && (!predicate || predicate(c)));
     }
 
     private languageKey(): any {
-        return Settings.Local.CONTENT_LANGUAGE(this.schema.id);
+        return Settings.Local.CONTENT_LANGUAGE(this.schema().id);
     }
 }
 

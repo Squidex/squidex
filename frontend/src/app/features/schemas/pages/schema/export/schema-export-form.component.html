@@ -1,5 +1,5 @@
 <form class="inner-form" [formGroup]="synchronizeForm.form" (submit)="synchronize()">
-    @if (isEditable) {
+    @if (isEditable()) {
         <div class="inner-header">
             <div class="row gx-3 align-items-center">
                 <div class="col"></div>

@@ -5,8 +5,8 @@
 
     <hr />
 
-    <div cdkDropList [cdkDropListData]="listFields" (cdkDropListDropped)="drop($event)">
-        @for (field of listFields; track field) {
+    <div cdkDropList [cdkDropListData]="listFields()" (cdkDropListDropped)="drop($event)">
+        @for (field of listFields(); track field) {
             <div cdkDrag>
                 <i class="icon-drag2 drag-handle"></i>
                 <div class="form-check">
@@ -27,11 +27,11 @@
         }
     </div>
 
-    @if (fieldsNotAdded.length > 0) {
+    @if (fieldsNotAdded().length > 0) {
         <hr />
 
         <div>
-            @for (field of fieldsNotAdded; track field) {
+            @for (field of fieldsNotAdded(); track field) {
                 <div>
                     <i class="icon-drag2 drag-handle invisible"></i>
                     <div class="form-check">

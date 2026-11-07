@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, Optional, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, Optional, Renderer2 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 import { StringColorPipe } from '@app/framework';
-import { CollaborationService, Subscriptions } from '@app/shared/internal';
+import { CollaborationService } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-focus-marker',
@@ -21,7 +21,6 @@ import { CollaborationService, Subscriptions } from '@app/shared/internal';
     ],
 })
 export class FocusMarkerComponent {
-    private readonly subscriptions = new Subscriptions();
     private readonly users;
 
     /** The ID of the control, to show which other user has focused it. */
@@ -39,14 +38,17 @@ export class FocusMarkerComponent {
     ) {
         this.users = toSignal(collaboration?.userChanges ?? of([]), { initialValue: [] });
 
-        if (!collaboration) {
-            return;
-        }
+        effect(onCleanup => {
+            if (!collaboration) {
+                return;
+            }
 
-        this.subscriptions.add(
-            renderer.listen('window', 'click', (event: MouseEvent) => {
+            const unlisten = renderer.listen('window', 'click', (event: MouseEvent) => {
                 this.updateFocusedControl(event, null);
-            }));
+            });
+
+            onCleanup(unlisten);
+        });
     }
 
     public onClick(event: MouseEvent) {

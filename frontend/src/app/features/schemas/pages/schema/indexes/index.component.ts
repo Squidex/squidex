@@ -5,23 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { ConfirmClickDirective, IndexDto, IndexesState, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-index',
     styleUrls: ['./index.component.scss'],
     templateUrl: './index.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         TranslatePipe,
     ],
 })
 export class IndexComponent {
-    @Input({ required: true })
-    public index!: IndexDto;
+    /** The index to show. */
+    public readonly index = input.required<IndexDto>();
 
-    public isExpanded?: boolean | null;
+    public readonly isExpanded = signal(false);
 
     constructor(
         private readonly indexesState: IndexesState,
@@ -29,10 +30,10 @@ export class IndexComponent {
     }
 
     public toggleExpanded() {
-        this.isExpanded = !this.isExpanded;
+        this.isExpanded.update(x => !x);
     }
 
     public delete() {
-        this.indexesState.delete(this.index);
+        this.indexesState.delete(this.index());
     }
 }

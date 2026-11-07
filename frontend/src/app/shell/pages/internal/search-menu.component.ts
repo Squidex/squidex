@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injectable, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
@@ -51,10 +51,9 @@ export class SearchSource implements AutocompleteSource {
     ],
 })
 export class SearchMenuComponent {
-    @ViewChild(AutocompleteComponent, { static: false })
-    public searchControl!: AutocompleteComponent;
+    private readonly searchControl = viewChild(AutocompleteComponent);
 
-    public searchResult?: SearchResultDto;
+    public readonly searchResult?: SearchResultDto;
 
     constructor(
         private readonly router: Router,
@@ -69,7 +68,7 @@ export class SearchMenuComponent {
 
             this.router.navigateByUrl(relativeUrl);
 
-            this.searchControl.reset();
+            this.searchControl()?.reset();
         }
     }
 }

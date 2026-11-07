@@ -6,8 +6,9 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, numberAttribute, Renderer2, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import * as ProgressBar from 'progressbar.js';
-import { Subscriptions, ThemeService } from '@app/framework/internal';
+import { ThemeService } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-progress-bar',
@@ -20,7 +21,6 @@ import { Subscriptions, ThemeService } from '@app/framework/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressBarComponent {
-    private readonly subscriptions = new Subscriptions();
     private readonly progressBar = signal<any>(null);
 
     /** Renders a horizontal line or a circle. */
@@ -90,14 +90,16 @@ export class ProgressBarComponent {
             }
         });
 
-        this.subscriptions.add(
-            themeService.themeChanges
-                .subscribe(() => {
-                    const progressBar = this.progressBar();
+        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
 
-                    progressBar?.path?.setAttribute('stroke', this.getColor());
-                    progressBar?.trail?.setAttribute('stroke', this.getTrailColor());
-                }));
+        effect(() => {
+            theme();
+
+            const progressBar = this.progressBar();
+
+            progressBar?.path?.setAttribute('stroke', this.getColor());
+            progressBar?.trail?.setAttribute('stroke', this.getTrailColor());
+        });
     }
 
     private getColor() {

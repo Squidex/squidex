@@ -1,11 +1,12 @@
+@let teamDto = team();
 <div class="team-header">
     <div class="row align-items-center">
         <div class="col">
-            <h3>{{ team.name }}</h3>
+            <h3>{{ teamDto.name }}</h3>
         </div>
 
         <div class="col-auto">
-            <a class="link" [routerLink]="['/app/teams', team.id]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
+            <a class="link" [routerLink]="['/app/teams', teamDto.id]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
         </div>
 
         <div class="col-auto">
@@ -24,7 +25,7 @@
                     confirmRememberKey="leaveApp"
                     confirmText="i18n:teams.leaveConfirmText"
                     confirmTitle="i18n:teams.leaveConfirmTitle"
-                    (sqxConfirmClick)="leave.emit(team)"
+                    (sqxConfirmClick)="leave.emit(teamDto)"
                     type="button">
                     {{ "teams.leave" | sqxTranslate }}
                 </button>

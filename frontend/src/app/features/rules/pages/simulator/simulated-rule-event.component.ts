@@ -8,9 +8,9 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BranchItem, CodeEditorComponent, FlowView, JoinPipe, RuleElementDto, SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { CodeEditorComponent, FlowView, JoinPipe, RuleElementDto, SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from '../../shared/history-step.component';
 import { RuleClassPipe, SimulatedRuleEventStatusPipe } from '../../shared/pipes';
 import { StateDetailsComponent } from '../../shared/state-details.component';
@@ -49,30 +49,27 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
     ],
 })
 export class SimulatedRuleEventComponent {
-    @Input({ required: true })
-    public availableSteps: Record<string, RuleElementDto> = {};
+    /** The available steps by type, to resolve the metadata of each step. */
+    public readonly availableSteps = input.required<Record<string, RuleElementDto>>();
 
-    @Input('sqxSimulatedRuleEvent')
-    public event!: SimulatedRuleEventDto;
+    /** The simulated event to show. */
+    public readonly event = input.required<SimulatedRuleEventDto>({ alias: 'sqxSimulatedRuleEvent' });
 
-    @Input({ transform: booleanAttribute })
-    public expanded = false;
+    /** Shows the details of the event. */
+    public readonly expanded = input(false, { transform: booleanAttribute });
 
-    @Output()
-    public expandedChange = new EventEmitter<any>();
+    /** Emits when the user wants to toggle the details. */
+    public readonly expandedChange = output();
 
-    public errorsAfterEvent = ERRORS_AFTER_EVENT;
-    public errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
+    public readonly errorsAfterEvent = ERRORS_AFTER_EVENT;
+    public readonly errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
 
-    public branchItems: BranchItem[] = [];
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.event) {
-            if (this.event.flowState) {
-                this.branchItems = new FlowView(this.event.flowState.definition as any).getAllItems();
-            } else {
-                this.branchItems = [];
-            }
+    public readonly branchItems = computed(() => {
+        const flowState = this.event().flowState;
+        if (!flowState) {
+            return [];
         }
-    }
+
+        return new FlowView(flowState.definition as any).getAllItems();
+    });
 }

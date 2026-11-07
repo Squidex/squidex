@@ -11,20 +11,20 @@
                 <ul class="nav nav-tabs2">
                     @for (script of editForm.form.controls | sqxKeys; track script) {
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="assetScript === script" (click)="selectField(script)" type="button">
+                            <button class="nav-link" [class.active]="assetScript() === script" (click)="selectField(script)" type="button">
                                 {{ script | sqxScriptName }}
                             </button>
                         </li>
                     }
                 </ul>
-                <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
+                <button class="float-end btn btn-primary" [class.invisible]="!isEditable()" type="submit">
                     {{ "common.save" | sqxTranslate }}
                 </button>
             </div>
 
             <div class="inner-main">
                 @for (script of editForm.form.controls | sqxKeys; track script) {
-                    @if (assetScript === script) {
+                    @if (assetScript() === script) {
                         <sqx-code-editor borderless="true" [completion]="assetCompletions | async" [formControlName]="script" />
                     }
                 }

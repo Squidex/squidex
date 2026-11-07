@@ -6,22 +6,20 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output, signal, untracked } from '@angular/core';
 import { ConfirmClickDirective, ExternalLinkDirective, FileDropDirective, FromNowPipe, HTTP, ImageSourceDirective, ProgressBarComponent, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AssetDto, AssetUploaderState, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { AssetDto, AssetUploaderState, DialogService, Types, UploadCanceled } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { AssetPreviewUrlPipe, AssetUrlPipe, FileIconPipe } from './pipes';
-
-interface State {
-    // The download progress.
-    progress: number;
-}
 
 @Component({
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        '[class.isListView]': 'isListView()',
+    },
     imports: [
         AssetPreviewUrlPipe,
         AssetUrlPipe,
@@ -39,144 +37,137 @@ interface State {
         UserPictureRefPipe,
     ],
 })
-export class AssetComponent extends StatefulComponent<State> implements OnInit {
-    @Output()
-    public loadDone = new EventEmitter<AssetDto>();
+export class AssetComponent {
+    /** Emits the asset when the file has been uploaded or replaced. */
+    public readonly loadDone = output<AssetDto>();
 
-    @Output()
-    public loadError = new EventEmitter();
+    /** Emits the error when the upload of the file has failed. */
+    public readonly loadError = output<any>();
 
-    @Output()
-    public remove = new EventEmitter();
+    /** Emits when the asset should be removed from the list (remove mode). */
+    public readonly remove = output();
 
-    @Output()
-    public delete = new EventEmitter();
+    /** Emits when the asset should be deleted. */
+    public readonly delete = output();
 
-    @Output()
-    public edit = new EventEmitter<AssetDto>();
+    /** Emits when the asset should be edited. */
+    public readonly edit = output<AssetDto>();
 
-    @Output()
-    public selectAsset = new EventEmitter();
+    /** Emits when the asset is clicked. */
+    public readonly selectAsset = output();
 
-    @Output()
-    public selectFolder = new EventEmitter<string>();
+    /** Emits the ID of the parent folder when the folder button is clicked. */
+    public readonly selectFolder = output<string>();
 
-    @Input()
-    public assetFile?: HTTP.UploadFile;
+    /** The file to upload as new asset. */
+    public readonly assetFile = input<HTTP.UploadFile>();
 
-    @Input()
-    public asset?: AssetDto;
+    /** The asset to show. */
+    public readonly asset = input<AssetDto>();
 
-    @Input()
-    public folderId?: string;
+    /** The ID of the folder to upload the file to. */
+    public readonly folderId = input<string>();
 
-    @Input({ transform: booleanAttribute })
-    public folderIcon?: boolean | null | undefined;
+    /** Shows a button to open the folder of the asset. */
+    public readonly folderIcon = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public removeMode?: boolean | null;
+    /** Shows a button to remove the asset instead of deleting it. */
+    public readonly removeMode = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isDisabled?: boolean | null;
+    /** Hides the buttons to edit, delete or remove the asset. */
+    public readonly isDisabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isSelected?: boolean | null;
+    /** Highlights the asset as selected. */
+    public readonly isSelected = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isCompact: boolean | undefined | null;
+    /** Hides the details in the list view. */
+    public readonly isCompact = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isSelectable?: boolean | null;
+    /** Indicates that the asset can be selected. */
+    public readonly isSelectable = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute }) @HostBinding('class.isListView')
-    public isListView?: boolean | null;
+    /** Renders the asset as row instead of a card. */
+    public readonly isListView = input(false, { transform: booleanAttribute });
+
+    public readonly progress = signal(0);
 
     constructor(
         private readonly assetUploader: AssetUploaderState,
         private readonly dialogs: DialogService,
     ) {
-        super({ progress: 0 });
+        effect(() => {
+            const assetFile = this.assetFile();
+            if (!assetFile) {
+                return;
+            }
+
+            untracked(() => this.uploadFile(assetFile));
+        });
     }
 
-    public ngOnInit() {
-        const assetFile = this.assetFile;
+    private uploadFile(assetFile: HTTP.UploadFile) {
+        this.progress.set(1);
 
-        if (assetFile) {
-            this.setProgress(1);
+        this.assetUploader.uploadFile(assetFile, this.folderId())
+            .subscribe({
+                next: assetOrProgress => {
+                    if (Types.isNumber(assetOrProgress)) {
+                        this.progress.set(assetOrProgress);
+                    } else {
+                        this.loadDone.emit(assetOrProgress);
+                    }
+                },
+                error: error => {
+                    if (!Types.is(error, UploadCanceled)) {
+                        this.dialogs.notifyError(error);
+                    }
 
-            this.assetUploader.uploadFile(assetFile, this.folderId)
-                .subscribe({
-                    next: assetOrProgress => {
-                        if (Types.isNumber(assetOrProgress)) {
-                            this.setProgress(assetOrProgress);
-                        } else {
-                            this.emitLoad(assetOrProgress);
-                        }
-                    },
-                    error: error => {
-                        if (!Types.is(error, UploadCanceled)) {
-                            this.dialogs.notifyError(error);
-                        }
-
-                        this.emitLoadError(error);
-                    },
-                });
-        }
+                    this.loadError.emit(error);
+                },
+            });
     }
 
     public updateFile(files: ReadonlyArray<HTTP.UploadFile>) {
-        const asset = this.asset;
-
-        if (files.length === 1 && asset?.canUpload) {
-            this.dialogs.confirm('i18n:assets.replaceConfirmTitle', 'i18n:assets.replaceConfirmText')
-                .subscribe(confirmed => {
-                    if (confirmed) {
-                        this.setProgress(1);
-
-                        this.assetUploader.uploadAsset(asset, files[0])
-                            .subscribe({
-                                next: assetOrProgress => {
-                                    if (Types.isNumber(assetOrProgress)) {
-                                        this.setProgress(assetOrProgress);
-                                    } else {
-                                        this.emitLoad(assetOrProgress);
-                                    }
-                                },
-                                error: error => {
-                                    this.dialogs.notifyError(error);
-
-                                    this.setProgress(0);
-                                },
-                                complete: () => {
-                                    this.setProgress(0);
-                                },
-                            });
-                    }
-                });
+        const asset = this.asset();
+        if (files.length !== 1 || !asset?.canUpload) {
+            return;
         }
+
+        this.dialogs.confirm('i18n:assets.replaceConfirmTitle', 'i18n:assets.replaceConfirmText')
+            .subscribe(confirmed => {
+                if (!confirmed) {
+                    return;
+                }
+
+                this.progress.set(1);
+
+                this.assetUploader.uploadAsset(asset, files[0])
+                    .subscribe({
+                        next: assetOrProgress => {
+                            if (Types.isNumber(assetOrProgress)) {
+                                this.progress.set(assetOrProgress);
+                            } else {
+                                this.loadDone.emit(assetOrProgress);
+                            }
+                        },
+                        error: error => {
+                            this.dialogs.notifyError(error);
+
+                            this.progress.set(0);
+                        },
+                        complete: () => {
+                            this.progress.set(0);
+                        },
+                    });
+            });
     }
 
     public emitEdit() {
-        if (!this.isDisabled) {
-            this.edit.emit(this.asset);
+        const asset = this.asset();
+        if (!asset || this.isDisabled()) {
+            return;
         }
-    }
 
-    public emitLoad(asset: AssetDto) {
-        this.loadDone.emit(asset);
-    }
-
-    public emitLoadError(error: any) {
-        this.loadError.emit(error);
-    }
-
-    public setAsset(asset: AssetDto) {
-        this.asset = asset;
-
-        this.detectChanges();
-    }
-
-    public setProgress(progress: number) {
-        this.next({ progress });
+        this.edit.emit(asset);
     }
 }

@@ -6,7 +6,7 @@
  */
 
 
-import { Component, Input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeComponent, FormHintComponent, SchemaDto, TemplatedFormArray, TranslatePipe, TriggerForm } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
@@ -29,36 +29,36 @@ import { ContentChangedSchemaComponent } from './content-changed-schema.componen
     ],
 })
 export class ContentChangedTriggerComponent {
-    @Input()
-    public schemas?: ReadonlyArray<SchemaDto> | null;
+    /** The schemas the user can choose from. */
+    public readonly schemas = input<ReadonlyArray<SchemaDto> | null>();
 
-    @Input({ required: true })
-    public triggerDto!: any;
+    /** The current trigger settings. */
+    public readonly triggerDto = input.required<any>();
 
-    @Input({ required: true })
-    public triggerForm!: TriggerForm;
+    /** The form to edit the trigger settings. */
+    public readonly triggerForm = input.required<TriggerForm>();
 
-    public get schemasForm() {
-        return this.triggerForm.form.get('schemas') as TemplatedFormArray;
-    }
+    public readonly schemasForm = computed(() => {
+        return this.triggerForm().form.get('schemas') as TemplatedFormArray;
+    });
 
-    public get referencedSchemasForm() {
-        return this.triggerForm.form.get('referencedSchemas') as TemplatedFormArray;
-    }
+    public readonly referencedSchemasForm = computed(() => {
+        return this.triggerForm().form.get('referencedSchemas') as TemplatedFormArray;
+    });
 
     public addSchema() {
-        this.schemasForm.add();
+        this.schemasForm().add();
     }
 
     public addReferencedSchema() {
-        this.referencedSchemasForm.add();
+        this.referencedSchemasForm().add();
     }
 
     public remove(index: number) {
-        this.schemasForm.removeAt(index);
+        this.schemasForm().removeAt(index);
     }
 
     public removeReferencedSchema(index: number) {
-        this.referencedSchemasForm.removeAt(index);
+        this.referencedSchemasForm().removeAt(index);
     }
 }

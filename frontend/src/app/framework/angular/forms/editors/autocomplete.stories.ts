@@ -7,7 +7,7 @@
 
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { map, Observable, timer } from 'rxjs';
-import { AutocompleteComponent, AutocompleteSource, LocalizerService, RootViewComponent } from '@app/framework';
+import { AutocompleteComponent, AutocompleteSource, LocalizerService, NOOP_DATASOURCE, RootViewComponent } from '@app/framework';
 
 const TRANSLATIONS = {
     'common.search': 'Search',
@@ -24,6 +24,9 @@ export default {
         dropdownFullWidth: {
             control: 'boolean',
         },
+    },
+    args: {
+        itemsSource: NOOP_DATASOURCE,
     },
     render: args => ({
         props: args,

@@ -1,4 +1,6 @@
-<sqx-form-row [for]="property.name" hideError label="property.display">
+@let valueType = this.valueType();
+@let valueFormatted = this.valueFormatted();
+<sqx-form-row [for]="property().name" hideError label="property.display">
     @if (valueType === "MultilineJson") {
         <sqx-code-editor disabled="true" height="auto" [ngModel]="valueFormatted" />
     } @else if (valueType === "MultilineAny") {

@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, effect, inject, input, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, combineLatest, of } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
-import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, ContentsState, ErrorDto, FormErrorComponent, ToolbarService, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, ContentsState, ErrorDto, FormErrorComponent, ToolbarService, TranslatePipe } from '@app/shared';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 
@@ -18,79 +18,74 @@ type Mode = 'Content' | 'Data' | 'FlatData';
     selector: 'sqx-content-inspection',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         FormErrorComponent,
         FormsModule,
         TranslatePipe,
     ],
 })
-export class ContentInspectionComponent implements OnDestroy {
-    private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);
+export class ContentInspectionComponent {
+    private contentData: any;
 
-    @Input({ required: true })
-    public appName!: string;
+    /** The name of the app. */
+    public readonly appName = input.required<string>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language to load the flat data for. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public content!: ContentDto;
+    /** The content to inspect. */
+    public readonly content = input.required<ContentDto>();
 
-    public mode = new BehaviorSubject<Mode>('Content');
+    public readonly mode = signal<Mode>('Content');
 
-    public contentError?: ErrorDto | null;
-    public contentData: any;
+    public readonly contentError = signal<ErrorDto | null | undefined>(undefined);
 
-    public actualData =
-        combineLatest([
-            this.languageChanges$.pipe(filter(x => !!x)),
-            this.mode,
-        ]).pipe(
-            switchMap(([language, mode]) => {
+    private readonly request = computed(() => {
+        return { language: this.language(), mode: this.mode() };
+    });
+
+    public readonly actualData = toSignal(
+        toObservable(this.request).pipe(
+            switchMap(({ language, mode }) => {
+                const content = this.content();
+
                 if (mode === 'Data') {
-                    return of(this.content.data);
+                    return of(content.data);
                 } else if (mode === 'Content') {
-                    return this.contentsService.getRawContent(this.appName,
-                        this.content.schemaName,
-                        this.content.id);
+                    return this.contentsService.getRawContent(this.appName(),
+                        content.schemaName,
+                        content.id);
                 } else {
-                    return this.contentsService.getRawContent(this.appName,
-                        this.content.schemaName,
-                        this.content.id,
+                    return this.contentsService.getRawContent(this.appName(),
+                        content.schemaName,
+                        content.id,
                         language?.iso2Code).pipe(
                         map(x => x.data));
                 }
-            }));
+            })));
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsService: ContentsService,
         private readonly contentsState: ContentsState,
-        private toolbar: ToolbarService,
+        private readonly toolbar: ToolbarService,
     ) {
-    }
+        inject(DestroyRef).onDestroy(() => {
+            this.toolbar.remove(this);
+        });
 
-    public ngOnDestroy() {
-        this.toolbar.remove(this);
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.language) {
-            this.languageChanges$.next(this.language);
-        }
-
-        if (changes.content) {
+        effect(() => {
             this.updateActions();
-        }
+        });
     }
 
     private updateActions() {
-        if (this.mode.value === 'Data' && this.content.canUpdate) {
+        if (this.mode() === 'Data' && this.content().canUpdate) {
             this.toolbar.addButton(this, 'common.save', () => {
                 this.save();
 
@@ -108,9 +103,7 @@ export class ContentInspectionComponent implements OnDestroy {
     }
 
     public setMode(mode: Mode) {
-        this.mode.next(mode);
-
-        this.updateActions();
+        this.mode.set(mode);
     }
 
     private save() {
@@ -118,13 +111,13 @@ export class ContentInspectionComponent implements OnDestroy {
             return;
         }
 
-        this.contentsState.update(this.content, this.contentData)
+        this.contentsState.update(this.content(), this.contentData)
             .subscribe({
                 next: () => {
-                    this.contentError = null;
+                    this.contentError.set(null);
                 },
                 error: error => {
-                    this.contentError = error;
+                    this.contentError.set(error);
                 },
             });
     }

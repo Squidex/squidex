@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            @if (groupedApps | async; as groups) {
+            @if (groupedApps(); as groups) {
                 <div class="apps-section" sqxTourStep="allApps">
                     <h3 class="mb-3">{{ "apps.myApps" | sqxTranslate }}</h3>
 
@@ -49,7 +49,7 @@
                 </div>
             }
 
-            @if (showAllApps | async) {
+            @if (showAllApps()) {
                 <div class="apps-section">
                     <div class="row align-items-center mb-3">
                         <div class="col">
@@ -89,7 +89,7 @@
 <sqx-onboarding-dialog (dialogClose)="onboardingDialog.hide()" *sqxModal="onboardingDialog" />
 
 @if (starters | async; as templates) {
-    <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate" [templates]="templates" />
+    <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate()" [templates]="templates" />
 }
 
-<sqx-news-dialog (dialogClose)="newsDialog.hide()" [features]="newsFeatures!" *sqxModal="newsDialog" />
+<sqx-news-dialog (dialogClose)="newsDialog.hide()" [features]="newsFeatures()!" *sqxModal="newsDialog" />

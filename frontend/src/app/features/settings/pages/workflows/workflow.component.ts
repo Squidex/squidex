@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormRowComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowView } from '@app/shared';
 import { WorkflowDiagramComponent } from './workflow-diagram.component';
@@ -16,6 +16,7 @@ import { WorkflowStepComponent } from './workflow-step.component';
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         ConfirmClickDirective,
@@ -31,85 +32,85 @@ import { WorkflowStepComponent } from './workflow-step.component';
 export class WorkflowComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
-    @Input({ required: true })
-    public set workflow(value: WorkflowDto) {
-        this.workflowView = new WorkflowView(value);
-    }
+    /** The workflow to show and edit. */
+    public readonly workflow = input.required<WorkflowDto>();
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<string>;
+    /** The roles that can be selected for steps and transitions. */
+    public readonly roles = input.required<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public schemasSource!: SchemaTagSource;
+    /** The source for the schemas the workflow can be assigned to. */
+    public readonly schemasSource = input.required<SchemaTagSource>();
 
-    public error?: ErrorDto | null;
+    public readonly error = signal<ErrorDto | null | undefined>(undefined);
 
-    public isEditing = false;
-    public isEditable = false;
+    public readonly isEditing = signal(false);
 
-    public workflowView!: WorkflowView;
+    public readonly isEditable = computed(() => {
+        return this.workflow().canUpdate;
+    });
 
-    public selectedTab = 0;
+    public readonly workflowView = linkedSignal(() => new WorkflowView(this.workflow()));
+
+    public readonly selectedTab = signal(0);
 
     constructor(
         private readonly workflowsState: WorkflowsState,
     ) {
     }
 
-    public ngOnChanges() {
-        this.isEditable = this.workflowView.dto.canUpdate;
-    }
-
     public toggleEditing() {
-        this.isEditing = !this.isEditing;
+        this.isEditing.update(x => !x);
     }
 
     public remove() {
-        this.workflowsState.delete(this.workflowView.dto);
+        this.workflowsState.delete(this.workflowView().dto);
     }
 
     public save() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 
-        this.workflowsState.update(this.workflowView.dto, this.workflowView.toUpdate())
+        const workflowView = this.workflowView();
+
+        this.workflowsState.update(workflowView.dto, workflowView.toUpdate())
             .subscribe({
                 next: () => {
-                    this.error = null;
+                    this.error.set(null);
                 },
                 error: (error: ErrorDto) => {
-                    this.error = error;
+                    this.error.set(error);
                 },
             });
     }
 
     public addStep() {
-        const index = this.workflowView.steps.length;
+        const workflowView = this.workflowView();
+        const index = workflowView.steps.length;
 
         for (let i = index; i < index + 100; i++) {
             const name = `Step${i}`;
 
-            if (!this.workflowView.getStep(name)) {
-                this.workflowView = this.workflowView.setStep(name, { color: MathHelper.randomColor() });
+            if (!workflowView.getStep(name)) {
+                this.workflowView.set(workflowView.setStep(name, { color: MathHelper.randomColor() }));
                 return;
             }
         }
     }
 
     public rename(name: string) {
-        this.workflowView = this.workflowView.changeName(name);
+        this.workflowView.update(x => x.changeName(name));
     }
 
     public changeSchemaIds(schemaIds: string[]) {
-        this.workflowView = this.workflowView.changeSchemaIds(schemaIds);
+        this.workflowView.update(x => x.changeSchemaIds(schemaIds));
     }
 
     public update(updated: WorkflowView) {
-        this.workflowView = updated;
+        this.workflowView.set(updated);
     }
 
     public selectTab(tab: number) {
-        this.selectedTab = tab;
+        this.selectedTab.set(tab);
     }
 }

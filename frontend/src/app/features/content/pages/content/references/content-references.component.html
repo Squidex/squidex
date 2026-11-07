@@ -8,8 +8,8 @@
                         [columns]="contents | sqxContentsColumns"
                         [isCompact]="false"
                         [isDisabled]="false"
-                        [language]="language"
-                        [languages]="languages"
+                        [language]="language()"
+                        [languages]="languages()"
                         [sqxReferenceItem]="content"
                         [validations]="(contentsState.validationResults | async)!"
                         [validityVisible]="true"></tbody>
@@ -18,11 +18,11 @@
                 @if ((contentsState.isLoaded | async) && contents.length === 0) {
                     <tbody>
                         <tr>
-                            @if (mode === "references") {
+                            @if (mode() === "references") {
                                 <td class="table-items-row-empty">{{ "contents.noReferences" | sqxTranslate }}</td>
                             }
 
-                            @if (mode === "referencing") {
+                            @if (mode() === "referencing") {
                                 <td class="table-items-row-empty">{{ "contents.noReferencing" | sqxTranslate }}</td>
                             }
                         </tr>

@@ -6,10 +6,11 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, effect, input, untracked } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { switchMap } from 'rxjs/operators';
+import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldPropertiesDto, TagEditorComponent, TranslatePipe, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui',
@@ -25,61 +26,69 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSour
         TranslatePipe,
     ],
 })
-export class StringUIComponent  {
-    private readonly subscriptions = new Subscriptions();
-
+export class StringUIComponent {
     public readonly editors = StringFieldEditorValues;
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: StringFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<StringFieldPropertiesDto>();
 
-    public hideAllowedValues?: Observable<boolean>;
-    public hideClassNames?: Observable<boolean>;
-    public hideInlineEditable?: Observable<boolean>;
-    public hideSchemaIds?: Observable<boolean>;
+    public readonly hideAllowedValues = toSignal(
+        toObservable(this.fieldForm).pipe(
+            switchMap(form => valueProjection$(form.controls['editor'], hidesAllowedValues))),
+        { initialValue: false });
+
+    public readonly hideClassNames = toSignal(
+        toObservable(this.fieldForm).pipe(
+            switchMap(form => valueProjection$(form.controls['editor'], hidesClassNames))),
+        { initialValue: false });
 
     constructor(
         public readonly schemasSource: SchemaTagSource,
     ) {
+        effect(onCleanup => {
+            const fieldForm = this.fieldForm();
+
+            const subscription = untracked(() =>
+                valueProjection$(fieldForm.controls['editor'], hidesAllowedValues)
+                    .subscribe(isHidden => {
+                        if (isHidden) {
+                            fieldForm.controls['allowedValues'].setValue(undefined);
+                        }
+                    }));
+
+            onCleanup(() => subscription.unsubscribe());
+        });
+
+        effect(onCleanup => {
+            const fieldForm = this.fieldForm();
+
+            const subscription = untracked(() =>
+                valueProjection$(fieldForm.controls['editor'], hidesInlineEditable)
+                    .subscribe(isHidden => {
+                        if (isHidden) {
+                            fieldForm.controls['inlineEditable'].setValue(false);
+                        }
+                    }));
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
+}
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.fieldForm) {
-            this.subscriptions.unsubscribeAll();
+function hidesAllowedValues(editor: string) {
+    return !(editor && (editor === 'Radio' || editor === 'Dropdown'));
+}
 
-            const editor = this.fieldForm.controls['editor'];
+function hidesClassNames(editor: string) {
+    return !(editor && editor === 'RichText');
+}
 
-            this.hideAllowedValues =
-                valueProjection$(editor, x => !(x && (x === 'Radio' || x === 'Dropdown')));
-
-            this.hideClassNames =
-                valueProjection$(editor, x => !(x && (x === 'RichText')));
-
-            this.hideInlineEditable =
-                valueProjection$(editor, x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug')));
-
-            this.hideSchemaIds =
-                valueProjection$(this.fieldForm.controls['isEmbeddable'], x => !x);
-
-            this.subscriptions.add(
-                this.hideAllowedValues.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['allowedValues'].setValue(undefined);
-                    }
-                }));
-
-            this.subscriptions.add(
-                this.hideInlineEditable.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['inlineEditable'].setValue(false);
-                    }
-                }));
-        }
-    }
+function hidesInlineEditable(editor: string) {
+    return !(editor && (editor === 'Input' || editor === 'Dropdown' || editor === 'Slug'));
 }

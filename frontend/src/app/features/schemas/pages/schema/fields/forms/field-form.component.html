@@ -1,62 +1,62 @@
 <div class="table-items-row-details-tabs clearfix">
     <ul class="nav nav-tabs2">
         <li class="nav-item">
-            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
+            <button class="nav-link" [class.active]="selectedTab() === 0" (click)="selectTab(0)" type="button">
                 {{ "schemas.field.tabCommon" | sqxTranslate }}
             </button>
         </li>
 
-        <li class="nav-item" [class.hidden]="!field.properties.isContentField">
-            <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
+        <li class="nav-item" [class.hidden]="!field().properties.isContentField">
+            <button class="nav-link" [class.active]="selectedTab() === 1" (click)="selectTab(1)" type="button">
                 {{ "schemas.field.tabValidation" | sqxTranslate }}
             </button>
         </li>
 
-        <li class="nav-item" [class.hidden]="!field.properties.isContentField">
-            <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)" type="button">
+        <li class="nav-item" [class.hidden]="!field().properties.isContentField">
+            <button class="nav-link" [class.active]="selectedTab() === 2" (click)="selectTab(2)" type="button">
                 {{ "schemas.field.tabEditing" | sqxTranslate }}
             </button>
         </li>
 
-        <li class="nav-item" [class.hidden]="field.properties.fieldType !== 'Json'">
-            <button class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)" type="button">
+        <li class="nav-item" [class.hidden]="field().properties.fieldType !== 'Json'">
+            <button class="nav-link" [class.active]="selectedTab() === 3" (click)="selectTab(3)" type="button">
                 {{ "schemas.field.tabMore" | sqxTranslate }}
             </button>
         </li>
     </ul>
 
-    @if (showButtons) {
+    @if (showButtons()) {
         <div class="float-end">
-            <button class="btn btn-text-secondary" (click)="dialogClose.emit()" [disabled]="field.isLocked" type="button">
+            <button class="btn btn-text-secondary" (click)="dialogClose.emit()" [disabled]="field().isLocked" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            @if (isEditable) {
-                <button class="btn btn-primary ms-1" [disabled]="field.isLocked" type="submit">{{ "common.save" | sqxTranslate }}</button>
+            @if (isEditable()) {
+                <button class="btn btn-primary ms-1" [disabled]="field().isLocked" type="submit">{{ "common.save" | sqxTranslate }}</button>
             }
         </div>
     }
 </div>
 
-<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-    <sqx-field-form-common [field]="field" [fieldForm]="fieldForm" [schema]="schema" />
+<div class="table-items-row-details-tab" [class.hidden]="selectedTab() !== 0">
+    <sqx-field-form-common [field]="field()" [fieldForm]="fieldForm()" [schema]="schema()" />
 </div>
 
-<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
+<div class="table-items-row-details-tab" [class.hidden]="selectedTab() !== 1">
     <sqx-field-form-validation
-        [field]="field"
-        [fieldForm]="fieldForm"
-        [isLocalizable]="isLocalizable"
-        [languages]="languages"
-        [schema]="schema"
-        [settings]="settings" />
+        [field]="field()"
+        [fieldForm]="fieldForm()"
+        [isLocalizable]="isLocalizable()"
+        [languages]="languages()"
+        [schema]="schema()"
+        [settings]="settings()" />
 </div>
 
-<div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-    <sqx-field-form-ui [field]="field" [fieldForm]="fieldForm" [schema]="schema" />
+<div class="table-items-row-details-tab" [class.hidden]="selectedTab() !== 2">
+    <sqx-field-form-ui [field]="field()" [fieldForm]="fieldForm()" [schema]="schema()" />
 </div>
 
-@if (selectedTab === 3) {
+@if (selectedTab() === 3) {
     <div class="table-items-row-details-tab">
-        <sqx-json-more [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-json-more [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     </div>
 }

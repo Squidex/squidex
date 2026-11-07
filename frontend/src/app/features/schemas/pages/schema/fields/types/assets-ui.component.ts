@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormRowComponent, TranslatePipe } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormR
     selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
     templateUrl: 'assets-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetFolderDropdownComponent,
         FormRowComponent,
@@ -22,12 +23,12 @@ import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormR
     ],
 })
 export class AssetsUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: AssetsFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<AssetsFieldPropertiesDto>();
 }

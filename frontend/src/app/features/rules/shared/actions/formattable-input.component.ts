@@ -6,9 +6,9 @@
  */
 
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, forwardRef, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, signal, viewChild } from '@angular/core';
+import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { CodeEditorComponent, ScriptCompletions, SignalControlComponent, Types } from '@app/shared';
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
 
@@ -29,40 +29,61 @@ export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
         FormsModule,
     ],
 })
-export class FormattableInputComponent implements ControlValueAccessor, AfterViewInit {
-    private fnChanged = (_: any) => { /* NOOP */ };
-    private fnTouched = () => { /* NOOP */ };
+export class FormattableInputComponent extends SignalControlComponent<string> {
+    private readonly codeEditor = viewChild(CodeEditorComponent);
     private value?: string;
 
-    @Input({ required: true })
-    public type: 'Text' | 'Code' = 'Text';
+    /** Renders a single line input for text or a large editor for code. */
+    public readonly type = input.required<'Text' | 'Code'>();
 
-    @Input()
-    public completion: ScriptCompletions | undefined | null;
+    /** The suggestions for autocompletion. */
+    public readonly completion = input<ScriptCompletions | undefined | null>();
 
-    @ViewChild(CodeEditorComponent)
-    public codeEditor!: CodeEditorComponent;
+    public readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
 
-    public disabled = false;
+    public readonly mode = signal<TemplateMode>('Text');
 
-    public modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
-    public mode: TemplateMode = 'Text';
+    public readonly editorMode = computed(() => {
+        switch (this.mode()) {
+            case 'Script':
+                return 'ace/mode/javascript';
+            case 'Liquid':
+                return 'ace/mode/liquid';
+            default:
+                return 'ace/mode/text';
+        }
+    });
 
-    public editorMode = 'ace/mode/text';
-    public editorCompletion?: ScriptCompletions | undefined | null;
+    public readonly editorCompletion = computed(() => {
+        const completion = this.completion();
+        if (this.mode() === 'Script') {
+            return completion;
+        }
 
-    public ngAfterViewInit() {
-        this.codeEditor.registerOnChange((value: any) => {
-            this.value = value;
+        return completion?.filter(x => x.type !== 'Function');
+    });
 
-            this.fnChanged(getValueFromMode(value, this.mode));
+    constructor() {
+        super();
+
+        effect(() => {
+            const codeEditor = this.codeEditor();
+            if (!codeEditor) {
+                return;
+            }
+
+            codeEditor.registerOnChange((value: any) => {
+                this.value = value;
+
+                this.callChange(getValueFromMode(value, this.mode()));
+            });
+
+            codeEditor.registerOnTouched(() => {
+                this.callTouched();
+            });
+
+            codeEditor.writeValue(this.value);
         });
-
-        this.codeEditor.registerOnTouched(() => {
-            this.fnTouched();
-        });
-
-        this.codeEditor.writeValue(this.value);
     }
 
     public writeValue(obj: any) {
@@ -71,48 +92,20 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
         this.value = value;
 
         this.setMode(mode, false);
-        this.codeEditor?.writeValue(value);
-    }
-
-    public setDisabledState(isDisabled: boolean) {
-        this.setDisabled(isDisabled);
-        this.codeEditor?.setDisabledState?.(isDisabled);
-    }
-
-    private setDisabled(isDisabled: boolean) {
-        this.disabled = isDisabled;
+        this.codeEditor()?.writeValue(value);
     }
 
     public setMode(mode: TemplateMode, emit = true) {
-        if (this.mode === mode) {
+        if (this.mode() === mode) {
             return;
         }
 
-        if (mode === 'Script') {
-            this.editorMode = 'ace/mode/javascript';
-            this.editorCompletion = this.completion;
-        } else if (mode === 'Liquid') {
-            this.editorMode = 'ace/mode/liquid';
-            this.editorCompletion = this.completion?.filter(x => x.type !== 'Function');
-        } else {
-            this.editorMode = 'ace/mode/text';
-            this.editorCompletion = this.completion?.filter(x => x.type !== 'Function');
-        }
-
-        this.mode = mode;
+        this.mode.set(mode);
 
         if (emit) {
-            this.fnChanged(getValueFromMode(this.value, mode));
-            this.fnTouched();
+            this.callChange(getValueFromMode(this.value, mode));
+            this.callTouched();
         }
-    }
-
-    public registerOnChange(fn: any) {
-        this.fnChanged = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.fnTouched = fn;
     }
 }
 

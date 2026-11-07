@@ -6,10 +6,11 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, defined, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { ConfirmClickDirective, defined, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaEditFormComponent } from './common/schema-edit-form.component';
 import { SchemaMigrateFormComponent } from './common/schema-migrate-form.component';
@@ -25,6 +26,7 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
     selector: 'sqx-schema-page',
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         ConfirmClickDirective,
@@ -52,15 +54,13 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
         TranslatePipe,
     ],
 })
-export class SchemaPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-
+export class SchemaPageComponent {
     public readonly hideIndexes = inject(UIOptions).value.hideIndexes;
 
-    public schema!: SchemaDto;
-    public schemaTab = this.route.queryParams.pipe(map(x => x['tab'] || 'fields'));
+    public readonly schema;
+    public readonly schemaTab;
 
-    public editOptionsDropdown = new ModalModel();
+    public readonly editOptionsDropdown = new ModalModel();
 
     constructor(
         public readonly schemasState: SchemasState,
@@ -69,32 +69,49 @@ export class SchemaPageComponent implements OnInit {
         private readonly router: Router,
         private readonly messageBus: MessageBus,
     ) {
-    }
+        this.schema = toSignal(this.schemasState.selectedSchema.pipe(defined()));
 
-    public ngOnInit() {
+        this.schemaTab = toSignal(
+            this.route.queryParams.pipe(map(x => (x['tab'] || 'fields') as string)),
+            { initialValue: 'fields' });
+
         this.languageState.load();
-
-        this.subscriptions.add(
-            this.schemasState.selectedSchema.pipe(defined())
-                .subscribe(schema => {
-                    this.schema = schema;
-                }));
     }
 
     public cloneSchema() {
-        this.messageBus.emit(new SchemaCloning(this.schema.export()));
+        const schema = this.schema();
+        if (!schema) {
+            return;
+        }
+
+        this.messageBus.emit(new SchemaCloning(schema.export()));
     }
 
     public publish() {
-        this.schemasState.publish(this.schema).subscribe();
+        const schema = this.schema();
+        if (!schema) {
+            return;
+        }
+
+        this.schemasState.publish(schema).subscribe();
     }
 
     public unpublish() {
-        this.schemasState.unpublish(this.schema).subscribe();
+        const schema = this.schema();
+        if (!schema) {
+            return;
+        }
+
+        this.schemasState.unpublish(schema).subscribe();
     }
 
     public deleteSchema() {
-        this.schemasState.delete(this.schema)
+        const schema = this.schema();
+        if (!schema) {
+            return;
+        }
+
+        this.schemasState.delete(schema)
             .subscribe(() => {
                 this.back();
             });

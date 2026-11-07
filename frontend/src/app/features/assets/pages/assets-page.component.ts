@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathComponent, AssetsListComponent, AssetsState, DialogModel, LayoutComponent, ListViewComponent, LocalStoreService, MathHelper, ModalDirective, PagerComponent, Queries, Query, QueryFullTextSynchronizer, Router2State, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, TagEditorComponent, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIState } from '@app/shared';
@@ -42,13 +42,13 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
         TranslatePipe,
     ],
 })
-export class AssetsPageComponent implements OnInit {
-    public editAsset?: AssetDto;
+export class AssetsPageComponent {
+    public readonly editAsset = signal<AssetDto | undefined>(undefined);
 
-    public listQueries = new Queries(this.uiState, 'assets');
-    public listMode = false;
+    public readonly listQueries = new Queries(this.uiState, 'assets');
+    public readonly listMode = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
 
-    public addAssetFolderDialog = new DialogModel();
+    public readonly addAssetFolderDialog = new DialogModel();
 
     constructor(
         public readonly assetsRoute: Router2State,
@@ -56,10 +56,6 @@ export class AssetsPageComponent implements OnInit {
         private readonly localStore: LocalStoreService,
         private readonly uiState: UIState,
     ) {
-        this.listMode = this.localStore.getBoolean(Settings.Local.ASSETS_MODE);
-    }
-
-    public ngOnInit() {
         const initial =
             this.assetsRoute.mapTo(this.assetsState)
                 .withPaging('assets', 30)
@@ -82,11 +78,11 @@ export class AssetsPageComponent implements OnInit {
     }
 
     public editStart(asset: AssetDto) {
-        this.editAsset = asset;
+        this.editAsset.set(asset);
     }
 
     public editDone() {
-        this.editAsset = undefined;
+        this.editAsset.set(undefined);
     }
 
     public search(query: Query) {
@@ -106,7 +102,7 @@ export class AssetsPageComponent implements OnInit {
     }
 
     public changeView(isListView: boolean) {
-        this.listMode = isListView;
+        this.listMode.set(isListView);
 
         this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }

@@ -6,16 +6,12 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, FromNowPipe, MarkdownDirective, MessageBus, NOOP_DATASOURCE, ScrollActiveDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
-import { CommentItem, CommentSelected, CommentsState, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
+import { CommentItem, CommentSelected, CommentsState, DialogService, Keys, UpsertCommentForm } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
-
-interface State {
-    mode?: 'Normal' | 'Edit' | 'Reply';
-}
 
 @Component({
     selector: 'sqx-comment',
@@ -34,120 +30,118 @@ interface State {
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-        StopClickDirective
+        StopClickDirective,
     ],
 })
-export class CommentComponent extends StatefulComponent<State> {
-    @Input({ transform: booleanAttribute })
-    public canFollow?: boolean | null;
+export class CommentComponent {
+    /** Shows a link to the page where the comment has been created. */
+    public readonly canFollow = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public canAnswer?: boolean | null;
+    /** Allows the user to reply to the comment. */
+    public readonly canAnswer = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public canDelete?: boolean | null;
+    /** Allows the user to delete the comment, even if it is not the own comment. */
+    public readonly canDelete = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public canEdit?: boolean | null;
+    /** Allows the user to edit the own comment. */
+    public readonly canEdit = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public canResolve?: boolean | null;
+    /** Allows the user to resolve the comment. */
+    public readonly canResolve = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public confirmDelete?: boolean | null = true;
+    /** Asks for a confirmation before the comment is deleted. */
+    public readonly confirmDelete = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isSelected?: boolean | null;
+    /** Highlights the comment and scrolls it into view. */
+    public readonly isSelected = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public commentItem!: CommentItem;
+    /** The comment with its replies. */
+    public readonly commentItem = input.required<CommentItem>();
 
-    @Input({ required: true })
-    public comments!: CommentsState;
+    /** The state to create, update and delete comments. */
+    public readonly comments = input.required<CommentsState>();
 
-    @Input()
-    public contributors: AutocompleteSource = NOOP_DATASOURCE;
+    /** The source for the autocompletion of contributors when editing or replying. */
+    public readonly contributors = input<AutocompleteSource>(NOOP_DATASOURCE);
 
-    @Input()
-    public userToken = '';
+    /** The token of the current user. */
+    public readonly userToken = input('');
 
-    @Input()
-    public currentUrl = '';
+    /** The URL that is stored with replies. */
+    public readonly currentUrl = input('');
 
-    @Input()
-    public scrollContainer?: string;
+    /** The selector of the container to scroll when the comment is selected. */
+    public readonly scrollContainer = input<string>();
 
-    public replyForm = new UpsertCommentForm();
+    public readonly replyForm = new UpsertCommentForm();
 
-    public updateForm = new UpsertCommentForm();
+    public readonly updateForm = new UpsertCommentForm();
 
-    public isDeletable = false;
-    public isEditable = false;
-    public isOnlyDelete = false;
+    public readonly mode = signal<'Normal' | 'Edit' | 'Reply'>('Normal');
+
+    public readonly isMyComment = computed(() => {
+        return this.commentItem().comment.user === this.userToken();
+    });
+
+    public readonly isOnlyDelete = computed(() => {
+        // A single icon without context is hard to understand, therefore we show a label in this case.
+        return !this.canAnswer() && !(this.isMyComment() && this.canEdit()) && !this.canResolve();
+    });
 
     constructor(
         private readonly dialogs: DialogService,
         private readonly messageBus: MessageBus,
     ) {
-        super({});
-    }
-
-    public ngOnChanges() {
-        const isMyComment = this.commentItem.comment.user === this.userToken;
-
-        this.isDeletable = isMyComment;
-        this.isEditable = isMyComment;
-
-        // A single icon without context is hard to understand, therefore we show a label in this case.
-        this.isOnlyDelete = !this.canAnswer && !(this.isEditable && this.canEdit) && !this.canResolve;
     }
 
     public select() {
-        if (this.commentItem.comment.editorId) {
-            this.messageBus.emit(new CommentSelected(this.commentItem.comment.editorId));
+        const editorId = this.commentItem().comment.editorId;
+        if (!editorId) {
+            return;
         }
+
+        this.messageBus.emit(new CommentSelected(editorId));
     }
 
     public startEdit() {
-        this.updateForm.load({ text: this.commentItem.comment.text });
-        this.next({ mode: 'Edit' });
+        this.updateForm.load({ text: this.commentItem().comment.text });
+        this.mode.set('Edit');
     }
 
     public startReply() {
-        this.next({ mode: 'Reply' });
+        this.mode.set('Reply');
     }
 
     public cancelUpdateOrReply() {
-        this.next({ mode: 'Normal' });
+        this.mode.set('Normal');
     }
 
     public resolve(isResolved: boolean) {
-        if (!this.canResolve) {
+        if (!this.canResolve()) {
             return;
         }
 
-        this.comments.update(this.commentItem.index, { isResolved });
+        this.comments().update(this.commentItem().index, { isResolved });
     }
 
     public delete() {
-        if (!this.isDeletable && !this.canDelete) {
+        if (!this.isMyComment() && !this.canDelete()) {
             return;
         }
 
-        this.comments.remove(this.commentItem.index);
+        this.comments().remove(this.commentItem().index);
     }
 
     public reply() {
-        if (!this.canAnswer) {
+        if (!this.canAnswer()) {
             return;
         }
 
         const { text } = this.replyForm.submit() || {};
 
-        if (text && text.length > 0 && this.commentItem.comment.id) {
-            const replyTo = this.commentItem.comment.id!;
-
-            this.comments.create(this.userToken, text, this.currentUrl, { replyTo });
+        const replyTo = this.commentItem().comment.id;
+        if (text && text.length > 0 && replyTo) {
+            this.comments().create(this.userToken(), text, this.currentUrl(), { replyTo });
         }
 
         this.replyForm.submitCompleted();
@@ -155,7 +149,7 @@ export class CommentComponent extends StatefulComponent<State> {
     }
 
     public update() {
-        if (!this.isEditable) {
+        if (!this.isMyComment()) {
             return;
         }
 
@@ -169,7 +163,7 @@ export class CommentComponent extends StatefulComponent<State> {
                     }
                 });
         } else {
-            this.comments.update(this.commentItem.index, { text });
+            this.comments().update(this.commentItem().index, { text });
         }
 
         this.updateForm.submitCompleted();

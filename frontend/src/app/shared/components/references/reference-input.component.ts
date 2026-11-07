@@ -5,23 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalDirective } from '@app/framework';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
+import { ModalDirective, SignalControlComponent } from '@app/framework';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, Types } from '@app/shared/internal';
 import { ContentSelectorComponent } from './content-selector.component';
 
 export const SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceInputComponent), multi: true,
 };
-
-interface State {
-    // The referenced content item.
-    selectedContent?: ContentDto;
-
-    // The name of the selected item.
-    selectedName?: string;
-}
 
 @Component({
     selector: 'sqx-reference-input',
@@ -37,44 +29,52 @@ interface State {
         ModalDirective,
     ],
 })
-export class ReferenceInputComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
-    @Input()
-    public schemaIds?: ReadonlyArray<string>;
+export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArray<string> | string> {
+    /** The IDs or names of the schemas to select the content from. */
+    public readonly schemaIds = input<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public query?: string;
+    /** The initial full text query of the content selector. */
+    public readonly query = input.required<string | undefined>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language to build the name of the selected content. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public mode: 'Array' | 'Single' = 'Single';
+    /** Defines whether the value is a single ID or an array with one ID. */
+    public readonly mode = input.required<'Array' | 'Single'>();
 
-    @Input()
-    public small = false;
+    /** Renders a small input. */
+    public readonly small = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly contentSelectorDialog = new DialogModel();
 
-    public contentSelectorDialog = new DialogModel();
+    public readonly selectedContent = signal<ContentDto | undefined>(undefined);
+
+    public readonly selectedName = computed(() => {
+        const content = this.selectedContent();
+        if (!content) {
+            return undefined;
+        }
+
+        const language = this.language();
+        const name =
+            content.referenceFields
+                .map(f => getContentValue(content, language, f, false))
+                .map(v => v.formatted)
+                .defined()
+                .join(', ');
+
+        return name || this.localizer.getOrKey('common.noValue');
+    });
 
     constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService,
     ) {
-        super({});
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.language) {
-            this.selectContent(this.snapshot.selectedContent);
-        }
+        super();
     }
 
     public writeValue(obj: any) {
@@ -83,7 +83,7 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
         } else if (Types.isArrayOfString(obj)) {
             this.loadContent(obj[0]);
         } else {
-            this.updateContent();
+            this.selectedContent.set(undefined);
         }
     }
 
@@ -91,16 +91,16 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
         this.contentsService.getAllContents(this.appsState.appName, { ids: [id] })
             .subscribe({
                 next: contents => {
-                    this.updateContent(contents.items[0]);
+                    this.selectedContent.set(contents.items[0]);
                 },
                 error: () => {
-                    this.updateContent(undefined);
+                    this.selectedContent.set(undefined);
                 },
             });
     }
 
     public openDialog() {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
@@ -116,49 +116,20 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
     }
 
     public selectContent(selectedContent?: ContentDto) {
-        if (this.snapshot.isDisabled) {
+        if (this.isDisabled()) {
             return;
         }
 
         const id = selectedContent?.id;
+        const isSingle = this.mode() === 'Single';
 
         if (id) {
-            if (this.mode === 'Single') {
-                this.callChange(id);
-            } else {
-                this.callChange([id]);
-            }
-        } else if (this.mode === 'Single') {
-            this.callChange(null);
+            this.callChange(isSingle ? id : [id]);
         } else {
-            this.callChange([]);
+            this.callChange(isSingle ? null : []);
         }
 
         this.callTouched();
-        this.updateContent(selectedContent);
-    }
-
-    private updateContent(selectedContent?: ContentDto) {
-        this.next(s => ({
-            ...s,
-            selectedContent,
-            selectedName: this.createContentName(selectedContent),
-        }));
-    }
-
-    private createContentName(content?: ContentDto) {
-        if (!content) {
-            return undefined;
-        }
-
-        const name =
-            content.referenceFields
-                .map(f => getContentValue(content, this.language, f, false))
-                .map(v => v.formatted)
-                .defined()
-                .join(', ')
-            || this.localizer.getOrKey('common.noValue');
-
-        return name || this.localizer.getOrKey('common.noValue');
+        this.selectedContent.set(selectedContent);
     }
 }

@@ -1,15 +1,17 @@
-<div class="panel2" #panel [class.minimized]="isMinimized">
-    @if (layout === "right") {
-        <div class="panel2-slice right" [style.maxWidth]="desiredWidth" [style.minWidth]="desiredWidth">
-            @if (!hideHeader) {
+@let layoutValue = layout();
+@let displayModeValue = displayMode();
+<div class="panel2" #panel [class.minimized]="isMinimized()">
+    @if (layoutValue === "right") {
+        <div class="panel2-slice right" [style.maxWidth]="desiredWidth()" [style.minWidth]="desiredWidth()">
+            @if (!hideHeader()) {
                 <div class="panel2-header right">
                     <div class="panel2-header-inner right">
-                        @if (titleText) {
+                        @if (titleText()) {
                             <h3>
-                                @if (titleIcon) {
-                                    <i class="icon-{{ titleIcon }}"></i>
+                                @if (titleIcon()) {
+                                    <i class="icon-{{ titleIcon() }}"></i>
                                 }
-                                {{ titleText | sqxTranslate }}
+                                {{ titleText() | sqxTranslate }}
                             </h3>
                         }
 
@@ -24,7 +26,7 @@
                         <a
                             class="btn panel2-collapse"
                             attr.aria-label="{{ 'common.close' | sqxTranslate }}"
-                            [queryParamsHandling]="closeQueryParamsHandling"
+                            [queryParamsHandling]="closeQueryParamsHandling()"
                             [relativeTo]="route"
                             [routerLink]="['./../']">
                             <i class="icon-close"></i>
@@ -38,29 +40,29 @@
             }
 
             <div class="panel2-main right">
-                <div class="panel2-main-inner right" [class.overflow]="overflow" [class.padded]="padding" [class.white]="white">
+                <div class="panel2-main-inner right" [class.overflow]="overflow()" [class.padded]="padding()" [class.white]="white()">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
         </div>
     }
 
-    @if (layout === "left") {
+    @if (layoutValue === "left") {
         <div
             class="panel2-slice left"
-            [class.collapsed]="displayMode === 'Collapsed'"
+            [class.collapsed]="displayModeValue === 'Collapsed'"
             (click)="switchToNormalFromDiv($event)"
-            [style.maxWidth]="desiredWidth"
-            [style.minWidth]="desiredWidth">
-            @if (!hideHeader) {
+            [style.maxWidth]="desiredWidth()"
+            [style.minWidth]="desiredWidth()">
+            @if (!hideHeader()) {
                 <div class="panel2-header left">
                     <div class="panel2-header-inner left">
-                        @if (titleText) {
+                        @if (titleText()) {
                             <h3>
-                                @if (titleIcon) {
-                                    <i class="icon-{{ titleIcon }}"></i>
+                                @if (titleIcon()) {
+                                    <i class="icon-{{ titleIcon() }}"></i>
                                 }
-                                {{ titleText | sqxTranslate }}
+                                {{ titleText() | sqxTranslate }}
                             </h3>
                         }
 
@@ -76,40 +78,40 @@
                         (click)="toggle()"
                         sqxStopClick
                         type="button">
-                        @if (displayMode === "Collapsed" && expandedWidth > 0) {
+                        @if (displayModeValue === "Collapsed" && expandedWidth() > 0) {
                             <i class="icon-angle-right"></i>
-                        } @else if (displayMode === "Collapsed") {
+                        } @else if (displayModeValue === "Collapsed") {
                             <i class="icon-angle-right"></i>
-                        } @else if (displayMode === "Normal") {
+                        } @else if (displayModeValue === "Normal") {
                             <i class="icon-angle-left"></i>
-                        } @else if (displayMode === "Expanded") {
+                        } @else if (displayModeValue === "Expanded") {
                             <i class="icon-angle-left"></i>
                         }
                     </button>
 
-                    <div class="panel2-sidebar-title">{{ titleCollapsed || titleText | sqxTranslate }}</div>
+                    <div class="panel2-sidebar-title">{{ titleCollapsed() || titleText() | sqxTranslate }}</div>
                 </div>
             }
 
             <div class="panel2-main left">
-                <div class="panel2-main-inner left" [class.overflow]="overflow" [class.padded]="padding" [class.white]="white">
+                <div class="panel2-main-inner left" [class.overflow]="overflow()" [class.padded]="padding()" [class.white]="white()">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
         </div>
     }
 
-    @if (layout === "main") {
+    @if (layoutValue === "main") {
         <div class="panel2-slice main">
-            @if (!hideHeader) {
+            @if (!hideHeader()) {
                 <div class="panel2-header main">
-                    <div class="panel2-header-inner main" [style.width]="desiredInnerWidth">
-                        @if (titleText) {
+                    <div class="panel2-header-inner main" [style.width]="desiredInnerWidth()">
+                        @if (titleText()) {
                             <h3>
-                                @if (titleIcon) {
-                                    <i class="icon-{{ titleIcon }}"></i>
+                                @if (titleIcon()) {
+                                    <i class="icon-{{ titleIcon() }}"></i>
                                 }
-                                {{ titleText | sqxTranslate }}
+                                {{ titleText() | sqxTranslate }}
                             </h3>
                         }
 
@@ -123,20 +125,20 @@
             }
 
             <div class="panel2-main main">
-                <div class="panel2-main-inner main" [class.overflow]="overflow" [class.padded]="padding" [class.white]="white">
+                <div class="panel2-main-inner main" [class.overflow]="overflow()" [class.padded]="padding()" [class.white]="white()">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
         </div>
 
-        @if (!hideSidebar) {
+        @if (!hideSidebar()) {
             <div class="panel2-slice menu">
                 <div class="panel2-header menu">
-                    @if (firstChild | async) {
+                    @if (hasFirstChild()) {
                         <a
                             class="btn panel2-collapse"
                             attr.aria-label="{{ 'common.close' | sqxTranslate }}"
-                            [queryParamsHandling]="closeQueryParamsHandling"
+                            [queryParamsHandling]="closeQueryParamsHandling()"
                             [relativeTo]="route"
                             replaceUrl="true"
                             [routerLink]="['./']">
@@ -146,7 +148,7 @@
                 </div>
 
                 <div class="panel2-main menu">
-                    <ng-container *ngTemplateOutlet="sidebarMenuTemplate?.templateRef || null"></ng-container>
+                    <ng-container *ngTemplateOutlet="sidebarMenuTemplate()?.templateRef || null"></ng-container>
                 </div>
             </div>
         }

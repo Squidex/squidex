@@ -1,22 +1,23 @@
+@let jobValue = job();
 <div class="table-items-row table-items-row-expandable">
     <div class="table-items-row-summary">
         <div class="row align-items-center">
-            <div class="col-auto pe-4"><sqx-status-icon size="lg" [status]="job.status" /></div>
+            <div class="col-auto pe-4"><sqx-status-icon size="lg" [status]="jobValue.status" /></div>
 
             <div class="col">
                 <div>
-                    <h4>{{ job.description }}</h4>
+                    <h4>{{ jobValue.description }}</h4>
                 </div>
 
                 <div class="row text-sm">
                     <div class="col">
-                        {{ "common.started" | sqxTranslate }}: <span>{{ job.started | sqxFromNow }}</span>
+                        {{ "common.started" | sqxTranslate }}: <span>{{ jobValue.started | sqxFromNow }}</span>
                     </div>
 
                     <div class="col">
                         {{ "jobs.jobDuration" | sqxTranslate }}:
-                        @if (job.stopped) {
-                            <span>{{ duration }}</span>
+                        @if (jobValue.stopped) {
+                            <span>{{ duration() }}</span>
                         }
                     </div>
                 </div>
@@ -26,12 +27,12 @@
                 <a
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'common.download' | sqxTranslate }}"
-                    [class.invisible]="!job.downloadUrl"
-                    href="{{ apiUrl.buildUrl(job.downloadUrl || '') }}"
+                    [class.invisible]="!jobValue.downloadUrl"
+                    href="{{ apiUrl.buildUrl(jobValue.downloadUrl || '') }}"
                     sqxExternalLink="noicon">
                     <i class="icon-download"></i>
                 </a>
-                <button class="btn btn-outline-secondary btn-expand ms-1" [class.expanded]="isExpanded" (click)="toggleExpanded()" type="button">
+                <button class="btn btn-outline-secondary btn-expand ms-1" [class.expanded]="isExpanded()" (click)="toggleExpanded()" type="button">
                     <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                 </button>
                 <button
@@ -40,7 +41,7 @@
                     confirmRememberKey="deleteBackup"
                     confirmText="i18n:jobs.deleteConfirmText"
                     confirmTitle="i18n:jobs.deleteConfirmTitle"
-                    [disabled]="!job.canDelete"
+                    [disabled]="!jobValue.canDelete"
                     (sqxConfirmClick)="delete()"
                     type="button">
                     <i class="icon-bin3"></i>
@@ -49,7 +50,7 @@
         </div>
     </div>
 
-    @if (isExpanded) {
+    @if (isExpanded()) {
         <div class="table-items-row-details">
             <div class="job-header">
                 <h4>{{ "common.details" | sqxTranslate }}</h4>
@@ -57,7 +58,7 @@
 
             <div class="row job-dump">
                 <div class="col-12">
-                    <sqx-code-editor disabled="true" height="auto" minLines="12" mode="ace/mode/text" [ngModel]="details" wordWrap="true" />
+                    <sqx-code-editor disabled="true" height="auto" minLines="12" mode="ace/mode/text" [ngModel]="details()" wordWrap="true" />
                 </div>
             </div>
         </div>

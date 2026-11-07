@@ -1,4 +1,4 @@
-<div class="form-horizontal" [formGroup]="triggerForm.form">
+<div class="form-horizontal" [formGroup]="triggerForm().form">
     <sqx-form-row for="limit" hint="rules.conditions.usageLimitHint" label="rules.conditions.usageLimit">
         <input class="form-control" id="limit" formControlName="limit" step="1" type="number" />
     </sqx-form-row>

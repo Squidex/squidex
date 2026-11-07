@@ -1,87 +1,90 @@
 <div class="control-container">
-    <div class="anchor invisible" #anchor [class.cursor-size]="startCharacter" [class.full-size]="!startCharacter">
+    @let startCharacterValue = startCharacter();
+    @let iconValue = icon();
+    @let inputStyleValue = inputStyle();
+    <div class="anchor invisible" #anchor [class.cursor-size]="startCharacterValue" [class.full-size]="!startCharacterValue">
         <span class="form-control w-100">&nbsp;</span>
     </div>
 
-    @if (textArea) {
+    @if (textArea()) {
         <textarea
             class="form-control"
-            [id]="formId"
+            [id]="formId()"
             #input
             autocapitalize="off"
             autocomplete="off"
             autocorrect="off"
             (blur)="blur()"
-            [class.form-empty]="inputStyle === 'empty'"
-            [class.form-icon]="!!icon"
-            [class.form-underlined]="inputStyle === 'underlined'"
+            [class.form-empty]="inputStyleValue === 'empty'"
+            [class.form-icon]="!!iconValue"
+            [class.form-underlined]="inputStyleValue === 'underlined'"
             [formControl]="queryInput"
             (keydown)="onKeyDown($event)"
             (keypress)="editorKeyPress.emit($event)"
-            [name]="formName"
-            [placeholder]="placeholder"
+            [name]="formName()"
+            [placeholder]="placeholder()"
             rows="2"
             sqxAutosize
-            [sqxFocusOnInit]="autoFocus"
+            [sqxFocusOnInit]="autoFocus()"
             sqxForwardFormClasses></textarea>
     } @else {
         <input
             class="form-control"
-            [id]="formId"
+            [id]="formId()"
             #input
             autocapitalize="off"
             autocomplete="off"
             autocorrect="off"
             (blur)="blur()"
-            [class.form-empty]="inputStyle === 'empty'"
-            [class.form-icon]="!!icon"
-            [class.form-underlined]="inputStyle === 'underlined'"
+            [class.form-empty]="inputStyleValue === 'empty'"
+            [class.form-icon]="!!iconValue"
+            [class.form-underlined]="inputStyleValue === 'underlined'"
             [formControl]="queryInput"
             (keydown)="onKeyDown($event)"
             (keypress)="editorKeyPress.emit($event)"
-            [name]="formName"
-            [placeholder]="placeholder"
-            [sqxFocusOnInit]="autoFocus" />
+            [name]="formName()"
+            [placeholder]="placeholder()"
+            [sqxFocusOnInit]="autoFocus()" />
     }
 
-    @if (icon) {
+    @if (iconValue) {
         <div class="icon">
-            @if (snapshot.isLoading) {
+            @if (isLoading()) {
                 <sqx-loader color="input" />
             } @else {
-                <i class="icon-{{ icon }}"></i>
+                <i class="icon-{{ iconValue }}"></i>
             }
         </div>
     }
 
-    @if (allowOpen) {
+    @if (allowOpen()) {
         <div class="btn btn-sm" (click)="openModal()" sqxStopClick><i class="icon-caret-down"></i></div>
     }
     <sqx-dropdown-menu
         class="control-dropdown"
         #container
         adjustHeight="false"
-        [adjustWidth]="dropdownFullWidth && !startCharacter"
-        [position]="dropdownPosition"
+        [adjustWidth]="dropdownFullWidth() && !startCharacterValue"
+        [position]="dropdownPosition()"
         scrollX="false"
         scrollY="true"
         [sqxAnchoredTo]="anchor"
         *sqxModal="suggestionsModal"
-        [style]="dropdownStyles">
-        @for (item of snapshot.suggestedItems; track item; let i = $index) {
+        [style]="dropdownStyles()">
+        @let itemTemplateValue = itemTemplate();
+        @let suggestedIndexValue = suggestedIndex();
+        @for (item of suggestedItems(); track item; let i = $index) {
             <div
                 class="control-dropdown-item control-dropdown-item-selectable"
-                [class.active]="i === snapshot.suggestedIndex"
+                [class.active]="i === suggestedIndexValue"
                 (mousedown)="selectItem(item)"
                 (mouseover)="selectIndex(i)"
-                [sqxScrollActive]="i === snapshot.suggestedIndex"
+                [sqxScrollActive]="i === suggestedIndexValue"
                 [sqxScrollContainer]="$any(container.nativeElement)">
-                @if (!itemTemplate) {
+                @if (!itemTemplateValue) {
                     {{ item }}
-                }
-
-                @if (itemTemplate) {
-                    <ng-template [index]="i" [item]="item" [sqxTemplateWrapper]="itemTemplate"></ng-template>
+                } @else {
+                    <ng-template [index]="i" [item]="item" [sqxTemplateWrapper]="itemTemplateValue"></ng-template>
                 }
             </div>
         }

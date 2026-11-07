@@ -1,4 +1,4 @@
-<div class="form-horizontal" [formGroup]="triggerForm.form">
+<div class="form-horizontal" [formGroup]="triggerForm().form">
     <sqx-form-row for="cronExpression" label="rules.conditions.cronExpression">
         <input class="form-control" id="cronExpression" formControlName="cronExpression" />
 
@@ -37,7 +37,7 @@
     <sqx-form-row for="cronTimezone" hint="rules.conditions.cronTimezoneHint" label="rules.conditions.cronTimezone">
         <select class="form-select" id="cronTimezone" formControlName="cronTimezone">
             <option></option>
-            @for (timezone of timezones | async; track timezone) {
+            @for (timezone of timezones(); track timezone) {
                 <option [ngValue]="timezone">{{ timezone }}</option>
             }
         </select>

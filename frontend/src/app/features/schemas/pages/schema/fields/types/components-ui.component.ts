@@ -6,7 +6,7 @@
  */
 
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, ReferencesFieldPropertiesDto } from '@app/shared';
 
@@ -16,6 +16,7 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     selector: 'sqx-components-ui',
     styleUrls: ['components-ui.component.scss'],
     templateUrl: 'components-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormRowComponent,
         FormsModule,
@@ -23,14 +24,14 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     ],
 })
 export class ComponentsUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: ReferencesFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<ReferencesFieldPropertiesDto>();
 
-    public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
+    public readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

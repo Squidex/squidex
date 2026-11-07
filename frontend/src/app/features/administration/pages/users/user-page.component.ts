@@ -6,10 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormErrorComponent, FormRowComponent, LayoutComponent, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
+import { FormErrorComponent, FormRowComponent, LayoutComponent, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
 import { UserDto, UserForm, UsersState } from '../../internal';
 
 @Component({
@@ -29,38 +29,40 @@ import { UserDto, UserForm, UsersState } from '../../internal';
         TranslatePipe,
     ],
 })
-export class UserPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class UserPageComponent {
+    private user?: UserDto | null;
 
-    public isEditable = false;
+    public readonly isEditable = signal(false);
 
-    public user?: UserDto | null;
-    public userForm = new UserForm();
+    public readonly userForm = new UserForm();
 
     constructor(
         public readonly usersState: UsersState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-    }
+        effect(onCleanup => {
+            const subscription =
+                this.usersState.selectedUser
+                    .subscribe(user => {
+                        this.user = user;
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.usersState.selectedUser
-                .subscribe(user => {
-                    this.user = user;
+                        const isEditable = !user || user.canUpdate;
 
-                    this.isEditable = !user || user.canUpdate;
+                        this.isEditable.set(isEditable);
 
-                    const permissions: string[] = [];
+                        const permissions: string[] = [];
 
-                    this.userForm.load(user || { permissions });
-                    this.userForm.setEnabled(this.isEditable);
-                }));
+                        this.userForm.load(user || { permissions });
+                        this.userForm.setEnabled(isEditable);
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public save() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 

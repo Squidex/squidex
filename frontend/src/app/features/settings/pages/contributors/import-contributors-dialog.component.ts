@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
@@ -23,6 +23,7 @@ type ImportStatus = {
     selector: 'sqx-import-contributors-dialog',
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         FormHintComponent,
@@ -35,15 +36,15 @@ type ImportStatus = {
     ],
 })
 export class ImportContributorsDialogComponent {
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<RoleDto>;
+    /** The roles that can be assigned to the imported contributors. */
+    public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    public importForm = new ImportContributorsForm();
-    public importStatus: ReadonlyArray<ImportStatus> = [];
-    public importStage: 'Start' | 'Change' | 'Wait' = 'Start';
+    public readonly importForm = new ImportContributorsForm();
+    public readonly importStatus = signal<ReadonlyArray<ImportStatus>>([]);
+    public readonly importStage = signal<'Start' | 'Change' | 'Wait'>('Start');
 
     constructor(
         private readonly contributorsState: ContributorsState,
@@ -51,46 +52,40 @@ export class ImportContributorsDialogComponent {
     }
 
     public detect() {
-        this.importStage = 'Change';
+        this.importStage.set('Change');
 
         const contributors = this.importForm.submit();
 
         if (contributors) {
-            this.importStatus = contributors.map(contributor => ({
+            this.importStatus.set(contributors.map(contributor => ({
                 email: contributor.contributorId,
                 result: 'Pending',
                 resultText: 'Pending',
                 role: 'Developer',
-            }));
+            })));
         }
     }
 
     public import() {
-        this.importStage = 'Wait';
+        this.importStage.set('Wait');
 
-        of(...this.importStatus).pipe(
+        of(...this.importStatus()).pipe(
             mergeMap(s =>
                 this.contributorsState.assign(createRequest(s), { silent: true }).pipe(
                     tap(created => {
-                        const status = this.importStatus.find(x => x.email === s.email);
-
-                        if (status) {
-                            status.resultText = getSuccess(created);
-                            status.result = 'Success';
-                        }
+                        this.updateStatus(s.email, 'Success', getSuccess(created));
                     }),
                     catchError((error: ErrorDto) => {
-                        const status = this.importStatus.find(x => x.email === s.email);
-
-                        if (status) {
-                            status.resultText = getError(error);
-                            status.result = 'Failed';
-                        }
+                        this.updateStatus(s.email, 'Failed', getError(error));
 
                         return EMPTY;
                     }),
                 ), 1),
         ).subscribe();
+    }
+
+    private updateStatus(email: string, result: ImportStatus['result'], resultText: string) {
+        this.importStatus.update(statuses => statuses.map(x => x.email === email ? { ...x, result, resultText } : x));
     }
 }
 

@@ -6,9 +6,11 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
+import { map } from 'rxjs/operators';
+import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
 import { WorkflowAddFormComponent } from './workflow-add-form.component';
 import { WorkflowComponent } from './workflow.component';
 
@@ -16,6 +18,7 @@ import { WorkflowComponent } from './workflow.component';
     selector: 'sqx-workflows-page',
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         LayoutComponent,
@@ -33,25 +36,14 @@ import { WorkflowComponent } from './workflow.component';
         WorkflowComponent,
     ],
 })
-export class WorkflowsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-
-    public roles: ReadonlyArray<string> = [];
+export class WorkflowsPageComponent {
+    public readonly roles = toSignal(this.rolesState.roles.pipe(map(roles => roles.map(x => x.name))), { initialValue: [] });
 
     constructor(
         public readonly rolesState: RolesState,
         public readonly schemasSource: SchemaTagSource,
         public readonly workflowsState: WorkflowsState,
     ) {
-    }
-
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.rolesState.roles
-                .subscribe(roles => {
-                    this.roles = roles.map(x => x.name);
-                }));
-
         this.rolesState.load();
 
         this.workflowsState.load();

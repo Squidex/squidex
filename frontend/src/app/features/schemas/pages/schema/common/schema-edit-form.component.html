@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-body">
             <sqx-form-row for="name" label="common.name" vertical>
-                <input class="form-control" id="name" [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }" readonly />
+                <input class="form-control" id="name" [ngModel]="schema().name" [ngModelOptions]="{ standalone: true }" readonly />
             </sqx-form-row>
 
             <sqx-form-row for="label" hint="schemas.schemaLabelHint" label="common.label" vertical>
@@ -32,7 +32,7 @@
             </sqx-form-row>
 
             <sqx-form-row alert="schemas.searchFieldsHelp" for="searchFields" hint="schemas.searchFieldsHint" label="schemas.searchFields" vertical>
-                <sqx-tag-editor id="searchFields" allowOpen="true" formControlName="searchFields" [itemsSource]="fieldNames" />
+                <sqx-tag-editor id="searchFields" allowOpen="true" formControlName="searchFields" [itemsSource]="fieldNames()" />
             </sqx-form-row>
 
             <sqx-form-row for="tags" hint="schemas.schemaTagsHint" label="common.tags" vertical>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="card-footer">
-            @if (isEditable) {
+            @if (isEditable()) {
                 <button class="float-end btn btn-primary" type="submit">{{ "common.save" | sqxTranslate }}</button>
             }
         </div>

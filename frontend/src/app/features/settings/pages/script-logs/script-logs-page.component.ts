@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormAlertComponent, LayoutComponent, ListViewComponent, ScriptLogsState, ShortcutDirective, TitleComponent, TranslatePipe } from '@app/shared';
 import { ScriptLogComponent } from './script-log.component';
@@ -15,6 +15,7 @@ import { ScriptLogComponent } from './script-log.component';
     selector: 'sqx-script-logs-page',
     styleUrls: ['./script-logs-page.component.scss'],
     templateUrl: './script-logs-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         FormAlertComponent,
@@ -27,13 +28,10 @@ import { ScriptLogComponent } from './script-log.component';
         TranslatePipe,
     ],
 })
-export class ScriptLogsPageComponent implements OnInit {
+export class ScriptLogsPageComponent {
     constructor(
         public readonly scriptLogsState: ScriptLogsState,
     ) {
-    }
-
-    public ngOnInit() {
         this.scriptLogsState.load();
     }
 

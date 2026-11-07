@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, GeolocationFieldPropertiesDto } from '@app/shared';
 
@@ -20,12 +20,12 @@ import { FieldDto, FormRowComponent, GeolocationFieldPropertiesDto } from '@app/
     ],
 })
 export class GeolocationUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: GeolocationFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<GeolocationFieldPropertiesDto>();
 }

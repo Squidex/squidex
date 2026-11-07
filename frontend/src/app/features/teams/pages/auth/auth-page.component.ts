@@ -6,16 +6,19 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ApiUrlConfig, CopyDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { map } from 'rxjs';
+import { ApiUrlConfig, CopyDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
 
 @Component({
     selector: 'sqx-auth-page',
     styleUrls: ['./auth-page.component.scss'],
     templateUrl: './auth-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         CopyDirective,
@@ -36,60 +39,59 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
         TranslatePipe,
     ],
 })
-export class AuthPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class AuthPageComponent {
+    public readonly urlToRedirect;
+    public readonly urlToTest;
 
-    public urlToRedirect!: string;
-    public urlToTest!: string;
+    public readonly isEditable = signal(false);
+    public readonly isEditing = signal(false);
 
-    public isEditable = false;
-    public isEditing = false;
+    public readonly updateForm = new UpdateTeamAuthForm();
 
-    public updateForm = new UpdateTeamAuthForm();
-
-    constructor(
-        private readonly apiUrl: ApiUrlConfig,
+    constructor(apiUrl: ApiUrlConfig, teamsState: TeamsState,
         private readonly authState: TeamAuthState,
-        private readonly teamsState: TeamsState,
     ) {
-    }
+        this.urlToTest = apiUrl.buildUrl('/identity-server/test');
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.teamsState.selectedTeam.pipe(defined())
-                .subscribe(team => {
-                    this.urlToTest = this.apiUrl.buildUrl('/identity-server/test');
-                    this.urlToRedirect = this.apiUrl.buildUrl(`/identity-server/signin-${team.id}`);
-                }));
+        this.urlToRedirect = toSignal(
+            teamsState.selectedTeam.pipe(
+                defined(),
+                map(team => apiUrl.buildUrl(`/identity-server/signin-${team.id}`))),
+            { initialValue: '' });
 
-        this.subscriptions.add(
-            this.authState.changes.pipe(defined())
-                .subscribe(state => {
-                    const scheme = state.snapshot.scheme;
+        effect(onCleanup => {
+            const subscription =
+                this.authState.changes.pipe(defined())
+                    .subscribe(state => {
+                        const scheme = state.snapshot.scheme;
+                        const isEditable = !!state.snapshot.canUpdate;
 
-                    this.isEditable = !!state.snapshot.canUpdate;
-                    this.isEditing = !!scheme;
+                        this.isEditable.set(isEditable);
+                        this.isEditing.set(!!scheme);
 
-                    this.updateForm.load(scheme || {});
-                    this.updateForm.setEnabled(this.isEditable);
-                }));
+                        this.updateForm.load(scheme || {});
+                        this.updateForm.setEnabled(isEditable);
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
 
         this.authState.load();
     }
 
     public toggle(isEditing: boolean) {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 
-        this.isEditing = isEditing;
+        this.isEditing.set(isEditing);
         if (!isEditing) {
             this.authState.update(undefined);
         }
     }
 
     public save() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 

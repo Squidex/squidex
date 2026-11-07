@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ControlErrorsComponent, ExtendedFormGroup, TemplatedFormArray, TranslatePipe } from '@app/shared';
 
@@ -23,13 +23,13 @@ import { ControlErrorsComponent, ExtendedFormGroup, TemplatedFormArray, Translat
     ],
 })
 export class BranchesInputComponent {
-    @Input({ required: true })
-    public control!: TemplatedFormArray;
+    /** The form array with one form group per branch condition. */
+    public readonly control = input.required<TemplatedFormArray>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isEditable = true;
+    /** Allows the user to add and remove branches. */
+    public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    public get branchesControls(): ReadonlyArray<ExtendedFormGroup> {
-        return this.control.controls as any;
-    }
+    public readonly branchesControls = computed<ReadonlyArray<ExtendedFormGroup>>(() => {
+        return this.control().controls as any;
+    });
 }

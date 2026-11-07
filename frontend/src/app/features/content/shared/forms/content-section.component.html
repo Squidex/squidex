@@ -1,10 +1,10 @@
-@if ((formSection.visibleChanges | async) || formCompare) {
-    @if (formSection.separator; as separator) {
+@if ((formSection().visibleChanges | async) || formCompare()) {
+    @if (formSection().separator; as separator) {
         <div class="header">
             <div class="row g-0 align">
                 <div class="col-auto">
                     <button class="btn btn-sm btn-text-secondary" (click)="toggle()" type="button">
-                        <i [class.icon-caret-down]="!snapshot.isCollapsed" [class.icon-caret-right]="snapshot.isCollapsed"></i>
+                        <i [class.icon-caret-down]="!isCollapsed()" [class.icon-caret-right]="isCollapsed()"></i>
                     </button>
                 </div>
 
@@ -22,19 +22,19 @@
     }
 }
 
-<div class="row gx-1" [class.hidden]="snapshot.isCollapsed && !formCompare">
-    @for (field of formSection.fields; track field.field.fieldId) {
+<div class="row gx-1" [class.hidden]="isCollapsed() && !formCompare()">
+    @for (field of formSection().fields; track field.field.fieldId) {
         <sqx-content-field
-            [form]="form"
-            [formCompare]="formCompare"
-            [formContext]="formContext"
-            [formLevel]="formLevel"
+            [form]="form()"
+            [formCompare]="formCompare()"
+            [formContext]="formContext()"
+            [formLevel]="formLevel()"
             [formModel]="field"
             [formModelCompare]="getFieldFormCompare(field)"
-            [isCompact]="isCompact"
-            [language]="language"
+            [isCompact]="isCompact()"
+            [language]="language()"
             (languageChange)="languageChange.emit($event)"
-            [languages]="languages"
-            [schema]="schema" />
+            [languages]="languages()"
+            [schema]="schema()" />
     }
 </div>

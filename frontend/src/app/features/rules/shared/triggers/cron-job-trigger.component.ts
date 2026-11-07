@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
 
@@ -15,7 +15,6 @@ import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesSer
     styleUrls: ['./cron-job-trigger.component.scss'],
     templateUrl: './cron-job-trigger.component.html',
     imports: [
-        AsyncPipe,
         CodeComponent,
         FormHintComponent,
         FormRowComponent,
@@ -25,14 +24,12 @@ import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesSer
     ],
 })
 export class CronJobTriggerComponent {
-    @Input({ required: true })
-    public triggerForm!: TriggerForm;
+    /** The form to edit the trigger settings. */
+    public readonly triggerForm = input.required<TriggerForm>();
 
-    public timezones = this.rulesService.getTimezones(this.appsState.appName);
+    public readonly timezones;
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly rulesService: RulesService,
-    ) {
+    constructor(appsState: AppsState, rulesService: RulesService) {
+        this.timezones = toSignal(rulesService.getTimezones(appsState.appName), { initialValue: [] });
     }
 }

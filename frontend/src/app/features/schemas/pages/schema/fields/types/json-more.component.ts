@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { CodeEditorComponent, FieldDto, FormRowComponent, JsonFieldPropertiesDto } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { CodeEditorComponent, FieldDto, FormRowComponent, JsonFieldPropertiesDto
     selector: 'sqx-json-more',
     styleUrls: ['json-more.component.scss'],
     templateUrl: 'json-more.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormRowComponent,
@@ -21,12 +22,12 @@ import { CodeEditorComponent, FieldDto, FormRowComponent, JsonFieldPropertiesDto
     ],
 })
 export class JsonMoreComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: JsonFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<JsonFieldPropertiesDto>();
 }

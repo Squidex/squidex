@@ -5,19 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EMPTY, Observable, shareReplay } from 'rxjs';
+import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { TranslatePipe } from '@app/framework';
-import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
+import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',
     styleUrls: ['./schema-field-rules-form.component.scss'],
     templateUrl: './schema-field-rules-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
@@ -26,29 +26,16 @@ import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, Co
         TranslatePipe,
     ],
 })
-export class SchemaFieldRulesFormComponent implements  OnInit {
-    @Input()
-    public schema!: SchemaDto;
+export class SchemaFieldRulesFormComponent {
+    /** The schema to configure the field rules for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public editForm = new ConfigureFieldRulesForm();
+    public readonly editForm = new ConfigureFieldRulesForm();
 
-    public fieldOptions: ReadonlyArray<{ label: string; value: string }> = [];
-    public fieldActions = FIELD_RULE_ACTIONS;
-    public fieldCompletions: Observable<ScriptCompletions> = EMPTY;
+    public readonly fieldActions = FIELD_RULE_ACTIONS;
+    public readonly fieldCompletions;
 
-    public isEditable = false;
-
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly schemasService: SchemasService,
-    ) {
-    }
-
-    public ngOnInit() {
-        this.fieldCompletions = this.schemasService.getFieldRulesCompletion(this.schemasState.appName, this.schema.name).pipe(shareReplay(1));
-    }
-
-    public ngOnChanges() {
+    public readonly fieldOptions = computed(() => {
         const fieldNames = new Set<string>();
         const fieldTags = new Set<string>();
 
@@ -62,7 +49,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
             }
         };
 
-        for (const field of this.schema.fields) {
+        for (const field of this.schema().fields) {
             if (field.properties.isContentField) {
                 addField(field.name, field.properties);
 
@@ -74,7 +61,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
             }
         }
 
-        this.fieldOptions = [
+        return [
             ...[...fieldNames]
                 .sorted()
                 .map(value => ({ label: `field: ${value}`, value })),
@@ -82,19 +69,35 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
                 .sorted()
                 .map(value => ({ label: `tag: ${value}`, value: `tag:${value}` })),
         ];
+    });
 
-        this.isEditable = this.schema.canUpdateUrls;
+    public readonly isEditable = computed(() => {
+        return this.schema().canUpdateUrls;
+    });
 
-        this.editForm.load(this.schema);
-        this.editForm.setEnabled(this.isEditable);
+    constructor(schemasService: SchemasService,
+        private readonly schemasState: SchemasState,
+    ) {
+        this.fieldCompletions = toSignal(
+            toObservable(this.schema).pipe(
+                map(schema => schema.name),
+                distinctUntilChanged(),
+                switchMap(name => schemasService.getFieldRulesCompletion(schemasState.appName, name))));
+
+        effect(() => {
+            const schema = this.schema();
+
+            this.editForm.load(schema);
+            this.editForm.setEnabled(schema.canUpdateUrls);
+        });
     }
 
     public add() {
-        this.editForm.add(this.fieldOptions[0].value);
+        this.editForm.add(this.fieldOptions()[0].value);
     }
 
     public saveSchema() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 
@@ -103,7 +106,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
             return;
         }
 
-        this.schemasState.configureFieldRules(this.schema, value)
+        this.schemasState.configureFieldRules(this.schema(), value)
             .subscribe({
                 next: () => {
                     this.editForm.submitCompleted({ noReset: true });

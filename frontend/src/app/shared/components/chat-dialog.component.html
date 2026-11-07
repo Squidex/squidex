@@ -1,14 +1,14 @@
-<sqx-modal-dialog (dialogClose)="contentSelect.emit()" flexBody="true" fullHeight="true" size="lg">
+<sqx-modal-dialog (dialogClose)="contentSelect.emit(undefined)" flexBody="true" fullHeight="true" size="lg">
     <ng-container title> {{ "chat.title" | sqxTranslate }}</ng-container>
     <ng-container content>
         <div class="scroll-container" #container>
-            @for (item of snapshot.chatItems; track item; let isLast = $last; let isFirst = $first) {
+            @for (item of chatItems(); track item; let isLast = $last; let isFirst = $first) {
                 <sqx-chat-item
                     [content]="item.content"
                     (contentSelect)="contentSelect.emit($event)"
-                    [copyMode]="copyMode"
+                    [copyMode]="copyMode()"
                     (done)="setCompleted()"
-                    [folderId]="folderId"
+                    [folderId]="folderId()"
                     [isFirst]="isFirst"
                     [isLast]="isLast"
                     [type]="item.type"
@@ -23,8 +23,8 @@
                     <input
                         class="form-control"
                         #input
-                        [disabled]="snapshot.isRunning"
-                        [ngModel]="snapshot.chatQuestion"
+                        [disabled]="isRunning()"
+                        [ngModel]="chatQuestion()"
                         (ngModelChange)="setQuestion($event)"
                         [ngModelOptions]="{ standalone: true }"
                         placeholder="{{ 'chat.prompt' | sqxTranslate }}"
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="col-auto">
-                    <button class="btn btn-primary" [disabled]="snapshot.isRunning" type="submit">{{ "chat.ask" | sqxTranslate }}</button>
+                    <button class="btn btn-primary" [disabled]="isRunning()" type="submit">{{ "chat.ask" | sqxTranslate }}</button>
                 </div>
             </div>
         </form>

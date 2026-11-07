@@ -6,10 +6,11 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { EMPTY, Observable, shareReplay } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditAssetScriptsForm, KeysPipe, LayoutComponent, ScriptCompletions, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ScriptNamePipe } from '@app/shared/components/pipes';
 
@@ -17,6 +18,7 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     selector: 'sqx-asset-scripts-page',
     styleUrls: ['./asset-scripts-page.component.scss'],
     templateUrl: './asset-scripts-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         CodeEditorComponent,
@@ -36,34 +38,31 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
         TranslatePipe,
     ],
 })
-export class AssetScriptsPageComponent implements OnInit {
-    public assetScript = 'query';
-    public assetCompletions: Observable<ScriptCompletions> = EMPTY;
+export class AssetScriptsPageComponent {
+    public readonly assetScript = signal('query');
+    public readonly assetCompletions: Observable<ScriptCompletions>;
 
-    public editForm = new EditAssetScriptsForm();
+    public readonly editForm = new EditAssetScriptsForm();
 
-    public isEditable = false;
+    public readonly isEditable = toSignal(this.assetScriptsState.canUpdate, { initialValue: false });
 
-    constructor(
-        private readonly appsState: AppsState,
+    constructor(appsState: AppsState, assetsService: AssetsService,
         private readonly assetScriptsState: AssetScriptsState,
-        private readonly assetsService: AssetsService,
     ) {
-    }
+        this.assetCompletions = assetsService.getCompletions(appsState.appName).pipe(shareReplay(1));
 
-    public ngOnInit() {
-        this.assetCompletions = this.assetsService.getCompletions(this.appsState.appName).pipe(shareReplay(1));
+        effect(onCleanup => {
+            const subscription = this.assetScriptsState.scripts
+                .subscribe(scripts => {
+                    this.editForm.load(scripts);
+                });
 
-        this.assetScriptsState.scripts
-            .subscribe(scripts => {
-                this.editForm.load(scripts);
-            });
-        this.assetScriptsState.canUpdate
-            .subscribe(canUpdate => {
-                this.isEditable = canUpdate;
+            onCleanup(() => subscription.unsubscribe());
+        });
 
-                this.editForm.setEnabled(this.isEditable);
-            });
+        effect(() => {
+            this.editForm.setEnabled(this.isEditable());
+        });
 
         this.assetScriptsState.load();
     }
@@ -73,11 +72,11 @@ export class AssetScriptsPageComponent implements OnInit {
     }
 
     public selectField(field: string) {
-        this.assetScript = field;
+        this.assetScript.set(field);
     }
 
     public saveScripts() {
-        if (!this.isEditable) {
+        if (!this.isEditable()) {
             return;
         }
 

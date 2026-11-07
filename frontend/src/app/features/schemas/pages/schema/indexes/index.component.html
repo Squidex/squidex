@@ -1,7 +1,7 @@
 <div class="table-items-row table-items-row-expandable">
     <div class="table-items-row-summary row gx-2 align-items-center">
         <div class="col">
-            <span class="truncate">{{ index.name }}</span>
+            <span class="truncate">{{ index().name }}</span>
         </div>
 
         <div class="col-auto">
@@ -9,7 +9,7 @@
                 <button
                     class="btn btn-outline-secondary btn-expand me-1"
                     attr.aria-label="{{ 'common.options' | sqxTranslate }}"
-                    [class.expanded]="isExpanded"
+                    [class.expanded]="isExpanded()"
                     (click)="toggleExpanded()"
                     type="button">
                     <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
@@ -20,7 +20,7 @@
                     confirmRememberKey="deleteIndex"
                     confirmText="i18n:schemas.indexes.deleteConfirmText"
                     confirmTitle="i18n:schemas.indexes.deleteConfirmTitle"
-                    [disabled]="!index.canDelete"
+                    [disabled]="!index().canDelete"
                     (sqxConfirmClick)="delete()"
                     type="button">
                     <i class="icon-bin3"></i>
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    @if (isExpanded) {
+    @if (isExpanded()) {
         <div class="table-items-row-details">
             <table class="table table-sm table-fixed mb-0">
                 <colgroup>
@@ -47,7 +47,7 @@
                 </thead>
 
                 <tbody>
-                    @for (field of index.fields; track field.name) {
+                    @for (field of index().fields; track field.name) {
                         <tr>
                             <td>{{ field.name }}</td>
 

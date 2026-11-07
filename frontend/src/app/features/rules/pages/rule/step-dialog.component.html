@@ -1,3 +1,6 @@
+@let currentStep = this.currentStep();
+@let stepDefinition = this.stepDefinition();
+@let scriptCompletions = this.scriptCompletions();
 <form [formGroup]="currentStep?.form!" (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
         <ng-container title>
@@ -73,7 +76,7 @@
                                 }
 
                                 @case ("Branches") {
-                                    <sqx-branches-input [control]="currentStep.branch(property.name)" [isEditable]="isEditable" />
+                                    <sqx-branches-input [control]="currentStep.branch(property.name)" [isEditable]="isEditable()" />
                                 }
 
                                 @default {
@@ -100,7 +103,7 @@
                 </div>
             } @else {
                 <div class="row g-0">
-                    @for (availableStep of availableSteps | sqxEntries: "title"; track availableStep.key) {
+                    @for (availableStep of availableSteps() | sqxEntries: "title"; track availableStep.key) {
                         <div class="col-12 col-md-6">
                             <div class="rule-element" (click)="selectStep(availableStep.key)">
                                 <sqx-rule-element

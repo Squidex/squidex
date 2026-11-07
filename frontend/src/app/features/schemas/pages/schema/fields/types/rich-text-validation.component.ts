@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { FieldDto, FormRowComponent, RichTextFieldPropertiesDto, TranslatePipe }
     selector: 'sqx-rich-text-validation',
     styleUrls: ['rich-text-validation.component.scss'],
     templateUrl: 'rich-text-validation.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormRowComponent,
         FormsModule,
@@ -20,13 +21,13 @@ import { FieldDto, FormRowComponent, RichTextFieldPropertiesDto, TranslatePipe }
         TranslatePipe,
     ],
 })
-export class RichTextValidationComponent  {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+export class RichTextValidationComponent {
+    /** The form group to edit the field properties. */
+    public readonly fieldForm = input.required<UntypedFormGroup>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: RichTextFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<RichTextFieldPropertiesDto>();
 }

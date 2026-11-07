@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ContentSectionComponent } from '../forms/content-section.component';
@@ -15,6 +15,7 @@ import { ContentSectionComponent } from '../forms/content-section.component';
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         ResolveAssets,
         ResolveContents,
@@ -32,67 +33,90 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         forwardRef(() => ContentSectionComponent),
     ],
 })
-export class ContentCreatorComponent implements OnInit {
-    @Output()
-    public contentCreate = new EventEmitter<ReadonlyArray<ContentDto>>();
+export class ContentCreatorComponent {
+    private isInitialDataLoaded = false;
 
-    @Input()
-    public initialData: any;
+    /** Emits the created content, or an empty array when the dialog is closed. */
+    public readonly contentCreate = output<ReadonlyArray<ContentDto>>();
 
-    @Input()
-    public schemaName?: string | null;
+    /** The data to initialize the new content with, for example when cloning a content. */
+    public readonly initialData = input<any>();
 
-    @Input()
-    public schemaIds?: ReadonlyArray<string>;
+    /** The name of the schema to select initially. */
+    public readonly schemaName = input<string | null>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The IDs of the schemas the user can create contents for. */
+    public readonly schemaIds = input<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The initial language of the editor. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public schema!: SchemaDto;
-    public schemas: ReadonlyArray<SchemaDto> = [];
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    public contentForm!: EditContentForm;
+    public readonly languageSelected = linkedSignal(() => {
+        return this.language();
+    });
+
+    public readonly schemas = computed(() => {
+        const schemaIds = this.schemaIds();
+
+        const schemas = this.schemasState.snapshot.schemas.filter(x => x.canContentsCreate);
+        if (!schemaIds || schemaIds.length === 0) {
+            return schemas;
+        }
+
+        return schemas.filter(x => x.type === 'Default' && schemaIds.indexOf(x.id) >= 0);
+    });
+
+    public readonly schema = linkedSignal<SchemaDto | undefined>(() => {
+        const schemas = this.schemas();
+
+        return schemas.find(x => x.name === this.schemaName()) || schemas[0];
+    });
+
+    public readonly contentForm = signal<EditContentForm | undefined>(undefined);
 
     constructor(
         private readonly contentsState: ComponentContentsState,
         private readonly schemasState: SchemasState,
     ) {
-    }
+        effect(() => {
+            const schema = this.schema();
+            if (!schema) {
+                return;
+            }
 
-    public ngOnInit() {
-        this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canContentsCreate);
-
-        if (this.schemaIds && this.schemaIds.length > 0) {
-            this.schemas = this.schemas.filter(x => x.type === 'Default' && this.schemaIds!.indexOf(x.id) >= 0);
-        }
-
-        const selectedSchema = this.schemas.find(x => x.name === this.schemaName) || this.schemas[0];
-
-        this.selectSchema(selectedSchema);
+            untracked(() => this.createForm(schema));
+        });
     }
 
     public selectSchema(schema: SchemaDto) {
-        this.schema = schema;
+        this.schema.set(schema);
+    }
 
-        if (schema) {
-            this.contentsState.schema = schema;
-            this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, { user: this.formContext.user });
+    private createForm(schema: SchemaDto) {
+        const formContext = this.formContext();
+        const languages = this.languages();
 
-            this.formContext['languages'] = this.languages;
-            this.formContext['schema'] = schema;
+        this.contentsState.schema = schema;
 
-            if (this.initialData) {
-                this.contentForm.load(this.initialData, true);
+        const contentForm = new EditContentForm(languages, schema, this.schemasState.schemaMap, { user: formContext.user });
 
-                this.initialData = null;
-            }
+        formContext['languages'] = languages;
+        formContext['schema'] = schema;
+
+        const initialData = this.initialData();
+        if (initialData && !this.isInitialDataLoaded) {
+            contentForm.load(initialData, true);
+
+            this.isInitialDataLoaded = true;
         }
+
+        this.contentForm.set(contentForm);
     }
 
     public saveAndPublish() {
@@ -104,9 +128,14 @@ export class ContentCreatorComponent implements OnInit {
     }
 
     private saveContent(publish: boolean) {
-        const value = this.contentForm.submit();
+        const contentForm = this.contentForm();
+        if (!contentForm) {
+            return;
+        }
+
+        const value = contentForm.submit();
         if (!value) {
-            this.contentForm.submitFailed('i18n:contents.contentNotValid');
+            contentForm.submitFailed('i18n:contents.contentNotValid');
             return;
         }
 
@@ -117,21 +146,26 @@ export class ContentCreatorComponent implements OnInit {
         this.contentsState.create(value, publish)
             .subscribe({
                 next: content => {
-                    this.contentForm.submitCompleted({ noReset: true });
+                    contentForm.submitCompleted({ noReset: true });
 
                     this.emitSelect(content);
                 },
                 error: error => {
-                    this.contentForm.submitFailed(error);
+                    contentForm.submitFailed(error);
                 },
             });
     }
 
     private canCreate(publish: boolean) {
+        const schema = this.schema();
+        if (!schema) {
+            return false;
+        }
+
         if (publish) {
-            return this.schema.canContentsCreateAndPublish;
+            return schema.canContentsCreateAndPublish;
         } else {
-            return this.schema.canContentsCreate;
+            return schema.canContentsCreate;
         }
     }
 

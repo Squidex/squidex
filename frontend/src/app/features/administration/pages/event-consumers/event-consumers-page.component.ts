@@ -6,11 +6,11 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { DialogModel, EventConsumerDto, LayoutComponent, ListViewComponent, ModalDialogComponent, ModalDirective, ShortcutDirective, SidebarMenuDirective, Subscriptions, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { DialogModel, EventConsumerDto, LayoutComponent, ListViewComponent, ModalDialogComponent, ModalDirective, ShortcutDirective, SidebarMenuDirective, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { EventConsumersState } from '../../internal';
 import { EventConsumerComponent } from './event-consumer.component';
 
@@ -37,23 +37,23 @@ import { EventConsumerComponent } from './event-consumer.component';
         TranslatePipe,
     ],
 })
-export class EventConsumersPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-
-    public eventConsumerErrorDialog = new DialogModel();
-    public eventConsumerError?: string;
+export class EventConsumersPageComponent {
+    public readonly eventConsumerErrorDialog = new DialogModel();
+    public readonly eventConsumerError = signal<string | undefined>(undefined);
 
     constructor(
         public readonly eventConsumersState: EventConsumersState,
     ) {
-    }
-
-    public ngOnInit() {
         this.eventConsumersState.load();
 
-        this.subscriptions.add(
-            timer(1000, 1000).pipe(
-                switchMap(() => this.eventConsumersState.load(false, true))));
+        effect(onCleanup => {
+            const subscription =
+                timer(1000, 1000).pipe(
+                    switchMap(() => this.eventConsumersState.load(false, true)))
+                    .subscribe();
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public reload() {
@@ -61,7 +61,7 @@ export class EventConsumersPageComponent implements OnInit {
     }
 
     public showError(eventConsumer: EventConsumerDto) {
-        this.eventConsumerError = eventConsumer.error;
+        this.eventConsumerError.set(eventConsumer.error);
         this.eventConsumerErrorDialog.show();
     }
 }

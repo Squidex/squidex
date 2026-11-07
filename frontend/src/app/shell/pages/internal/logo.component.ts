@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { LoaderComponent } from '@app/shared';
 
 @Component({
@@ -18,6 +18,6 @@ import { LoaderComponent } from '@app/shared';
     ],
 })
 export class LogoComponent {
-    @Input({ transform: booleanAttribute })
-    public isLoading?: boolean | null;
+    /** Shows a loading indicator instead of the logo. */
+    public readonly isLoading = input(false, { transform: booleanAttribute });
 }

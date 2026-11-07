@@ -21,7 +21,7 @@
 
             <div class="col-3">
                 <select class="form-select" formControlName="role">
-                    @for (role of roles; track role) {
+                    @for (role of roles(); track role) {
                         <option [ngValue]="role.name">{{ role.name }}</option>
                     }
                 </select>
@@ -42,4 +42,4 @@
         </sqx-form-hint>
     </div>
 </div>
-<sqx-import-contributors-dialog (dialogClose)="importDialog.hide()" [roles]="roles" *sqxModal="importDialog" />
+<sqx-import-contributors-dialog (dialogClose)="importDialog.hide()" [roles]="roles()" *sqxModal="importDialog" />

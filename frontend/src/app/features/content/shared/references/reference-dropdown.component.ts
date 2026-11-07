@@ -5,25 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, SignalControlComponent, Types } from '@app/shared';
 
 export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,
 };
-
-interface State {
-    // The names of the selected content items for search.
-    contentNames: ReadonlyArray<ContentName>;
-
-    // The name of the selected item.
-    selectedItem?: ContentName;
-
-    // True when loading.
-    isLoading?: boolean;
-}
 
 type ContentName = { name: string; id?: string };
 
@@ -45,80 +34,92 @@ const NO_EMIT = { emitEvent: false };
         SafeHtmlPipe,
     ],
 })
-export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
-    private readonly subscriptions = new Subscriptions();
-    private readonly contents: ContentDto[] = [];
+export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyArray<string> | string> {
     private isOpenedBefore = false;
-    private isLoadingFailed = false;
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language to build the names of the contents. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public schemaId!: string;
+    /** The ID of the schema to select the content from. */
+    public readonly schemaId = input.required<string>();
 
-    @Input({ required: true })
-    public mode: 'Array' | 'Single' = 'Single';
+    /** Defines whether the value is a single ID or an array with one ID. */
+    public readonly mode = input.required<'Array' | 'Single'>();
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly control = new UntypedFormControl('');
 
-    public control = new UntypedFormControl('');
+    public readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
+        source: this.schemaId,
+        computation: () => [],
+    });
 
-    public get isValid() {
-        return !!this.schemaId && !!this.language;
-    }
+    public readonly contentsFailed = signal(false);
+    public readonly contentsLoading = signal(false);
+
+    public readonly contentNames = computed(() => {
+        const language = this.language();
+
+        const contentNames: ContentName[] = [
+            { name: this.localizer.getOrKey('contents.noReference') },
+        ];
+
+        for (const content of this.contents()) {
+            const name =
+                content.referenceFields
+                    .map(f => getContentValue(content, language, f, false))
+                    .map(v => v.formatted)
+                    .defined()
+                    .join(', ')
+                || this.localizer.getOrKey('common.noValue');
+
+            contentNames.push({ name, id: content.id });
+        }
+
+        return contentNames;
+    });
+
+    public readonly isValid = computed(() => {
+        return !!this.schemaId() && !!this.language();
+    });
 
     constructor(
         private readonly contentsResolver: ResolveContents,
         private readonly localizer: LocalizerService,
     ) {
-        super({ contentNames: [] });
+        super();
 
-        this.subscriptions.add(
-            value$(this.control)
-                .subscribe((id: string) => {
-                    if (this.control.enabled) {
+        effect(() => {
+            if (this.isDisabled() || !this.isValid() || this.contentsFailed()) {
+                this.control.disable(NO_EMIT);
+            } else {
+                this.control.enable(NO_EMIT);
+            }
+        });
+
+        effect(onCleanup => {
+            const subscription =
+                this.control.valueChanges
+                    .subscribe((id: string) => {
+                        if (!this.control.enabled) {
+                            return;
+                        }
+
+                        const isSingle = this.mode() === 'Single';
+
                         if (id) {
-                            if (this.mode === 'Single') {
-                                this.callChange(id);
-                            } else {
-                                this.callChange([id]);
-                            }
-                        } else if (this.mode === 'Single') {
-                            this.callChange(null);
+                            this.callChange(isSingle ? id : [id]);
                         } else {
-                            this.callChange([]);
+                            this.callChange(isSingle ? null : []);
                         }
 
                         this.callTouched();
-                    }
-                }));
-    }
+                    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.schemaId) {
-            this.contents.clear();
-
-            this.resetState();
-        }
-
-        if (changes.language || changes.schemaId) {
-            this.resetContentNames(true);
-        }
-    }
-
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.control.disable(NO_EMIT);
-        } else if (this.isValid) {
-            this.control.enable(NO_EMIT);
-        }
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     public writeValue(obj: any) {
@@ -137,11 +138,11 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
         }
 
         this.isOpenedBefore = true;
-        this.loadMore(this.contentsResolver.resolveAll(this.schemaId));
+        this.loadMore(this.contentsResolver.resolveAll(this.schemaId()));
     }
 
     private selectContent(id: string | undefined) {
-        const isNewId = !this.contents.find(x => x.id === id);
+        const isNewId = !this.contents().find(x => x.id === id);
 
         if (id && isNewId) {
             this.loadMore(this.contentsResolver.resolveMany([id]));
@@ -151,62 +152,39 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     }
 
     private loadMore(observable: Observable<ContentsDto>) {
-        this.next({ isLoading: true });
+        this.contentsLoading.set(true);
 
         observable
             .subscribe({
                 next: ({ items }) => {
+                    this.contentsLoading.set(false);
+
                     if (items.length === 0) {
                         return;
                     }
 
-                    for (const content of items) {
-                        const index = this.contents.findIndex(x => x.id === content.id);
+                    this.contents.update(contents => {
+                        const result = [...contents];
 
-                        if (index >= 0) {
-                            this.contents[index] = content;
-                        } else {
-                            this.contents.push(content);
+                        for (const content of items) {
+                            const index = result.findIndex(x => x.id === content.id);
+
+                            if (index >= 0) {
+                                result[index] = content;
+                            } else {
+                                result.push(content);
+                            }
                         }
-                    }
 
-                    this.isLoadingFailed = false;
+                        return result;
+                    });
 
-                    this.resetContentNames(true);
+                    this.contentsFailed.set(false);
                 },
                 error: () => {
-                    this.isLoadingFailed = true;
-
-                    this.resetContentNames(false);
+                    this.contentsLoading.set(false);
+                    this.contentsFailed.set(true);
                 },
             });
-    }
-
-    private resetContentNames(rebuild: boolean) {
-        const success = this.isValid && !this.isLoadingFailed;
-
-        this.onDisabled(!success || this.snapshot.isDisabled);
-
-        if (success && rebuild) {
-            const contentNames: ContentName[] = [
-                { name: this.localizer.getOrKey('contents.noReference') },
-            ];
-
-            for (const content of this.contents) {
-                const name =
-                    content.referenceFields
-                        .map(f => getContentValue(content, this.language, f, false))
-                        .map(v => v.formatted)
-                        .defined()
-                        .join(', ')
-                    || this.localizer.getOrKey('common.noValue');
-
-                contentNames.push({ name, id: content.id });
-            }
-
-            this.next({ contentNames });
-        }
-
-        this.next({ isLoading: false });
     }
 }

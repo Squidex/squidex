@@ -6,9 +6,8 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, DropdownMenuComponent, EditContentForm, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, effect, input, numberAttribute, viewChildren } from '@angular/core';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, DropdownMenuComponent, EditContentForm, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, TranslatePipe, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -27,70 +26,68 @@ import { ComponentSectionComponent } from './component-section.component';
     ],
 })
 export class ComponentComponent {
-    private readonly subscriptions = new Subscriptions();
+    private readonly sections = viewChildren(ComponentSectionComponent);
 
-    @Input({ required: true })
-    public hasChatBot!: boolean;
+    /** Enables the AI features of the editors. */
+    public readonly hasChatBot = input.required<boolean>();
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** The content form the field belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** The nesting level of the field, 0 for root fields. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public formModel!: ComponentForm;
+    /** The form model of the component field. */
+    public readonly formModel = input.required<ComponentForm>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isComparing = false;
+    /** Renders the editors next to the editors of another version. */
+    public readonly isComparing = input.required<boolean, unknown>({ transform: booleanAttribute });
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language of the field values. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @ViewChildren(ComponentSectionComponent)
-    public sections!: QueryList<ComponentSectionComponent>;
+    public readonly schemasDropdown = new ModalModel();
 
-    public schemasDropdown = new ModalModel();
-    public schemasList: ReadonlyArray<SchemaDto> = [];
+    public readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
+        const formModel = this.formModel();
 
-    public isDisabled?: Observable<boolean>;
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-    ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formModel) {
-            this.subscriptions.unsubscribeAll();
-
-            this.isDisabled = disabled$(this.formModel.form);
-
-            this.subscriptions.add(
-                this.formModel.form.valueChanges
-                    .subscribe(() => {
-                        this.changeDetector.detectChanges();
-                    }));
-
-            if (Types.is(this.formModel.field.properties, ComponentFieldPropertiesDto)) {
-                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).defined() || [];
-            }
+        const properties = formModel.field.properties;
+        if (!Types.is(properties, ComponentFieldPropertiesDto)) {
+            return [];
         }
-    }
 
-    public reset() {
-        this.sections.forEach(section => {
-            section.reset();
+        return properties.schemaIds?.map(x => formModel.globals.schemas[x]).defined() || [];
+    });
+
+    public readonly isDisabled = computed(() => {
+        return disabled$(this.formModel().form);
+    });
+
+    constructor(changeDetector: ChangeDetectorRef) {
+        effect(onCleanup => {
+            const subscription =
+                this.formModel().form.valueChanges
+                    .subscribe(() => {
+                        changeDetector.detectChanges();
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
         });
     }
 
+    public reset() {
+        for (const section of this.sections()) {
+            section.reset();
+        }
+    }
+
     public setSchema(schema: SchemaDto) {
-        this.formModel.selectSchema(schema.id);
+        this.formModel().selectSchema(schema.id);
     }
 }

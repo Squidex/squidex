@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
 
@@ -25,11 +25,11 @@ import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalMode
     ],
 })
 export class TeamComponent {
-    @Input({ required: true })
-    public team!: TeamDto;
+    /** The team to show in the header. */
+    public readonly team = input.required<TeamDto>();
 
-    @Output()
-    public leave = new EventEmitter<TeamDto>();
+    /** Emits the team when the user confirms to leave it. */
+    public readonly leave = output<TeamDto>();
 
-    public dropdown = new ModalModel();
+    public readonly dropdown = new ModalModel();
 }

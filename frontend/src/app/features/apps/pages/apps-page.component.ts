@@ -6,7 +6,8 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
@@ -38,22 +39,22 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
         TranslatePipe,
     ],
 })
-export class AppsPageComponent implements OnInit {
-    public addAppDialog = new DialogModel();
-    public addAppTemplate?: TemplateDto;
+export class AppsPageComponent {
+    public readonly addAppDialog = new DialogModel();
+    public readonly addAppTemplate = signal<TemplateDto | undefined>(undefined);
 
-    public onboardingDialog = new DialogModel();
+    public readonly onboardingDialog = new DialogModel();
 
-    public newsFeatures?: ReadonlyArray<FeatureDto>;
-    public newsDialog = new DialogModel();
+    public readonly newsFeatures = signal<ReadonlyArray<FeatureDto> | undefined>(undefined);
+    public readonly newsDialog = new DialogModel();
 
-    public generalInfo = '';
+    public readonly generalInfo: string = this.uiOptions.value.showInfo ? this.uiOptions.value.info : '';
 
-    public starters = this.templatesState.starters;
+    public readonly starters = this.templatesState.starters;
 
-    public allAppsFilter = new UntypedFormControl();
+    public readonly allAppsFilter = new UntypedFormControl();
 
-    public showAllApps =
+    public readonly showAllApps = toSignal(
         combineLatest([
             this.allAppsState.containsAllApps,
             this.allAppsState.total,
@@ -62,9 +63,9 @@ export class AppsPageComponent implements OnInit {
         ]).pipe(map(([containsAllApps, total, query, apps]) => {
             // Keep the section visible while searching, even if the search returns fewer apps.
             return containsAllApps && (!!query || total > apps.length);
-        }));
+        })));
 
-    public groupedApps =
+    public readonly groupedApps = toSignal(
         combineLatest([
             this.appsState.apps,
             this.teamsState.teams,
@@ -86,7 +87,7 @@ export class AppsPageComponent implements OnInit {
             }
 
             return grouped;
-        }));
+        })));
 
     constructor(
         public readonly allAppsState: AllAppsState,
@@ -100,18 +101,9 @@ export class AppsPageComponent implements OnInit {
         private readonly tourState: TourState,
         private readonly uiOptions: UIOptions,
     ) {
-        if (uiOptions.value.showInfo) {
-            this.generalInfo = uiOptions.value.info;
-        }
-    }
-
-    public ngOnInit() {
         this.appsState.apps.pipe(take(1))
             .subscribe(apps => {
-                if (apps.length === 0 &&
-                    this.uiOptions.value.hideOnboarding !== true &&
-                    this.tourState.snapshot.status !== 'Completed' &&
-                    this.tourState.snapshot.status !== 'Started') {
+                if (this.shouldShowOnboarding(apps)) {
                     this.onboardingDialog.show();
                     return;
                 }
@@ -127,7 +119,7 @@ export class AppsPageComponent implements OnInit {
                         .subscribe(result => {
                             if (result.version !== newsVersion) {
                                 if (result.features.length > 0) {
-                                    this.newsFeatures = result.features;
+                                    this.newsFeatures.set(result.features);
                                     this.newsDialog.show();
                                 }
 
@@ -147,7 +139,7 @@ export class AppsPageComponent implements OnInit {
     }
 
     public createNewApp(template?: TemplateDto) {
-        this.addAppTemplate = template;
+        this.addAppTemplate.set(template);
         this.addAppDialog.show();
     }
 
@@ -161,5 +153,19 @@ export class AppsPageComponent implements OnInit {
 
     public trackByGroup(_index: number, group: GroupedApps) {
         return group.team?.id || '0';
+    }
+
+    private shouldShowOnboarding(apps: ReadonlyArray<AppDto>) {
+        if (apps.length > 0) {
+            return false;
+        }
+
+        if (this.uiOptions.value.hideOnboarding === true) {
+            return false;
+        }
+
+        const tourStatus = this.tourState.snapshot.status;
+
+        return tourStatus !== 'Completed' && tourStatus !== 'Started';
     }
 }

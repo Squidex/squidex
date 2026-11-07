@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild } from '@angular/core';
-import { ApiUrlConfig, Subscriptions, ThemeService, Types } from '@app/framework';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ApiUrlConfig, ThemeService, Types } from '@app/framework';
 import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
 
 @Component({
@@ -19,8 +20,7 @@ import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
     },
 })
 export class IFrameCardComponent {
-    private readonly subscriptions = new Subscriptions();
-    private readonly iframe = viewChild.required<ElementRef<HTMLIFrameElement>>('iframe');
+    private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
     private isInitialized = false;
 
     /** The card configuration, with the name and the URL of the page to embed. */
@@ -52,18 +52,21 @@ export class IFrameCardComponent {
         private readonly themeService: ThemeService,
     ) {
         effect(() => {
-            this.iframe().nativeElement.src = this.options()?.src;
+            const iframe = this.iframe();
+            if (iframe) {
+                iframe.nativeElement.src = this.options()?.src;
+            }
         });
 
-        this.subscriptions.add(
-            themeService.themeChanges
-                .subscribe(() => {
-                    this.sendTheme();
-                }));
+        const theme = toSignal(themeService.themeChanges, { initialValue: themeService.theme });
+
+        effect(() => {
+            this.sendMessage('themeChanged', { theme: theme() });
+        });
     }
 
     public onWindowMessage(event: MessageEvent) {
-        if (event.source !== this.iframe().nativeElement.contentWindow) {
+        if (event.source !== this.iframe()?.nativeElement.contentWindow) {
             return;
         }
 
@@ -88,7 +91,7 @@ export class IFrameCardComponent {
             return;
         }
 
-        const target = this.iframe().nativeElement.contentWindow;
+        const target = this.iframe()?.nativeElement.contentWindow;
         if (!target || !Types.isFunction(target.postMessage)) {
             return;
         }

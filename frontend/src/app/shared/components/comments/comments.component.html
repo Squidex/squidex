@@ -1,5 +1,5 @@
 <div class="comments-header">
-    @if (reference) {
+    @if (reference(); as reference) {
         <div class="reference text-sm">
             {{ 'comments.reference' | sqxTranslate }}:
 
@@ -34,7 +34,7 @@
 </div>
 
 <div class="comments-list" #scrollContainer>
-    @for (comment of commentItems | async; track comment.index) {
+    @for (comment of commentItems() | async; track comment.index) {
         <sqx-comment
             canAnswer="true"
             canEdit="true"

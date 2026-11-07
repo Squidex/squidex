@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddFieldForm, AppSettingsDto, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
@@ -35,44 +35,42 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
         TranslatePipe,
     ],
 })
-export class FieldWizardComponent implements OnInit {
-    @ViewChild('nameInput', { static: false })
-    public nameInput!: ElementRef<HTMLElement>;
+export class FieldWizardComponent {
+    private readonly nameInput = viewChild<ElementRef<HTMLElement>>('nameInput');
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema to add the field to. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public settings!: AppSettingsDto;
+    /** The settings of the app. */
+    public readonly settings = input.required<AppSettingsDto>();
 
-    @Input()
-    public parent: FieldDto | null | undefined;
+    /** The parent array field, if a nested field is added. */
+    public readonly parent = input<FieldDto | null>();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    public fieldTypes = fieldTypes;
+    public readonly fieldTypes = computed(() => {
+        if (this.parent()) {
+            return fieldTypes.filter(x => x.type !== 'Array');
+        }
 
-    public addFieldForm = new AddFieldForm();
-    public addFieldModal = new ModalModel();
+        return fieldTypes;
+    });
 
-    public editField!: FieldDto;
-    public editForm?: EditFieldForm;
+    public readonly addFieldForm = new AddFieldForm();
+    public readonly addFieldModal = new ModalModel();
 
-    public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || (this.editField as any)['isLocalizable'];
-    }
+    public readonly editing = signal<{ field: FieldDto; form: EditFieldForm } | null>(null);
+
+    public readonly isLocalizable = computed(() => {
+        return this.parent()?.isLocalizable || (this.editing()?.field as any)?.['isLocalizable'];
+    });
 
     constructor(
         private readonly schemasState: SchemasState,
         public readonly languagesState: LanguagesState,
     ) {
-    }
-
-    public ngOnInit() {
-        if (this.parent) {
-            this.fieldTypes = this.fieldTypes.filter(x => x.type !== 'Array');
-        }
     }
 
     public emitClose() {
@@ -85,23 +83,17 @@ export class FieldWizardComponent implements OnInit {
             return;
         }
 
-        this.schemasState.addField(this.schema, value, this.parent)
+        this.schemasState.addField(this.schema(), value, this.parent())
             .subscribe({
                 next: dto => {
                     switch (navigationMode) {
                         case 'Add':
                             this.addFieldForm.submitCompleted({ newValue: { ...DEFAULT_FIELD } });
-
-                            if (Types.isFunction(this.nameInput.nativeElement.focus)) {
-                                this.nameInput.nativeElement.focus();
-                            }
-
+                            this.focusName();
                             break;
 
                         case 'Edit':
-                            this.editField = dto as any;
-                            this.editForm = new EditFieldForm(this.editField.properties);
-                            this.editForm.load(this.editField.properties);
+                            this.startEditing(dto as any);
                             break;
 
                         case 'Close':
@@ -115,23 +107,24 @@ export class FieldWizardComponent implements OnInit {
     }
 
     public save(navigationMode: SaveNavigationMode) {
-        if (!this.editForm) {
+        const editing = this.editing();
+        if (!editing) {
             return;
         }
 
-        const value = this.editForm.submit();
+        const value = editing.form.submit();
         if (!value) {
             return;
         }
 
-        const properties = createProperties(this.editField.properties.fieldType as any, value);
+        const properties = createProperties(editing.field.properties.fieldType as any, value);
 
-        this.schemasState.updateField(this.schema, this.editField, new UpdateFieldDto({ properties }))
+        this.schemasState.updateField(this.schema(), editing.field, new UpdateFieldDto({ properties }))
             .subscribe({
                 next: () => {
                     switch (navigationMode) {
                         case 'Add':
-                            this.editForm = undefined;
+                            this.editing.set(null);
                             break;
                         case 'Close': {
                             this.emitClose();
@@ -139,9 +132,23 @@ export class FieldWizardComponent implements OnInit {
                     }
                 },
                 error: error => {
-                    this.editForm!.submitFailed(error);
+                    editing.form.submitFailed(error);
                 },
             });
+    }
+
+    private startEditing(field: FieldDto) {
+        const form = new EditFieldForm(field.properties);
+        form.load(field.properties);
+
+        this.editing.set({ field, form });
+    }
+
+    private focusName() {
+        const nameInput = this.nameInput()?.nativeElement;
+        if (nameInput && Types.isFunction(nameInput.focus)) {
+            nameInput.focus();
+        }
     }
 }
 

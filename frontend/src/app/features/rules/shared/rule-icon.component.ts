@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RuleTriggerMetadataDto, SafeHtmlPipe } from '@app/shared';
 
 @Component({
@@ -19,9 +19,9 @@ import { RuleTriggerMetadataDto, SafeHtmlPipe } from '@app/shared';
     ],
 })
 export class RuleIconComponent {
-    @Input({ required: true })
-    public elementInfo!: RuleTriggerMetadataDto;
+    /** The metadata of the trigger or step, which defines the icon. */
+    public readonly elementInfo = input.required<RuleTriggerMetadataDto>();
 
-    @Input()
-    public size: 'sm' | 'md' | 'lg' = 'sm';
+    /** The size of the icon. */
+    public readonly size = input<'sm' | 'md' | 'lg'>('sm');
 }

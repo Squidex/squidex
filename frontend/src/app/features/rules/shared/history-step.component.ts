@@ -7,7 +7,7 @@
 
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { RuleTriggerMetadataDto, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from './rule-element.component';
 
@@ -23,30 +23,30 @@ import { RuleElementComponent } from './rule-element.component';
     ],
 })
 export class HistoryStepComponent {
-    @Input({ transform: booleanAttribute })
-    public isFirst = false;
+    /** Marks the step as the first step in the history. */
+    public readonly isFirst = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isLast = false;
+    /** Marks the step as the last step and hides the connecting line. */
+    public readonly isLast = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isExpandable = false;
+    /** Allows the user to expand the step to show the details. */
+    public readonly isExpandable = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isActive = false;
+    /** Highlights the step as the current step. */
+    public readonly isActive = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public small = false;
+    /** Renders the step in a compact layout. */
+    public readonly small = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public elementType?: string;
+    /** The type of the trigger or step to show the icon for. */
+    public readonly elementType = input<string>();
 
-    @Input()
-    public elementInfo?: RuleTriggerMetadataDto;
+    /** The metadata of the trigger or step to show the icon for. */
+    public readonly elementInfo = input<RuleTriggerMetadataDto>();
 
-    public isExpanded = false;
+    public readonly isExpanded = signal(false);
 
     public toggle() {
-        this.isExpanded = !this.isExpanded;
+        this.isExpanded.update(x => !x);
     }
 }

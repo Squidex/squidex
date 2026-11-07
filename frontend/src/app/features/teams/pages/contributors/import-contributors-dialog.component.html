@@ -2,7 +2,7 @@
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()">
         <ng-container title> {{ "contributors.importTitle" | sqxTranslate }}</ng-container>
         <ng-container content>
-            @switch (importStage) {
+            @switch (importStage()) {
                 @case ("Start") {
                     <textarea class="form-control content" formControlName="import" placeholder="user1@squidex.io;user2@squidex.io"></textarea>
                     <sqx-form-hint>
@@ -14,7 +14,7 @@
                 }
 
                 @case ("Change") {
-                    @for (status of importStatus; track status) {
+                    @for (status of importStatus(); track status) {
                         <div class="row pb-2">
                             <div class="col-12 truncate aligned">{{ status.email }}</div>
                         </div>
@@ -22,7 +22,7 @@
                 }
 
                 @case ("Wait") {
-                    @for (status of importStatus; track status) {
+                    @for (status of importStatus(); track status) {
                         <div class="row pb-2">
                             <div class="col truncate aligned">{{ status.email }}</div>
 
@@ -38,7 +38,7 @@
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            @switch (importStage) {
+            @switch (importStage()) {
                 @case ("Start") {
                     <button class="btn btn-success" [disabled]="importForm.hasNoUser | async" type="submit">
                         {{ "contributors.import.run" | sqxTranslate }}
@@ -46,7 +46,7 @@
                 }
 
                 @case ("Change") {
-                    <button class="btn btn-success" (click)="import()" [disabled]="importStatus.length === 0" type="button">
+                    <button class="btn btn-success" (click)="import()" [disabled]="importStatus().length === 0" type="button">
                         {{ "contributors.import.run2" | sqxTranslate }}
                     </button>
                 }

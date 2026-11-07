@@ -1,4 +1,4 @@
-<div class="form-horizontal" [formGroup]="triggerForm.form">
+<div class="form-horizontal" [formGroup]="triggerForm().form">
     <sqx-form-row for="condition" label="common.condition">
         <textarea class="form-control code" id="condition" formControlName="condition" placeholder="{{ 'rules.conditionHint' | sqxTranslate }}"></textarea>
 

@@ -6,10 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, input, signal, viewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AutocompleteComponent, Keys, MessageBus, Subscriptions, TranslatePipe } from '@app/framework';
+import { AutocompleteComponent, Keys, MessageBus, TranslatePipe } from '@app/framework';
 import { AnnotationCreateAfterNavigate, AnnotationsSelectedAfterNavigate, AuthService, CommentsState, ContentDto, FieldSelected, UpsertCommentForm } from '@app/shared/internal';
 import { UserPicturePipe } from '../pipes';
 import { CommentComponent } from './comment.component';
@@ -32,81 +32,77 @@ import { ContributorsDataSource } from './data-source';
         UserPicturePipe,
     ],
 })
-export class CommentsComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-    private selection: ReadonlyArray<string> = [];
+export class CommentsComponent {
+    private readonly input = viewChild<AutocompleteComponent>('input');
+    private readonly selection = signal<ReadonlyArray<string>>([]);
 
-    @ViewChild('input', { static: false })
-    public input!: AutocompleteComponent;
+    /** Shows all comments instead of only the unresolved comments. */
+    public readonly resolved = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public resolved = false;
+    /** The content the comments belong to. */
+    public readonly content = input<ContentDto | null>();
 
-    @Input()
-    public content?: ContentDto | null;
+    /** The ID of the comments thread. */
+    public readonly commentsId = input<string | null>('');
 
-    @Input()
-    public commentsId = '';
+    public readonly commentForm = new UpsertCommentForm();
+    public readonly commentUser: string;
 
-    public commentForm = new UpsertCommentForm();
-    public commentUser: string;
+    public readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
 
-    public reference?: AnnotationCreateAfterNavigate;
-
-    public get commentItems() {
-        return this.resolved ?
+    public readonly commentItems = computed(() => {
+        return this.resolved() ?
             this.commentsState.groupedComments :
             this.commentsState.groupedUnresolvedComments;
-    }
+    });
 
-    constructor(authService: AuthService,
+    constructor(authService: AuthService, messageBus: MessageBus,
         public readonly commentsState: CommentsState,
         public readonly router: Router,
         public readonly contributorsDataSource: ContributorsDataSource,
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly messageBus: MessageBus,
     ) {
         this.commentUser = authService.user!.token;
-    }
 
-    public ngOnInit() {
         this.contributorsDataSource.loadIfNotLoaded();
 
-        this.subscriptions.add(
-            this.messageBus.of(FieldSelected)
-                .subscribe(message => {
-                    for (let content of this.commentsState.items) {
-                        if (content.editorId === message.editorId) {
-                            this.selection = [content.id!];
+        effect(onCleanup => {
+            const subscriptions = [
+                messageBus.of(FieldSelected)
+                    .subscribe(message => {
+                        for (const content of this.commentsState.items) {
+                            if (content.editorId === message.editorId) {
+                                this.selection.set([content.id!]);
+                            }
                         }
-                    }
+                    }),
+                messageBus.of(AnnotationsSelectedAfterNavigate)
+                    .subscribe(message => {
+                        this.selection.set(message.commentIds);
+                    }),
+                messageBus.of(AnnotationCreateAfterNavigate)
+                    .subscribe(message => {
+                        this.reference.set(message);
+                        this.input()?.focus();
+                    }),
+            ];
 
-                    this.changeDetector.detectChanges();
-                }));
-
-        this.subscriptions.add(
-            this.messageBus.of(AnnotationsSelectedAfterNavigate)
-                .subscribe(message => {
-                    this.selection = message.commentIds;
-                    this.changeDetector.detectChanges();
-                }));
-
-        this.subscriptions.add(
-            this.messageBus.of(AnnotationCreateAfterNavigate)
-                .subscribe(message => {
-                    this.reference = message;
-                    this.input.focus();
-                    this.changeDetector.detectChanges();
-                }));
+            onCleanup(() => {
+                for (const subscription of subscriptions) {
+                    subscription.unsubscribe();
+                }
+            });
+        });
     }
 
     public comment() {
         const { text } = this.commentForm.submit() || {};
 
         if (text && text.length > 0) {
-            const { from, to } = this.reference?.annotation || {};
+            const reference = this.reference();
 
-            this.commentsState.create(this.commentUser, text, this.router.url, { editorId: this.reference?.editorId, from, to });
+            const { from, to } = reference?.annotation || {};
+
+            this.commentsState.create(this.commentUser, text, this.router.url, { editorId: reference?.editorId, from, to });
         }
 
         this.commentForm.submitCompleted();
@@ -121,11 +117,11 @@ export class CommentsComponent implements OnInit {
 
     public onBlur() {
         setTimeout(() => {
-            this.reference = undefined;
+            this.reference.set(undefined);
         }, 100);
     }
 
     public isSelected(id: string | undefined) {
-        return id && this.selection.includes(id);
+        return !!id && this.selection().includes(id);
     }
 }

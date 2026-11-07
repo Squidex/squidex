@@ -1,16 +1,16 @@
-@if (enableShortcut) {
+@if (enableShortcut()) {
     <sqx-shortcut keys="CTRL + I" (trigger)="inputFind.focus()" />
 }
 
 <div hintAfter="60000" hintPosition="bottom-end" hintText="i18n:search.advancedTour" sqxTourStep="search">
     <filter-input
         #inputFind
-        [isBookmarked]="!!(saveKey | async)"
+        [isBookmarked]="!!(saveKey() | async)"
         (isBookmarkedChange)="bookmark($event)"
-        [model]="filterModel"
+        [model]="filterModel()"
         [options]="options"
-        [query]="cleanedQuery"
-        (queryChange)="cleanedQuery = $event"
+        [query]="cleanedQuery()"
+        (queryChange)="cleanedQuery.set($event)"
         (search)="queryChange.emit($event)"
         [valueTemplate]="valueTemplate" />
 
@@ -26,8 +26,8 @@
 
             @case ("Reference") {
                 <sqx-reference-input
-                    [language]="language"
-                    [languages]="languages"
+                    [language]="language()!"
+                    [languages]="languages()"
                     mode="Single"
                     [ngModel]="value"
                     (ngModelChange)="onChange($event)"

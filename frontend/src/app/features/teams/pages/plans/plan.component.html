@@ -1,3 +1,4 @@
+@let planInfo = this.planInfo();
 <div class="card plan" [class.border-primary]="planInfo.isSelected || planInfo.isYearlySelected">
     <div class="card-header text-center">
         <h4 class="card-title">{{ planInfo.plan.name }}</h4>

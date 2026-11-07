@@ -6,8 +6,8 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, forwardRef, Input } from '@angular/core';
-import { AppLanguageDto, AppsState, DialogModel, FieldDto, fieldTypes, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ChangeDetectionStrategy, Component, forwardRef, input } from '@angular/core';
+import { AppLanguageDto, AppsState, DialogModel, FieldDto, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
 
@@ -15,6 +15,7 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
         FieldWizardComponent,
@@ -25,14 +26,13 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     ],
 })
 export class SchemaFieldsComponent {
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema to render and edit the fields for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public languages!: AppLanguageDto[];
+    /** The languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public fieldTypes = fieldTypes;
-    public fieldWizard = new DialogModel();
+    public readonly fieldWizard = new DialogModel();
 
     constructor(
         public readonly appsState: AppsState,
@@ -41,6 +41,6 @@ export class SchemaFieldsComponent {
     }
 
     public sortFields(fields: ReadonlyArray<FieldDto>) {
-        this.schemasState.orderFields(this.schema, fields).subscribe();
+        this.schemasState.orderFields(this.schema(), fields).subscribe();
     }
 }

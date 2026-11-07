@@ -1,3 +1,5 @@
+@let currentTrigger = this.currentTrigger();
+@let trigger = this.trigger();
 <form [formGroup]="currentTrigger?.form!" (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
         <ng-container title>
@@ -41,7 +43,7 @@
                 }
             } @else {
                 <div class="row g-0">
-                    @for (availableTrigger of availableTriggers | sqxEntries: "title"; track availableTrigger.key) {
+                    @for (availableTrigger of availableTriggers() | sqxEntries: "title"; track availableTrigger.key) {
                         <div class="col-12 col-md-6">
                             <div class="rule-element" (click)="selectTrigger(availableTrigger.key)">
                                 <sqx-rule-element

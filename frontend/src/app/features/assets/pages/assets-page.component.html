@@ -40,18 +40,18 @@
                     <button
                         class="btn btn-secondary btn-toggle"
                         attr.aria-label="{{ 'assets.listView' | sqxTranslate }}"
-                        [class.btn-primary]="listMode"
+                        [class.btn-primary]="listMode()"
                         (click)="changeView(true)"
-                        [disabled]="listMode"
+                        [disabled]="listMode()"
                         type="button">
                         <i class="icon-list"></i>
                     </button>
                     <button
                         class="btn btn-secondary btn-toggle"
                         attr.aria-label="{{ 'assets.gridView' | sqxTranslate }}"
-                        [class.btn-primary]="!listMode"
+                        [class.btn-primary]="!listMode()"
                         (click)="changeView(false)"
-                        [disabled]="!listMode"
+                        [disabled]="!listMode()"
                         type="button">
                         <i class="icon-grid"></i>
                     </button>
@@ -82,7 +82,7 @@
                         [assetsState]="assetsState"
                         (edit)="editStart($event)"
                         [isDisabled]="false"
-                        [isListView]="listMode"
+                        [isListView]="listMode()"
                         [showFolderIcon]="path.length === 0" />
                 </div>
             }
@@ -111,8 +111,8 @@
 <router-outlet />
 <sqx-asset-folder-dialog (dialogClose)="addAssetFolderDialog.hide()" *sqxModal="addAssetFolderDialog" />
 <sqx-asset-dialog
-    [asset]="editAsset!"
+    [asset]="editAsset()!"
     (assetReplaced)="replaceAsset($event)"
     (assetUpdated)="replaceAsset($event)"
     (dialogClose)="editDone()"
-    *sqxModal="editAsset; isDialog: true" />
+    *sqxModal="editAsset(); isDialog: true" />

@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, Injectable, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, Injectable, input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
@@ -44,6 +44,7 @@ export class UsersDataSource implements AutocompleteSource {
     selector: 'sqx-contributor-add-form',
     styleUrls: ['./contributor-add-form.component.scss'],
     templateUrl: './contributor-add-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         UsersDataSource,
     ],
@@ -60,26 +61,25 @@ export class UsersDataSource implements AutocompleteSource {
     ],
 })
 export class ContributorAddFormComponent {
-    private defaultValue: any;
+    private readonly defaultValue = computed<any>(() => {
+        return { role: this.roles()[0]?.name, user: '' };
+    });
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<RoleDto>;
+    /** The roles that can be assigned to new contributors. */
+    public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    public assignContributorForm = new AssignContributorForm();
+    public readonly assignContributorForm = new AssignContributorForm();
 
-    public importDialog = new DialogModel();
+    public readonly importDialog = new DialogModel();
 
     constructor(
         public readonly contributorsState: ContributorsState,
         public readonly usersDataSource: UsersDataSource,
         private readonly dialogs: DialogService,
     ) {
-    }
-
-    public ngOnChanges() {
-        this.defaultValue = { role: this.roles?.[0]?.name, user: '' };
-
-        this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
+        effect(() => {
+            this.assignContributorForm.submitCompleted({ newValue: this.defaultValue() });
+        });
     }
 
     public assignContributor() {
@@ -91,7 +91,7 @@ export class ContributorAddFormComponent {
         this.contributorsState.assign(value)
             .subscribe({
                 next: isCreated => {
-                    this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
+                    this.assignContributorForm.submitCompleted({ newValue: this.defaultValue() });
 
                     if (isCreated) {
                         this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');

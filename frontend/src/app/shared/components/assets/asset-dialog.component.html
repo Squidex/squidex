@@ -1,3 +1,4 @@
+@let asset = assetActual();
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" fullHeight="true" hasTabs="true" showFooter="false" size="xl">
         <ng-container title> {{ "assets.edit" | sqxTranslate }}</ng-container>
@@ -6,45 +7,45 @@
                 <div class="col">
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
+                            <button class="nav-link" [class.active]="selectedTab() === 0" (click)="selectTab(0)" type="button">
                                 {{ "assets.tabMetadata" | sqxTranslate }}
                             </button>
                         </li>
 
                         <li class="nav-item">
-                            @if (isImage) {
-                                <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
+                            @if (isImage()) {
+                                <button class="nav-link" [class.active]="selectedTab() === 1" (click)="selectTab(1)" type="button">
                                     {{ "assets.tabImage" | sqxTranslate }}
                                 </button>
                             }
                         </li>
 
                         <li class="nav-item">
-                            @if (isImage) {
-                                <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)" type="button">
+                            @if (isImage()) {
+                                <button class="nav-link" [class.active]="selectedTab() === 2" (click)="selectTab(2)" type="button">
                                     {{ "assets.tabFocusPoint" | sqxTranslate }}
                                 </button>
                             }
                         </li>
 
                         <li class="nav-item">
-                            @if (isDocumentLikely) {
-                                <button class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)" type="button">
+                            @if (isDocumentLikely()) {
+                                <button class="nav-link" [class.active]="selectedTab() === 3" (click)="selectTab(3)" type="button">
                                     {{ "assets.tabTextEditor" | sqxTranslate }}
                                 </button>
                             }
                         </li>
 
                         <li class="nav-item">
-                            @if (isVideo || (asset | sqxPreviewable)) {
-                                <button class="nav-link" [class.active]="selectedTab === 4" (click)="selectTab(4)" type="button">
+                            @if (isVideo() || (asset | sqxPreviewable)) {
+                                <button class="nav-link" [class.active]="selectedTab() === 4" (click)="selectTab(4)" type="button">
                                     {{ "assets.tabPreview" | sqxTranslate }}
                                 </button>
                             }
                         </li>
 
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 5" (click)="selectTab(5)" type="button">
+                            <button class="nav-link" [class.active]="selectedTab() === 5" (click)="selectTab(5)" type="button">
                                 {{ "assets.tabHistory" | sqxTranslate }}
                             </button>
                         </li>
@@ -52,9 +53,9 @@
                 </div>
 
                 <div class="col-auto">
-                    @switch (selectedTab) {
+                    @switch (selectedTab()) {
                         @case (0) {
-                            <button class="btn btn-primary" [class.invisible]="!isEditable" type="submit">
+                            <button class="btn btn-primary" [class.invisible]="!isEditable()" type="submit">
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         }
@@ -62,26 +63,22 @@
                         @case (1) {
                             <button
                                 class="btn btn-primary"
-                                [class.invisible]="!isUploadable"
+                                [class.invisible]="!isUploadable()"
                                 (click)="cropImage()"
-                                [disabled]="progress > 0"
-                                type="button"
-                                type="button"
-                                type="button"
-                                type="button"
+                                [disabled]="progress() > 0"
                                 type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
                         }
 
                         @case (2) {
-                            <button class="btn btn-primary" [class.invisible]="!isEditable" (click)="setFocusPoint()" type="button">
+                            <button class="btn btn-primary" [class.invisible]="!isEditable()" (click)="setFocusPoint()" type="button">
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         }
 
                         @case (3) {
-                            <button class="btn btn-primary" [class.invisible]="!isUploadable" (click)="saveText()" type="button">
+                            <button class="btn btn-primary" [class.invisible]="!isUploadable()" (click)="saveText()" type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
                         }
@@ -90,14 +87,14 @@
             </div>
         </ng-container>
         <ng-container content>
-            @switch (selectedTab) {
+            @switch (selectedTab()) {
                 @case (0) {
                     <div class="metadata">
                         <sqx-form-error [error]="annotateForm.error | async" />
 
                         <sqx-form-row for="folder" hideError label="common.folder" vertical>
                             <div class="path">
-                                @if (isMoving) {
+                                @if (isMoving()) {
                                     <form [formGroup]="moveForm.form" (ngSubmit)="moveAsset()">
                                         <div class="row align-items-center g-2">
                                             <div class="col"><sqx-asset-folder-dropdown formControlName="parentId" /></div>
@@ -110,10 +107,10 @@
                                 } @else {
                                     <div class="row align-items-center g-2">
                                         <div class="col">
-                                            <sqx-asset-path all="true" (navigate)="navigate($event.id)" [path]="pathItems | async" />
+                                            <sqx-asset-path all="true" (navigate)="navigate($event.id)" [path]="assetPath()" />
                                         </div>
 
-                                        @if (isMoveable) {
+                                        @if (isMoveable()) {
                                             <div class="col-auto">
                                                 <button class="btn btn-outline-secondary" (click)="startMoving()" type="button">
                                                     {{ "assets.move" | sqxTranslate }}
@@ -162,7 +159,7 @@
                             </button>
                         </sqx-form-row>
 
-                        @if (annotateTags | async; as tags) {
+                        @if (assetTags(); as tags) {
                             <sqx-form-row for="tags" label="common.tags" vertical>
                                 <sqx-tag-editor id="tags" allowDuplicates="false" formControlName="tags" [itemsSource]="tags" undefinedWhenEmpty="false" />
                             </sqx-form-row>
@@ -193,7 +190,7 @@
                                             confirmRememberKey="removeAssetMetadata"
                                             confirmText="i18n:assets.deleteMetadataConfirmText"
                                             confirmTitle="i18n:assets.deleteMetadataConfirmTitle"
-                                            [disabled]="!isEditable"
+                                            [disabled]="!isEditable()"
                                             (sqxConfirmClick)="annotateForm.metadata.removeAt(i)"
                                             type="button">
                                             <i class="icon-bin3"></i>
@@ -203,7 +200,7 @@
                             }
 
                             <div>
-                                <button class="btn btn-success" (click)="annotateForm.metadata.add()" [disabled]="!isEditable" type="button">
+                                <button class="btn btn-success" (click)="annotateForm.metadata.add()" [disabled]="!isEditable()" type="button">
                                     {{ "assets.metadataAdd" | sqxTranslate }}
                                 </button>
                             </div>
@@ -226,9 +223,9 @@
                 @case (1) {
                     <div class="editor">
                         <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl" />
-                        @if (progress > 0) {
+                        @if (progress() > 0) {
                             <div class="editor-progress">
-                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress" />
+                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress()" />
                             </div>
                         }
                     </div>
@@ -237,9 +234,9 @@
                 @case (2) {
                     <div>
                         <sqx-image-focus-point [focusPoint]="asset.metadata" [imageSource]="asset | sqxAssetPreviewUrl" />
-                        @if (progress > 0) {
+                        @if (progress() > 0) {
                             <div class="editor-progress">
-                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress" />
+                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress()" />
                             </div>
                         }
                     </div>
@@ -248,9 +245,9 @@
                 @case (3) {
                     <div class="editor">
                         <sqx-asset-text-editor [fileName]="asset.fileName" [fileSource]="asset | sqxAssetPreviewUrl" [mimeType]="asset.mimeType" />
-                        @if (progress > 0) {
+                        @if (progress() > 0) {
                             <div class="editor-progress">
-                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress" />
+                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress()" />
                             </div>
                         }
                     </div>

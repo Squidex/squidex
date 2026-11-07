@@ -8,9 +8,9 @@
 /* eslint-disable @angular-eslint/component-selector */
 /* eslint-disable @angular-eslint/no-output-native */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BranchItem, ConfirmClickDirective, FlowView, FromNowPipe, RuleElementDto, RuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { ConfirmClickDirective, FlowView, FromNowPipe, RuleElementDto, RuleEventDto, TranslatePipe } from '@app/shared';
 import { RuleClassPipe } from '../../shared/pipes';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { StateDetailsComponent } from '../../shared/state-details.component';
@@ -31,39 +31,31 @@ import { StateDetailsComponent } from '../../shared/state-details.component';
     ],
 })
 export class RuleEventComponent {
-    @Input('sqxRuleEvent')
-    public event!: RuleEventDto;
+    /** The rule event to show. */
+    public readonly event = input.required<RuleEventDto>({ alias: 'sqxRuleEvent' });
 
-    @Input({ required: true })
-    public availableSteps: Record<string, RuleElementDto> = {};
+    /** The available steps by type, to resolve the metadata of each step. */
+    public readonly availableSteps = input.required<Record<string, RuleElementDto>>();
 
-    @Input({ transform: booleanAttribute })
-    public expanded = false;
+    /** Shows the details of the event. */
+    public readonly expanded = input(false, { transform: booleanAttribute });
 
-    @Output()
-    public expandedChange = new EventEmitter<any>();
+    /** Emits when the user wants to toggle the details. */
+    public readonly expandedChange = output();
 
-    @Output()
-    public enqueue = new EventEmitter<any>();
+    /** Emits when the user wants to enqueue the event again. */
+    public readonly enqueue = output();
 
-    @Output()
-    public cancel = new EventEmitter<any>();
+    /** Emits when the user confirms to cancel the event. */
+    public readonly cancel = output();
 
-    public selectedStep: string | null = null;
+    public readonly selectedStep = signal<string | null>(null);
 
-    public branchItems: BranchItem[] = [];
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.event) {
-            this.branchItems = new FlowView(this.event.flowState.definition as any).getAllItems();
-        }
-    }
+    public readonly branchItems = computed(() => {
+        return new FlowView(this.event().flowState.definition as any).getAllItems();
+    });
 
     public selectStep(id: string) {
-        if (this.selectedStep === id) {
-            this.selectedStep = null;
-        } else {
-            this.selectedStep = id;
-        }
+        this.selectedStep.update(x => x === id ? null : id);
     }
 }

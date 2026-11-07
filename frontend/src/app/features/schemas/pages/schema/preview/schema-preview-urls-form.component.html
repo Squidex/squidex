@@ -5,7 +5,7 @@
         <div class="card-body">
             <sqx-form-alert> {{ "schemas.previewUrls.help" | sqxTranslate }}</sqx-form-alert>
             <div class="content">
-                @if (!isEditable && editForm.previewControls.length === 0) {
+                @if (!isEditable() && editForm.previewControls.length === 0) {
                     <div class="mt-4">{{ "schemas.previewUrls.empty" | sqxTranslate }}</div>
                 }
 
@@ -22,7 +22,7 @@
 
                         <div class="col">
                             <sqx-control-errors for="url" />
-                            <sqx-code-editor [completion]="fieldCompletions | async" formControlName="url" mode="ace/mode/liquid" singleLine="true" />
+                            <sqx-code-editor [completion]="fieldCompletions()" formControlName="url" mode="ace/mode/liquid" singleLine="true" />
                         </div>
 
                         <div class="col-auto">
@@ -32,7 +32,7 @@
                                 confirmRememberKey="removePreviewUrl"
                                 confirmText="i18n:schemas.deleteUrlConfirmText"
                                 confirmTitle="i18n:schemas.deleteUrlConfirmTitle"
-                                [disabled]="!isEditable"
+                                [disabled]="!isEditable()"
                                 (sqxConfirmClick)="editForm.form.removeAt(i)"
                                 type="button">
                                 <i class="icon-bin3"></i>
@@ -41,7 +41,7 @@
                     </div>
                 }
 
-                @if (isEditable) {
+                @if (isEditable()) {
                     <div class="form-group row gx-2">
                         <div class="col col-name">
                             <div class="form-control preview">{{ "schemas.previewUrls.namePlaceholder" | sqxTranslate }}</div>
@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        @if (isEditable) {
+        @if (isEditable()) {
             <div class="card-footer">
                 <button class="float-end btn btn-primary" type="submit">{{ "common.save" | sqxTranslate }}</button>
             </div>

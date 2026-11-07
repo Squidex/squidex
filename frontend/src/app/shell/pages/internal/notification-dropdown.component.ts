@@ -6,9 +6,8 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { tap } from 'rxjs/operators';
-import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Subscriptions, TranslatePipe } from '@app/shared';
+import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
+import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-notification-dropdown',
@@ -28,30 +27,29 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
         TranslatePipe,
     ],
 })
-export class NotificationDropdownComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class NotificationDropdownComponent {
+    public readonly modalMenu = new ModalModel();
 
-    public modalMenu = new ModalModel();
-
-    public commentUser: string;
-    public commentItems = this.commentsState.groupedUnresolvedComments;
+    public readonly commentUser: string;
+    public readonly commentItems = this.commentsState.groupedUnresolvedComments;
 
     constructor(authService: AuthService,
         public readonly commentsState: CommentsState,
         public readonly collaboration: CollaborationService,
     ) {
         this.commentUser = authService.user!.token;
-    }
 
-    public ngOnInit() {
         this.collaboration.connect('users/collaboration');
 
-        this.subscriptions.add(
-            this.modalMenu.isOpenChanges.pipe(
-                tap(_ => {
-                    this.commentsState.prune(100);
-                    this.commentsState.markRead();
-                }),
-            ));
+        effect(onCleanup => {
+            const subscription =
+                this.modalMenu.isOpenChanges
+                    .subscribe(() => {
+                        this.commentsState.prune(100);
+                        this.commentsState.markRead();
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 }

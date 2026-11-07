@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, EventEmitter, forwardRef, Input, numberAttribute, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, contentChild, DestroyRef, effect, ElementRef, forwardRef, inject, input, numberAttribute, output, signal, TemplateRef, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
 import getCaretCoordinates from 'textarea-caret';
-import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, Types } from '@app/framework/internal';
+import { FloatingPlacement, Keys, ModalModel, SignalControlComponent, Types } from '@app/framework/internal';
 import { AutosizeDirective } from '../../autosize.directive';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
@@ -44,26 +44,38 @@ interface Query {
     range?: { from: number; to: number };
 }
 
-interface State {
-    // The suggested items.
-    suggestedItems: ReadonlyArray<any>;
-
-    // The selected suggest item index.
-    suggestedIndex: number;
-
-    // True, when the searching is in progress.
-    isSearching?: boolean;
-
-    // The last query.
-    lastQuery?: Query;
-
-    // Indicates whether the loading is in progress.
-    isLoading?: boolean;
-}
-
 const NO_EMIT = { emitEvent: false };
-const NO_QUERY = { text: '' };
+const NO_QUERY: Query = { text: '' };
 const RANGE_LIMIT = 60;
+
+function parseQuery(text: unknown, startCharacter: string, cursor: number): Query {
+    if (!Types.isString(text)) {
+        return NO_QUERY;
+    }
+
+    if (!startCharacter) {
+        return { text: text.trim() };
+    }
+
+    const rangeTo = Math.min(cursor, text.length);
+    let rangeFrom = -1;
+    for (let j = rangeTo - 1; j >= Math.max(0, rangeTo - RANGE_LIMIT); j--) {
+        const char = text[j];
+        if (char === startCharacter) {
+            rangeFrom = j;
+        }
+
+        if (/[\s]/.test(char)) {
+            break;
+        }
+    }
+
+    if (rangeFrom >= 0 && rangeFrom < rangeTo) {
+        return { text: text.substring(rangeFrom + 1, rangeTo + 1), range: { from: rangeFrom, to: rangeTo } };
+    }
+
+    return { text: '' };
+}
 
 @Component({
     selector: 'sqx-autocomplete',
@@ -88,178 +100,142 @@ const RANGE_LIMIT = 60;
         TemplateWrapperDirective,
     ],
 })
-export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
-    private readonly subscriptions = new Subscriptions();
+export class AutocompleteComponent extends SignalControlComponent<ReadonlyArray<any>> {
     private readonly modalStream = new Subject<Query>();
+    private readonly anchor = viewChild.required<ElementRef<HTMLDivElement>>('anchor');
+    private readonly inputControl = viewChild.required<ElementRef<HTMLInputElement>>('input');
     private lastCursor = 0;
+    private lastQuery?: Query;
     private timer: any;
 
-    @Output()
-    public editorBlur = new EventEmitter();
+    /** Emits when the input loses the focus. */
+    public readonly editorBlur = output();
 
-    @Output()
-    public editorKeyDown = new EventEmitter<KeyboardEvent>();
+    /** Emits the keydown events of the input. */
+    public readonly editorKeyDown = output<KeyboardEvent>();
 
-    @Output()
-    public editorKeyPress = new EventEmitter<KeyboardEvent>();
+    /** Emits the keypress events of the input. */
+    public readonly editorKeyPress = output<KeyboardEvent>();
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** The source to query the suggestions from. */
+    public readonly itemsSource = input.required<AutocompleteSource>();
 
-    @Input({ required: true })
-    public itemsSource!: AutocompleteSource;
+    /** The visual style of the input. */
+    public readonly inputStyle = input<'underlined' | 'empty'>();
 
-    @Input()
-    public inputStyle?: 'underlined' | 'empty';
+    /** Shows a button to open the suggestions with an empty query. */
+    public readonly allowOpen = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public allowOpen?: boolean | null = false;
+    /** The ID of the inner input. */
+    public readonly formId = input<string>();
 
-    @Input()
-    public formId?: string;
+    /** The name of the inner input. */
+    public readonly formName = input<string>();
 
-    @Input()
-    public formName?: string;
+    /** Renders a multiline text area instead of an input. */
+    public readonly textArea = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public textArea?: boolean;
+    /** The property of the selected item to display in the input. */
+    public readonly displayProperty = input('');
 
-    @Input()
-    public displayProperty = '';
+    /** The property of the selected item to use as value. */
+    public readonly valueProperty = input('');
 
-    @Input()
-    public valueProperty = '';
+    /** The placeholder of the input. */
+    public readonly placeholder = input('');
 
-    @Input()
-    public placeholder = '';
+    /** Only queries the text after this character, for example "@" for mentions. */
+    public readonly startCharacter = input('');
 
-    @Input()
-    public startCharacter = '';
+    /** The icon to show in the input. */
+    public readonly icon = input('');
 
-    @Input()
-    public icon = '';
+    /** Focuses the input when the component is rendered. */
+    public readonly autoFocus = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public autoFocus?: boolean | null;
+    /** Selects the only suggestion on enter, when no suggestion is active. */
+    public readonly autoSelectFirst = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public autoSelectFirst = true;
+    /** The time in milliseconds to wait after typing before querying the source. */
+    public readonly debounceTime = input(300, { transform: numberAttribute });
 
-    @Input({ transform: numberAttribute })
-    public debounceTime = 300;
+    /** The position of the suggestions dropdown. */
+    public readonly dropdownPosition = input<FloatingPlacement>('bottom-start');
 
-    @Input()
-    public dropdownPosition: FloatingPlacement = 'bottom-start';
+    /** Makes the suggestions dropdown as wide as the input. */
+    public readonly dropdownFullWidth = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public dropdownFullWidth = true;
+    /** Additional styles for the suggestions dropdown. */
+    public readonly dropdownStyles = input<any>({});
 
-    @Input()
-    public dropdownStyles: any = {};
+    public readonly itemTemplate = contentChild(TemplateRef);
 
-    @ContentChild(TemplateRef, { static: false })
-    public itemTemplate!: TemplateRef<any>;
+    public readonly suggestionsModal = new ModalModel();
+    public readonly suggestedItems = signal<ReadonlyArray<any>>([]);
+    public readonly suggestedIndex = signal(-1);
+    public readonly isLoading = signal(false);
 
-    @ViewChild('anchor', { static: false })
-    public anchor!: ElementRef<HTMLDivElement>;
-
-    @ViewChild('input', { static: false })
-    public inputControl!: ElementRef<HTMLInputElement>;
-
-    public suggestionsModal = new ModalModel();
-
-    public queryInput = new UntypedFormControl();
+    public readonly queryInput = new UntypedFormControl();
 
     constructor() {
-        super({
-            suggestedItems: [],
-            suggestedIndex: -1,
+        super();
+
+        inject(DestroyRef).onDestroy(() => {
+            clearTimeout(this.timer);
         });
-    }
 
-    public ngOnDestroy() {
-        clearTimeout(this.timer);
-    }
+        effect(() => {
+            if (this.isDisabled()) {
+                this.resetState();
 
-    public ngOnInit() {
-        this.project(x => x.suggestedItems).subscribe(suggestedItems => {
-            if (suggestedItems.length > 0) {
-                this.suggestionsModal.show();
+                this.queryInput.disable(NO_EMIT);
             } else {
-                this.suggestionsModal.hide();
+                this.queryInput.enable(NO_EMIT);
             }
         });
 
-        const queryStream: Observable<Query> =
-            this.queryInput.valueChanges.pipe(
-                tap(query => {
-                    this.callChange(query);
-                    this.next({ lastQuery: undefined });
-                }),
-                map((text: string) => {
-                    if (!Types.isString(text)) {
-                        return NO_QUERY;
-                    }
+        effect(onCleanup => {
+            const queryStream =
+                this.queryInput.valueChanges.pipe(
+                    tap(query => {
+                        this.callChange(query);
+                        this.lastQuery = undefined;
+                    }),
+                    map(text => parseQuery(text, this.startCharacter(), this.lastCursor)),
+                    debounceTime(this.debounceTime()));
 
-                    if (!this.startCharacter) {
-                        return { text: text.trim() };
-                    }
-
-                    let rangeTo = Math.min(this.lastCursor, text.length);
-                    let rangeFrom = -1;
-                    for (let j = rangeTo - 1; j >= Math.max(0, rangeTo - RANGE_LIMIT); j--) {
-                        const char = text[j];
-                        if (char === this.startCharacter) {
-                            rangeFrom = j;
-                        }
-
-                        if (/[\s]/.test(char)) {
-                            break;
-                        }
-                    }
-
-                    if (rangeFrom >= 0 && rangeFrom < rangeTo) {
-                        text = text.substring(rangeFrom + 1, rangeTo + 1);
-
-                        return { text, range: { from: rangeFrom, to: rangeTo } };
-                    }
-
-                    return { text: '' };
-                }),
-                debounceTime(this.debounceTime));
-
-        this.subscriptions.add(
-            merge(queryStream, this.modalStream).pipe(
-                switchMap(query => {
-                    this.next({ lastQuery: query });
-
-                    if (!this.itemsSource || query.text === '') {
-                        return of([]);
-                    } else {
-                        this.setLoading(true);
-
-                        return this.itemsSource.find(query.text ).pipe(
-                            finalize(() => {
-                                this.setLoading(false);
-                            }),
-                            catchError(() => of([])),
-                        );
-                    }
-                }))
-            .subscribe(items => {
-                this.updateAnchor();
-                this.next({
-                    suggestedIndex: -1,
-                    suggestedItems: items || [],
-                    isSearching: false,
+            const subscription =
+                merge(queryStream, this.modalStream).pipe(
+                    switchMap(query => this.find(query)))
+                .subscribe(items => {
+                    this.updateAnchor();
+                    this.suggestedIndex.set(-1);
+                    this.setSuggestedItems(items || []);
                 });
-            }));
+
+            onCleanup(() => subscription.unsubscribe());
+        });
+    }
+
+    private find(query: Query) {
+        this.lastQuery = query;
+
+        if (query.text === '') {
+            return of([]);
+        }
+
+        this.setLoading(true);
+
+        return this.itemsSource().find(query.text).pipe(
+            finalize(() => {
+                this.setLoading(false);
+            }),
+            catchError(() => of([])),
+        );
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        this.lastCursor = this.inputControl.nativeElement.selectionEnd || 0;
+        this.lastCursor = this.inputControl().nativeElement.selectionEnd || 0;
         this.editorKeyDown.emit(event);
 
         if (Keys.isEscape(event)) {
@@ -267,15 +243,15 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             this.reset();
         }
 
-        if (this.snapshot.suggestedItems.length === 0) {
+        if (this.suggestedItems().length === 0) {
             return true;
         }
 
         if (Keys.isUp(event)) {
-            this.selectPrevIndex();
+            this.selectIndex(this.suggestedIndex() - 1);
             return false;
         } else if (Keys.isDown(event)) {
-            this.selectNextIndex();
+            this.selectIndex(this.suggestedIndex() + 1);
             return false;
         } else if (Keys.isEnter(event)) {
             return !this.selectItem();
@@ -285,25 +261,17 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public writeValue(obj: any) {
+        const displayProperty = this.displayProperty();
+
         if (!obj) {
             this.resetForm();
-        } else if (this.displayProperty && this.displayProperty.length > 0) {
-            this.queryInput.setValue(obj[this.displayProperty], NO_EMIT);
+        } else if (displayProperty && displayProperty.length > 0) {
+            this.queryInput.setValue(obj[displayProperty], NO_EMIT);
         } else {
             this.queryInput.setValue(obj.toString(), NO_EMIT);
         }
 
         this.resetState();
-    }
-
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.resetState();
-
-            this.queryInput.disable(NO_EMIT);
-        } else {
-            this.queryInput.enable(NO_EMIT);
-        }
     }
 
     public openModal() {
@@ -317,7 +285,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     public focus() {
         this.resetState();
-        this.inputControl.nativeElement.focus();
+        this.inputControl().nativeElement.focus();
     }
 
     public blur() {
@@ -327,12 +295,14 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public selectItem(selection: any | null = null): boolean {
+        const suggestedItems = this.suggestedItems();
+
         if (!selection) {
-            selection = this.snapshot.suggestedItems[this.snapshot.suggestedIndex];
+            selection = suggestedItems[this.suggestedIndex()];
         }
 
-        if (!selection && this.snapshot.suggestedItems.length === 1 && this.autoSelectFirst) {
-            selection = this.snapshot.suggestedItems[0];
+        if (!selection && suggestedItems.length === 1 && this.autoSelectFirst()) {
+            selection = suggestedItems[0];
         }
 
         if (!selection) {
@@ -340,27 +310,29 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         }
 
         try {
+            const displayProperty = this.displayProperty();
+
             let displayString: string;
-            if (this.displayProperty && this.displayProperty.length > 0) {
-                displayString = selection[this.displayProperty];
+            if (displayProperty && displayProperty.length > 0) {
+                displayString = selection[displayProperty];
             } else {
                 displayString = selection.toString();
             }
 
-            const query = this.snapshot.lastQuery;
+            const query = this.lastQuery;
             if (query?.range) {
                 const input = this.queryInput.value;
                 const textBefore = input.substring(0, query.range.from);
                 const textAfter = input.substring(query.range.to + 1);
 
-                displayString = `${textBefore}${this.startCharacter}${displayString}${textAfter}`;
+                displayString = `${textBefore}${this.startCharacter()}${displayString}${textAfter}`;
             }
 
             this.queryInput.setValue(displayString, NO_EMIT);
 
             let value = selection;
-            if (this.valueProperty) {
-                value = selection[this.valueProperty];
+            if (this.valueProperty()) {
+                value = selection[this.valueProperty()];
             }
 
             this.callChange(value);
@@ -372,36 +344,47 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         return true;
     }
 
-    private setLoading(value: boolean) {
-        clearTimeout(this.timer);
-
-        if (value) {
-            this.next({ isLoading: true });
-        } else {
-            this.timer = setTimeout(() => {
-                this.next({ isLoading: false });
-            }, 250);
-        }
-    }
-
     public selectIndex(suggestedIndex: number) {
+        const suggestedItems = this.suggestedItems();
+
         if (suggestedIndex < 0) {
             suggestedIndex = 0;
         }
 
-        if (suggestedIndex >= this.snapshot.suggestedItems.length) {
-            suggestedIndex = this.snapshot.suggestedItems.length - 1;
+        if (suggestedIndex >= suggestedItems.length) {
+            suggestedIndex = suggestedItems.length - 1;
         }
 
-        this.next({ suggestedIndex });
+        this.suggestedIndex.set(suggestedIndex);
     }
 
-    private selectPrevIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex - 1);
+    private setLoading(value: boolean) {
+        clearTimeout(this.timer);
+
+        if (value) {
+            this.isLoading.set(true);
+        } else {
+            this.timer = setTimeout(() => {
+                this.isLoading.set(false);
+            }, 250);
+        }
     }
 
-    private selectNextIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex + 1);
+    private setSuggestedItems(suggestedItems: ReadonlyArray<any>) {
+        this.suggestedItems.set(suggestedItems);
+
+        if (suggestedItems.length > 0) {
+            this.suggestionsModal.show();
+        } else {
+            this.suggestionsModal.hide();
+        }
+    }
+
+    private resetState() {
+        this.lastQuery = undefined;
+        this.suggestedIndex.set(-1);
+        this.setSuggestedItems([]);
+        this.isLoading.set(false);
     }
 
     private resetForm() {
@@ -409,18 +392,19 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     private updateAnchor() {
-        if (!this.startCharacter) {
+        if (!this.startCharacter()) {
             return;
         }
 
-        const query = this.snapshot.lastQuery;
+        const query = this.lastQuery;
         if (!query?.range) {
             return;
         }
 
-        const inputWidth = this.inputControl.nativeElement.getBoundingClientRect().width;
-        const coordsStart = getCaretCoordinates(this.inputControl.nativeElement, query.range.from);
-        const coordsEnd = getCaretCoordinates(this.inputControl.nativeElement, query.range.to + 1);
+        const input = this.inputControl().nativeElement;
+        const inputWidth = input.getBoundingClientRect().width;
+        const coordsStart = getCaretCoordinates(input, query.range.from);
+        const coordsEnd = getCaretCoordinates(input, query.range.to + 1);
 
         let w = coordsEnd.left - coordsStart.left;
         let x = coordsStart.left;
@@ -431,8 +415,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         x = Math.max(0, x);
         w = Math.min(w, inputWidth);
 
-        this.anchor.nativeElement.style.top = `${coordsStart.top - 2}px`;
-        this.anchor.nativeElement.style.left = `${x}px`;
-        this.anchor.nativeElement.style.width = `${w}px`;
+        const anchor = this.anchor().nativeElement;
+        anchor.style.top = `${coordsStart.top - 2}px`;
+        anchor.style.left = `${x}px`;
+        anchor.style.width = `${w}px`;
     }
 }

@@ -6,20 +6,15 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FromNowPipe, ShortDatePipe, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AppLanguageDto, ContentDto, FieldValue, getContentValue, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
+import { AppLanguageDto, ContentDto, FieldValue, getContentValue, META_FIELDS, SchemaDto, TableField, TableSettings } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { ContentStatusComponent } from './content-status.component';
 import { ContentValueEditorComponent } from './content-value-editor.component';
 import { ContentValueComponent } from './content-value.component';
 import { TranslationStatusComponent } from './translation-status.component';
-
-interface State {
-    // The formatted value.
-    formatted: FieldValue;
-}
 
 @Component({
     selector: 'sqx-content-list-field',
@@ -39,58 +34,65 @@ interface State {
         UserPictureRefPipe,
     ],
 })
-export class ContentListFieldComponent extends StatefulComponent<State> {
+export class ContentListFieldComponent {
     public readonly metaFields = META_FIELDS;
 
-    @Input({ required: true })
-    public field!: TableField;
+    /** The field or meta field to render. */
+    public readonly field = input.required<TableField>();
 
-    @Input()
-    public fields?: TableSettings;
+    /** The table settings, used to render nested values. */
+    public readonly fields = input<TableSettings>();
 
-    @Input({ required: true })
-    public content!: ContentDto;
+    /** The content to render the value for. */
+    public readonly content = input.required<ContentDto>();
 
-    @Input({ transform: booleanAttribute })
-    public patchAllowed?: boolean | null;
+    /** Renders an inline editor if the field supports it. */
+    public readonly patchAllowed = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public patchForm?: UntypedFormGroup | null;
+    /** The form for inline editing. The value of the field is written to this form. */
+    public readonly patchForm = input<UntypedFormGroup | null>();
 
-    @Input({ required: true })
-    public schema?: SchemaDto;
+    /** The schema of the content. */
+    public readonly schema = input.required<SchemaDto | undefined>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language to render the value for. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public get isInlineEditable() {
-        return this.field.rootField?.isInlineEditable === true;
-    }
+    public readonly isInlineEditable = computed(() => {
+        return this.field().rootField?.isInlineEditable === true;
+    });
+
+    public readonly formatted = computed<FieldValue>(() => {
+        const rootField = this.field().rootField;
+        if (!rootField) {
+            return '';
+        }
+
+        return getContentValue(this.content(), this.language(), rootField).formatted;
+    });
 
     constructor() {
-        super({ formatted: '' });
-    }
-
-    public ngOnChanges() {
-        this.reset();
+        effect(() => {
+            this.reset();
+        });
     }
 
     public reset() {
-        if (this.field.rootField) {
-            const { value, formatted } = getContentValue(this.content, this.language, this.field.rootField);
-
-            if (this.patchForm) {
-                const formControl = this.patchForm.controls[this.field.rootField.name];
-
-                if (formControl) {
-                    formControl.setValue(value);
-                }
-            }
-
-            this.next({ formatted });
+        const rootField = this.field().rootField;
+        if (!rootField) {
+            return;
         }
+
+        const formControl = this.patchForm()?.controls[rootField.name];
+        if (!formControl) {
+            return;
+        }
+
+        const { value } = getContentValue(this.content(), this.language(), rootField);
+
+        formControl.setValue(value);
     }
 }

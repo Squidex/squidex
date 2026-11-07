@@ -5,30 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, forwardRef, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, LoaderComponent, ModalDialogComponent, ModalDirective, StatefulControlComponent, StockPhotoDto, StockPhotoService, StopClickDirective, Subscriptions, thumbnail, TooltipDirective, TranslatePipe, Types, value$, valueProjection$ } from '@app/shared';
+import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, LoaderComponent, ModalDialogComponent, ModalDirective, SignalControlComponent, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe, Types, value$, valueProjection$ } from '@app/shared';
 
 export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,
 };
-
-interface State {
-    // True when loading assets.
-    isLoading?: boolean;
-
-    // The photos.
-    stockPhotos: ReadonlyArray<StockPhotoDto>;
-
-    // True if more photos are available.
-    hasMore?: boolean;
-
-    // The status of the thumbnail.
-    thumbnailStatus?: 'Loaded' | 'Failed';
-}
 
 type Request = { search?: string; page: number };
 
@@ -41,7 +27,6 @@ type Request = { search?: string; page: number };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ExternalLinkDirective,
         FocusOnInitDirective,
         FormsModule,
@@ -54,72 +39,77 @@ type Request = { search?: string; page: number };
         TranslatePipe,
     ],
 })
-export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class StockPhotoEditorComponent extends SignalControlComponent<string> {
+    public readonly valueControl = new UntypedFormControl('');
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    public readonly value = toSignal(value$<string>(this.valueControl), { initialValue: '' });
 
-    public valueControl = new UntypedFormControl('');
+    public readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
+    public readonly stockPhotoThumbnail = toSignal(valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x));
+    public readonly stockPhotoSearch = new UntypedFormControl('');
+    public readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
+    public readonly stockPhotosHasMore = signal(false);
+    public readonly stockPhotosLoading = signal(false);
 
-    public stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
-    public stockPhotoThumbnail = valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x);
-    public stockPhotoSearch = new UntypedFormControl('');
+    public readonly thumbnailStatus = signal<'Loaded' | 'Failed' | undefined>(undefined);
 
-    public searchDialog = new DialogModel();
+    public readonly searchDialog = new DialogModel();
 
     constructor(
         private readonly stockPhotoService: StockPhotoService,
     ) {
-        super({ stockPhotos: [] });
-    }
+        super();
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            value$(this.valueControl)
-                .subscribe(() => {
-                    this.next({ thumbnailStatus: undefined });
-                }));
+        effect(() => {
+            if (this.isDisabled()) {
+                this.stockPhotoSearch.disable({ emitEvent: false });
+            } else {
+                this.stockPhotoSearch.enable({ emitEvent: false });
+            }
+        });
 
-        this.subscriptions.add(
-            value$(this.stockPhotoSearch)
-                .subscribe(search => {
-                    this.stockPhotoRequests.next({ search, page: 1 });
-                }));
-
-        this.subscriptions.add(
-            this.valueControl.valueChanges
-                .subscribe(value => {
-                    this.callChange(value);
-                    this.callTouched();
-                }));
-
-        this.subscriptions.add(
-            this.stockPhotoRequests.pipe(
-                debounceTime(500),
-                tap(request => {
-                    if (request.search && request.search.length > 0) {
-                        this.next({ isLoading: true });
-                    }
+        effect(onCleanup => {
+            const subscriptions = [
+                value$(this.valueControl)
+                    .subscribe(() => {
+                        this.thumbnailStatus.set(undefined);
+                    }),
+                value$(this.stockPhotoSearch)
+                    .subscribe(search => {
+                        this.stockPhotoRequests.next({ search, page: 1 });
+                    }),
+                this.valueControl.valueChanges
+                    .subscribe(value => {
+                        this.callChange(value);
+                        this.callTouched();
+                    }),
+                this.stockPhotoRequests.pipe(
+                    debounceTime(500),
+                    tap(request => {
+                        if (request.search && request.search.length > 0) {
+                            this.stockPhotosLoading.set(true);
+                        }
+                    }),
+                    switchMap(request => {
+                        if (request.search && request.search.length > 0) {
+                            return this.stockPhotoService.getImages(request.search, request.page).pipe(map(result => ({ request, result })));
+                        } else {
+                            return of(({ request, result: [] }));
+                        }
+                    }))
+                .subscribe(({ request, result }) => {
+                    this.stockPhotosLoading.set(false);
+                    this.stockPhotos.update(x => request.page > 1 ? [...x, ...result] : result);
+                    this.stockPhotosHasMore.set(result.length === 20);
                 }),
-                switchMap(request => {
-                    if (request.search && request.search.length > 0) {
-                        return this.stockPhotoService.getImages(request.search, request.page).pipe(map(result => ({ request, result })));
-                    } else {
-                        return of(({ request, result: [] }));
-                    }
-                }),
-                tap(({ request, result }) => {
-                    this.next(s => ({
-                        ...s,
-                        isLoading: false,
-                        isDisabled: s.isDisabled,
-                        stockPhotos: request.page > 1 ? [...s.stockPhotos, ...result] : result,
-                        hasMore: result.length === 20,
-                    }));
-                })));
+            ];
+
+            onCleanup(() => {
+                for (const subscription of subscriptions) {
+                    subscription.unsubscribe();
+                }
+            });
+        });
     }
 
     public writeValue(obj: string) {
@@ -130,16 +120,8 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
         }
     }
 
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.stockPhotoSearch.disable({ emitEvent: false });
-        } else {
-            this.stockPhotoSearch.enable({ emitEvent: false });
-        }
-    }
-
     public selectPhoto(photo: StockPhotoDto) {
-        if (!this.snapshot.isDisabled) {
+        if (!this.isDisabled()) {
             this.valueControl.setValue(photo.url);
 
             this.searchDialog.hide();
@@ -147,7 +129,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     }
 
     public reset() {
-        if (!this.snapshot.isDisabled) {
+        if (!this.isDisabled()) {
             this.valueControl.setValue('');
         }
     }
@@ -159,14 +141,14 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     }
 
     public onThumbnailLoaded() {
-        this.next({ thumbnailStatus: 'Loaded' });
+        this.thumbnailStatus.set('Loaded');
     }
 
     public onThumbnailFailed() {
-        this.next({ thumbnailStatus: 'Failed' });
+        this.thumbnailStatus.set('Failed');
     }
 
     public isSelected(photo: StockPhotoDto) {
-        return photo.url === this.valueControl.value;
+        return photo.url === this.value();
     }
 }
