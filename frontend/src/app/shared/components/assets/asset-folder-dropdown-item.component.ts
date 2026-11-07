@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectorRef, Component, computed, input, numberAttribute, output } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, input, numberAttribute, output, inject } from '@angular/core';
 import { LoaderComponent, StopClickDirective, TranslatePipe } from '@app/framework';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
@@ -22,6 +22,9 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     ],
 })
 export class AssetFolderDropdownItemComponent {
+    private readonly assetsService = inject(AssetsService);
+    private readonly changeDetector = inject(ChangeDetectorRef);
+
     /** The name of the app to load the child folders from. */
     public readonly appName = input.required<string>();
 
@@ -37,12 +40,6 @@ export class AssetFolderDropdownItemComponent {
     protected readonly paddingLeft = computed(() => {
         return `${this.nodeLevel()}rem`;
     });
-
-    constructor(
-        private readonly assetsService: AssetsService,
-        private readonly changeDetector: ChangeDetectorRef,
-    ) {
-    }
 
     protected toggle() {
         const nodeModel = this.nodeModel();

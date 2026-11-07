@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, signal, inject } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, SignalControlComponent, Types } from '@app/shared';
@@ -35,6 +35,20 @@ const NO_EMIT = { emitEvent: false };
     ],
 })
 export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyArray<string> | string> {
+    private readonly contentsResolver = inject(ResolveContents);
+    private readonly localizer = inject(LocalizerService);
+
+    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
+        source: () => this.schemaId(),
+        computation: () => [],
+    });
+
+    private readonly contentsFailed = signal(false);
+
+    private readonly isValid = computed(() => {
+        return !!this.schemaId() && !!this.language();
+    });
+
     private isOpenedBefore = false;
 
     /** The language to build the names of the contents. */
@@ -51,12 +65,6 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
 
     protected readonly control = new UntypedFormControl('');
 
-    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
-        source: this.schemaId,
-        computation: () => [],
-    });
-
-    private readonly contentsFailed = signal(false);
     protected readonly contentsLoading = signal(false);
 
     protected readonly contentNames = computed(() => {
@@ -81,14 +89,7 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
         return contentNames;
     });
 
-    private readonly isValid = computed(() => {
-        return !!this.schemaId() && !!this.language();
-    });
-
-    constructor(
-        private readonly contentsResolver: ResolveContents,
-        private readonly localizer: LocalizerService,
-    ) {
+    constructor() {
         super();
 
         effect(() => {

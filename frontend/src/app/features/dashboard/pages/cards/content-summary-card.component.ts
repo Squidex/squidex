@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, signal, inject } from '@angular/core';
 import { AppDto, ContentsService, TranslatePipe, Types } from '@app/shared';
 
 @Component({
@@ -26,7 +26,9 @@ export class ContentSummaryCardComponent {
 
     protected readonly itemCount = signal(0);
 
-    constructor(contentsService: ContentsService) {
+    constructor() {
+        const contentsService = inject(ContentsService);
+
         effect(onCleanup => {
             const options = this.options();
             if (!Types.isString(options?.schema)) {

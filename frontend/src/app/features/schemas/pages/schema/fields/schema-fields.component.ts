@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, forwardRef, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, input, inject } from '@angular/core';
 import { AppLanguageDto, AppsState, DialogModel, FieldDto, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
@@ -24,6 +24,10 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     ],
 })
 export class SchemaFieldsComponent {
+    private readonly schemasState = inject(SchemasState);
+
+    protected readonly appsState = inject(AppsState);
+
     /** The schema to render and edit the fields for. */
     public readonly schema = input.required<SchemaDto>();
 
@@ -31,12 +35,6 @@ export class SchemaFieldsComponent {
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
     protected readonly fieldWizard = new DialogModel();
-
-    constructor(
-        protected readonly appsState: AppsState,
-        private readonly schemasState: SchemasState,
-    ) {
-    }
 
     protected sortFields(fields: ReadonlyArray<FieldDto>) {
         this.schemasState.orderFields(this.schema(), fields).subscribe();

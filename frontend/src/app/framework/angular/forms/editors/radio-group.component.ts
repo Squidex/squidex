@@ -32,6 +32,24 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
     private readonly containerWidth = signal(0);
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
 
+    private readonly tagValuesUnsorted = computed(() => {
+        return getTagValues(this.values(), false);
+    });
+
+    private readonly tagValuesSorted = computed(() => {
+        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
+    });
+
+    private readonly tagValuesWidth = computed(() => {
+        let width = 0;
+        for (const value of this.tagValuesUnsorted()) {
+            width += 40;
+            width += this.textMeasurer.getTextSize(value.name);
+        }
+
+        return width;
+    });
+
     protected readonly controlId = MathHelper.guid();
 
     /** Renders the options in a single line, in multiple lines or depending on the available space. */
@@ -43,26 +61,8 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
     /** The values to choose from. */
     public readonly values = input<ReadonlyArray<string | TagValue>>([]);
 
-    private readonly tagValuesUnsorted = computed(() => {
-        return getTagValues(this.values(), false);
-    });
-
-    private readonly tagValuesSorted = computed(() => {
-        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
-    });
-
     protected readonly tagValues = computed(() => {
         return this.unsorted() ? this.tagValuesUnsorted() : this.tagValuesSorted();
-    });
-
-    private readonly tagValuesWidth = computed(() => {
-        let width = 0;
-        for (const value of this.tagValuesUnsorted()) {
-            width += 40;
-            width += this.textMeasurer.getTextSize(value.name);
-        }
-
-        return width;
     });
 
     protected readonly isSingleline = computed(() => {

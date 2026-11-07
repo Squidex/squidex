@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '@app/framework';
 import { HelpService } from '@app/shared/internal';
@@ -24,11 +24,8 @@ import { HelpMarkdownPipe } from './help-markdown.pipe';
     ],
 })
 export class HelpComponent {
-    protected helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);
+    private readonly helpService = inject(HelpService);
+    private readonly route = inject(ActivatedRoute);
 
-    constructor(
-        private readonly helpService: HelpService,
-        private readonly route: ActivatedRoute,
-    ) {
-    }
+    protected helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);
 }

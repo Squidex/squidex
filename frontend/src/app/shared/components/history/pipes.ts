@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectorRef, DestroyRef, inject, Pipe, PipeTransform } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@app/shared/internal';
 
@@ -13,21 +13,17 @@ import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@ap
     name: 'sqxHistoryMessage',
     pure: false,
 })
-export class HistoryMessagePipe implements OnDestroy, PipeTransform {
+export class HistoryMessagePipe implements PipeTransform {
+    private readonly changeDetector = inject(ChangeDetectorRef);
+    private readonly users = inject(UsersProviderService);
     private subscription?: Subscription;
     private lastMessage?: string;
     private lastValue: string | null = null;
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly users: UsersProviderService,
-    ) {
-    }
-
-    public ngOnDestroy() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
+    constructor() {
+        inject(DestroyRef).onDestroy(() => {
+            this.subscription?.unsubscribe();
+        });
     }
 
     public transform(event: HistoryEventDto): string | null {

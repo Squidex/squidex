@@ -33,13 +33,14 @@ import { SearchMenuComponent } from './search-menu.component';
     ],
 })
 export class InternalAreaComponent {
+    private readonly dialogs = inject(DialogService);
+    private readonly route = inject(ActivatedRoute);
+
+    protected readonly loadingService = inject(LoadingService);
+
     protected readonly isEmbedded = inject(UIOptions).value.embedded;
 
-    constructor(
-        protected readonly loadingService: LoadingService,
-        private readonly dialogs: DialogService,
-        private readonly route: ActivatedRoute,
-    ) {
+    constructor() {
         effect(onCleanup => {
             const subscription =
                 this.route.queryParams.subscribe(params => {

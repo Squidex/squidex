@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, input, output } from '@angular/core';
+import { Component, effect, input, output, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/internal';
@@ -26,6 +26,8 @@ import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/i
     ],
 })
 export class AssetTagDialogComponent {
+    private readonly assetsState = inject(AssetsState);
+
     /** Emits when the dialog is closed, after a rename or when canceled. */
     public readonly dialogClose = output();
 
@@ -34,9 +36,7 @@ export class AssetTagDialogComponent {
 
     protected readonly editForm = new RenameAssetTagForm();
 
-    constructor(
-        private readonly assetsState: AssetsState,
-    ) {
+    constructor() {
         effect(() => {
             this.editForm.load({ tagName: this.tagName() });
         });

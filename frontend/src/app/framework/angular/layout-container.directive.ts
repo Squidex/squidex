@@ -5,36 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
+import { afterNextRender, Directive, ElementRef, inject, Renderer2 } from '@angular/core';
 import { LayoutComponent } from './layout.component';
 
 @Directive({
     selector: '[sqxLayoutContainer]',
+    host: {
+        '(window:resize)': 'onResize()',
+    },
 })
-export class LayoutContainerDirective implements AfterViewInit {
+export class LayoutContainerDirective {
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
     private readonly layouts: LayoutComponent[] = [];
     private isViewInit = false;
     private containerWidth = 0;
 
-    constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
+    constructor() {
+        afterNextRender(() => {
+            this.isViewInit = true;
+
+            this.invalidate(true);
+        });
     }
 
-    @HostListener('window:resize')
     protected onResize() {
         this.invalidate(true);
     }
 
     public push(layout: LayoutComponent) {
         this.layouts.push(layout);
-    }
-
-    public ngAfterViewInit() {
-        this.isViewInit = true;
-
-        this.invalidate(true);
     }
 
     public peek() {

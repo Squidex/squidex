@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, inject } from '@angular/core';
 import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -27,6 +27,23 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
     ],
 })
 export class ClientConnectFormComponent {
+    private readonly clientsService = inject(ClientsService);
+    private readonly dialogs = inject(DialogService);
+    private readonly helpService = inject(HelpService);
+
+    private readonly mcpServerName = computed(() => {
+        return `squidex-${this.appName}`;
+    });
+
+    private readonly mcpAuthorization = computed(() => {
+        const client = this.client();
+
+        // The client secret does not expire, unlike the access token.
+        return `Basic ${btoa(`${this.appName}:${client.id}:${client.secret}`)}`;
+    });
+
+    protected readonly apiUrl = inject(ApiUrlConfig);
+
     /** Emits when the dialog is closed. */
     public readonly dialogClose = output();
 
@@ -34,19 +51,17 @@ export class ClientConnectFormComponent {
     public readonly client = input.required<ClientDto>();
 
     protected readonly sdks = this.helpService.getSDKs();
+
     protected readonly sdk = signal<SDKEntry | undefined>(undefined);
 
     protected readonly appName: string;
+
     protected readonly appToken = signal<AccessTokenDto | undefined>(undefined);
 
     protected readonly step = signal('Start');
 
     protected readonly mcpUrl = computed(() => {
         return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
-    });
-
-    private readonly mcpServerName = computed(() => {
-        return `squidex-${this.appName}`;
     });
 
     protected readonly mcpCommand = computed(() => {
@@ -69,21 +84,10 @@ export class ClientConnectFormComponent {
         return JSON.stringify(config, undefined, 4);
     });
 
-    private readonly mcpAuthorization = computed(() => {
-        const client = this.client();
+    constructor() {
+        const appsState = inject(AppsState);
+        const messageBus = inject(MessageBus);
 
-        // The client secret does not expire, unlike the access token.
-        return `Basic ${btoa(`${this.appName}:${client.id}:${client.secret}`)}`;
-    });
-
-    constructor(
-        appsState: AppsState,
-        protected readonly apiUrl: ApiUrlConfig,
-        private readonly clientsService: ClientsService,
-        private readonly dialogs: DialogService,
-        private readonly helpService: HelpService,
-        messageBus: MessageBus,
-    ) {
         this.appName = appsState.appName;
 
         effect(onCleanup => {

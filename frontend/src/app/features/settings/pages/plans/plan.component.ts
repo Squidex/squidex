@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, PlansState, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -22,13 +22,10 @@ import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, Pl
     ],
 })
 export class PlanComponent {
+    protected readonly plansState = inject(PlansState);
+
     /** The plan to show, including whether it is currently selected. */
     public readonly planInfo = input.required<PlanInfo>();
-
-    constructor(
-        protected readonly plansState: PlansState,
-    ) {
-    }
 
     protected changeMonthly() {
         this.plansState.change(this.planInfo().plan.id);

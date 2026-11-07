@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, signal } from '@angular/core';
+import { Component, effect, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormErrorComponent, FormRowComponent, LayoutComponent, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
@@ -28,17 +28,18 @@ import { UserDto, UserForm, UsersState } from '../../internal';
     ],
 })
 export class UserPageComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+
     private user?: UserDto | null;
+
+    protected readonly usersState = inject(UsersState);
 
     protected readonly isEditable = signal(false);
 
     protected readonly userForm = new UserForm();
 
-    constructor(
-        protected readonly usersState: UsersState,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-    ) {
+    constructor() {
         effect(() => {
             const user = this.usersState.selectedUser();
 

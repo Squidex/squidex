@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { ChangeDetectionStrategy, Component, computed, effect, input, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, linkedSignal, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
 
@@ -28,6 +28,8 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowCompone
     ],
 })
 export class LanguageComponent {
+    private readonly languagesState = inject(LanguagesState);
+
     /** The app language to show and edit. */
     public readonly language = input.required<AppLanguageDto>();
 
@@ -51,9 +53,7 @@ export class LanguageComponent {
 
     protected readonly editForm = new EditLanguageForm();
 
-    constructor(
-        private readonly languagesState: LanguagesState,
-    ) {
+    constructor() {
         effect(() => {
             this.editForm.load(this.language());
             this.editForm.setEnabled(this.isEditable());

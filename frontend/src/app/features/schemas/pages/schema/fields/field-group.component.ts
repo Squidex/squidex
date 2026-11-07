@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, linkedSignal, output, inject } from '@angular/core';
 import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, LocalStoreService, SchemaDto, Settings } from '@app/shared';
 import { FieldComponent } from './field.component';
 
@@ -24,6 +24,8 @@ import { FieldComponent } from './field.component';
     ],
 })
 export class FieldGroupComponent {
+    private readonly localStore = inject(LocalStoreService);
+
     /** Emits when the user has moved a field within or into this group. */
     public readonly sorted = output<CdkDragDrop<FieldDto[]>>();
 
@@ -56,11 +58,6 @@ export class FieldGroupComponent {
 
         return this.localStore.getBoolean(this.isCollapsedKey(separator));
     });
-
-    constructor(
-        private readonly localStore: LocalStoreService,
-    ) {
-    }
 
     protected toggle() {
         const isCollapsed = !this.isCollapsed();

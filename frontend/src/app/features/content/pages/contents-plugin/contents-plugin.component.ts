@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
@@ -20,10 +20,7 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
     ],
 })
 export class ContentsPluginComponent {
-    protected readonly schema = this.schemasState.selectedSchema;
+    private readonly schemasState = inject(SchemasState);
 
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
+    protected readonly schema = this.schemasState.selectedSchema;
 }

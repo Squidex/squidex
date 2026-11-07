@@ -5,16 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable, OnDestroy, signal } from '@angular/core';
-import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { Types } from '../utils/types';
 
 @Injectable({
     providedIn: 'root',
 })
-export class LoadingService implements OnDestroy {
-    private readonly routerSubscription: Subscription;
+export class LoadingService {
     private readonly loadingCount = signal(0);
     private readonly loadingOperations: { [key: string]: boolean } = {};
 
@@ -26,24 +25,11 @@ export class LoadingService implements OnDestroy {
         setTimeout(action, 200);
     };
 
-    constructor(router: Router) {
-        this.routerSubscription =
-            router.events.subscribe(event => {
-                if (Types.is(event, NavigationStart)) {
-                    this.startLoading(event.id.toString());
-                } else if (
-                    Types.is(event, NavigationEnd) ||
-                    Types.is(event, NavigationCancel) ||
-                    Types.is(event, NavigationError)) {
-                    this.completeLoading(event.id.toString());
-                }
+    constructor() {
+        inject(Router).events.pipe(takeUntilDestroyed())
+            .subscribe(event => {
+                this.handleRouterEvent(event);
             });
-    }
-
-    public ngOnDestroy() {
-        if (this.routerSubscription) {
-            this.routerSubscription.unsubscribe();
-        }
     }
 
     public startLoading(key: string) {
@@ -61,6 +47,17 @@ export class LoadingService implements OnDestroy {
             this.scheduler(() => {
                 this.loadingCount.update(x => Math.max(0, x - 1));
             });
+        }
+    }
+
+    private handleRouterEvent(event: Event) {
+        if (Types.is(event, NavigationStart)) {
+            this.startLoading(event.id.toString());
+            return;
+        }
+
+        if (Types.is(event, NavigationEnd) || Types.is(event, NavigationCancel) || Types.is(event, NavigationError)) {
+            this.completeLoading(event.id.toString());
         }
     }
 }

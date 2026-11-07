@@ -35,6 +35,30 @@ export class LayoutComponent {
     private readonly renderer = inject(Renderer2);
     private readonly router = inject(Router, { optional: true });
     private readonly panel = viewChild.required<ElementRef<HTMLElement>>('panel');
+
+    private readonly actualWidth = computed(() => {
+        const displayMode = this.displayMode();
+        const layout = this.layout();
+
+        if (layout === 'left') {
+            const expandedWidth = this.expandedWidth();
+            if (displayMode === 'Expanded' && expandedWidth > 0) {
+                return expandedWidth;
+            }
+
+            const collapsedWidth = this.collapsedWidth();
+            if (displayMode === 'Collapsed' && collapsedWidth > 0) {
+                return collapsedWidth;
+            }
+        } else if (layout === 'right') {
+            if (displayMode === 'Collapsed' || this.isMinimized()) {
+                return 0;
+            }
+        }
+
+        return this.width();
+    });
+
     private widthPrevious?: string;
     private widthToRender = 0;
     private isViewInitField = false;
@@ -111,29 +135,6 @@ export class LayoutComponent {
         }
 
         return '100%';
-    });
-
-    private readonly actualWidth = computed(() => {
-        const displayMode = this.displayMode();
-        const layout = this.layout();
-
-        if (layout === 'left') {
-            const expandedWidth = this.expandedWidth();
-            if (displayMode === 'Expanded' && expandedWidth > 0) {
-                return expandedWidth;
-            }
-
-            const collapsedWidth = this.collapsedWidth();
-            if (displayMode === 'Collapsed' && collapsedWidth > 0) {
-                return collapsedWidth;
-            }
-        } else if (layout === 'right') {
-            if (displayMode === 'Collapsed' || this.isMinimized()) {
-                return 0;
-            }
-        }
-
-        return this.width();
     });
 
     protected readonly hasFirstChild = toSignal(

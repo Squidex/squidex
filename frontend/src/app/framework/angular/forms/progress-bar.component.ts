@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, numberAttribute, Renderer2, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, numberAttribute, Renderer2, signal, inject } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
 import { ThemeService } from '@app/framework/internal';
 
@@ -20,6 +20,8 @@ import { ThemeService } from '@app/framework/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressBarComponent {
+    private readonly themeService = inject(ThemeService);
+
     private readonly progressBar = signal<any>(null);
 
     /** Renders a horizontal line or a circle. */
@@ -46,11 +48,11 @@ export class ProgressBarComponent {
     /** The progress in percent, between 0 and 100. */
     public readonly value = input(0, { transform: numberAttribute });
 
-    constructor(
-        element: ElementRef,
-        renderer: Renderer2,
-        private readonly themeService: ThemeService,
-    ) {
+    constructor() {
+        const element = inject(ElementRef);
+        const renderer = inject(Renderer2);
+        const themeService = this.themeService;
+
         renderer.setStyle(element.nativeElement, 'display', 'block');
 
         effect(onCleanup => {

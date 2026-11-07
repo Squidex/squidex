@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, TranslatePipe } from '@app/shared';
 
@@ -25,12 +25,9 @@ import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, Tra
     ],
 })
 export class RoleAddFormComponent {
-    protected addRoleForm = new AddRoleForm();
+    private readonly rolesState = inject(RolesState);
 
-    constructor(
-        private readonly rolesState: RolesState,
-    ) {
-    }
+    protected addRoleForm = new AddRoleForm();
 
     protected addRole() {
         const value = this.addRoleForm.submit();

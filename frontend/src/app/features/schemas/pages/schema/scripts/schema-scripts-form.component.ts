@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs';
@@ -26,6 +26,8 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, Schema
     ],
 })
 export class SchemaScriptsFormComponent {
+    private readonly schemasState = inject(SchemasState);
+
     /** The schema to edit the scripts for. */
     public readonly schema = input.required<SchemaDto>();
 
@@ -38,9 +40,10 @@ export class SchemaScriptsFormComponent {
         return this.schema().canUpdateScripts;
     });
 
-    constructor(appsState: AppsState, schemasService: SchemasService,
-        private readonly schemasState: SchemasState,
-    ) {
+    constructor() {
+        const appsState = inject(AppsState);
+        const schemasService = inject(SchemasService);
+
         this.schemaCompletions = toSignal(
             toObservable(this.schema).pipe(
                 switchMap(schema => schemasService.getContentScriptsCompletion(appsState.appName, schema.name))));

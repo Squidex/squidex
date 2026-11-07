@@ -8,42 +8,48 @@
 /* eslint-disable @angular-eslint/no-input-rename */
 /* eslint-disable @angular-eslint/no-output-rename */
 
-import { Directive, EventEmitter, HostListener, Input, numberAttribute, Output, Renderer2 } from '@angular/core';
+import { DestroyRef, Directive, inject, input, numberAttribute, output, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxLongHover]',
+    host: {
+        '(mouseover)': 'onMove($event)',
+    },
 })
 export class LongHoverDirective {
+    private readonly renderer = inject(Renderer2);
     private timerOut: Function | null = null;
     private timer?: any;
     private wasHovering = false;
 
-    @Output('sqxLongHover')
-    public hover = new EventEmitter();
+    /** Emits when the mouse stays over the element for the given duration. */
+    public readonly hover = output({ alias: 'sqxLongHover' });
 
-    @Output('longHoverCancelled')
-    public cancelled = new EventEmitter();
+    /** Emits when the mouse leaves the element after a long hover. */
+    public readonly cancelled = output({ alias: 'longHoverCancelled' });
 
-    @Input('longHoverSelector')
-    public selector?: string;
+    /** The CSS selector of the child elements that trigger the long hover. */
+    public readonly selector = input<string | undefined>(undefined, { alias: 'longHoverSelector' });
 
-    @Input({ alias: 'longHoverDuration', transform: numberAttribute })
-    public duration = 2000;
+    /** The time in milliseconds until the long hover is triggered. */
+    public readonly duration = input(2000, { alias: 'longHoverDuration', transform: numberAttribute });
 
-    constructor(
-        private readonly renderer: Renderer2,
-    ) {
+    constructor() {
+        inject(DestroyRef).onDestroy(() => {
+            clearTimeout(this.timer);
+            this.timerOut?.();
+        });
     }
 
-    @HostListener('mouseover', ['$event'])
     protected onMove(event: MouseEvent) {
         if (!(event.target instanceof Element)) {
             this.clearTimer();
             return;
         }
 
-        const isMatch = !this.selector || event.target.matches(this.selector);
+        const selector = this.selector();
 
+        const isMatch = !selector || event.target.matches(selector);
         if (!isMatch) {
             this.clearTimer();
             return;
@@ -59,7 +65,7 @@ export class LongHoverDirective {
             this.wasHovering = true;
 
             this.hover.emit();
-        }, this.duration);
+        }, this.duration());
 
         this.timerOut = this.renderer.listen(event.target, 'mouseleave', () => {
             this.clearTimer();

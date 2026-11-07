@@ -6,7 +6,7 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent } from '@app/framework';
 
@@ -32,7 +32,9 @@ export class AssetTextEditorComponent {
 
     protected readonly text = signal('');
 
-    constructor(httpClient: HttpClient) {
+    constructor() {
+        const httpClient = inject(HttpClient);
+
         effect(onCleanup => {
             const subscription =
                 httpClient.get(this.fileSource(), { responseType: 'text' })

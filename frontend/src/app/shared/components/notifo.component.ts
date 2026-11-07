@@ -20,6 +20,8 @@ import { TourHintDirective } from './tour-hint.directive';
     ],
 })
 export class NotifoComponent {
+    private readonly renderer = inject(Renderer2);
+
     private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;
     private readonly notifoApiKey: string | undefined;
     private readonly element = viewChild<ElementRef<Element>>('element');
@@ -32,9 +34,11 @@ export class NotifoComponent {
     /** The position of the notifications popup. */
     public readonly position = input<'bottom-left' | 'bottom-right'>('bottom-left');
 
-    constructor(resourceLoader: ResourceLoaderService, authService: AuthService, destroyRef: DestroyRef,
-        private readonly renderer: Renderer2,
-    ) {
+    constructor() {
+        const resourceLoader = inject(ResourceLoaderService);
+        const authService = inject(AuthService);
+        const destroyRef = inject(DestroyRef);
+
         this.notifoApiKey = authService.user?.notifoToken;
 
         if (!this.notifoApiKey || !this.notifoApiUrl) {

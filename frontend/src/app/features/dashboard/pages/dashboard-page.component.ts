@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterEveryRender, Component, effect, NgZone, Renderer2, signal, viewChild } from '@angular/core';
+import { afterEveryRender, Component, effect, NgZone, Renderer2, signal, viewChild, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, defined, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, switchSafe, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
@@ -48,6 +48,10 @@ import { DashboardConfigComponent } from './dashboard-config.component';
     ],
 })
 export class DashboardPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly authState = inject(AuthService);
+    private readonly localStore = inject(LocalStoreService);
+
     private readonly grid = viewChild<Gridster>('grid');
 
     protected readonly selectedApp;
@@ -69,14 +73,11 @@ export class DashboardPageComponent {
 
     protected readonly user = this.authState.user?.displayName;
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly authState: AuthService,
-        private readonly localStore: LocalStoreService,
-        renderer: Renderer2,
-        usagesService: UsagesService,
-        zone: NgZone,
-    ) {
+    constructor() {
+        const renderer = inject(Renderer2);
+        const usagesService = inject(UsagesService);
+        const zone = inject(NgZone);
+
         const dateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
         const dateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
 

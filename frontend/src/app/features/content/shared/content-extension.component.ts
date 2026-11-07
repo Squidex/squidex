@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, ThemeService, Types } from '@app/shared';
 
@@ -22,7 +22,26 @@ import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, Saf
     },
 })
 export class ContentExtensionComponent {
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly appsState = inject(AppsState);
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+    private readonly themeService = inject(ThemeService);
     private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
+
+    private readonly context = computed(() => {
+        const schema = this.contentSchema();
+
+        return {
+            apiUrl: this.apiUrl.buildUrl('api'),
+            appId: this.appsState.snapshot.selectedApp!.id,
+            appName: this.appsState.snapshot.selectedApp!.name,
+            user: this.authService.user,
+            schemaName: schema?.name,
+            schemaId: schema?.id,
+        };
+    });
+
     private isInitialized = false;
 
     /** The content that is passed to the extension. */
@@ -41,26 +60,9 @@ export class ContentExtensionComponent {
         return computeEditorUrl(this.editorUrl(), this.appsState.snapshot.selectedSettings);
     });
 
-    private readonly context = computed(() => {
-        const schema = this.contentSchema();
+    constructor() {
+        const themeService = this.themeService;
 
-        return {
-            apiUrl: this.apiUrl.buildUrl('api'),
-            appId: this.appsState.snapshot.selectedApp!.id,
-            appName: this.appsState.snapshot.selectedApp!.name,
-            user: this.authService.user,
-            schemaName: schema?.name,
-            schemaId: schema?.id,
-        };
-    });
-
-    constructor(
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly appsState: AppsState,
-        private readonly authService: AuthService,
-        private readonly router: Router,
-        private readonly themeService: ThemeService,
-    ) {
         effect(() => {
             this.sendMessage('themeChanged', { theme: themeService.theme() });
         });

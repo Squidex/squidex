@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, StatusIconComponent, TranslatePipe } from '@app/shared';
 
@@ -25,6 +25,10 @@ import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, Ext
     ],
 })
 export class JobComponent {
+    private readonly jobsState = inject(JobsState);
+
+    protected readonly apiUrl = inject(ApiUrlConfig);
+
     /** The job to show. */
     public readonly job = input.required<JobDto>();
 
@@ -53,12 +57,6 @@ export class JobComponent {
     });
 
     protected readonly isExpanded = signal(false);
-
-    constructor(
-        protected readonly apiUrl: ApiUrlConfig,
-        private readonly jobsState: JobsState,
-    ) {
-    }
 
     protected delete() {
         this.jobsState.delete(this.job());

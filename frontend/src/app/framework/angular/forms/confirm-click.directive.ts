@@ -5,63 +5,60 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { Subscriber, take } from 'rxjs';
-import { DialogService, Types } from '@app/framework/internal';
+import { booleanAttribute, Directive, inject, input, output } from '@angular/core';
+import { take } from 'rxjs';
+import { DialogService } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxConfirmClick]',
+    host: {
+        '(click)': 'onClick($event)',
+    },
 })
 export class ConfirmClickDirective {
-    @Input()
-    public confirmTitle: string | undefined | null;
+    private readonly dialogs = inject(DialogService);
 
-    @Input()
-    public confirmText: string | undefined | null;
+    /** The title of the confirmation dialog. */
+    public readonly confirmTitle = input<string | undefined | null>();
 
-    @Input()
-    public confirmRememberKey: string | undefined | null;
+    /** The text of the confirmation dialog. */
+    public readonly confirmText = input<string | undefined | null>();
 
-    @Input({ transform: booleanAttribute })
-    public confirmRequired?: boolean | null = true;
+    /** Shows the confirmation dialog before emitting the click. */
+    public readonly confirmRequired = input(true, { transform: booleanAttribute });
 
-    @Output()
-    public beforeClick = new EventEmitter();
+    /** The key to remember the decision of the user, so the dialog is not shown again. */
+    public readonly confirmRememberKey = input<string | undefined | null>();
 
-    @Output('sqxConfirmClick')
-    public clickConfirmed = new EventEmitter();
+    /** Emits before the confirmation dialog is shown. */
+    public readonly beforeClick = output();
 
-    constructor(
-        private readonly dialogs: DialogService,
-    ) {
-    }
+    /** Emits when the click is confirmed or no confirmation is required. */
+    public readonly clickConfirmed = output<boolean | undefined>({ alias: 'sqxConfirmClick' });
 
-    @HostListener('click', ['$event'])
-    public onClick(event: Event) {
-        if (this.confirmRequired &&
-            this.confirmTitle &&
-            this.confirmTitle.length > 0 &&
-            this.confirmText &&
-            this.confirmText.length > 0) {
-            const destinations = this.clickConfirmed.observers?.map(x => (x as Subscriber<any>)['destination']) || [];
+    protected onClick(event: Event) {
+        event.preventDefault();
 
-            this.beforeClick.emit();
+        const title = this.confirmTitle();
+        const text = this.confirmText();
 
-            const rememberKey = this.confirmRememberKey || '';
-            this.dialogs.confirm(this.confirmTitle, this.confirmText, rememberKey).pipe(take(1))
-                .subscribe(confirmed => {
-                    if (confirmed) {
-                        for (const destination of destinations) {
-                            if (Types.isFunction(destination?.next)) {
-                                destination.next(true);
-                            }
-                        }
-                    }
-                });
-        } else {
-            this.clickConfirmed.emit();
+        if (!this.confirmRequired() || !title || !text) {
+            this.clickConfirmed.emit(undefined);
+            return;
         }
 
-        event.preventDefault();
+        const listeners: ((value: boolean) => void)[] = [...((this.clickConfirmed as any)['listeners'] || [])];
+
+        this.beforeClick.emit();
+
+        const rememberKey = this.confirmRememberKey() || '';
+        this.dialogs.confirm(title, text, rememberKey).pipe(take(1))
+            .subscribe(confirmed => {
+                if (confirmed) {
+                    for (const listener of listeners) {
+                        listener(true);
+                    }
+                }
+            });
     }
 }

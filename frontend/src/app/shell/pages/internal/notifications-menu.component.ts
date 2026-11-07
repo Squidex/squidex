@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AuthService, NotifoComponent, UIOptions } from '@app/shared';
 import { NotificationDropdownComponent } from './notification-dropdown.component';
 
@@ -23,8 +23,10 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
 export class NotificationsMenuComponent {
     protected readonly isNotifoConfigured: boolean;
 
-    constructor(authService: AuthService, uiOptions: UIOptions,
-    ) {
+    constructor() {
+        const authService = inject(AuthService);
+        const uiOptions = inject(UIOptions);
+
         const notifoApiKey = authService.user?.notifoToken;
         const notifoApiUrl = uiOptions.value.notifoApi;
 

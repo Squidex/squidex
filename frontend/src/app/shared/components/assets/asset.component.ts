@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output, signal, untracked } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output, signal, untracked, inject } from '@angular/core';
 import { ConfirmClickDirective, ExternalLinkDirective, FileDropDirective, FromNowPipe, HTTP, ImageSourceDirective, ProgressBarComponent, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetUploaderState, DialogService, Types, UploadCanceled } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
@@ -38,6 +38,9 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, FileIconPipe } from './pipes';
     ],
 })
 export class AssetComponent {
+    private readonly assetUploader = inject(AssetUploaderState);
+    private readonly dialogs = inject(DialogService);
+
     /** Emits the asset when the file has been uploaded or replaced. */
     public readonly loadDone = output<AssetDto>();
 
@@ -91,10 +94,7 @@ export class AssetComponent {
 
     protected readonly progress = signal(0);
 
-    constructor(
-        private readonly assetUploader: AssetUploaderState,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         effect(() => {
             const assetFile = this.assetFile();
             if (!assetFile) {

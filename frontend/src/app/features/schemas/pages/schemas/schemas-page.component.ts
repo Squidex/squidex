@@ -6,7 +6,7 @@
  */
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -37,7 +37,13 @@ import { SchemaFormComponent } from './schema-form.component';
     ],
 })
 export class SchemasPageComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+
+    protected readonly schemasState = inject(SchemasState);
+
     protected readonly addSchemaDialog = new DialogModel();
+
     protected readonly addCategoryForm = new CreateCategoryForm();
 
     protected readonly schemasFilter = new UntypedFormControl();
@@ -46,11 +52,9 @@ export class SchemasPageComponent {
 
     protected readonly source = signal<any>(null);
 
-    constructor(messageBus: MessageBus,
-        protected readonly schemasState: SchemasState,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-    ) {
+    constructor() {
+        const messageBus = inject(MessageBus);
+
         const schemasFilterValue = toSignal(value$<string>(this.schemasFilter));
 
         this.categories = computed(() => {

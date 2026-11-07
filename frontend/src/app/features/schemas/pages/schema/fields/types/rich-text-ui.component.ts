@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, RichTextFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -24,6 +24,8 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, RichTextField
     ],
 })
 export class RichTextUIComponent {
+    protected readonly schemasSource = inject(SchemaTagSource);
+
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();
 
@@ -32,9 +34,4 @@ export class RichTextUIComponent {
 
     /** The type specific properties of the field. */
     public readonly properties = input.required<RichTextFieldPropertiesDto>();
-
-    constructor(
-        protected readonly schemasSource: SchemaTagSource,
-    ) {
-    }
 }

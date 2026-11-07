@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
 
@@ -26,12 +26,9 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
     ],
 })
 export class ClientAddFormComponent {
-    protected addClientForm = new AddClientForm();
+    private readonly clientsState = inject(ClientsState);
 
-    constructor(
-        private readonly clientsState: ClientsState,
-    ) {
-    }
+    protected addClientForm = new AddClientForm();
 
     protected addClient() {
         const value = this.addClientForm.submit();

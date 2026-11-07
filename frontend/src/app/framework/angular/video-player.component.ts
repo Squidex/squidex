@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, Renderer2, signal, viewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, Renderer2, signal, viewChild, inject } from '@angular/core';
 import { ResourceLoaderService } from '@app/framework/internal';
 
 declare const videojs: any;
@@ -26,11 +26,11 @@ export class VideoPlayerComponent {
     /** The mime type of the video, for example "video/mp4". */
     public readonly mimeType = input('');
 
-    constructor(
-        resourceLoader: ResourceLoaderService,
-        renderer: Renderer2,
-        destroyRef: DestroyRef,
-    ) {
+    constructor() {
+        const resourceLoader = inject(ResourceLoaderService);
+        const renderer = inject(Renderer2);
+        const destroyRef = inject(DestroyRef);
+
         afterNextRender(async () => {
             await Promise.all([
                 resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),

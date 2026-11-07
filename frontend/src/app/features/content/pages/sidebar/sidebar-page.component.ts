@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ContentsState, LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
@@ -20,6 +20,9 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
     ],
 })
 export class SidebarPageComponent {
+    protected readonly contentsState = inject(ContentsState);
+    protected readonly schemasState = inject(SchemasState);
+
     protected readonly url = computed(() => {
         const schema = this.schemasState.selectedSchema();
         if (!schema) {
@@ -33,10 +36,4 @@ export class SidebarPageComponent {
 
         return url;
     });
-
-    constructor(
-        protected readonly contentsState: ContentsState,
-        protected readonly schemasState: SchemasState,
-    ) {
-    }
 }

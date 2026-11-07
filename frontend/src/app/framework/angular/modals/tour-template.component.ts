@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ModalPlacementDirective } from './modal-placement.directive';
@@ -28,9 +28,12 @@ import { StepDefinition, TourService } from './tour.service';
 export class TourTemplateComponent {
     private delayedDestroy: any;
 
+    protected readonly tourService = inject(TourService);
+
     protected readonly isVisible = signal(false);
 
     protected readonly currentStep = signal<StepDefinition | null>(null);
+
     protected readonly currentElement = signal<any>(null);
 
     protected readonly hasPrev = false;
@@ -65,9 +68,9 @@ export class TourTemplateComponent {
         return `${100 * stepIndex / stepCount}%`;
     });
 
-    constructor(
-        protected readonly tourService: TourService,
-    ) {
+    constructor() {
+        const tourService = this.tourService;
+
         tourService.component = this;
     }
 

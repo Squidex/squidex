@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 import { AppDto, HistoryListComponent, HistoryService, TranslatePipe } from '@app/shared';
@@ -26,7 +26,9 @@ export class HistoryCardComponent {
 
     protected readonly history;
 
-    constructor(historyService: HistoryService) {
+    constructor() {
+        const historyService = inject(HistoryService);
+
         this.history = toSignal(
             toObservable(this.app).pipe(
                 switchMap(app => historyService.getHistory(app.name, ''))));

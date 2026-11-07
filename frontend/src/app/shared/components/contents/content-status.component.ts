@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, inject } from '@angular/core';
 import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ScheduleJobDto } from '@app/shared/internal';
 
@@ -21,6 +21,8 @@ import { ScheduleJobDto } from '@app/shared/internal';
     ],
 })
 export class ContentStatusComponent {
+    private readonly localizer = inject(LocalizerService);
+
     /** The name of the status. */
     public readonly status = input.required<string>();
 
@@ -57,9 +59,4 @@ export class ContentStatusComponent {
 
         return this.localizer.getOrKey('i18n:contents.scheduledTooltip', args);
     });
-
-    constructor(
-        private readonly localizer: LocalizerService,
-    ) {
-    }
 }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, input, signal, inject } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalDirective, SignalControlComponent } from '@app/framework';
 import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, Types } from '@app/shared/internal';
@@ -30,6 +30,11 @@ export const SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     ],
 })
 export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArray<string> | string> {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly localizer = inject(LocalizerService);
+    private readonly selectedContent = signal<ContentDto | undefined>(undefined);
+
     /** The IDs or names of the schemas to select the content from. */
     public readonly schemaIds = input<ReadonlyArray<string>>();
 
@@ -50,8 +55,6 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
 
     protected readonly contentSelectorDialog = new DialogModel();
 
-    private readonly selectedContent = signal<ContentDto | undefined>(undefined);
-
     protected readonly selectedName = computed(() => {
         const content = this.selectedContent();
         if (!content) {
@@ -68,14 +71,6 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
 
         return name || this.localizer.getOrKey('common.noValue');
     });
-
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly localizer: LocalizerService,
-    ) {
-        super();
-    }
 
     public writeValue(obj: any) {
         if (Types.isString(obj)) {

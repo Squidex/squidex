@@ -19,6 +19,8 @@ import { SafeUrlPipe } from './safe-html.pipe';
     ],
 })
 export class AvatarComponent {
+    private readonly actualImage = linkedSignal(() => this.image());
+
     /** The identifier to generate the fallback image from, for example the user ID. */
     public readonly identifier = input<string | undefined | null>();
 
@@ -27,8 +29,6 @@ export class AvatarComponent {
 
     /** The width and height of the avatar in pixels. */
     public readonly size = input(50, { transform: numberAttribute });
-
-    private readonly actualImage = linkedSignal(() => this.image());
 
     protected readonly imageSource = computed(() => {
         return this.actualImage() || this.createSvg(this.identifier());

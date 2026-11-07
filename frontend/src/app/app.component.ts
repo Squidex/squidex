@@ -6,7 +6,7 @@
  */
 
 
-import { Component, Injector } from '@angular/core';
+import { Component, Injector, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, syncChartTheme, ThemeService, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
 
@@ -27,7 +27,9 @@ import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootVie
 export class AppComponent {
     public isLoaded?: boolean | null;
 
-    constructor(injector: Injector) {
+    constructor() {
+        const injector = inject(Injector);
+
         injector.get(AnalyticsService);
         syncChartTheme(injector.get(ThemeService));
     }

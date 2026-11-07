@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, effect, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
@@ -36,6 +36,12 @@ import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileD
     ],
 })
 export class MorePageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+
+    protected readonly router = inject(Router);
+    protected readonly teamsState = inject(TeamsState);
+
     protected readonly app = this.appsState.selectedApp;
 
     protected readonly isEditable = computed(() => {
@@ -61,12 +67,7 @@ export class MorePageComponent {
 
     protected readonly updateForm = new UpdateAppForm();
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        protected readonly router: Router,
-        protected readonly teamsState: TeamsState,
-    ) {
+    constructor() {
         effect(() => {
             const app = this.app();
             if (!app) {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -28,11 +28,9 @@ import { AppDto, AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComp
     ],
 })
 export class SchemasPageComponent {
-    protected readonly schemasFilter = new UntypedFormControl();
-
-    private readonly schemasFilterValue = toSignal(value$(this.schemasFilter));
-
-    protected readonly isEmbedded = inject(UIOptions).value.embedded;
+    private readonly schemasState = inject(SchemasState);
+    private readonly appsState = inject(AppsState);
+    private readonly schemasFilterValue: Signal<string | undefined>;
 
     private readonly schemas = computed(() => {
         const app = this.appsState.snapshot.selectedApp!;
@@ -40,14 +38,16 @@ export class SchemasPageComponent {
         return this.schemasState.schemas().filter(schema => isVisible(schema, app));
     });
 
+    protected readonly schemasFilter = new UntypedFormControl();
+
+    protected readonly isEmbedded = inject(UIOptions).value.embedded;
+
     protected readonly categories = computed(() => {
         return getCategoryTree(this.schemas(), this.schemasState.addedCategories(), this.schemasFilterValue());
     });
 
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly appsState: AppsState,
-    ) {
+    constructor() {
+        this.schemasFilterValue = toSignal(value$(this.schemasFilter));
     }
 }
 

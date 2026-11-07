@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, input, output, signal, viewChild, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddFieldForm, AppSettingsDto, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
@@ -36,7 +36,10 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
     ],
 })
 export class FieldWizardComponent {
+    private readonly schemasState = inject(SchemasState);
     private readonly nameInput = viewChild<ElementRef<HTMLElement>>('nameInput');
+
+    protected readonly languagesState = inject(LanguagesState);
 
     /** The schema to add the field to. */
     public readonly schema = input.required<SchemaDto>();
@@ -59,6 +62,7 @@ export class FieldWizardComponent {
     });
 
     protected readonly addFieldForm = new AddFieldForm();
+
     protected readonly addFieldModal = new ModalModel();
 
     protected readonly editing = signal<{ field: FieldDto; form: EditFieldForm } | null>(null);
@@ -66,12 +70,6 @@ export class FieldWizardComponent {
     protected readonly isLocalizable = computed(() => {
         return this.parent()?.isLocalizable || (this.editing()?.field as any)?.['isLocalizable'];
     });
-
-    constructor(
-        private readonly schemasState: SchemasState,
-        protected readonly languagesState: LanguagesState,
-    ) {
-    }
 
     protected emitClose() {
         this.dialogClose.emit();

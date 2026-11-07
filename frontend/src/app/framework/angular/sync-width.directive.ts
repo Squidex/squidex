@@ -5,41 +5,42 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
-import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
+import { afterNextRender, Directive, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxSyncWidth]',
 })
-export class SyncWidthDirective implements AfterViewInit, ResizeListener {
-    private readonly subscriptions = new Subscriptions();
+export class SyncWidthDirective implements ResizeListener {
+    private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly resizeService = inject(ResizeService);
 
-    @Input('sqxSyncWidth')
-    public target!: HTMLElement;
+    /** The element that gets the same width as this element. */
+    public readonly target = input<HTMLElement | null | undefined>(undefined, { alias: 'sqxSyncWidth' });
 
-    constructor(
-        private readonly element: ElementRef<HTMLElement>,
-        private readonly renderer: Renderer2,
-        private readonly resizeService: ResizeService,
-    ) {
-        this.subscriptions.add(this.resizeService.listen(this.element.nativeElement, this));
-    }
+    constructor() {
+        effect(onCleanup => {
+            const unlisten = this.resizeService.listen(this.element.nativeElement, this);
 
-    public ngAfterViewInit() {
-        this.onReposition();
+            onCleanup(unlisten);
+        });
+
+        afterNextRender(() => {
+            this.resize(this.element.nativeElement.clientWidth);
+        });
     }
 
     public onResize(size: DOMRect) {
         this.resize(size.width);
     }
 
-    private onReposition() {
-        this.resize(this.element.nativeElement.clientWidth);
-    }
-
     private resize(width: number) {
-        if (this.target) {
-            this.renderer.setStyle(this.target, 'width', `${width}px`);
+        const target = this.target();
+        if (!target) {
+            return;
         }
+
+        this.renderer.setStyle(target, 'width', `${width}px`);
     }
 }

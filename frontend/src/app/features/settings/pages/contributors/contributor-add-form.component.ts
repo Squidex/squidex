@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, Injectable, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, Injectable, input, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -15,11 +15,9 @@ import { ImportContributorsDialogComponent } from './import-contributors-dialog.
 
 @Injectable()
 export class UsersDataSource implements AutocompleteSource {
-    constructor(
-        private readonly contributorsState: ContributorsState,
-        private readonly usersService: UsersService,
-    ) {
-    }
+    private readonly contributorsState = inject(ContributorsState);
+    private readonly usersService = inject(UsersService);
+
 
     public find(query: string): Observable<ReadonlyArray<any>> {
         if (!query) {
@@ -62,9 +60,14 @@ export class UsersDataSource implements AutocompleteSource {
     ],
 })
 export class ContributorAddFormComponent {
+    private readonly contributorsState = inject(ContributorsState);
+    private readonly dialogs = inject(DialogService);
+
     private readonly defaultValue = computed<any>(() => {
         return { role: this.roles()[0]?.name, user: '' };
     });
+
+    protected readonly usersDataSource = inject(UsersDataSource);
 
     /** The roles that can be assigned to new contributors. */
     public readonly roles = input.required<ReadonlyArray<RoleDto>>();
@@ -73,11 +76,7 @@ export class ContributorAddFormComponent {
 
     protected readonly importDialog = new DialogModel();
 
-    constructor(
-        private readonly contributorsState: ContributorsState,
-        protected readonly usersDataSource: UsersDataSource,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         effect(() => {
             this.assignContributorForm.submitCompleted({ newValue: this.defaultValue() });
         });

@@ -35,6 +35,8 @@ import { AssetsListComponent } from './assets-list.component';
 export class AssetSelectorComponent {
     private readonly localStore = inject(LocalStoreService);
 
+    protected readonly assetsState = inject(ComponentAssetsState);
+
     /** Emits the selected assets, or an empty array when the dialog is closed. */
     public readonly assetSelect = output<ReadonlyArray<AssetDto>>();
 
@@ -46,9 +48,7 @@ export class AssetSelectorComponent {
 
     protected readonly isListView = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
 
-    constructor(
-        protected readonly assetsState: ComponentAssetsState,
-    ) {
+    constructor() {
         effect(() => {
             this.localStore.setBoolean(Settings.Local.ASSETS_MODE, this.isListView());
         });

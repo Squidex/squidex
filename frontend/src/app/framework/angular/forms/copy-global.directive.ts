@@ -5,20 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, HostListener, Renderer2 } from '@angular/core';
+import { Directive, inject, Renderer2 } from '@angular/core';
 import { DialogService, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCopyGlobal]',
+    host: {
+        '(document:click)': 'onClick($event)',
+    },
 })
 export class CopyGlobalDirective {
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    private readonly dialogs = inject(DialogService);
+    private readonly renderer = inject(Renderer2);
 
-    @HostListener('document:click', ['$event'])
     protected onClick(event: MouseEvent) {
         function findElement(target: HTMLElement | null): string | null {
             if (!target) {

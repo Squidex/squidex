@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, Component, DestroyRef, effect, ElementRef, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, signal, viewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL } from 'graphiql';
@@ -31,24 +31,28 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
     ],
 })
 export class GraphQLPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly authService = inject(AuthService);
+    private readonly clientsService = inject(ClientsService);
+    private readonly messageBus = inject(MessageBus);
+    private readonly themeService = inject(ThemeService);
     private readonly graphiQLContainer = viewChild.required<ElementRef<HTMLDivElement>>('graphiQLContainer');
+
     private reactRoot?: ReactDOM.Root | null;
     private fetcher?: ReturnType<typeof createGraphiQLFetcher>;
 
+    protected readonly clientsState = inject(ClientsState);
+
     protected readonly clientsReadable: boolean;
+
     protected readonly clientsDialog = new DialogModel();
+
     protected readonly clientSelected = signal<ClientDto | null>(null);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly authService: AuthService,
-        private readonly clientsService: ClientsService,
-        private readonly messageBus: MessageBus,
-        private readonly themeService: ThemeService,
-        protected readonly clientsState: ClientsState,
-        destroyRef: DestroyRef,
-    ) {
+    constructor() {
+        const destroyRef = inject(DestroyRef);
+
         this.clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
 
         if (this.clientsReadable) {

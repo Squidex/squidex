@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathComponent, AssetsListComponent, AssetsState, DialogModel, LayoutComponent, ListViewComponent, LocalStoreService, MathHelper, ModalDirective, PagerComponent, Queries, Query, QueryFullTextSynchronizer, Router2State, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, TagEditorComponent, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIState } from '@app/shared';
@@ -41,19 +41,21 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
     ],
 })
 export class AssetsPageComponent {
+    private readonly assetsRoute = inject(Router2State);
+    private readonly localStore = inject(LocalStoreService);
+    private readonly uiState = inject(UIState);
+
+    protected readonly assetsState = inject(AssetsState);
+
     protected readonly editAsset = signal<AssetDto | undefined>(undefined);
 
     protected readonly listQueries = new Queries(this.uiState, 'assets');
+
     protected readonly listMode = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
 
     protected readonly addAssetFolderDialog = new DialogModel();
 
-    constructor(
-        private readonly assetsRoute: Router2State,
-        protected readonly assetsState: AssetsState,
-        private readonly localStore: LocalStoreService,
-        private readonly uiState: UIState,
-    ) {
+    constructor() {
         const initial =
             this.assetsRoute.mapTo(this.assetsState)
                 .withPaging('assets', 30)

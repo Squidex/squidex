@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, computed, effect, forwardRef, input, linkedSignal, numberAttribute, output, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, forwardRef, input, linkedSignal, numberAttribute, output, signal, untracked, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
@@ -41,7 +41,17 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
     ],
 })
 export class ContentSelectorComponent {
+    private readonly schemasState = inject(SchemasState);
+
+    private readonly alreadySelectedIdsAll = computed(() => {
+        return this.alreadySelected()?.map(x => x.id) ?? this.alreadySelectedIds();
+    });
+
+    private readonly selectedItems = signal<Record<string, ContentDto>>({});
+
     private isInitialQueryUsed = false;
+
+    protected readonly contentsState = inject(ComponentContentsState);
 
     protected readonly metaFields = META_FIELDS;
 
@@ -81,10 +91,6 @@ export class ContentSelectorComponent {
     /** The contents that have already been selected before. Takes precedence over the IDs. */
     public readonly alreadySelected = input<ReadonlyArray<ContentDto> | null>();
 
-    private readonly alreadySelectedIdsAll = computed(() => {
-        return this.alreadySelected()?.map(x => x.id) ?? this.alreadySelectedIds();
-    });
-
     protected readonly languageSelected = linkedSignal(() => this.language());
 
     protected readonly schema = signal<SchemaDto | undefined>(undefined);
@@ -100,8 +106,6 @@ export class ContentSelectorComponent {
         return schemas.filter(x => schemaIdentifiers.includes(x.id) || schemaIdentifiers.includes(x.name));
     });
 
-    private readonly selectedItems = signal<Record<string, ContentDto>>({});
-
     protected readonly selectionCount = computed(() => {
         return Object.keys(this.selectedItems()).length;
     });
@@ -112,10 +116,10 @@ export class ContentSelectorComponent {
 
     protected readonly queryModel;
 
-    constructor(appsState: AppsState, schemasService: SchemasService,
-        protected readonly contentsState: ComponentContentsState,
-        private readonly schemasState: SchemasState,
-    ) {
+    constructor() {
+        const appsState = inject(AppsState);
+        const schemasService = inject(SchemasService);
+
         this.queryModel = toSignal(
             toObservable(this.schema).pipe(map(x => x?.name), distinctUntilChanged(),
                 switchMap(x => {

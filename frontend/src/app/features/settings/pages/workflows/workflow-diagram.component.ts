@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, signal, viewChild, inject } from '@angular/core';
 import { ListViewComponent, ResourceLoaderService, ThemeService, WorkflowView } from '@app/shared';
 
 declare const vis: any;
@@ -20,6 +20,9 @@ declare const vis: any;
     ],
 })
 export class WorkflowDiagramComponent {
+    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly themeService = inject(ThemeService);
+
     private network: any;
 
     public readonly chartContainer = viewChild<ElementRef<HTMLElement>>('chartContainer');
@@ -29,10 +32,10 @@ export class WorkflowDiagramComponent {
 
     protected readonly isLoaded = signal(false);
 
-    constructor(destroyRef: DestroyRef,
-        private readonly resourceLoader: ResourceLoaderService,
-        private readonly themeService: ThemeService,
-    ) {
+    constructor() {
+        const destroyRef = inject(DestroyRef);
+        const themeService = this.themeService;
+
         effect(() => {
             themeService.theme();
 

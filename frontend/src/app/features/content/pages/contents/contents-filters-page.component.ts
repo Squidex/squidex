@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ContentsState, LayoutComponent, Queries, Query, QueryListComponent, SavedQueriesComponent, SchemasState, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
@@ -20,6 +20,11 @@ import { ContentsState, LayoutComponent, Queries, Query, QueryListComponent, Sav
     ],
 })
 export class ContentsFiltersPageComponent {
+    private readonly schemasState = inject(SchemasState);
+    private readonly uiState = inject(UIState);
+
+    protected readonly contentsState = inject(ContentsState);
+
     protected readonly schemaQueries = computed(() => {
         const schema = this.schemasState.selectedSchema();
         if (!schema) {
@@ -28,13 +33,6 @@ export class ContentsFiltersPageComponent {
 
         return new Queries(this.uiState, `schemas.${schema.name}`);
     });
-
-    constructor(
-        protected readonly contentsState: ContentsState,
-        private readonly schemasState: SchemasState,
-        private readonly uiState: UIState,
-    ) {
-    }
 
     protected search(query?: Query) {
         this.contentsState.search(query);

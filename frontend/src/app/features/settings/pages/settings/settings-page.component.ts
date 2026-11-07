@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -36,16 +36,16 @@ import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettin
     ],
 })
 export class SettingsPageComponent {
-    protected readonly editForm = new EditAppSettingsForm();
+    private readonly appsState = inject(AppsState);
     private readonly editingSettings = this.appsState.selectedSettings;
+
+    protected readonly editForm = new EditAppSettingsForm();
 
     protected readonly isEditable = computed(() => {
         return this.editingSettings()?.canUpdate === true;
     });
 
-    constructor(
-        private readonly appsState: AppsState,
-    ) {
+    constructor() {
         this.appsState.loadSettings();
 
         effect(() => {

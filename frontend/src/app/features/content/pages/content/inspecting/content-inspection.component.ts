@@ -27,6 +27,15 @@ type Mode = 'Content' | 'Data' | 'FlatData';
     ],
 })
 export class ContentInspectionComponent {
+    private readonly changeDetector = inject(ChangeDetectorRef);
+    private readonly contentsService = inject(ContentsService);
+    private readonly contentsState = inject(ContentsState);
+    private readonly toolbar = inject(ToolbarService);
+
+    private readonly request = computed(() => {
+        return { language: this.language(), mode: this.mode() };
+    });
+
     private contentData: any;
 
     /** The name of the app. */
@@ -44,10 +53,6 @@ export class ContentInspectionComponent {
     protected readonly mode = signal<Mode>('Content');
 
     protected readonly contentError = signal<ErrorDto | null | undefined>(undefined);
-
-    private readonly request = computed(() => {
-        return { language: this.language(), mode: this.mode() };
-    });
 
     protected readonly actualData = toSignal(
         toObservable(this.request).pipe(
@@ -69,12 +74,7 @@ export class ContentInspectionComponent {
                 }
             })));
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly contentsService: ContentsService,
-        private readonly contentsState: ContentsState,
-        private readonly toolbar: ToolbarService,
-    ) {
+    constructor() {
         inject(DestroyRef).onDestroy(() => {
             this.toolbar.remove(this);
         });

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, Host, input, Optional, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal, untracked, inject } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
 import { LocalizerService, Types } from '@app/framework/internal';
@@ -23,16 +23,8 @@ import { touchedChange$ } from './forms-helper';
     ],
 })
 export class ControlErrorsComponent {
-    /** The control or the name of the control in the parent form group. */
-    public readonly for = input.required<string | AbstractControl>();
-
-    /** Shows the errors only when the form has been submitted, if set. */
-    public readonly submitCount = input<number | null>();
-
-    /** The field name in the error messages. Falls back to a name derived from the control. */
-    public readonly fieldName = input<string | null>();
-
-    protected readonly errorMessages = signal<ReadonlyArray<string>>([]);
+    private readonly formGroupDirective = inject(FormGroupDirective, { optional: true, host: true });
+    private readonly localizer = inject(LocalizerService);
 
     private readonly control = computed(() => {
         const control = this.for();
@@ -57,10 +49,18 @@ export class ControlErrorsComponent {
         return this.localizer.get(`common.${control}`) || control.substring(0, 1).toUpperCase() + control.substring(1);
     });
 
-    constructor(
-        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
-        private readonly localizer: LocalizerService,
-    ) {
+    /** The control or the name of the control in the parent form group. */
+    public readonly for = input.required<string | AbstractControl>();
+
+    /** Shows the errors only when the form has been submitted, if set. */
+    public readonly submitCount = input<number | null>();
+
+    /** The field name in the error messages. Falls back to a name derived from the control. */
+    public readonly fieldName = input<string | null>();
+
+    protected readonly errorMessages = signal<ReadonlyArray<string>>([]);
+
+    constructor() {
         effect(onCleanup => {
             const control = this.control();
             const controlDisplayName = this.controlDisplayName();

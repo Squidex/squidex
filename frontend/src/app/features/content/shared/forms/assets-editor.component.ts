@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, forwardRef, input, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, forwardRef, input, signal, inject } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, SignalControlComponent, sorted, TranslatePipe, Types } from '@app/shared';
 
@@ -48,6 +48,10 @@ class AssetUpdated {
     },
 })
 export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<string>> {
+    private readonly localStore = inject(LocalStoreService);
+    private readonly assetsResolver = inject(ResolveAssets);
+    private readonly messageBus = inject(MessageBus);
+
     /** The folder to upload new assets to. */
     public readonly folderId = input<string>();
 
@@ -68,11 +72,7 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
 
     protected readonly assetsDialog = new DialogModel();
 
-    constructor(
-        private readonly localStore: LocalStoreService,
-        private readonly assetsResolver: ResolveAssets,
-        private readonly messageBus: MessageBus,
-    ) {
+    constructor() {
         super();
 
         effect(onCleanup => {

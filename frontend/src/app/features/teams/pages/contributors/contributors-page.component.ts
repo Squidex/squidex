@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -41,10 +41,11 @@ import { ContributorComponent } from './contributor.component';
     ],
 })
 export class ContributorsPageComponent {
-    constructor(
-        private readonly contributorsRoute: Router2State,
-        protected readonly contributorsState: TeamContributorsState,
-    ) {
+    private readonly contributorsRoute = inject(Router2State);
+
+    protected readonly contributorsState = inject(TeamContributorsState);
+
+    constructor() {
         const initial =
             this.contributorsRoute.mapTo(this.contributorsState)
                 .withPaging('contributors', 10)

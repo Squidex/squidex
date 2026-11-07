@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, effect, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal, untracked, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription, timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, Notification, Tooltip } from '@app/framework/internal';
@@ -56,7 +56,9 @@ export class DialogRendererComponent {
     protected readonly notifications = signal<ReadonlyArray<Notification>>([]);
     protected readonly tooltips = signal<ReadonlyArray<Tooltip>>([]);
 
-    constructor(dialogs: DialogService) {
+    constructor() {
+        const dialogs = inject(DialogService);
+
         effect(onCleanup => {
             const subscriptions = new Subscription();
 

@@ -7,51 +7,52 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { booleanAttribute, Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, inject, input, output, Renderer2 } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxDropFile]',
+    host: {
+        '(paste)': 'onPaste($event)',
+        '(dragend)': 'onDragEnd($event)',
+        '(dragleave)': 'onDragEnd($event)',
+        '(dragenter)': 'onDragEnter($event)',
+        '(dragover)': 'onDragOver($event)',
+        '(drop)': 'onDrop($event)',
+    },
 })
 export class FileDropDirective {
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
     private dragCounter = 0;
 
-    @Input()
-    public allowedFiles?: ReadonlyArray<string>;
+    /** The MIME types of the files that are accepted. All files are accepted if not defined. */
+    public readonly allowedFiles = input<ReadonlyArray<string>>();
 
-    @Input({ alias: 'sqxDropOnlyImages', transform: booleanAttribute })
-    public onlyImages!: boolean;
+    /** Only accepts image files. */
+    public readonly onlyImages = input(false, { alias: 'sqxDropOnlyImages', transform: booleanAttribute });
 
-    @Input({ alias: 'sqxDropNoPaste', transform: booleanAttribute })
-    public noPaste!: boolean;
+    /** Does not accept files that are pasted from the clipboard. */
+    public readonly noPaste = input(false, { alias: 'sqxDropNoPaste', transform: booleanAttribute });
 
-    @Input({ alias: 'sqxDropDisabled', transform: booleanAttribute })
-    public disabled = false;
+    /** Ignores dropped and pasted files. */
+    public readonly disabled = input(false, { alias: 'sqxDropDisabled', transform: booleanAttribute });
 
-    @Output('sqxDropFile')
-    public fileDrop = new EventEmitter<ReadonlyArray<File>>();
+    /** Emits the accepted files when they are dropped or pasted. */
+    public readonly fileDrop = output<ReadonlyArray<File>>({ alias: 'sqxDropFile' });
 
-    constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
-    }
-
-    @HostListener('paste', ['$event'])
     protected async onPaste(event: ClipboardEvent) {
-        if (!this.noPaste) {
+        if (!this.noPaste()) {
             this.stopEvent(event);
 
             const files = await this.getAllowedFiles(event.clipboardData);
 
-            if (files && !this.disabled) {
+            if (files && !this.disabled()) {
                 this.fileDrop.emit(files);
             }
         }
     }
 
-    @HostListener('dragend', ['$event'])
-    @HostListener('dragleave', ['$event'])
     protected onDragEnd(event: DragEvent) {
         const hasFile = this.hasAllowedFile(event.dataTransfer);
 
@@ -60,7 +61,6 @@ export class FileDropDirective {
         }
     }
 
-    @HostListener('dragenter', ['$event'])
     protected onDragEnter(event: DragEvent) {
         const hasFile = this.hasAllowedFile(event.dataTransfer);
 
@@ -69,7 +69,6 @@ export class FileDropDirective {
         }
     }
 
-    @HostListener('dragover', ['$event'])
     protected onDragOver(event: DragEvent) {
         const isFiles = hasFiles(event.dataTransfer);
 
@@ -78,14 +77,13 @@ export class FileDropDirective {
         }
     }
 
-    @HostListener('drop', ['$event'])
     protected async onDrop(event: DragEvent) {
         if (hasFiles(event.dataTransfer)) {
             this.stopDrag(event);
 
             const files = await this.getAllowedFiles(event.dataTransfer);
 
-            if (files && !this.disabled) {
+            if (files && !this.disabled()) {
                 this.fileDrop.emit(files);
             }
         }
@@ -104,7 +102,7 @@ export class FileDropDirective {
     private dragStart() {
         this.dragCounter++;
 
-        if (this.dragCounter === 1 && !this.disabled) {
+        if (this.dragCounter === 1 && !this.disabled()) {
             this.renderer.addClass(this.element.nativeElement, 'drag');
         }
     }
@@ -112,7 +110,7 @@ export class FileDropDirective {
     private dragEnd(number?: number) {
         this.dragCounter = number || this.dragCounter - 1;
 
-        if (this.dragCounter === 0 && !this.disabled) {
+        if (this.dragCounter === 0 && !this.disabled()) {
             this.renderer.removeClass(this.element.nativeElement, 'drag');
         }
     }
@@ -194,11 +192,13 @@ export class FileDropDirective {
     }
 
     private isAllowed(file: { type: string }) {
-        return !this.allowedFiles || this.allowedFiles.includes(file.type);
+        const allowedFiles = this.allowedFiles();
+
+        return !allowedFiles || allowedFiles.includes(file.type);
     }
 
     private isImage(file: { type: string }) {
-        return !this.onlyImages || file.type.indexOf('image/') === 0;
+        return !this.onlyImages() || file.type.indexOf('image/') === 0;
     }
 }
 

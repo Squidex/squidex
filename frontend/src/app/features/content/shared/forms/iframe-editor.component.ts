@@ -26,12 +26,24 @@ import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEdi
     },
 })
 export class IFrameEditorComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly renderer = inject(Renderer2);
+    private readonly router = inject(Router);
+    private readonly themeService = inject(ThemeService);
     private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
     private readonly container = viewChild.required<ElementRef<HTMLElement>>('container');
     private readonly inner = viewChild.required<ElementRef<HTMLElement>>('inner');
     private readonly isDisabledByControl = signal(false);
+
+    private readonly isDisabled = computed(() => {
+        return this.disabled() || this.isDisabledByControl();
+    });
+
     private value: any;
     private isInitialized = false;
+    private assetsCorrelationId: any;
+    private contentsCorrelationId: any;
 
     /** Emits when the editor wants to toggle the expanded mode. */
     public readonly isExpandedChange = output();
@@ -73,28 +85,21 @@ export class IFrameEditorComponent {
         return computeEditorUrl(this.url(), this.appsState.snapshot.selectedSettings);
     });
 
-    private readonly isDisabled = computed(() => {
-        return this.disabled() || this.isDisabledByControl();
-    });
-
     protected readonly isFullscreen = signal(false);
 
-    private assetsCorrelationId: any;
     protected readonly assetsDialog = new DialogModel();
 
-    private contentsCorrelationId: any;
     protected readonly contentsQuery = signal<string | undefined>(undefined);
+
     protected readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
+
     protected readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
+
     protected readonly contentsDialog = new DialogModel();
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly renderer: Renderer2,
-        private readonly router: Router,
-        private readonly themeService: ThemeService,
-    ) {
+    constructor() {
+        const themeService = this.themeService;
+
         effect(() => {
             this.sendMessage('themeChanged', { theme: themeService.theme() });
         });

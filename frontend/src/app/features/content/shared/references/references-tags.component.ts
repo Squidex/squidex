@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, signal, inject } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ContentDto, ContentsDto, LocalizerService, ResolveContents, SignalControlComponent, TagEditorComponent, TranslatePipe, Types } from '@app/shared';
@@ -33,6 +33,20 @@ const NO_EMIT = { emitEvent: false };
     ],
 })
 export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArray<string>> {
+    private readonly contentsResolver = inject(ResolveContents);
+    private readonly localizer = inject(LocalizerService);
+
+    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
+        source: () => this.schemaId(),
+        computation: () => [],
+    });
+
+    private readonly contentsFailed = signal(false);
+
+    private readonly isValid = computed(() => {
+        return !!this.schemaId() && !!this.language();
+    });
+
     private isOpenedBefore = false;
 
     /** The ID of the schema to select the contents from. */
@@ -46,26 +60,13 @@ export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArra
 
     protected readonly control = new UntypedFormControl([]);
 
-    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
-        source: this.schemaId,
-        computation: () => [],
-    });
-
-    private readonly contentsFailed = signal(false);
     protected readonly contentsLoading = signal(false);
 
     protected readonly converter = computed(() => {
         return new ReferencesTagsConverter(this.language(), this.contents(), this.localizer);
     });
 
-    private readonly isValid = computed(() => {
-        return !!this.schemaId() && !!this.language();
-    });
-
-    constructor(
-        private readonly contentsResolver: ResolveContents,
-        private readonly localizer: LocalizerService,
-    ) {
+    constructor() {
         super();
 
         effect(() => {

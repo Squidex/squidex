@@ -19,13 +19,10 @@ import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirectiv
     ],
 })
 export class ChatMenuComponent {
+    protected readonly appsState = inject(AppsState);
+    protected readonly authService = inject(AuthService);
+
     protected readonly chatDialog = new DialogModel();
 
     protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
-
-    constructor(
-        protected readonly appsState: AppsState,
-        protected readonly authService: AuthService,
-    ) {
-    }
 }

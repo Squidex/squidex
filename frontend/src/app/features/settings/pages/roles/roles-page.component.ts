@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { AppsState, AutocompleteSource, FormHintComponent, LayoutComponent, ListViewComponent, RolesService, RolesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -51,14 +51,15 @@ class PermissionsAutocomplete implements AutocompleteSource {
     ],
 })
 export class RolesPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly rolesService = inject(RolesService);
+
+    protected readonly rolesState = inject(RolesState);
+    protected readonly schemasState = inject(SchemasState);
+
     protected readonly allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly rolesService: RolesService,
-        protected readonly rolesState: RolesState,
-        protected readonly schemasState: SchemasState,
-    ) {
+    constructor() {
         this.schemasState.loadIfNotLoaded();
 
         this.rolesState.load();

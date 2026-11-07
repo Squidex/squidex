@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfigureUIFieldsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 import { FieldListComponent } from './field-list.component';
@@ -22,6 +22,8 @@ import { FieldListComponent } from './field-list.component';
     ],
 })
 export class SchemaUIFormComponent {
+    private readonly schemasState = inject(SchemasState);
+
     /** The schema to configure the list and reference fields for. */
     public readonly schema = input.required<SchemaDto>();
 
@@ -38,11 +40,6 @@ export class SchemaUIFormComponent {
     protected readonly fieldsInReferences = linkedSignal<string[]>(() => {
         return this.schema().fieldsInReferences;
     });
-
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
 
     protected setFieldsInLists(names: string[]) {
         this.fieldsInLists.set(names);

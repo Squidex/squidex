@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, viewChild, inject } from '@angular/core';
 import { ApiUrlConfig, ThemeService, Types } from '@app/framework';
 import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
 
@@ -19,17 +19,10 @@ import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
     },
 })
 export class IFrameCardComponent {
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly authService = inject(AuthService);
+    private readonly themeService = inject(ThemeService);
     private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
-    private isInitialized = false;
-
-    /** The card configuration, with the name and the URL of the page to embed. */
-    public readonly options = input<any>();
-
-    /** The team of the dashboard, passed to the embedded page. */
-    public readonly team = input<TeamDto | null>();
-
-    /** The app of the dashboard, passed to the embedded page. */
-    public readonly app = input<AppDto | null>();
 
     private readonly context = computed(() => {
         const team = this.team();
@@ -45,11 +38,20 @@ export class IFrameCardComponent {
         };
     });
 
-    constructor(
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly authService: AuthService,
-        private readonly themeService: ThemeService,
-    ) {
+    private isInitialized = false;
+
+    /** The card configuration, with the name and the URL of the page to embed. */
+    public readonly options = input<any>();
+
+    /** The team of the dashboard, passed to the embedded page. */
+    public readonly team = input<TeamDto | null>();
+
+    /** The app of the dashboard, passed to the embedded page. */
+    public readonly app = input<AppDto | null>();
+
+    constructor() {
+        const themeService = this.themeService;
+
         effect(() => {
             const iframe = this.iframe();
             if (iframe) {

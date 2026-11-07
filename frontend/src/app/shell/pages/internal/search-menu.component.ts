@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Injectable, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injectable, viewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
@@ -14,13 +14,10 @@ import { AutocompleteComponent as AutocompleteComponent_1 } from '../../../frame
 
 @Injectable()
 export class SearchSource implements AutocompleteSource {
-    public readonly selectedApp = this.appsState.selectedApp;
+    private readonly appsState = inject(AppsState);
+    private readonly searchService = inject(SearchService);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly searchService: SearchService,
-    ) {
-    }
+    public readonly selectedApp = this.appsState.selectedApp;
 
     public find(query: string): Observable<readonly any[]> {
         if (!query || query.length < 3) {
@@ -49,16 +46,13 @@ export class SearchSource implements AutocompleteSource {
     ],
 })
 export class SearchMenuComponent {
+    private readonly router = inject(Router);
+    private readonly apiUrl = inject(ApiUrlConfig);
     private readonly searchControl = viewChild(AutocompleteComponent);
 
-    protected readonly searchResult?: SearchResultDto;
+    protected readonly searchSource = inject(SearchSource);
 
-    constructor(
-        private readonly router: Router,
-        private readonly apiUrl: ApiUrlConfig,
-        protected readonly searchSource: SearchSource,
-    ) {
-    }
+    protected readonly searchResult?: SearchResultDto;
 
     protected selectResult(result: SearchResultDto) {
         if (Types.is(result, SearchResultDto)) {

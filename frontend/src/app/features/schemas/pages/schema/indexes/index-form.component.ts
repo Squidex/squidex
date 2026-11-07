@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIndexForm, FormHintComponent, IndexesState, MarkdownDirective, ModalDialogComponent, SchemaDto, TranslatePipe } from '@app/shared';
 
@@ -27,6 +27,8 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
     ],
 })
 export class IndexFormComponent {
+    private readonly indexesState = inject(IndexesState);
+
     /** Emits when the index has been created. */
     public readonly create = output();
 
@@ -69,11 +71,6 @@ export class IndexFormComponent {
 
         return [...metaFields, ...dataFields.sort()];
     });
-
-    constructor(
-        private readonly indexesState: IndexesState,
-    ) {
-    }
 
     private emitCreate() {
         this.create.emit();

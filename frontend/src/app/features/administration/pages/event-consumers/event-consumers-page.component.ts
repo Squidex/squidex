@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, signal } from '@angular/core';
+import { Component, effect, signal, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -36,12 +36,12 @@ import { EventConsumerComponent } from './event-consumer.component';
     ],
 })
 export class EventConsumersPageComponent {
+    protected readonly eventConsumersState = inject(EventConsumersState);
+
     protected readonly eventConsumerErrorDialog = new DialogModel();
     protected readonly eventConsumerError = signal<string | undefined>(undefined);
 
-    constructor(
-        protected readonly eventConsumersState: EventConsumersState,
-    ) {
+    constructor() {
         this.eventConsumersState.load();
 
         effect(onCleanup => {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, linkedSignal, numberAttribute, output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, linkedSignal, numberAttribute, output, inject } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldDto, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, SchemaDto, Settings } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
 
@@ -21,6 +21,8 @@ import { ContentFieldComponent } from './content-field.component';
     ],
 })
 export class ContentSectionComponent {
+    private readonly localStore = inject(LocalStoreService);
+
     /** Emits when the user selects another language. */
     public readonly languageChange = output<AppLanguageDto>();
 
@@ -58,11 +60,6 @@ export class ContentSectionComponent {
 
         return this.localStore.getBoolean(this.isCollapsedKey());
     });
-
-    constructor(
-        private readonly localStore: LocalStoreService,
-    ) {
-    }
 
     protected toggle() {
         this.isCollapsed.update(x => !x);

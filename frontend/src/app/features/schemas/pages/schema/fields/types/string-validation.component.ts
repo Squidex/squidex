@@ -28,6 +28,14 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormRo
     ],
 })
 export class StringValidationComponent {
+    private readonly patternControl = computed(() => {
+        return this.fieldForm().controls['pattern'];
+    });
+
+    private readonly patternValue = toSignal(
+        toObservable(this.patternControl).pipe(
+            switchMap(control => value$<string>(control))));
+
     protected readonly contentTypes = StringContentTypeValues;
 
     /** The form group to edit the field properties. */
@@ -52,14 +60,6 @@ export class StringValidationComponent {
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
     protected readonly patternsModal = new ModalModel();
-
-    private readonly patternControl = computed(() => {
-        return this.fieldForm().controls['pattern'];
-    });
-
-    private readonly patternValue = toSignal(
-        toObservable(this.patternControl).pipe(
-            switchMap(control => value$<string>(control))));
 
     protected readonly showPatternMessage = toSignal(
         toObservable(this.patternControl).pipe(

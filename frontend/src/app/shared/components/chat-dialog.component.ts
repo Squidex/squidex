@@ -6,7 +6,7 @@
  */
 
 
-import { Component, effect, input, output, signal } from '@angular/core';
+import { Component, effect, input, output, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { HTTP, MathHelper, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -28,6 +28,9 @@ type ChatItem = { content: string | Observable<ChatEventDto>; type: 'User' | 'As
     ],
 })
 export class ChatDialogComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly translator = inject(TranslationsService);
+
     /** Emits the content the user wants to use, or nothing when the dialog is closed. */
     public readonly contentSelect = output<string | HTTP.UploadFile | undefined | null>();
 
@@ -50,10 +53,9 @@ export class ChatDialogComponent {
 
     protected readonly isRunning = signal(false);
 
-    constructor(authService: AuthService,
-        private readonly appsState: AppsState,
-        private readonly translator: TranslationsService,
-    ) {
+    constructor() {
+        const authService = inject(AuthService);
+
         this.user = authService.user!;
 
         effect(onCleanup => {

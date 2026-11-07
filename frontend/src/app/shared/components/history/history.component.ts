@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { merge, Observable, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
@@ -26,6 +26,13 @@ import { HistoryListComponent } from './history-list.component';
     ],
 })
 export class HistoryComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly historyService = inject(HistoryService);
+    private readonly messageBus = inject(MessageBus);
+    private readonly route = inject(ActivatedRoute);
+    private readonly schemasState = inject(SchemasState);
+    private readonly teamsState = inject(TeamsState);
+
     private readonly channel = this.calculateChannel();
 
     protected events: Observable<ReadonlyArray<HistoryEventDto>> =
@@ -34,16 +41,6 @@ export class HistoryComponent {
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000)),
         ).pipe(
             switchSafe(() => this.getHistory()));
-
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly historyService: HistoryService,
-        private readonly messageBus: MessageBus,
-        private readonly route: ActivatedRoute,
-        private readonly schemasState: SchemasState,
-        private readonly teamsState: TeamsState,
-    ) {
-    }
 
     private getHistory() {
         if (this.teamsState.teamId) {

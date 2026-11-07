@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
@@ -29,7 +29,9 @@ export class AppsCardComponent {
 
     protected readonly apps;
 
-    constructor(appsService: AppsService) {
+    constructor() {
+        const appsService = inject(AppsService);
+
         this.apps = toSignal(
             toObservable(this.team).pipe(
                 switchMap(team => appsService.getTeamApps(team.id))));

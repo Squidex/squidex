@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutContainerDirective, TitleComponent, TranslatePipe, UIState } from '@app/shared';
 
@@ -23,8 +23,5 @@ import { LayoutContainerDirective, TitleComponent, TranslatePipe, UIState } from
     ],
 })
 export class AdministrationAreaComponent {
-    constructor(
-        protected readonly uiState: UIState,
-    ) {
-    }
+    protected readonly uiState = inject(UIState);
 }

@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, numberAttribute, viewChild, viewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, numberAttribute, viewChild, viewChildren, inject } from '@angular/core';
 import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
 import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
@@ -32,6 +32,8 @@ import { ArrayItemComponent } from './array-item.component';
     ],
 })
 export class ArrayEditorComponent {
+    private readonly localStore = inject(LocalStoreService);
+
     private readonly children = viewChildren(ArrayItemComponent);
     private readonly scroller = viewChild(VirtualScrollerComponent);
 
@@ -97,11 +99,6 @@ export class ArrayEditorComponent {
     protected readonly hasField = computed(() => {
         return (this.formModel().field as any)['nested']?.length > 0;
     });
-
-    constructor(
-        private readonly localStore: LocalStoreService,
-    ) {
-    }
 
     protected removeItem(index: number) {
         this.formModel().removeItemAt(index);

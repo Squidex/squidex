@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output, inject } from '@angular/core';
 import { ShortcutService } from '@app/framework/internal';
 
 @Component({
@@ -23,7 +23,9 @@ export class ShortcutComponent {
     /** Ignores the shortcut while true. */
     public readonly disabled = input(false, { transform: booleanAttribute });
 
-    constructor(shortcutService: ShortcutService) {
+    constructor() {
+        const shortcutService = inject(ShortcutService);
+
         effect(onCleanup => {
             const keys = this.keys();
             if (!keys) {

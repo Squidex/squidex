@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { computed, Directive, effect, ElementRef, input, Input, numberAttribute, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
+import { computed, Directive, effect, ElementRef, inject, input, numberAttribute, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { ContentDto, FieldSizes, META_FIELDS, TableField, TableSettings } from '@app/shared/internal';
 
 export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
@@ -65,12 +65,8 @@ export class ContentsColumnsPipe implements PipeTransform {
     selector: '[sqxContentListWidth]',
 })
 export class ContentListWidthDirective {
-    /** The fields to calculate the minimum width of the table from. */
-    public readonly fields = input<ReadonlyArray<TableField> | null | undefined>(undefined, { alias: 'sqxContentListWidth' });
-
-    /** The table settings that provide the custom column sizes. */
-    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
-
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
     private readonly size = computed(() => {
         const fields = this.fields();
         if (!fields) {
@@ -88,10 +84,13 @@ export class ContentListWidthDirective {
         return size;
     });
 
-    constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
+    /** The fields to calculate the minimum width of the table from. */
+    public readonly fields = input<ReadonlyArray<TableField> | null | undefined>(undefined, { alias: 'sqxContentListWidth' });
+
+    /** The table settings that provide the custom column sizes. */
+    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
+
+    constructor() {
         effect(() => {
             const size = this.size();
             if (size === undefined) {
@@ -107,12 +106,8 @@ export class ContentListWidthDirective {
     selector: '[sqxContentListCell]',
 })
 export class ContentListCellDirective {
-    /** The field of the cell to calculate the width for. */
-    public readonly field = input.required<TableField>();
-
-    /** The table settings that provide the custom column sizes. */
-    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
-
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
     private readonly size = computed(() => {
         const field = this.field();
         if (!field.name) {
@@ -122,10 +117,13 @@ export class ContentListCellDirective {
         return getCellWidth(field, this.tableSettings()?.fieldSizes());
     });
 
-    constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
+    /** The field of the cell to calculate the width for. */
+    public readonly field = input.required<TableField>();
+
+    /** The table settings that provide the custom column sizes. */
+    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
+
+    constructor() {
         effect(() => {
             const size = this.size();
             if (size === undefined) {
@@ -144,71 +142,71 @@ export class ContentListCellDirective {
 @Directive({
     selector: '[sqxContentListCellResize][field][fields]',
 })
-export class ContentListCellResizeDirective implements OnInit, OnDestroy {
+export class ContentListCellResizeDirective {
+    private readonly element = inject<ElementRef<HTMLTableCellElement>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly isResizable = computed(() => {
+        return !!this.field() && !!this.tableFields();
+    });
     private mouseMove?: Function;
     private mouseUp?: Function;
-    private mouseDown?: Function;
-    private mouseBlur?: Function;
     private windowBlur?: Function;
     private startOffset = 0;
     private startWidth = 0;
     private resizer: any;
 
-    @Input()
-    public field!: TableField;
+    /** The field of the cell to resize. */
+    public readonly field = input<TableField>();
 
-    @Input('fields')
-    public tableFields?: TableSettings;
+    /** The table settings to store the new size in. */
+    public readonly tableFields = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
 
-    @Input({ transform: numberAttribute })
-    public minimumWidth = 50;
+    /** The minimum width of the cell in pixels. */
+    public readonly minimumWidth = input(50, { transform: numberAttribute });
 
-    constructor(
-        private readonly element: ElementRef<HTMLTableCellElement>,
-        private readonly renderer: Renderer2,
-    ) {
+    constructor() {
+        effect(onCleanup => {
+            if (!this.isResizable()) {
+                return;
+            }
+
+            const resizer = this.renderer.createElement('span');
+
+            this.renderer.addClass(resizer, 'resize-holder');
+            this.renderer.appendChild(this.element.nativeElement, resizer);
+
+            const mouseDown = this.renderer.listen(resizer, 'mousedown', (event: MouseEvent) => this.onMouseDown(event));
+            const mouseBlur = this.renderer.listen(resizer, 'blur', (event: MouseEvent) => this.onMouseUp(event));
+
+            this.resizer = resizer;
+
+            onCleanup(() => {
+                mouseDown();
+                mouseBlur();
+
+                this.resetMovement();
+                this.renderer.removeChild(this.element.nativeElement, resizer);
+            });
+        });
     }
 
-    public ngOnDestroy() {
-        this.mouseDown?.();
-        this.mouseDown = undefined;
-        this.mouseBlur?.();
-        this.mouseBlur = undefined;
-
-        this.resetMovement();
-    }
-
-    public ngOnInit() {
-        if (!this.tableFields || !this.field) {
-            return;
-        }
-
-        this.resizer = this.renderer.createElement('span');
-
-        this.renderer.addClass(this.resizer, 'resize-holder');
-        this.renderer.appendChild(this.element.nativeElement, this.resizer);
-
-        this.mouseDown = this.renderer.listen(this.resizer, 'mousedown', this.onMouseDown);
-        this.mouseBlur = this.renderer.listen(this.resizer, 'blur', this.onMouseUp);
-    }
-
-    private onMouseDown = (event: MouseEvent) => {
-        if (!this.tableFields || !this.field) {
+    private onMouseDown(event: MouseEvent) {
+        if (!this.isResizable()) {
             return;
         }
 
         this.resizer.focus();
 
-        this.mouseMove = this.renderer.listen('document', 'mousemove', this.onMouseMove);
-        this.mouseUp = this.renderer.listen('document', 'mouseup', this.onMouseUp);
-        this.windowBlur = this.renderer.listen('window', 'blur', this.onBlur);
+        this.mouseMove = this.renderer.listen('document', 'mousemove', (event: MouseEvent) => this.onMouseMove(event));
+        this.mouseUp = this.renderer.listen('document', 'mouseup', (event: MouseEvent) => this.onMouseUp(event));
+        this.windowBlur = this.renderer.listen('window', 'blur', () => this.onBlur());
 
         this.startOffset = event.pageX;
         this.startWidth = this.element.nativeElement.offsetWidth;
-    };
+    }
 
-    private onMouseMove = (event: MouseEvent) => {
-        if (!this.mouseMove || !this.tableFields || !this.field) {
+    private onMouseMove(event: MouseEvent) {
+        if (!this.mouseMove || !this.isResizable()) {
             return;
         }
 
@@ -217,10 +215,10 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         } catch {
             this.resetMovement();
         }
-    };
+    }
 
-    private onMouseUp = (event: MouseEvent) => {
-        if (!this.mouseMove || !this.tableFields || !this.field) {
+    private onMouseUp(event: MouseEvent) {
+        if (!this.mouseMove || !this.isResizable()) {
             return;
         }
 
@@ -229,20 +227,20 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         } finally {
             this.resetMovement();
         }
-    };
+    }
 
-    private onBlur = () => {
+    private onBlur() {
         this.resetMovement();
-    };
+    }
 
     private updateWidth(event: MouseEvent, save: boolean) {
         let width = this.startWidth + (event.pageX - this.startOffset);
 
-        if (width < this.minimumWidth) {
-            width = this.minimumWidth;
+        if (width < this.minimumWidth()) {
+            width = this.minimumWidth();
         }
 
-        this.tableFields!.updateSize(this.field.name!, width, save);
+        this.tableFields()!.updateSize(this.field()!.name!, width, save);
     }
 
     private resetMovement() {

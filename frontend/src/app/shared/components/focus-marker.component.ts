@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, input, Optional, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, Renderer2, inject } from '@angular/core';
 import { StringColorPipe } from '@app/framework';
 import { CollaborationService } from '@app/shared/internal';
 
@@ -19,6 +19,8 @@ import { CollaborationService } from '@app/shared/internal';
     ],
 })
 export class FocusMarkerComponent {
+    private readonly collaboration = inject(CollaborationService, { optional: true });
+
     private readonly users = computed(() => {
         return this.collaboration?.users() ?? [];
     });
@@ -32,10 +34,10 @@ export class FocusMarkerComponent {
         return this.users().find(x => x['focusedControl'] === controlId)?.user;
     });
 
-    constructor(
-        renderer: Renderer2,
-        @Optional() private readonly collaboration?: CollaborationService,
-    ) {
+    constructor() {
+        const renderer = inject(Renderer2);
+        const collaboration = this.collaboration;
+
         effect(onCleanup => {
             if (!collaboration) {
                 return;

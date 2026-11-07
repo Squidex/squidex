@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ApiUrlConfig, CopyDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -38,6 +38,8 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     ],
 })
 export class AuthPageComponent {
+    private readonly authState = inject(TeamAuthState);
+
     protected readonly urlToRedirect;
     protected readonly urlToTest;
 
@@ -46,9 +48,10 @@ export class AuthPageComponent {
 
     protected readonly updateForm = new UpdateTeamAuthForm();
 
-    constructor(apiUrl: ApiUrlConfig, teamsState: TeamsState,
-        private readonly authState: TeamAuthState,
-    ) {
+    constructor() {
+        const apiUrl = inject(ApiUrlConfig);
+        const teamsState = inject(TeamsState);
+
         this.urlToTest = apiUrl.buildUrl('/identity-server/test');
 
         this.urlToRedirect = computed(() => {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
 import { WorkflowAddFormComponent } from './workflow-add-form.component';
@@ -33,15 +33,16 @@ import { WorkflowComponent } from './workflow.component';
     ],
 })
 export class WorkflowsPageComponent {
+    private readonly rolesState = inject(RolesState);
+
+    protected readonly schemasSource = inject(SchemaTagSource);
+    protected readonly workflowsState = inject(WorkflowsState);
+
     protected readonly roles = computed(() => {
         return this.rolesState.roles().map(x => x.name);
     });
 
-    constructor(
-        private readonly rolesState: RolesState,
-        protected readonly schemasSource: SchemaTagSource,
-        protected readonly workflowsState: WorkflowsState,
-    ) {
+    constructor() {
         this.rolesState.load();
 
         this.workflowsState.load();

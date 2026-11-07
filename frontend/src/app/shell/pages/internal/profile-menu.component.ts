@@ -26,9 +26,16 @@ import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLink
     ],
 })
 export class ProfileMenuComponent {
+    private readonly authService = inject(AuthService);
+
+    protected readonly uiState = inject(UIState);
+
+    protected readonly themeService = inject(ThemeService);
+
     protected readonly modalMenu = new ModalModel();
 
     protected readonly language = inject(UIOptions).value.culture;
+
     protected readonly languages = UILanguages.ALL;
 
     protected readonly themeModes: ReadonlyArray<{ mode: ThemeMode; label: string }> = [
@@ -49,11 +56,9 @@ export class ProfileMenuComponent {
 
     protected readonly submenu = signal<'language' | 'theme' | null>(null);
 
-    constructor(apiUrl: ApiUrlConfig,
-        protected readonly uiState: UIState,
-        private readonly authService: AuthService,
-        protected readonly themeService: ThemeService,
-    ) {
+    constructor() {
+        const apiUrl = inject(ApiUrlConfig);
+
         this.profileUrl = apiUrl.buildUrl('/identity-server/account/profile');
     }
 

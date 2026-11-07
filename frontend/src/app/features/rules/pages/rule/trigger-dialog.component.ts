@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, effect, input, output, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, effect, input, output, signal, untracked, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -36,6 +36,10 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
     ],
 })
 export class TriggerDialogComponent {
+    private readonly rulesService = inject(RulesService);
+
+    protected readonly schemasState = inject(SchemasState);
+
     /** The trigger to edit, or null to add a new trigger. */
     public readonly trigger = input.required<RuleTriggerDto | null | undefined>();
 
@@ -53,10 +57,7 @@ export class TriggerDialogComponent {
 
     protected readonly currentTrigger = signal<TriggerForm | undefined>(undefined);
 
-    constructor(
-        protected readonly schemasState: SchemasState,
-        private readonly rulesService: RulesService,
-    ) {
+    constructor() {
         effect(() => {
             const trigger = this.trigger();
             if (!trigger) {

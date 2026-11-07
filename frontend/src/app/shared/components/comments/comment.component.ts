@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, signal, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, FromNowPipe, MarkdownDirective, MessageBus, NOOP_DATASOURCE, ScrollActiveDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -34,6 +34,9 @@ import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
     ],
 })
 export class CommentComponent {
+    private readonly dialogs = inject(DialogService);
+    private readonly messageBus = inject(MessageBus);
+
     /** Shows a link to the page where the comment has been created. */
     public readonly canFollow = input(false, { transform: booleanAttribute });
 
@@ -87,12 +90,6 @@ export class CommentComponent {
         // A single icon without context is hard to understand, therefore we show a label in this case.
         return !this.canAnswer() && !(this.isMyComment() && this.canEdit()) && !this.canResolve();
     });
-
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly messageBus: MessageBus,
-    ) {
-    }
 
     protected select() {
         const editorId = this.commentItem().comment.editorId;

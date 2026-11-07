@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, FormRowComponent, MarkdownDirective, MigrateContentsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
@@ -23,17 +23,14 @@ import { ConfirmClickDirective, FormRowComponent, MarkdownDirective, MigrateCont
     ],
 })
 export class SchemaMigrateFormComponent {
+    private readonly schemasState = inject(SchemasState);
+
     /** The schema to migrate the contents for. */
     public readonly schema = input.required<SchemaDto>();
 
     protected readonly migrateDraft = signal(true);
 
     protected readonly migratePublished = signal(true);
-
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
 
     protected migrateContents() {
         const schema = this.schema();

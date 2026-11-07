@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, input, output } from '@angular/core';
+import { Component, effect, input, output, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
@@ -27,6 +27,8 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
     ],
 })
 export class AssetFolderDialogComponent {
+    private readonly assetsState = inject(AssetsState);
+
     /** Emits when the dialog is closed or the folder has been saved. */
     public readonly dialogClose = output();
 
@@ -35,9 +37,7 @@ export class AssetFolderDialogComponent {
 
     protected readonly editForm = new RenameAssetFolderForm();
 
-    constructor(
-        private readonly assetsState: AssetsState,
-    ) {
+    constructor() {
         effect(() => {
             const assetFolder = this.assetFolder();
             if (assetFolder) {

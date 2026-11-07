@@ -6,7 +6,7 @@
  */
 
 
-import { afterRenderEffect, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, output, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, output, signal, viewChild, inject } from '@angular/core';
 import { lastValueFrom, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, LoaderComponent, MarkdownDirective, markdownExtractImage, markdownHasImage, markdownTransformImages, ResizedDirective, TranslatePipe, Types } from '@app/framework';
@@ -27,6 +27,9 @@ import { UserIdPicturePipe } from './pipes';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatItemComponent {
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly assetUploader = inject(AssetUploaderState);
+
     private readonly focusElement = viewChild<ElementRef<HTMLElement>>('focusElement');
 
     /** Emits when the answer has been completely received or has failed. */
@@ -63,10 +66,7 @@ export class ChatItemComponent {
     protected readonly isFailed = signal(false);
     protected readonly isCopying = signal(false);
 
-    constructor(
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly assetUploader: AssetUploaderState,
-    ) {
+    constructor() {
         effect(onCleanup => {
             const content = this.content();
             if (Types.isString(content)) {

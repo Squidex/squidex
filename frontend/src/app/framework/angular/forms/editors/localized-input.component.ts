@@ -40,6 +40,8 @@ type LocalizedValue = { [key: string]: any };
     ],
 })
 export class LocalizedInputComponent extends SignalControlComponent<LocalizedValue> {
+    private readonly value = signal<LocalizedValue | undefined>(undefined);
+
     /** The languages to edit a value for. */
     public readonly languages = input.required<ReadonlyArray<Language>>();
 
@@ -53,8 +55,6 @@ export class LocalizedInputComponent extends SignalControlComponent<LocalizedVal
     public readonly id = input('');
 
     protected readonly language = signal<Language>(DEFAULT_LANGUAGE);
-
-    private readonly value = signal<LocalizedValue | undefined>(undefined);
 
     protected readonly valueCurrent = computed(() => {
         return this.value()?.[this.language().iso2Code];

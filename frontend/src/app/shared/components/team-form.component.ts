@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { CreateTeamForm, TeamsState } from '@app/shared/internal';
@@ -29,15 +29,12 @@ import { CreateTeamForm, TeamsState } from '@app/shared/internal';
     ],
 })
 export class TeamFormComponent {
+    private readonly teamsStore = inject(TeamsState);
+
     /** Emits when the dialog is closed or the team has been created. */
     public readonly dialogClose = output();
 
     protected readonly createForm = new CreateTeamForm();
-
-    constructor(
-        private readonly teamsStore: TeamsState,
-    ) {
-    }
 
     protected emitClose() {
         this.dialogClose.emit();

@@ -25,6 +25,16 @@ const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELD
     ],
 })
 export class FieldListComponent {
+    private readonly fieldsAll = computed<ReadonlyArray<TableField>>(() => {
+        const fields = this.schema().contentFields;
+
+        if (this.withMetaFields()) {
+            return [...fields, ...META_FIELD_NAMES];
+        }
+
+        return fields;
+    });
+
     /** The text to show when no field has been added. */
     public readonly emptyText = input('');
 
@@ -39,16 +49,6 @@ export class FieldListComponent {
 
     /** Emits the new field names when fields are added, removed or reordered. */
     public readonly fieldNamesChange = output<string[]>();
-
-    private readonly fieldsAll = computed<ReadonlyArray<TableField>>(() => {
-        const fields = this.schema().contentFields;
-
-        if (this.withMetaFields()) {
-            return [...fields, ...META_FIELD_NAMES];
-        }
-
-        return fields;
-    });
 
     protected readonly fieldsAdded = computed<TableField[]>(() => {
         const fieldsAll = this.fieldsAll();

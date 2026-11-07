@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, ExportContentsDto, ExportFormat, FormRowComponent, MarkdownDirective, ModalDialogComponent, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
@@ -25,6 +25,8 @@ type FieldPaths = { label: string; paths: ReadonlyArray<string> };
     ],
 })
 export class ContentsExportDialogComponent {
+    private readonly schemasState = inject(SchemasState);
+
     /** Emits when the dialog is closed or the export has been started. */
     public readonly dialogClose = output();
 
@@ -52,11 +54,6 @@ export class ContentsExportDialogComponent {
     protected readonly format = signal<ExportFormat>('Csv');
     protected readonly fields = signal('');
     protected readonly unpublished = signal(false);
-
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
 
     protected addPath(path: string) {
         const current = this.fields().trim();

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, input, untracked } from '@angular/core';
+import { Component, effect, input, untracked, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
@@ -25,6 +25,8 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSour
     ],
 })
 export class StringUIComponent {
+    protected readonly schemasSource = inject(SchemaTagSource);
+
     protected readonly editors = StringFieldEditorValues;
 
     /** The form group to edit the field properties. */
@@ -46,9 +48,7 @@ export class StringUIComponent {
             switchMap(form => valueProjection$(form.controls['editor'], hidesClassNames))),
         { initialValue: false });
 
-    constructor(
-        protected readonly schemasSource: SchemaTagSource,
-    ) {
+    constructor() {
         effect(onCleanup => {
             const fieldForm = this.fieldForm();
 

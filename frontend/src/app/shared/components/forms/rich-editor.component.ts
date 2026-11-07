@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, forwardRef, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, forwardRef, input, output, signal, viewChild, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { catchError, of, switchMap } from 'rxjs';
@@ -37,6 +37,13 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
 })
 export class RichEditorComponent extends SignalControlComponent<EditorValue> {
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly appsState = inject(AppsState);
+    private readonly assetUploader = inject(AssetUploaderState);
+    private readonly assetService = inject(AssetsService);
+    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly themeService = inject(ThemeService);
+
     private readonly editor = viewChild.required<ElementRef>('editor');
     private readonly assetId = signal<string | null>(null);
     private editorWrapper?: SquidexEditorWrapper;
@@ -92,14 +99,9 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
 
     protected readonly contentsDialog = new DialogModel();
 
-    constructor(destroyRef: DestroyRef,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly appsState: AppsState,
-        private readonly assetUploader: AssetUploaderState,
-        private readonly assetService: AssetsService,
-        private readonly resourceLoader: ResourceLoaderService,
-        private readonly themeService: ThemeService,
-    ) {
+    constructor() {
+        const destroyRef = inject(DestroyRef);
+
         super();
 
         this.assetToEdit = toSignal(

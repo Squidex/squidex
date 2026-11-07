@@ -5,41 +5,44 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostBinding, Input, NgZone, OnInit, Renderer2 } from '@angular/core';
-import { Subscriptions } from '@app/framework/internal';
+import { Directive, effect, ElementRef, inject, input, NgZone, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxImageUrl]',
+    host: {
+        '[attr.src]': 'imageUrl()',
+    },
 })
-export class ImageUrlDirective implements  OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ImageUrlDirective {
+    private readonly zone = inject(NgZone);
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
 
-    @Input('sqxImageUrl') @HostBinding('attr.src')
-    public imageUrl!: string;
+    /** The URL of the image. The image is hidden until it has been loaded. */
+    public readonly imageUrl = input.required<string>({ alias: 'sqxImageUrl' });
 
-    constructor(
-        private readonly zone: NgZone,
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
-    }
-
-    public ngOnInit() {
-        this.zone.runOutsideAngular(() => {
-            this.subscriptions.add(
+    constructor() {
+        effect(onCleanup => {
+            const unlisteners = this.zone.runOutsideAngular(() => [
                 this.renderer.listen(this.element.nativeElement, 'load', () => {
                     this.onLoad();
-                }));
-
-            this.subscriptions.add(
+                }),
                 this.renderer.listen(this.element.nativeElement, 'error', () => {
                     this.onError();
-                }));
-        });
-    }
+                }),
+            ]);
 
-    public ngOnChanges() {
-        this.onError();
+            onCleanup(() => {
+                for (const unlisten of unlisteners) {
+                    unlisten();
+                }
+            });
+        });
+
+        effect(() => {
+            this.imageUrl();
+            this.onError();
+        });
     }
 
     private onLoad() {

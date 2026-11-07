@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, inject } from '@angular/core';
 import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
@@ -22,6 +22,8 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     ],
 })
 export class ApiCallsCardComponent {
+    private readonly usagesService = inject(UsagesService);
+
     /** The app to download the usage log for. Hides the download link when not set. */
     public readonly app = input<AppDto | null>();
 
@@ -48,11 +50,6 @@ export class ApiCallsCardComponent {
                 })),
         };
     });
-
-    constructor(
-        private readonly usagesService: UsagesService,
-    ) {
-    }
 
     protected downloadLog(app: AppDto) {
         this.usagesService.getLog(app.name)

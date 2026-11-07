@@ -59,6 +59,20 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
     private readonly editor = viewChild.required<ElementRef<HTMLDivElement>>('editor');
     private readonly aceEditor = signal<Editor | undefined>(undefined);
     private readonly valueChanged = new Subject<boolean>();
+
+    private readonly completions = computed<ReadonlyArray<Completion>>(() => {
+        const completion = this.completion();
+        if (!completion) {
+            return [];
+        }
+
+        return completion.map(source => {
+            const { path, description, type, ...other } = source;
+
+            return { value: path, name: path, description, meta: type?.toLowerCase(), path, ...other };
+        });
+    });
+
     private aceModes?: ModeList;
     private aceTools = false;
     private value = '';
@@ -98,19 +112,6 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
 
     /** The suggestions for autocompletion. */
     public readonly completion = input<ScriptCompletions | undefined | null>();
-
-    private readonly completions = computed<ReadonlyArray<Completion>>(() => {
-        const completion = this.completion();
-        if (!completion) {
-            return [];
-        }
-
-        return completion.map(source => {
-            const { path, description, type, ...other } = source;
-
-            return { value: path, name: path, description, meta: type?.toLowerCase(), path, ...other };
-        });
-    });
 
     constructor() {
         super();

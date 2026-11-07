@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, output, signal, untracked, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ContentSectionComponent } from '../forms/content-section.component';
@@ -32,6 +32,9 @@ import { ContentSectionComponent } from '../forms/content-section.component';
     ],
 })
 export class ContentCreatorComponent {
+    private readonly contentsState = inject(ComponentContentsState);
+    private readonly schemasState = inject(SchemasState);
+
     private isInitialDataLoaded = false;
 
     /** Emits the created content, or an empty array when the dialog is closed. */
@@ -78,10 +81,7 @@ export class ContentCreatorComponent {
 
     protected readonly contentForm = signal<EditContentForm | undefined>(undefined);
 
-    constructor(
-        private readonly contentsState: ComponentContentsState,
-        private readonly schemasState: SchemasState,
-    ) {
+    constructor() {
         effect(() => {
             const schema = this.schema();
             if (!schema) {

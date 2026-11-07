@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
@@ -37,17 +37,14 @@ type ImportStatus = {
     ],
 })
 export class ImportContributorsDialogComponent {
+    private readonly contributorsState = inject(TeamContributorsState);
+
     /** Emits when the dialog is closed. */
     public readonly dialogClose = output();
 
     protected readonly importForm = new ImportContributorsForm();
     protected readonly importStatus = signal<ReadonlyArray<ImportStatus>>([]);
     protected readonly importStage = signal<'Start' | 'Change' | 'Wait'>('Start');
-
-    constructor(
-        private readonly contributorsState: TeamContributorsState,
-    ) {
-    }
 
     protected detect() {
         this.importStage.set('Change');

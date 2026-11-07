@@ -7,44 +7,47 @@
 
 /* eslint-disable @angular-eslint/directive-selector */
 
-import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Directive, effect, ElementRef, inject, input } from '@angular/core';
 import { ShortcutService } from '@app/framework/internal';
 
 @Directive({
     selector: '[shortcut]',
 })
-export class ShortcutDirective implements OnDestroy, OnInit {
-    private subscription?: Function;
+export class ShortcutDirective {
+    private readonly element = inject(ElementRef);
+    private readonly shortcutService = inject(ShortcutService);
 
-    @Input()
-    public shortcut!: string;
+    /** The key combination to listen to, for example "ctrl+s". */
+    public readonly shortcut = input<string | null | undefined>();
 
-    @Input()
-    public shortcutAction: 'focus' | 'click' | 'none' = 'click';
+    /** What happens with the element when the shortcut is pressed. */
+    public readonly shortcutAction = input<'focus' | 'click' | 'none'>('click');
 
-    constructor(
-        private readonly element: ElementRef,
-        private readonly shortcutService: ShortcutService,
-    ) {
-    }
+    constructor() {
+        effect(onCleanup => {
+            const shortcut = this.shortcut();
+            if (!shortcut) {
+                return;
+            }
 
-    public ngOnDestroy() {
-        this.subscription?.();
-    }
+            const shortcutAction = this.shortcutAction();
+            if (shortcutAction === 'none') {
+                return;
+            }
 
-    public ngOnInit() {
-        if (this.shortcut && this.shortcutAction !== 'none') {
-            this.subscription = this.shortcutService.listen(this.shortcut, () => {
+            const unsubscribe = this.shortcutService.listen(shortcut, () => {
                 const target = this.element.nativeElement;
 
                 if (target && !target.disabled) {
                     try {
-                        target[this.shortcutAction]();
+                        target[shortcutAction]();
                     } catch {
                         // NOOP
                     }
                 }
             });
-        }
+
+            onCleanup(unsubscribe);
+        });
     }
 }

@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, signal, untracked, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -65,9 +65,24 @@ type Tab = 'editor' | 'references' | 'referencing' | 'inspect' | 'extension';
     ],
 })
 export class ContentPageComponent implements CanComponentDeactivate {
+    private readonly autoSaveService = inject(AutoSaveService);
+    private readonly collaboration = inject(CollaborationService);
+    private readonly dialogs = inject(DialogService);
+    private readonly messageBus = inject(MessageBus);
+    private readonly languagesState = inject(LanguagesState);
+    private readonly localStore = inject(LocalStoreService);
+    private readonly location = inject(Location);
+    private readonly previousUrl = inject(PreviousUrl);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly schemasState = inject(SchemasState);
+    private readonly tempService = inject(TempService);
     private readonly mutableContext: Record<string, any>;
+
     private autoSaveKey!: AutoSaveKey;
     private autoSaveIgnore = false;
+
+    protected readonly contentsState = inject(ContentsState);
 
     protected readonly schema = computed(() => {
         return this.schemasState.selectedSchema()!;
@@ -76,11 +91,17 @@ export class ContentPageComponent implements CanComponentDeactivate {
     protected readonly formContext = signal<any>(undefined);
 
     protected readonly contentTab = toSignal(this.route.queryParams.pipe(map(x => x['tab'] as Tab || 'editor')), { initialValue: 'editor' });
+
     protected readonly contentId = signal('');
+
     protected readonly content = signal<ContentDto | null | undefined>(undefined);
+
     protected readonly contentVersion = signal<Version | null>(null);
+
     protected readonly contentFormCompare = signal<EditContentForm | null>(null);
+
     protected readonly saveOnlyDropdown = new ModalModel();
+
     protected readonly savePublishDropdown = new ModalModel();
 
     protected readonly dropdown = new ModalModel();
@@ -108,21 +129,12 @@ export class ContentPageComponent implements CanComponentDeactivate {
         return this.checkPendingChangesBeforePreview();
     };
 
-    constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
-        protected readonly contentsState: ContentsState,
-        private readonly autoSaveService: AutoSaveService,
-        private readonly collaboration: CollaborationService,
-        private readonly dialogs: DialogService,
-        private readonly messageBus: MessageBus,
-        private readonly languagesState: LanguagesState,
-        private readonly localStore: LocalStoreService,
-        private readonly location: Location,
-        private readonly previousUrl: PreviousUrl,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly schemasState: SchemasState,
-        private readonly tempService: TempService,
-    ) {
+    constructor() {
+        const apiUrl = inject(ApiUrlConfig);
+        const authService = inject(AuthService);
+        const appsState = inject(AppsState);
+        const contentsState = this.contentsState;
+
         const role = appsState.snapshot.selectedApp?.roleName;
 
         this.mutableContext = {

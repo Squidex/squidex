@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectorRef, Component, forwardRef, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, signal, inject } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalDirective, ModalModel, ModalPlacementDirective, SignalControlComponent, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
@@ -32,6 +32,9 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     ],
 })
 export class AssetFolderDropdownComponent extends SignalControlComponent<string> {
+    private readonly assetsService = inject(AssetsService);
+    private readonly changeDetector = inject(ChangeDetectorRef);
+
     protected readonly appName: string;
 
     protected readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
@@ -41,10 +44,9 @@ export class AssetFolderDropdownComponent extends SignalControlComponent<string>
 
     protected readonly dropdown = new ModalModel();
 
-    constructor(appsState: AppsState,
-        private readonly assetsService: AssetsService,
-        private readonly changeDetector: ChangeDetectorRef,
-    ) {
+    constructor() {
+        const appsState = inject(AppsState);
+
         super();
 
         this.appName = appsState.appName;

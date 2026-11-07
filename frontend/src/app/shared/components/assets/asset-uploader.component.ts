@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
@@ -24,14 +24,13 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     ],
 })
 export class AssetUploaderComponent {
-    protected modalMenu = new ModalModel();
+    private readonly assetsState = inject(AssetsState);
 
-    constructor(
-        protected readonly appsState: AppsState,
-        protected readonly assetUploader: AssetUploaderState,
-        private readonly assetsState: AssetsState,
-    ) {
-    }
+    protected readonly appsState = inject(AppsState);
+
+    protected readonly assetUploader = inject(AssetUploaderState);
+
+    protected modalMenu = new ModalModel();
 
     protected addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         for (const file of files) {

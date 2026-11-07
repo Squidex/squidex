@@ -5,35 +5,34 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+import { afterNextRender, Directive, ElementRef, inject, input, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxExternalLink]',
 })
-export class ExternalLinkDirective implements AfterViewInit {
-    @Input('sqxExternalLink')
-    public type?: 'noicon' | 'default' | string;
+export class ExternalLinkDirective {
+    private readonly element = inject<ElementRef<Element>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
 
-    constructor(
-        private readonly element: ElementRef<Element>,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    /** Use "noicon" to hide the external link icon. */
+    public readonly type = input<'noicon' | 'default' | string | undefined>(undefined, { alias: 'sqxExternalLink' });
 
-    public ngAfterViewInit() {
-        const element = this.element.nativeElement;
+    constructor() {
+        afterNextRender(() => {
+            const element = this.element.nativeElement;
 
-        this.renderer.setProperty(element, 'target', '_blank');
-        this.renderer.setProperty(element, 'rel', 'noopener');
-        this.renderer.addClass(element, 'external');
+            this.renderer.setProperty(element, 'target', '_blank');
+            this.renderer.setProperty(element, 'rel', 'noopener');
+            this.renderer.addClass(element, 'external');
 
-        if (this.type !== 'noicon') {
-            const icon = this.renderer.createElement('i');
+            if (this.type() !== 'noicon') {
+                const icon = this.renderer.createElement('i');
 
-            this.renderer.addClass(icon, 'icon-external-link');
+                this.renderer.addClass(icon, 'icon-external-link');
 
-            this.renderer.appendChild(element, this.renderer.createText(' '));
-            this.renderer.appendChild(element, icon);
-        }
+                this.renderer.appendChild(element, this.renderer.createText(' '));
+                this.renderer.appendChild(element, icon);
+            }
+        });
     }
 }

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, TranslatePipe } from '@app/shared';
 
@@ -23,6 +23,8 @@ import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, Tr
     ],
 })
 export class SchemaExportFormComponent {
+    private readonly schemasState = inject(SchemasState);
+
     /** The schema to export and synchronize. */
     public readonly schema = input.required<SchemaDto>();
 
@@ -32,9 +34,7 @@ export class SchemaExportFormComponent {
         return this.schema().canUpdateScripts;
     });
 
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
+    constructor() {
         effect(() => {
             this.synchronizeForm.loadSchema(this.schema());
         });

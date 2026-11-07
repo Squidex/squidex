@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppsState, LayoutContainerDirective, TitleComponent } from '@app/shared';
 import { LeftMenuComponent } from './left-menu.component';
@@ -22,8 +22,5 @@ import { LeftMenuComponent } from './left-menu.component';
     ],
 })
 export class AppAreaComponent {
-    constructor(
-        protected readonly appsState: AppsState,
-    ) {
-    }
+    protected readonly appsState = inject(AppsState);
 }

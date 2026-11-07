@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { AllAppsState, AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, ModalDirective, NewsService, PagerComponent, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
 import { AppComponent } from './app.component';
@@ -35,12 +35,28 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
     ],
 })
 export class AppsPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly localStore = inject(LocalStoreService);
+    private readonly newsService = inject(NewsService);
+    private readonly teamsState = inject(TeamsState);
+    private readonly templatesState = inject(TemplatesState);
+    private readonly tourState = inject(TourState);
+    private readonly uiOptions = inject(UIOptions);
+
+    protected readonly allAppsState = inject(AllAppsState);
+
+    protected readonly authState = inject(AuthService);
+
+    protected readonly uiState = inject(UIState);
+
     protected readonly addAppDialog = new DialogModel();
+
     protected readonly addAppTemplate = signal<TemplateDto | undefined>(undefined);
 
     protected readonly onboardingDialog = new DialogModel();
 
     protected readonly newsFeatures = signal<ReadonlyArray<FeatureDto> | undefined>(undefined);
+
     protected readonly newsDialog = new DialogModel();
 
     protected readonly generalInfo: string = this.uiOptions.value.showInfo ? this.uiOptions.value.info : '';
@@ -78,18 +94,7 @@ export class AppsPageComponent {
         return grouped;
     });
 
-    constructor(
-        protected readonly allAppsState: AllAppsState,
-        protected readonly authState: AuthService,
-        protected readonly uiState: UIState,
-        private readonly appsState: AppsState,
-        private readonly localStore: LocalStoreService,
-        private readonly newsService: NewsService,
-        private readonly teamsState: TeamsState,
-        private readonly templatesState: TemplatesState,
-        private readonly tourState: TourState,
-        private readonly uiOptions: UIOptions,
-    ) {
+    constructor() {
         const apps = this.appsState.apps();
         if (this.shouldShowOnboarding(apps)) {
             this.onboardingDialog.show();

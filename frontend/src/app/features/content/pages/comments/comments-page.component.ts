@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { CommentsComponent, ContentsState, LayoutComponent, TranslatePipe } from '@app/shared';
@@ -26,14 +26,11 @@ type Tab = 'unresolved' | 'all';
     ],
 })
 export class CommentsPageComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly contentStates = inject(ContentsState);
+
     protected readonly commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));
     protected readonly commentsTab = this.route.queryParams.pipe(map(x => x['commentsTab'] as Tab || 'unresolved'));
 
     protected readonly content = this.contentStates.selectedContent;
-
-    constructor(
-        private readonly route: ActivatedRoute,
-        private readonly contentStates: ContentsState,
-    ) {
-    }
 }

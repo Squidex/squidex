@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LayoutContainerDirective, TeamsState, TitleComponent } from '@app/shared';
 import { LeftMenuComponent } from './left-menu.component';
@@ -22,8 +22,5 @@ import { LeftMenuComponent } from './left-menu.component';
     ],
 })
 export class TeamAreaComponent {
-    constructor(
-        protected readonly teamsState: TeamsState,
-    ) {
-    }
+    protected readonly teamsState = inject(TeamsState);
 }

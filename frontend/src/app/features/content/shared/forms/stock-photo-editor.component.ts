@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, forwardRef, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, forwardRef, signal, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
@@ -40,24 +40,28 @@ type Request = { search?: string; page: number };
     ],
 })
 export class StockPhotoEditorComponent extends SignalControlComponent<string> {
+    private readonly stockPhotoService = inject(StockPhotoService);
+    private readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
+
     protected readonly valueControl = new UntypedFormControl('');
 
     protected readonly value = toSignal(value$<string>(this.valueControl), { initialValue: '' });
 
-    private readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
     protected readonly stockPhotoThumbnail = toSignal(valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x));
+
     protected readonly stockPhotoSearch = new UntypedFormControl('');
+
     protected readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
+
     protected readonly stockPhotosHasMore = signal(false);
+
     protected readonly stockPhotosLoading = signal(false);
 
     protected readonly thumbnailStatus = signal<'Loaded' | 'Failed' | undefined>(undefined);
 
     protected readonly searchDialog = new DialogModel();
 
-    constructor(
-        private readonly stockPhotoService: StockPhotoService,
-    ) {
+    constructor() {
         super();
 
         effect(() => {

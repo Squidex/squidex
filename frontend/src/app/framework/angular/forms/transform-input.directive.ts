@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { computed, Directive, ElementRef, forwardRef, inject, input, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { generateSlug, Types } from '@app/framework/internal';
 
@@ -25,34 +25,39 @@ export const SQX_TRANSFORM_INPUT_VALUE_ACCESSOR: any = {
     providers: [
         SQX_TRANSFORM_INPUT_VALUE_ACCESSOR,
     ],
+    host: {
+        '(input)': 'onChange($event)',
+        '(blur)': 'onTouched()',
+    },
 })
 export class TransformInputDirective implements ControlValueAccessor {
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly transformer = computed(() => {
+        const value = this.transform();
+
+        if (!Types.isString(value)) {
+            return value || TransformNoop;
+        }
+
+        switch (value) {
+            case 'LowerCase':
+                return TransformLowerCase;
+            case 'Slugify':
+                return TransformSlugify;
+            case 'UpperCase':
+                return TransformUpperCase;
+            default:
+                return TransformNoop;
+        }
+    });
+
     private callChange = (_: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
-    private transformer = TransformNoop;
 
-    @Input('sqxTransformInput')
-    public set transform(value: Transform | string) {
-        if (Types.isString(value)) {
-            if (value === 'LowerCase') {
-                this.transformer = TransformLowerCase;
-            } else if (value === 'Slugify') {
-                this.transform = TransformSlugify;
-            } else if (value === 'UpperCase') {
-                this.transform = TransformUpperCase;
-            }
-        } else {
-            this.transformer = value || TransformNoop;
-        }
-    }
+    /** The transformation that is applied to the entered text, either a function or LowerCase, Slugify or UpperCase. */
+    public readonly transform = input<Transform | string | undefined | null>(undefined, { alias: 'sqxTransformInput' });
 
-    constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
-    }
-
-    @HostListener('input', ['$event'])
     protected onChange(event: Event): void {
         const target = event.target as HTMLInputElement;
         if (target?.value === undefined) {
@@ -65,7 +70,6 @@ export class TransformInputDirective implements ControlValueAccessor {
         this.callChange(normalizedValue);
     }
 
-    @HostListener('blur')
     protected onTouched() {
         this.callTouched();
     }
@@ -89,6 +93,6 @@ export class TransformInputDirective implements ControlValueAccessor {
     }
 
     private transformValue(value: any): string {
-        return Types.isString(value) ? this.transformer(value) : '';
+        return Types.isString(value) ? this.transformer()(value) : '';
     }
 }

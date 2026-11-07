@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, input, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TitleService, Types } from '@app/framework/internal';
 
@@ -23,12 +23,12 @@ export class TitleComponent {
     /** The title to push to the title service. */
     public readonly message = input.required<string>();
 
-    constructor(
-        route: ActivatedRoute,
-        router: Router,
-        titleService: TitleService,
-        destroyRef: DestroyRef,
-    ) {
+    constructor() {
+        const route = inject(ActivatedRoute);
+        const router = inject(Router);
+        const titleService = inject(TitleService);
+        const destroyRef = inject(DestroyRef);
+
         effect(() => {
             const message = this.message();
             const routeTree = router.createUrlTree(this.url(), { relativeTo: route });

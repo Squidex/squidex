@@ -5,26 +5,61 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
+import { Component, signal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService } from '@app/framework/internal';
 import { ConfirmClickDirective } from './confirm-click.directive';
 
+@Component({
+    template: `
+        <button
+            sqxConfirmClick
+            [confirmRememberKey]="confirmRememberKey()"
+            [confirmRequired]="confirmRequired()"
+            [confirmText]="confirmText()"
+            [confirmTitle]="confirmTitle()">
+        </button>
+    `,
+    imports: [
+        ConfirmClickDirective,
+    ],
+})
+class TestHostComponent {
+    public readonly confirmRememberKey = signal<string | undefined>(undefined);
+    public readonly confirmRequired = signal(true);
+    public readonly confirmText = signal<string | undefined>(undefined);
+    public readonly confirmTitle = signal<string | undefined>(undefined);
+}
+
 describe('ConfirmClickDirective', () => {
     let dialogs: IMock<DialogService>;
+    let fixture: ComponentFixture<TestHostComponent>;
     let confirmClickDirective: ConfirmClickDirective;
+    let button: HTMLButtonElement;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
-        confirmClickDirective = new ConfirmClickDirective(dialogs.object);
+        TestBed.configureTestingModule({
+            imports: [TestHostComponent],
+            providers: [
+                { provide: DialogService, useValue: dialogs.object },
+            ],
+        });
+
+        fixture = TestBed.createComponent(TestHostComponent);
+
+        const element = fixture.debugElement.query(By.directive(ConfirmClickDirective));
+
+        confirmClickDirective = element.injector.get(ConfirmClickDirective);
+        button = element.nativeElement;
     });
 
     it('Should invoke action directly when disabled', () => {
-        confirmClickDirective.confirmRequired = false;
-        confirmClickDirective.confirmText = 'confirmText';
-        confirmClickDirective.confirmTitle = 'confirmTitle';
-        confirmClickDirective.confirmRememberKey = 'confirmKey';
+        setInputs(false, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -32,7 +67,7 @@ describe('ConfirmClickDirective', () => {
             invoked = true;
         });
 
-        confirmClickDirective.onClick(new Event('click'));
+        button.click();
 
         expect(invoked).toBe(true);
         dialogs.verify(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAny()), Times.never());
@@ -42,9 +77,7 @@ describe('ConfirmClickDirective', () => {
         dialogs.setup(x => x.confirm('confirmTitle', 'confirmText', 'confirmKey'))
             .returns(() => of(true));
 
-        confirmClickDirective.confirmText = 'confirmText';
-        confirmClickDirective.confirmTitle = 'confirmTitle';
-        confirmClickDirective.confirmRememberKey = 'confirmKey';
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -52,7 +85,7 @@ describe('ConfirmClickDirective', () => {
             invoked = true;
         });
 
-        confirmClickDirective.onClick(new Event('click'));
+        button.click();
 
         expect(invoked).toBe(true);
     });
@@ -61,9 +94,7 @@ describe('ConfirmClickDirective', () => {
         dialogs.setup(x => x.confirm('confirmTitle', 'confirmText', 'confirmKey'))
             .returns(() => of(true));
 
-        confirmClickDirective.confirmText = 'confirmText';
-        confirmClickDirective.confirmTitle = 'confirmTitle';
-        confirmClickDirective.confirmRememberKey = 'confirmKey';
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -75,7 +106,7 @@ describe('ConfirmClickDirective', () => {
             subscription.unsubscribe();
         });
 
-        confirmClickDirective.onClick(new Event('click'));
+        button.click();
 
         expect(invoked).toBe(true);
     });
@@ -84,9 +115,7 @@ describe('ConfirmClickDirective', () => {
         dialogs.setup(x => x.confirm('confirmTitle', 'confirmText', 'confirmKey'))
             .returns(() => of(false));
 
-        confirmClickDirective.confirmText = 'confirmText';
-        confirmClickDirective.confirmTitle = 'confirmTitle';
-        confirmClickDirective.confirmRememberKey = 'confirmKey';
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -94,7 +123,7 @@ describe('ConfirmClickDirective', () => {
             invoked = true;
         });
 
-        confirmClickDirective.onClick(new Event('click'));
+        button.click();
 
         expect(invoked).toBe(false);
     });
@@ -103,9 +132,7 @@ describe('ConfirmClickDirective', () => {
         dialogs.setup(x => x.confirm('confirmTitle', 'confirmText', 'confirmKey'))
             .returns(() => of(true));
 
-        confirmClickDirective.confirmText = 'confirmText';
-        confirmClickDirective.confirmTitle = 'confirmTitle';
-        confirmClickDirective.confirmRememberKey = 'confirmKey';
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -113,7 +140,7 @@ describe('ConfirmClickDirective', () => {
             invoked = true;
         }).unsubscribe();
 
-        confirmClickDirective.onClick(new Event('click'));
+        button.click();
 
         expect(invoked).toBe(false);
     });
@@ -122,8 +149,9 @@ describe('ConfirmClickDirective', () => {
         dialogs.setup(x => x.confirm('confirmTitle', 'confirmText', 'confirmKey'))
             .returns(() => of(false));
 
-        confirmClickDirective.confirmTitle = 'confirmTitle';
-        confirmClickDirective.onClick(new Event('click'));
+        setInputs(true, undefined, 'confirmTitle', undefined);
+
+        button.click();
 
         dialogs.verify(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAny()), Times.never());
     });
@@ -132,9 +160,21 @@ describe('ConfirmClickDirective', () => {
         dialogs.setup(x => x.confirm('confirmTitle', 'confirmText', 'confirmKey'))
             .returns(() => of(false));
 
-        confirmClickDirective.confirmText = 'confirmText';
-        confirmClickDirective.onClick(new Event('click'));
+        setInputs(true, 'confirmText', undefined, undefined);
+
+        button.click();
 
         dialogs.verify(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAny()), Times.never());
     });
+
+    function setInputs(confirmRequired: boolean, confirmText?: string, confirmTitle?: string, confirmRememberKey?: string) {
+        const host = fixture.componentInstance;
+
+        host.confirmRequired.set(confirmRequired);
+        host.confirmText.set(confirmText);
+        host.confirmTitle.set(confirmTitle);
+        host.confirmRememberKey.set(confirmRememberKey);
+
+        fixture.detectChanges();
+    }
 });

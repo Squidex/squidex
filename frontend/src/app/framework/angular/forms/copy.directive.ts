@@ -5,26 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, HostListener, Input, Renderer2 } from '@angular/core';
+import { Directive, inject, input, Renderer2 } from '@angular/core';
 import { DialogService, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCopy]',
+    host: {
+        '(click)': 'onClick()',
+    },
 })
 export class CopyDirective {
-    @Input('sqxCopy')
-    public inputElement!: any;
+    private readonly dialogs = inject(DialogService);
+    private readonly renderer = inject(Renderer2);
 
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    /** The element whose value or text is copied to the clipboard on click. */
+    public readonly inputElement = input<any>(undefined, { alias: 'sqxCopy' });
 
-    @HostListener('click')
     protected onClick() {
-        if (this.inputElement) {
-            this.copyToClipbord(this.inputElement);
+        const element = this.inputElement();
+        if (element) {
+            this.copyToClipbord(element);
         }
     }
 

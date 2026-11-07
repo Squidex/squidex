@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { ConfirmClickDirective, ContributorDto, HighlightPipe, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 import { TeamContributorsState } from '../../internal';
 
@@ -25,16 +25,13 @@ import { TeamContributorsState } from '../../internal';
     ],
 })
 export class ContributorComponent {
+    private readonly contributorsState = inject(TeamContributorsState);
+
     /** The search term to highlight in the name of the contributor. */
     public readonly search = input<string | RegExp | null>();
 
     /** The contributor to show. */
     public readonly contributor = input.required<ContributorDto>({ alias: 'sqxContributor' });
-
-    constructor(
-        private readonly contributorsState: TeamContributorsState,
-    ) {
-    }
 
     protected remove() {
         this.contributorsState.revoke(this.contributor());

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, TranslatePipe } from '@app/shared';
@@ -24,6 +24,9 @@ import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStore
     ],
 })
 export class PreviewButtonComponent {
+    private readonly authService = inject(AuthService);
+    private readonly localStore = inject(LocalStoreService);
+
     /** Asks the user for confirmation before the preview is opened, for example to save pending changes. */
     public readonly confirm = input<() => Observable<boolean>>();
 
@@ -55,12 +58,6 @@ export class PreviewButtonComponent {
 
         return previewNames.removed(previewNameSelected).sorted();
     });
-
-    constructor(
-        private readonly authService: AuthService,
-        private readonly localStore: LocalStoreService,
-    ) {
-    }
 
     protected follow(name?: string) {
         if (name) {

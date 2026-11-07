@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownDirective, NotifoComponent, PlansState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UserNamePipe } from '@app/shared';
 import { PlanComponent } from './plan.component';
@@ -38,10 +38,11 @@ import { PlanComponent } from './plan.component';
 export class PlansPageComponent {
     private readonly overridePlanId?: string;
 
-    constructor(
-        protected readonly plansState: PlansState,
-        route: ActivatedRoute,
-    ) {
+    protected readonly plansState = inject(PlansState);
+
+    constructor() {
+        const route = inject(ActivatedRoute);
+
         this.overridePlanId = route.snapshot.queryParams['planId'];
 
         this.plansState.load(false, this.overridePlanId);

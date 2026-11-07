@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -18,11 +18,9 @@ import { ImportContributorsDialogComponent } from './import-contributors-dialog.
 
 @Injectable()
 export class UsersDataSource implements AutocompleteSource {
-    constructor(
-        private readonly contributorsState: TeamContributorsState,
-        private readonly usersService: UsersService,
-    ) {
-    }
+    private readonly contributorsState = inject(TeamContributorsState);
+    private readonly usersService = inject(UsersService);
+
 
     public find(query: string): Observable<ReadonlyArray<any>> {
         if (!query) {
@@ -66,16 +64,14 @@ export class UsersDataSource implements AutocompleteSource {
     ],
 })
 export class ContributorAddFormComponent {
+    private readonly contributorsState = inject(TeamContributorsState);
+    private readonly dialogs = inject(DialogService);
+
+    protected readonly usersDataSource = inject(UsersDataSource);
+
     protected readonly assignContributorForm = new AssignTeamContributorForm();
 
     protected readonly importDialog = new DialogModel();
-
-    constructor(
-        private readonly contributorsState: TeamContributorsState,
-        protected readonly usersDataSource: UsersDataSource,
-        private readonly dialogs: DialogService,
-    ) {
-    }
 
     protected assignContributor() {
         const value = this.assignContributorForm.submit();

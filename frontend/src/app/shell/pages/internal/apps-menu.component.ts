@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamFormComponent, TeamsState, TemplatesState, TitleService, TranslatePipe, UIState } from '@app/shared';
 
@@ -26,7 +26,19 @@ import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalD
     ],
 })
 export class AppsMenuComponent {
+    private readonly titleService = inject(TitleService);
+    private readonly templatesState = inject(TemplatesState);
+
+    protected readonly appsState = inject(AppsState);
+
+    protected readonly route = inject(ActivatedRoute);
+
+    protected readonly teamsState = inject(TeamsState);
+
+    protected readonly uiState = inject(UIState);
+
     protected readonly addAppDialog = new DialogModel();
+
     protected readonly addTeamDialog = new DialogModel();
 
     protected readonly appsMenu = new ModalModel();
@@ -36,14 +48,4 @@ export class AppsMenuComponent {
     });
 
     protected readonly starters = this.templatesState.starters;
-
-    constructor(
-        private readonly titleService: TitleService,
-        protected readonly appsState: AppsState,
-        protected readonly route: ActivatedRoute,
-        protected readonly teamsState: TeamsState,
-        protected readonly uiState: UIState,
-        private readonly templatesState: TemplatesState,
-    ) {
-    }
 }

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, EditSchemaForm, FormRowComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -24,6 +24,8 @@ import { AppLanguageDto, EditSchemaForm, FormRowComponent, SchemaDto, SchemasSta
     ],
 })
 export class SchemaEditFormComponent {
+    private readonly schemasState = inject(SchemasState);
+
     /** The schema to edit. */
     public readonly schema = input.required<SchemaDto>();
 
@@ -55,9 +57,7 @@ export class SchemaEditFormComponent {
 
     protected readonly schemaForm = new EditSchemaForm();
 
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
+    constructor() {
         effect(() => {
             const schema = this.schema();
 

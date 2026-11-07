@@ -5,77 +5,75 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, NgZone, numberAttribute, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { MathHelper, StringHelper, Subscriptions } from '@app/framework/internal';
+import { afterNextRender, computed, DestroyRef, Directive, effect, ElementRef, inject, input, NgZone, numberAttribute, Renderer2 } from '@angular/core';
+import { MathHelper, StringHelper } from '@app/framework/internal';
 
 const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
 
 @Directive({
     selector: '[sqxImageSource]',
 })
-
-export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
-    private readonly subscriptions = new Subscriptions();
+export class ImageSourceDirective {
+    private readonly zone = inject(NgZone);
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly parentElement = computed(() => {
+        return this.parent() || this.renderer.parentNode(this.element.nativeElement);
+    });
     private size: any;
     private loadTimer: any;
     private loadRetries = 0;
     private loadQuery: string | null = null;
 
-    @Input('sqxImageSource')
-    public imageSource!: string;
+    /** The URL of the image, without the size query. */
+    public readonly imageSource = input.required<string>({ alias: 'sqxImageSource' });
 
-    @Input({ transform: numberAttribute })
-    public retryCount = 0;
+    /** The number of retries when the image cannot be loaded. */
+    public readonly retryCount = input(0, { transform: numberAttribute });
 
-    @Input()
-    public layoutKey = '';
+    /** The key to cache and share the size between images with the same layout. */
+    public readonly layoutKey = input('');
 
-    @Input()
-    public parent: any = null;
+    /** The element to calculate the size from. Defaults to the parent element. */
+    public readonly parent = input<any>(null);
 
-    constructor(
-        private readonly zone: NgZone,
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    constructor() {
+        effect(onCleanup => {
+            const parent = this.parentElement();
 
-    public ngOnDestroy() {
-        clearTimeout(this.loadTimer);
-    }
-
-    public ngOnInit() {
-        if (!this.parent) {
-            this.parent = this.renderer.parentNode(this.element.nativeElement);
-        }
-
-        this.zone.runOutsideAngular(() => {
-            this.subscriptions.add(
-                this.renderer.listen(this.parent, 'resize', () => {
+            const unlisteners = this.zone.runOutsideAngular(() => [
+                this.renderer.listen(parent, 'resize', () => {
                     this.resize();
-                }));
-
-            this.subscriptions.add(
+                }),
                 this.renderer.listen(this.element.nativeElement, 'load', () => {
                     this.onLoad();
-                }));
-
-            this.subscriptions.add(
+                }),
                 this.renderer.listen(this.element.nativeElement, 'error', () => {
                     this.onError();
-                }));
+                }),
+            ]);
+
+            onCleanup(() => {
+                for (const unlisten of unlisteners) {
+                    unlisten();
+                }
+            });
         });
-    }
 
-    public ngAfterViewInit() {
-        this.resize();
-    }
+        effect(() => {
+            this.loadQuery = null;
+            this.loadRetries = 0;
 
-    public ngOnChanges() {
-        this.loadQuery = null;
-        this.loadRetries = 0;
+            this.setImageSource();
+        });
 
-        this.setImageSource();
+        afterNextRender(() => {
+            this.resize();
+        });
+
+        inject(DestroyRef).onDestroy(() => {
+            clearTimeout(this.loadTimer);
+        });
     }
 
     private onLoad() {
@@ -91,18 +89,21 @@ export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
     private resize() {
         let size: { width: number; height: number } = null!;
 
-        if (this.layoutKey) {
-            size = LAYOUT_CACHE[this.layoutKey];
+        const layoutKey = this.layoutKey();
+        if (layoutKey) {
+            size = LAYOUT_CACHE[layoutKey];
         }
 
         if (!size) {
-            size = { width: this.parent.offsetWidth, height: this.parent.offsetHeight };
+            const parent = this.parentElement();
+
+            size = { width: parent.offsetWidth, height: parent.offsetHeight };
         }
 
         this.size = size;
 
-        if (this.layoutKey) {
-            LAYOUT_CACHE[this.layoutKey] = size;
+        if (layoutKey) {
+            LAYOUT_CACHE[layoutKey] = size;
         }
 
         this.renderer.setStyle(this.element.nativeElement, 'display', 'inline-block');
@@ -113,6 +114,7 @@ export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
     }
 
     private setImageSource() {
+        const imageSource = this.imageSource();
         if (!this.size) {
             return;
         }
@@ -129,7 +131,7 @@ export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
                 q: this.loadQuery,
             });
 
-            const url = this.imageSource + query;
+            const url = imageSource + query;
 
             this.renderer.setProperty(this.element.nativeElement, 'src', url);
         }
@@ -138,7 +140,7 @@ export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
     private retryLoadingImage() {
         this.loadRetries++;
 
-        if (this.loadRetries <= this.retryCount) {
+        if (this.loadRetries <= this.retryCount()) {
             this.loadTimer =
                 setTimeout(() => {
                     this.loadQuery = MathHelper.guid();

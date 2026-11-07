@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, shareReplay } from 'rxjs';
@@ -38,6 +38,8 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     ],
 })
 export class AssetScriptsPageComponent {
+    private readonly assetScriptsState = inject(AssetScriptsState);
+
     protected readonly assetScript = signal('query');
     protected readonly assetCompletions: Observable<ScriptCompletions>;
 
@@ -45,9 +47,10 @@ export class AssetScriptsPageComponent {
 
     protected readonly isEditable = this.assetScriptsState.canUpdate;
 
-    constructor(appsState: AppsState, assetsService: AssetsService,
-        private readonly assetScriptsState: AssetScriptsState,
-    ) {
+    constructor() {
+        const appsState = inject(AppsState);
+        const assetsService = inject(AssetsService);
+
         this.assetCompletions = assetsService.getCompletions(appsState.appName).pipe(shareReplay(1));
 
         effect(() => {

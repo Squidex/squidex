@@ -6,7 +6,7 @@
  */
 
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, input, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, linkedSignal, signal, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, UpdateRoleDto } from '@app/shared';
 
@@ -51,6 +51,8 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     ],
 })
 export class RoleComponent {
+    private readonly rolesState = inject(RolesState);
+
     /** The role to show and edit. */
     public readonly role = input.required<RoleDto>();
 
@@ -78,9 +80,7 @@ export class RoleComponent {
         return Math.ceil(this.schemas().length / 2);
     });
 
-    constructor(
-        private readonly rolesState: RolesState,
-    ) {
+    constructor() {
         effect(() => {
             this.editForm.load(this.role());
             this.editForm.setEnabled(this.isEditable());

@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, signal, inject } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, SignalControlComponent, sorted, TranslatePipe, Types } from '@app/shared';
 import { ContentCreatorComponent } from './content-creator.component';
@@ -42,6 +42,8 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     },
 })
 export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyArray<string>> {
+    private readonly contentsResolver = inject(ResolveContents);
+
     /** Renders the references in fullscreen mode. */
     public readonly isExpanded = input(false, { transform: booleanAttribute });
 
@@ -70,12 +72,6 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
 
     protected readonly contentCreatorDialog = new DialogModel();
     protected readonly contentSelectorDialog = new DialogModel();
-
-    constructor(
-        private readonly contentsResolver: ResolveContents,
-    ) {
-        super();
-    }
 
     public writeValue(obj: any) {
         if (!Types.isArrayOfString(obj)) {

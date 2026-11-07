@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, viewChild, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { timer } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -36,6 +36,12 @@ import { ContentPageComponent } from './content-page.component';
     ],
 })
 export class ContentHistoryPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly contentPage = inject(ContentPageComponent);
+    private readonly contentsState = inject(ContentsState);
+    private readonly historyService = inject(HistoryService);
+    private readonly schemasState = inject(SchemasState);
+
     private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
 
     protected readonly content = computed(() => {
@@ -56,15 +62,6 @@ export class ContentHistoryPageComponent {
     protected readonly disableScheduler = computed(() => {
         return this.appsState.selectedSettings()?.hideScheduler === true;
     });
-
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly contentPage: ContentPageComponent,
-        private readonly contentsState: ContentsState,
-        private readonly historyService: HistoryService,
-        private readonly schemasState: SchemasState,
-    ) {
-    }
 
     protected changeStatus(status: string) {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(

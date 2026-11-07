@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownDirective, NotifoComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
@@ -38,9 +38,11 @@ import { PlanComponent } from './plan.component';
 export class PlansPageComponent {
     private readonly overridePlanId?: string;
 
-    constructor(route: ActivatedRoute,
-        protected readonly plansState: TeamPlansState,
-    ) {
+    protected readonly plansState = inject(TeamPlansState);
+
+    constructor() {
+        const route = inject(ActivatedRoute);
+
         this.overridePlanId = route.snapshot.queryParams['planId'];
 
         this.plansState.load(false, this.overridePlanId);

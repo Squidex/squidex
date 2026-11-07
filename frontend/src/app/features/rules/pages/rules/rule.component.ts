@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, FlowView, ModalDirective, ModalModel, ModalPlacementDirective, RuleElementDto, RulesState, RuleTriggerMetadataDto, ToggleComponent, TranslatePipe } from '@app/shared';
@@ -31,6 +31,8 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     ],
 })
 export class RuleComponent {
+    private readonly rulesState = inject(RulesState);
+
     /** The available triggers by type, to resolve the metadata of the trigger. */
     public readonly availableTriggers = input.required<Record<string, RuleTriggerMetadataDto>>();
 
@@ -45,11 +47,6 @@ export class RuleComponent {
     });
 
     protected readonly dropdown = new ModalModel();
-
-    constructor(
-        private readonly rulesState: RulesState,
-    ) {
-    }
 
     protected delete() {
         this.rulesState.delete(this.rule());

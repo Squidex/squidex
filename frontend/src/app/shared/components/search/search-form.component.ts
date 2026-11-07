@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, linkedSignal, output, Type } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, linkedSignal, output, Type, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, SelectValue, StringValue } from 'ngx-inline-filter';
 import { DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, FormErrorComponent, FormRowComponent, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/framework';
@@ -41,6 +41,10 @@ import { TourHintDirective } from '../tour-hint.directive';
     ],
 })
 export class SearchFormComponent {
+    private readonly localizer = inject(LocalizerService);
+
+    protected readonly contributorsState = inject(ContributorsState);
+
     /** Emits the query when the user starts a search. */
     public readonly queryChange = output<Query>();
 
@@ -83,16 +87,16 @@ export class SearchFormComponent {
     });
 
     protected readonly saveQueryDialog = new DialogModel();
+
     protected readonly saveQueryForm = new SaveQueryForm();
 
     protected readonly cleanedQuery = linkedSignal(() => sanitize(this.query()));
 
     protected readonly options: FilterOptions;
 
-    constructor(
-        protected readonly contributorsState: ContributorsState,
-        private readonly localizer: LocalizerService,
-    ) {
+    constructor() {
+        const localizer = this.localizer;
+
         this.options = {
             cssClasses: {
                 ...BootstrapClasses,

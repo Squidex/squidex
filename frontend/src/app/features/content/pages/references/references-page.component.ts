@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -34,6 +34,12 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
     ],
 })
 export class ReferencesPageComponent {
+    private readonly contentsRoute = inject(Router2State);
+    private readonly languagesState = inject(LanguagesState);
+    private readonly route = inject(ActivatedRoute);
+
+    protected readonly contentsState = inject(ComponentContentsState);
+
     protected readonly language = linkedSignal<AppLanguageDto>(() => {
         return this.languagesState.isoMasterLanguage();
     });
@@ -42,12 +48,7 @@ export class ReferencesPageComponent {
         return this.languagesState.isoLanguages();
     });
 
-    constructor(
-        private readonly contentsRoute: Router2State,
-        protected readonly contentsState: ComponentContentsState,
-        private readonly languagesState: LanguagesState,
-        private readonly route: ActivatedRoute,
-    ) {
+    constructor() {
         effect(onCleanup => {
             const subscription =
                 getReferenceId(this.route)

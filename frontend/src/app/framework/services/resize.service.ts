@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
 
 export interface ResizeListener {
     onResize(rect: DOMRect, element: Element): void;
@@ -14,14 +14,14 @@ export interface ResizeListener {
 @Injectable({
     providedIn: 'root',
 })
-export class ResizeService implements OnDestroy {
+export class ResizeService {
     private readonly listeners = new WeakMap<Element, ResizeListener>();
     private observer?: ResizeObserver;
 
-    public ngOnDestroy() {
-        if (this.observer) {
-            this.observer.disconnect();
-        }
+    constructor() {
+        inject(DestroyRef).onDestroy(() => {
+            this.observer?.disconnect();
+        });
     }
 
     public listen(target: Element, listener: ResizeListener) {

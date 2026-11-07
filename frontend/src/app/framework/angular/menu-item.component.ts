@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, input, numberAttribute, Optional, output, TemplateRef, viewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, input, numberAttribute, output, TemplateRef, viewChild, inject } from '@angular/core';
 import { LocalizerService } from '../internal';
 import { ConfirmClickDirective } from './forms/confirm-click.directive';
 import { MenuItemRegistry } from './menu.component';
@@ -24,6 +24,8 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ],
 })
 export class MenuItemComponent {
+    private readonly localizerService = inject(LocalizerService);
+
     /** The text of the button. */
     public readonly label = input('');
 
@@ -68,11 +70,10 @@ export class MenuItemComponent {
         return this.localizerService.getOrKey(key);
     });
 
-    constructor(
-        @Optional() menuItemRegistry: MenuItemRegistry | null,
-        destroyRef: DestroyRef,
-        private readonly localizerService: LocalizerService,
-    ) {
+    constructor() {
+        const menuItemRegistry = inject(MenuItemRegistry, { optional: true });
+        const destroyRef = inject(DestroyRef);
+
         menuItemRegistry?.registerItem(this);
 
         destroyRef.onDestroy(() => {

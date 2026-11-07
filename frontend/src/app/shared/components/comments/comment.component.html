@@ -11,7 +11,7 @@
     [sqxScrollContainer]="scrollContainer"
     [sqxScrollOffset]="20">
     @if (mode !== "Edit") {
-        <div class="comment-text row g-0" sqxSc [sqxScrollActive]="isSelected" [sqxScrollContainer]="scrollContainer" [sqxScrollOffset]="-20">
+        <div class="comment-text row g-0" [sqxScrollActive]="isSelected" [sqxScrollContainer]="scrollContainer" [sqxScrollOffset]="-20">
             <div class="col-auto pe-2">
                 <img class="user-picture" [src]="commentItem.comment.user | sqxUserPictureRef" title="{{ commentItem.comment.user | sqxUserNameRef }}" />
             </div>

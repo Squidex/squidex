@@ -7,49 +7,47 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, numberAttribute, Renderer2 } from '@angular/core';
-import { TypedSimpleChanges, Types } from '../internal';
+import { afterNextRender, booleanAttribute, Directive, effect, ElementRef, inject, input, numberAttribute, Renderer2 } from '@angular/core';
+import { Types } from '../internal';
 
 @Directive({
     selector: '[sqxScrollActive]',
 })
-export class ScrollActiveDirective implements AfterViewInit {
-    @Input({ alias: 'sqxScrollActive', transform: booleanAttribute })
-    public isActive = false;
+export class ScrollActiveDirective {
+    private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
 
-    @Input({ alias: 'sqxScrollOffset', transform: numberAttribute })
-    public offset = 0;
+    /** Scrolls the element into the view of the container when true. */
+    public readonly isActive = input(false, { alias: 'sqxScrollActive', transform: booleanAttribute });
 
-    @Input('sqxScrollContainer')
-    public container?: HTMLElement | string | null;
+    /** The additional offset when scrolling down. */
+    public readonly offset = input(0, { alias: 'sqxScrollOffset', transform: numberAttribute });
 
-    constructor(
-        private readonly element: ElementRef<HTMLElement>,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    /** The scroll container or a CSS selector to find it in the ancestors of the element. */
+    public readonly container = input<HTMLElement | string | null | undefined>(undefined, { alias: 'sqxScrollContainer' });
 
-    public ngAfterViewInit() {
-        this.check();
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<ScrollActiveDirective>) {
-        if (changes.isActive) {
+    constructor() {
+        effect(() => {
             this.check();
-        }
+        });
+
+        afterNextRender(() => {
+            this.check();
+        });
     }
 
     private check() {
-        if (this.isActive && this.container) {
-            let container = this.container;
+        if (!this.isActive()) {
+            return;
+        }
 
-            if (Types.isString(container)) {
-                container = this.element.nativeElement.closest(container) as HTMLElement;
-            }
+        let container = this.container();
+        if (Types.isString(container)) {
+            container = this.element.nativeElement.closest(container) as HTMLElement;
+        }
 
-            if (container) {
-                this.scrollInView(container, this.element.nativeElement);
-            }
+        if (container) {
+            this.scrollInView(container, this.element.nativeElement);
         }
     }
 
@@ -69,7 +67,7 @@ export class ScrollActiveDirective implements AfterViewInit {
             const parentHeight = boundsParent.height;
 
             if ((scrollDiff + targetHeight) > parentHeight) {
-                this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollDiff - parentHeight + targetHeight + this.offset);
+                this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollDiff - parentHeight + targetHeight + this.offset());
             }
         }
     }

@@ -20,15 +20,12 @@ import { AuthService, FormHintComponent, TranslatePipe, UIOptions } from '@app/s
     ],
 })
 export class HomePageComponent {
-    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
+    private readonly authService = inject(AuthService);
+    private readonly location = inject(Location);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
-    constructor(
-        private readonly authService: AuthService,
-        private readonly location: Location,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-    ) {
-    }
+    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
 
     protected async login() {
         const redirectPath =

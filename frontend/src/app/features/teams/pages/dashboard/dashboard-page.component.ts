@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterEveryRender, Component, effect, NgZone, Renderer2, signal, viewChild } from '@angular/core';
+import { afterEveryRender, Component, effect, NgZone, Renderer2, signal, viewChild, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, defined, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, switchSafe, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
@@ -37,6 +37,9 @@ import { AppsCardComponent } from './cards/apps-card.component';
     ],
 })
 export class DashboardPageComponent {
+    private readonly authState = inject(AuthService);
+    private readonly localStore = inject(LocalStoreService);
+
     private readonly grid = viewChild<Gridster>('grid');
 
     protected readonly selectedTeam;
@@ -58,10 +61,12 @@ export class DashboardPageComponent {
 
     protected readonly user = this.authState.user?.displayName;
 
-    constructor(teamsState: TeamsState, usagesService: UsagesService, renderer: Renderer2, zone: NgZone,
-        private readonly authState: AuthService,
-        private readonly localStore: LocalStoreService,
-    ) {
+    constructor() {
+        const teamsState = inject(TeamsState);
+        const usagesService = inject(UsagesService);
+        const renderer = inject(Renderer2);
+        const zone = inject(NgZone);
+
         const dateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
         const dateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
 

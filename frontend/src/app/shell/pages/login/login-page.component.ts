@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/shared';
 
@@ -14,10 +14,10 @@ import { AuthService } from '@app/shared';
     template: '',
 })
 export class LoginPageComponent {
-    constructor(
-        private readonly authService: AuthService,
-        private readonly router: Router,
-    ) {
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+
+    constructor() {
         this.completeRedirect();
     }
 

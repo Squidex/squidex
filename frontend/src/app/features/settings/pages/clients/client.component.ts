@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormRowComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, UpdateClientDto } from '@app/shared';
 import { ClientConnectFormComponent } from './client-connect-form.component';
@@ -30,6 +30,10 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
     ],
 })
 export class ClientComponent {
+    private readonly clientsState = inject(ClientsState);
+
+    protected readonly appsState = inject(AppsState);
+
     /** The client to show and edit. */
     public readonly client = input.required<ClientDto>();
 
@@ -39,12 +43,6 @@ export class ClientComponent {
     protected readonly apiCallsLimit = linkedSignal(() => this.client().apiCallsLimit);
 
     protected readonly connectDialog = new DialogModel(false);
-
-    constructor(
-        protected readonly appsState: AppsState,
-        private readonly clientsState: ClientsState,
-    ) {
-    }
 
     protected revoke() {
         this.clientsState.revoke(this.client());

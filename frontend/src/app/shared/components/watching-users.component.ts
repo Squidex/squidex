@@ -6,7 +6,7 @@
  */
 
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { StringColorPipe, TooltipDirective } from '@app/framework';
 import { CollaborationService } from '@app/shared/internal';
 import { UserPicturePipe } from './pipes';
@@ -24,8 +24,5 @@ import { UserPicturePipe } from './pipes';
     ],
 })
 export class WatchingUsersComponent {
-    constructor(
-        protected readonly collaboration: CollaborationService,
-    ) {
-    }
+    protected readonly collaboration = inject(CollaborationService);
 }

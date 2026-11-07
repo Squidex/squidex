@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, inject } from '@angular/core';
 import { EventConsumerDto, TooltipDirective, TranslatePipe } from '@app/shared';
 import { EventConsumersState } from '../../internal';
 
@@ -23,16 +23,13 @@ import { EventConsumersState } from '../../internal';
     ],
 })
 export class EventConsumerComponent {
+    private readonly eventConsumersState = inject(EventConsumersState);
+
     /** Emits when the user clicks the error icon to see the failure details. */
     public readonly failure = output();
 
     /** The event consumer to show in the row. */
     public readonly eventConsumer = input.required<EventConsumerDto>({ alias: 'sqxEventConsumer' });
-
-    constructor(
-        private readonly eventConsumersState: EventConsumersState,
-    ) {
-    }
 
     protected start() {
         this.eventConsumersState.start(this.eventConsumer());

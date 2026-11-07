@@ -24,15 +24,15 @@ type ValueType = 'Raw' | 'Singleline' | 'MultilineAny' | 'MultilineJson';
     ],
 })
 export class StateStepPropertyComponent {
+    private readonly valueParsed = computed(() => {
+        return parseValue(this.value());
+    });
+
     /** The property definition, which provides the name and label. */
     public readonly property = input.required<RuleElementPropertyDto>();
 
     /** The configured value of the property. */
     public readonly value = input<any>();
-
-    private readonly valueParsed = computed(() => {
-        return parseValue(this.value());
-    });
 
     protected readonly valueFormatted = computed(() => {
         return this.valueParsed().formatted;

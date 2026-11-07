@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
@@ -35,16 +35,13 @@ import { ControlErrorsComponent, DialogService, ISODatePipe, JobsService, Layout
     ],
 })
 export class RestorePageComponent {
+    private readonly dialogs = inject(DialogService);
+    private readonly jobsService = inject(JobsService);
+
     protected readonly restoreForm = new RestoreForm();
 
     protected readonly restoreJob =
         timer(0, 2000).pipe(switchSafe(() => this.jobsService.getRestore()));
-
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly jobsService: JobsService,
-    ) {
-    }
 
     protected restore() {
         const value = this.restoreForm.submit();

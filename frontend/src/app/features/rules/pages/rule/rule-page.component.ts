@@ -6,7 +6,7 @@
  */
 
 import { LowerCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -55,15 +55,23 @@ type Snapshot = {
     ],
 })
 export class RulePageComponent {
-    protected readonly availableTriggers = ALL_TRIGGERS;
-    protected readonly availableSteps;
-
+    private readonly dialogs = inject(DialogService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private readonly error = signal<ErrorDto | undefined>(undefined);
 
+    protected readonly rulesState = inject(RulesState);
+
+    protected readonly availableTriggers = ALL_TRIGGERS;
+
+    protected readonly availableSteps;
+
     protected readonly stepDialog = new DialogModel();
+
     protected readonly stepToUpsert = signal<{ step?: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd } | undefined>(undefined);
 
     protected readonly triggerToEdit = signal<RuleTriggerDto | undefined>(undefined);
+
     protected readonly triggerDialog = new DialogModel();
 
     protected readonly rule = signal<DynamicRuleDto | null | undefined>(undefined);
@@ -80,15 +88,12 @@ export class RulePageComponent {
         return this.rule()?.trigger?.triggerType === 'Manual';
     });
 
-    constructor(
-        protected readonly rulesState: RulesState,
-        rulesService: RulesService,
-        schemasState: SchemasState,
-        private readonly dialogs: DialogService,
-        messageBus: MessageBus,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-    ) {
+    constructor() {
+        const rulesState = this.rulesState;
+        const rulesService = inject(RulesService);
+        const schemasState = inject(SchemasState);
+        const messageBus = inject(MessageBus);
+
         this.availableSteps = toSignal(rulesService.getSteps(), { initialValue: {} as { [name: string]: RuleElementDto } });
 
         this.scriptCompletions = toSignal(

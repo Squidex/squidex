@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppsState, LayoutComponent, TitleComponent } from '@app/shared';
 import { SettingsMenuComponent } from './settings-menu.component';
@@ -22,8 +22,5 @@ import { SettingsMenuComponent } from './settings-menu.component';
     ],
 })
 export class SettingsAreaComponent {
-    constructor(
-        protected readonly appsState: AppsState,
-    ) {
-    }
+    protected readonly appsState = inject(AppsState);
 }

@@ -35,6 +35,15 @@ export class ContentFieldComponent {
     private readonly appsState = inject(AppsState);
     private readonly localStore = inject(LocalStoreService);
     private readonly translations = inject(TranslationsService);
+    private readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
+
+    private readonly isHalfWidth = computed(() => {
+        return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
+    });
+
+    private readonly isLocalizable = computed(() => {
+        return this.formModel().field.isLocalizable;
+    });
 
     /** Emits when the user selects another language. */
     public readonly languageChange = output<AppLanguageDto>();
@@ -71,7 +80,6 @@ export class ContentFieldComponent {
 
     protected readonly commentsState = inject(CommentsState, { optional: true });
 
-    private readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
     protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
     protected readonly showAllControls = linkedSignal(() => {
@@ -79,6 +87,7 @@ export class ContentFieldComponent {
     });
 
     protected readonly isCollapsed = signal(false);
+
     protected readonly isSelected = signal(false);
 
     protected readonly isInvalid = computed(() => {
@@ -96,14 +105,6 @@ export class ContentFieldComponent {
         }
 
         return !Types.equals(this.formModel().value(), formModelCompare.value(), true);
-    });
-
-    private readonly isHalfWidth = computed(() => {
-        return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
-    });
-
-    private readonly isLocalizable = computed(() => {
-        return this.formModel().field.isLocalizable;
     });
 
     protected readonly isTranslatable = computed(() => {

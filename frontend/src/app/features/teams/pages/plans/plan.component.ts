@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
 
@@ -23,13 +23,10 @@ import { TeamPlansState } from '../../internal';
     ],
 })
 export class PlanComponent {
+    protected readonly plansState = inject(TeamPlansState);
+
     /** The plan to show, including whether it is selected. */
     public readonly planInfo = input.required<PlanInfo>();
-
-    constructor(
-        protected readonly plansState: TeamPlansState,
-    ) {
-    }
 
     protected changeMonthly() {
         this.plansState.change(this.planInfo().plan.id);

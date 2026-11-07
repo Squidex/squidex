@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, viewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, input, viewChild, inject } from '@angular/core';
 import Cropper from 'cropperjs';
 import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
 
@@ -27,7 +27,9 @@ export class ImageCropperComponent {
     /** The URL of the image to edit. */
     public readonly imageSource = input('');
 
-    constructor(destroyRef: DestroyRef) {
+    constructor() {
+        const destroyRef = inject(DestroyRef);
+
         effect(() => {
             const imageSource = this.imageSource();
 

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { distinctUntilChanged, map, switchMap } from 'rxjs';
@@ -27,6 +27,8 @@ import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, C
     ],
 })
 export class SchemaPreviewUrlsFormComponent {
+    private readonly schemasState = inject(SchemasState);
+
     /** The schema to configure the preview URLs for. */
     public readonly schema = input.required<SchemaDto>();
 
@@ -38,9 +40,10 @@ export class SchemaPreviewUrlsFormComponent {
         return this.schema().canUpdateUrls;
     });
 
-    constructor(schemasService: SchemasService,
-        private readonly schemasState: SchemasState,
-    ) {
+    constructor() {
+        const schemasService = inject(SchemasService);
+        const schemasState = this.schemasState;
+
         this.fieldCompletions = toSignal(
             toObservable(this.schema).pipe(
                 map(schema => schema.name),

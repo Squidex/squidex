@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, forwardRef, inject, input, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 
@@ -18,26 +18,25 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
     providers: [
         SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR,
     ],
+    host: {
+        '(click)': 'onClick()',
+        '(blur)': 'onTouched()',
+    },
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
+    private readonly element = inject<ElementRef<HTMLInputElement>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
     private callChange = (_: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private isChecked?: boolean | null;
 
-    @Input({ transform: booleanAttribute })
-    public threeStates = true;
+    /** Cycles through checked, unchecked and indeterminate on click instead of only checked and unchecked. */
+    public readonly threeStates = input(true, { transform: booleanAttribute });
 
-    constructor(
-        private readonly element: ElementRef<HTMLInputElement>,
-        private readonly renderer: Renderer2,
-    ) {
-    }
-
-    @HostListener('click')
     protected onClick() {
         let isChecked = this.isChecked;
 
-        if (this.threeStates) {
+        if (this.threeStates()) {
             if (isChecked) {
                 isChecked = null;
             } else {
@@ -54,7 +53,6 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
         this.writeValue(isChecked);
     }
 
-    @HostListener('blur')
     protected onTouched() {
         this.callTouched();
     }

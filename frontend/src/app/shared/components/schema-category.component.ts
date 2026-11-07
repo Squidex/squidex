@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, output, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { EditableTitleComponent, StopDragDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
 import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
@@ -33,6 +33,9 @@ const ITEM_HEIGHT = 2.5;
     ],
 })
 export class SchemaCategoryComponent {
+    private readonly localStore = inject(LocalStoreService);
+    private readonly schemasState = inject(SchemasState);
+
     /** Emits the name of the category that should be removed. */
     public readonly remove = output<string>();
 
@@ -62,12 +65,6 @@ export class SchemaCategoryComponent {
     protected readonly containerHeight = computed(() => {
         return `${ITEM_HEIGHT * this.schemas().length}rem`;
     });
-
-    constructor(
-        private readonly localStore: LocalStoreService,
-        private readonly schemasState: SchemasState,
-    ) {
-    }
 
     protected toggle() {
         const isCollapsed = !this.isCollapsed();

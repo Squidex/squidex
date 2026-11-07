@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePipe, WorkflowsState } from '@app/shared';
 
@@ -25,12 +25,9 @@ import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePi
     ],
 })
 export class WorkflowAddFormComponent {
-    protected addWorkflowForm = new AddWorkflowForm();
+    private readonly workflowsState = inject(WorkflowsState);
 
-    constructor(
-        private readonly workflowsState: WorkflowsState,
-    ) {
-    }
+    protected addWorkflowForm = new AddWorkflowForm();
 
     protected addWorkflow() {
         const value = this.addWorkflowForm.submit();

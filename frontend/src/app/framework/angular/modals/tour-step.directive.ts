@@ -5,55 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
+import { Directive, effect, ElementRef, inject, input, untracked } from '@angular/core';
 import { TourAnchorDirective } from 'ngx-ui-tour-core';
 import { StepDefinition, TourService } from './tour.service';
 
 @Directive({
     selector: '[sqxTourStep]',
+    host: {
+        '(click)': 'onClick()',
+    },
 })
-export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective {
+export class TourStepDirective implements TourAnchorDirective {
+    private readonly tourService = inject(TourService);
     private isNextOnClick = false;
     private isActive = false;
-    private currentAnchorId?: string | null;
     private wasClicked = false;
 
-    @Input({ alias: 'sqxTourStep', required: true })
-    public anchorId?: string | null;
+    public readonly element = inject(ElementRef);
 
-    constructor(public readonly element: ElementRef,
-        private readonly tourService: TourService,
-    ) {
+    /** The ID of the tour anchor to attach this element to. */
+    public readonly anchorId = input.required<string | undefined | null>({ alias: 'sqxTourStep' });
+
+    constructor() {
+        effect(onCleanup => {
+            const anchorId = this.anchorId();
+            if (!anchorId) {
+                return;
+            }
+
+            untracked(() => this.tourService.register(anchorId, this));
+
+            onCleanup(() => this.unregister(anchorId));
+        });
     }
 
-    public ngOnInit(): void {
-        this.currentAnchorId = this.anchorId;
-
-        if (!this.currentAnchorId) {
-            return;
-        }
-
-        this.tourService.register(this.currentAnchorId, this);
-    }
-
-    public ngOnDestroy(): void {
-        if (!this.currentAnchorId) {
-            return;
-        }
-
-        if (this.isActive && (!this.isNextOnClick || !this.wasClicked)) {
-            setTimeout(() => {
-                if (this.tourService.currentStep.anchorId === this.currentAnchorId) {
-                    this.tourService.render(null, null);
-                    this.tourService.pause();
-                }
-            }, 200);
-        }
-
-        this.tourService.unregister(this.currentAnchorId);
-    }
-
-    @HostListener('click')
     protected onClick() {
         this.wasClicked = true;
     }
@@ -68,5 +53,18 @@ export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective
         this.tourService.render(null, null);
         this.isActive = false;
         this.isNextOnClick = false;
+    }
+
+    private unregister(anchorId: string) {
+        if (this.isActive && (!this.isNextOnClick || !this.wasClicked)) {
+            setTimeout(() => {
+                if (this.tourService.currentStep.anchorId === anchorId) {
+                    this.tourService.render(null, null);
+                    this.tourService.pause();
+                }
+            }, 200);
+        }
+
+        this.tourService.unregister(anchorId);
     }
 }

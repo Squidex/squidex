@@ -5,20 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Directive, HostListener, Input } from '@angular/core';
+import { booleanAttribute, Directive, input } from '@angular/core';
 
 @Directive({
     selector: '[sqxStopDrag]',
+    host: {
+        '(dragstart)': 'onDragStart($event)',
+    },
 })
 export class StopDragDirective {
-    @Input({ alias: 'sqxStopDrag', transform: booleanAttribute })
-    public shouldStop = true;
+    /** Prevents dragging the element when true. */
+    public readonly shouldStop = input(true, { alias: 'sqxStopDrag', transform: booleanAttribute });
 
-    @HostListener('dragstart', ['$event'])
     protected onDragStart(event: Event) {
-        const shouldStop: any = this.shouldStop;
-
-        if (shouldStop || shouldStop === '') {
+        if (this.shouldStop()) {
             event.preventDefault();
         }
     }

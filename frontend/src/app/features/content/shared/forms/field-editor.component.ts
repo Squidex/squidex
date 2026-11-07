@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, numberAttribute, output, signal, viewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, numberAttribute, output, signal, viewChild, inject } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, HTTP, IndeterminateValueDirective, isValidValue, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
@@ -63,8 +63,10 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
     ],
 })
 export class FieldEditorComponent {
+    private readonly messageBus = inject(MessageBus);
     private readonly root = viewChild<ElementRef<HTMLElement>>('root');
     private readonly editor = viewChild<any>('editor');
+    private readonly isSelected = signal(false);
 
     /** Emits when the editor wants to change the expanded state. */
     public readonly expandedChange = output();
@@ -108,7 +110,6 @@ export class FieldEditorComponent {
     protected readonly uniqueId = MathHelper.guid();
 
     protected readonly isExpanded = signal(false);
-    private readonly isSelected = signal(false);
 
     protected readonly chatDialog = new DialogModel();
 
@@ -146,9 +147,7 @@ export class FieldEditorComponent {
         return this.comments()?.getAnnotations(this.formModel().path);
     }, { equal: Types.equals });
 
-    constructor(
-        private readonly messageBus: MessageBus,
-    ) {
+    constructor() {
         effect(onCleanup => {
             const subscription =
                 this.messageBus.of(CommentSelected)

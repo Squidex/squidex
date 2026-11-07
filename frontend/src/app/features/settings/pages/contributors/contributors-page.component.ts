@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ContributorsState, LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, RolesState, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -40,11 +40,12 @@ import { ContributorComponent } from './contributor.component';
     ],
 })
 export class ContributorsPageComponent {
-    constructor(
-        private readonly contributorsRoute: Router2State,
-        protected readonly contributorsState: ContributorsState,
-        protected readonly rolesState: RolesState,
-    ) {
+    private readonly contributorsRoute = inject(Router2State);
+
+    protected readonly contributorsState = inject(ContributorsState);
+    protected readonly rolesState = inject(RolesState);
+
+    constructor() {
         this.rolesState.load();
 
         const initial =

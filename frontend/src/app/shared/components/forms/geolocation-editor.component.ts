@@ -40,6 +40,8 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     ],
 })
 export class GeolocationEditorComponent extends SignalControlComponent<Geolocation> {
+    private readonly resourceLoader = inject(ResourceLoaderService);
+
     private readonly googleMapsKey = inject(UIOptions).value.map.googleMaps.key;
     private readonly localStore = inject(LocalStoreService);
     private readonly editor = viewChild.required<ElementRef<HTMLElement>>('editor');
@@ -64,9 +66,9 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
             ),
         });
 
-    constructor(destroyRef: DestroyRef,
-        private readonly resourceLoader: ResourceLoaderService,
-    ) {
+    constructor() {
+        const destroyRef = inject(DestroyRef);
+
         super();
 
         effect(() => {

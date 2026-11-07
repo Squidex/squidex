@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -24,6 +24,8 @@ import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, Re
     ],
 })
 export class ReferencesValidationComponent {
+    protected readonly schemasSource = inject(SchemaTagSource);
+
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();
 
@@ -38,9 +40,4 @@ export class ReferencesValidationComponent {
 
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
-
-    constructor(
-        protected readonly schemasSource: SchemaTagSource,
-    ) {
-    }
 }

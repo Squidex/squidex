@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
@@ -34,6 +34,9 @@ import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowCo
     ],
 })
 export class MorePageComponent {
+    private readonly router = inject(Router);
+    private readonly teamsState = inject(TeamsState);
+
     private readonly team;
 
     protected readonly isEditable = computed(() => {
@@ -46,10 +49,7 @@ export class MorePageComponent {
 
     protected readonly updateForm = new UpdateTeamForm();
 
-    constructor(
-        private readonly router: Router,
-        private readonly teamsState: TeamsState,
-    ) {
+    constructor() {
         this.team = this.teamsState.selectedTeam;
 
         effect(() => {

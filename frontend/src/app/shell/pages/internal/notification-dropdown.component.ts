@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, untracked, inject } from '@angular/core';
 import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -26,15 +26,19 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
     ],
 })
 export class NotificationDropdownComponent {
+    private readonly collaboration = inject(CollaborationService);
+
+    protected readonly commentsState = inject(CommentsState);
+
     protected readonly modalMenu = new ModalModel();
 
     protected readonly commentUser: string;
+
     protected readonly commentItems = this.commentsState.groupedUnresolvedComments;
 
-    constructor(authService: AuthService,
-        protected readonly commentsState: CommentsState,
-        private readonly collaboration: CollaborationService,
-    ) {
+    constructor() {
+        const authService = inject(AuthService);
+
         this.commentUser = authService.user!.token;
 
         this.collaboration.connect('users/collaboration');

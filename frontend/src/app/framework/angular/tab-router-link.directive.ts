@@ -5,25 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, HostListener, Input } from '@angular/core';
+import { Directive, inject, input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Directive({
     selector: '[sqxTabRouterLink]',
+    host: {
+        '(click)': 'onClick($event)',
+    },
 })
 export class TabRouterlinkDirective {
-    @Input('sqxTabRouterLink')
-    public commands!: any[];
+    private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
 
-    constructor(
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-    ) {
-    }
+    /** The router commands to navigate to; opens a new tab when ctrl or meta is pressed. */
+    public readonly commands = input.required<any[]>({ alias: 'sqxTabRouterLink' });
 
-    @HostListener('click', ['$event'])
     protected onClick(event: MouseEvent) {
-        const escaped = this.commands.map(x => encodeURIComponent(x));
+        const escaped = this.commands().map(x => encodeURIComponent(x));
 
         const urlTree = this.router.createUrlTree(escaped, {
             relativeTo: this.route,

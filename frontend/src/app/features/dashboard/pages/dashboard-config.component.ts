@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, Component, computed, input, output, signal } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output, signal, inject } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { GridsterItemConfig } from 'angular-gridster2';
@@ -30,6 +30,10 @@ import { AppDto, CodeEditorComponent, ConfirmClickDirective, DialogModel, Dialog
     ],
 })
 export class DashboardConfigComponent {
+    private readonly localizer = inject(LocalizerService);
+    private readonly dialogs = inject(DialogService);
+    private readonly uiState = inject(UIState);
+
     /** The app of the dashboard. The stored grid configuration is loaded when it changes. */
     public readonly app = input.required<AppDto>();
 
@@ -61,11 +65,7 @@ export class DashboardConfigComponent {
 
     protected readonly dropdownModal = new ModalModel();
 
-    constructor(
-        private readonly localizer: LocalizerService,
-        private readonly dialogs: DialogService,
-        private readonly uiState: UIState,
-    ) {
+    constructor() {
         toObservable(this.app).pipe(
             switchMap(() => this.uiState.waitForAppShared('dashboard.grid', this.configDefaults())),
             takeUntilDestroyed())

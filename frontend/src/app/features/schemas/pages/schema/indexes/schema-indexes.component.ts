@@ -28,6 +28,9 @@ import { IndexComponent } from './index.component';
     ],
 })
 export class SchemaIndexesComponent {
+    protected readonly indexesState = inject(IndexesState);
+    protected readonly languagesState = inject(LanguagesState);
+
     protected readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
 
     /** The schema to manage the indexes for. */
@@ -35,10 +38,7 @@ export class SchemaIndexesComponent {
 
     protected readonly addIndexDialog = new DialogModel();
 
-    constructor(
-        protected readonly indexesState: IndexesState,
-        protected readonly languagesState: LanguagesState,
-    ) {
+    constructor() {
         this.indexesState.load();
 
         effect(onCleanup => {

@@ -31,16 +31,10 @@ const NO_EMIT = { emitEvent: false };
     ],
 })
 export class ReferencesCheckboxesComponent extends SignalControlComponent<ReadonlyArray<string> | null | undefined> {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly localizer = inject(LocalizerService);
     private readonly itemCount: number = inject(UIOptions).value.referencesDropdownItemCount;
-
-    /** The ID of the schema to select the contents from. */
-    public readonly schemaId = input.required<string | undefined | null>();
-
-    /** The language to build the names of the contents. */
-    public readonly language = input.required<AppLanguageDto>();
-
-    protected readonly control = new FormControl<ReadonlyArray<string> | null | undefined>([]);
-
     private readonly contentItems = signal<ReadonlyArray<ContentDto> | null>(null);
 
     private readonly isValid = computed(() => {
@@ -53,6 +47,14 @@ export class ReferencesCheckboxesComponent extends SignalControlComponent<Readon
         return this.isValid() && !!contentItems && contentItems.length > 0;
     });
 
+    /** The ID of the schema to select the contents from. */
+    public readonly schemaId = input.required<string | undefined | null>();
+
+    /** The language to build the names of the contents. */
+    public readonly language = input.required<AppLanguageDto>();
+
+    protected readonly control = new FormControl<ReadonlyArray<string> | null | undefined>([]);
+
     protected readonly converter = computed(() => {
         const contentItems = this.contentItems();
         if (!this.isSuccess() || !contentItems) {
@@ -62,11 +64,7 @@ export class ReferencesCheckboxesComponent extends SignalControlComponent<Readon
         return new ReferencesTagsConverter(this.language(), contentItems, this.localizer);
     });
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly localizer: LocalizerService,
-    ) {
+    constructor() {
         super();
 
         effect(() => {

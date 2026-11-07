@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared/internal';
@@ -31,6 +31,8 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
     ],
 })
 export class AppFormComponent {
+    private readonly appsStore = inject(AppsState);
+
     /** Emits when the dialog is closed or the app has been created. */
     public readonly dialogClose = output();
 
@@ -43,11 +45,6 @@ export class AppFormComponent {
     protected readonly templateSelected = linkedSignal(() => this.template());
 
     protected readonly createForm = new CreateAppForm();
-
-    constructor(
-        private readonly appsStore: AppsState,
-    ) {
-    }
 
     protected emitClose() {
         this.dialogClose.emit();

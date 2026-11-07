@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LanguagesState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { LanguageAddFormComponent } from './language-add-form.component';
@@ -33,9 +33,9 @@ import { LanguageComponent } from './language.component';
     ],
 })
 export class LanguagesPageComponent {
-    constructor(
-        protected readonly languagesState: LanguagesState,
-    ) {
+    protected readonly languagesState = inject(LanguagesState);
+
+    constructor() {
         this.languagesState.load();
     }
 

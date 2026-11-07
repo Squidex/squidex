@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -32,14 +32,16 @@ import { RuleComponent } from './rule.component';
     ],
 })
 export class RulesPageComponent {
+    protected readonly rulesState = inject(RulesState);
+
     protected readonly availableTriggers = ALL_TRIGGERS;
     protected readonly availableSteps;
 
-    constructor(
-        protected readonly rulesState: RulesState,
-        rulesService: RulesService,
-        schemasState: SchemasState,
-    ) {
+    constructor() {
+        const rulesState = this.rulesState;
+        const rulesService = inject(RulesService);
+        const schemasState = inject(SchemasState);
+
         this.availableSteps = toSignal(rulesService.getSteps());
 
         rulesState.load();

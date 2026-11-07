@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, input } from '@angular/core';
+import { Component, input, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
@@ -29,7 +29,10 @@ export class CronJobTriggerComponent {
 
     protected readonly timezones;
 
-    constructor(appsState: AppsState, rulesService: RulesService) {
+    constructor() {
+        const appsState = inject(AppsState);
+        const rulesService = inject(RulesService);
+
         this.timezones = toSignal(rulesService.getTimezones(appsState.appName), { initialValue: [] });
     }
 }

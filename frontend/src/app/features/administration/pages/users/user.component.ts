@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ConfirmClickDirective, StopClickDirective, TooltipDirective, TranslatePipe, UserDtoPicture } from '@app/shared';
 import { UserDto, UsersState } from '../../internal';
@@ -29,13 +29,10 @@ import { UserDto, UsersState } from '../../internal';
     ],
 })
 export class UserComponent {
+    private readonly usersState = inject(UsersState);
+
     /** The user to show in the row. */
     public readonly user = input.required<UserDto>({ alias: 'sqxUser' });
-
-    constructor(
-        private readonly usersState: UsersState,
-    ) {
-    }
 
     protected lock() {
         this.usersState.lock(this.user());

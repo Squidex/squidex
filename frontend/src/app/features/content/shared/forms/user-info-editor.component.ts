@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, forwardRef, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, forwardRef, input, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
 import { map } from 'rxjs';
@@ -36,6 +36,8 @@ type UserInfo = { apiKey: string; role: string };
     ],
 })
 export class UserInfoEditorComponent extends SignalControlComponent<UserInfo> {
+    protected readonly rolesState = inject(RolesState);
+
     /** The prefix for the IDs of the inner inputs. */
     public readonly formId = input.required<string>();
 
@@ -53,9 +55,7 @@ export class UserInfoEditorComponent extends SignalControlComponent<UserInfo> {
             .pipe(map(x => x || 'NONE')),
         { initialValue: 'NONE' });
 
-    constructor(
-        protected readonly rolesState: RolesState,
-    ) {
+    constructor() {
         super();
 
         this.rolesState.loadIfNotLoaded();

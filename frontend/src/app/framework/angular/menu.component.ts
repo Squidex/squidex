@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, Injectable, input, Optional, signal, SkipSelf, viewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, Injectable, input, signal, viewChild, inject } from '@angular/core';
 import { ModalModel, ResizeListener, ResizeService } from '@app/framework/internal';
 import { DropdownMenuComponent } from './dropdown-menu.component';
 import { MenuItemComponent } from './menu-item.component';
@@ -85,10 +85,10 @@ export class MenuComponent implements ResizeListener {
         return isOverlapping ? [...items.values()].filter(x => x.actualMenuLabel()).sortedByString(x => x.actualMenuLabel()) : null;
     });
 
-    constructor(
-        resizeService: ResizeService,
-        @Optional() @SkipSelf() parentMenuItemRegistry?: MenuItemRegistry,
-    ) {
+    constructor() {
+        const resizeService = inject(ResizeService);
+        const parentMenuItemRegistry = inject(MenuItemRegistry, { optional: true, skipSelf: true });
+
         this.menuItemsRegistry = parentMenuItemRegistry ?? new MenuItemRegistry();
 
         effect(onCleanup => {

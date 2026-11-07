@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormAlertComponent, LayoutComponent, ListViewComponent, ScriptLogsState, ShortcutDirective, TitleComponent, TranslatePipe } from '@app/shared';
 import { ScriptLogComponent } from './script-log.component';
@@ -27,9 +27,9 @@ import { ScriptLogComponent } from './script-log.component';
     ],
 })
 export class ScriptLogsPageComponent {
-    constructor(
-        protected readonly scriptLogsState: ScriptLogsState,
-    ) {
+    protected readonly scriptLogsState = inject(ScriptLogsState);
+
+    constructor() {
         this.scriptLogsState.load();
     }
 

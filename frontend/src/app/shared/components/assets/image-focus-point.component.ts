@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, input, linkedSignal, viewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, input, linkedSignal, viewChild, inject } from '@angular/core';
 import { FocusedImage, FocusPicker } from 'image-focus';
 import { TranslatePipe, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
@@ -24,6 +24,7 @@ export class ImageFocusPointComponent {
     private readonly previewWide = viewChild.required<ElementRef<HTMLImageElement>>('previewWide');
     private readonly previewSmall = viewChild.required<ElementRef<HTMLImageElement>>('previewSmall');
     private readonly previewNormal = viewChild.required<ElementRef<HTMLImageElement>>('previewNormal');
+    private readonly focus = linkedSignal(() => getFocusPoint(this.focusPoint()));
 
     /** The URL of the image. */
     public readonly imageSource = input('');
@@ -31,9 +32,9 @@ export class ImageFocusPointComponent {
     /** The asset metadata with the initial focus point (focusX and focusY). */
     public readonly focusPoint = input<any>();
 
-    private readonly focus = linkedSignal(() => getFocusPoint(this.focusPoint()));
+    constructor() {
+        const destroyRef = inject(DestroyRef);
 
-    constructor(destroyRef: DestroyRef) {
         afterNextRender(() => {
             const properties = { focus: this.focus(), debounceTime: 50 };
 

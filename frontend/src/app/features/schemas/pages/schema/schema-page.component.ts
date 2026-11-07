@@ -53,20 +53,23 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
     ],
 })
 export class SchemaPageComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly messageBus = inject(MessageBus);
+
+    protected readonly schemasState = inject(SchemasState);
+
+    protected readonly languageState = inject(LanguagesState);
+
     protected readonly hideIndexes = inject(UIOptions).value.hideIndexes;
 
     protected readonly schema;
+
     protected readonly schemaTab;
 
     protected readonly editOptionsDropdown = new ModalModel();
 
-    constructor(
-        protected readonly schemasState: SchemasState,
-        protected readonly languageState: LanguagesState,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly messageBus: MessageBus,
-    ) {
+    constructor() {
         this.schema = this.schemasState.selectedSchema;
 
         this.schemaTab = toSignal(

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, computed, effect, input, signal, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, input, signal, viewChild, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AutocompleteComponent, Keys, MessageBus, TranslatePipe } from '@app/framework';
@@ -34,6 +34,12 @@ export class CommentsComponent {
     private readonly input = viewChild<AutocompleteComponent>('input');
     private readonly selection = signal<ReadonlyArray<string>>([]);
 
+    protected readonly commentsState = inject(CommentsState);
+
+    protected readonly router = inject(Router);
+
+    protected readonly contributorsDataSource = inject(ContributorsDataSource);
+
     /** Shows all comments instead of only the unresolved comments. */
     public readonly resolved = input(false, { transform: booleanAttribute });
 
@@ -44,6 +50,7 @@ export class CommentsComponent {
     public readonly commentsId = input<string | null>('');
 
     protected readonly commentForm = new UpsertCommentForm();
+
     protected readonly commentUser: string;
 
     protected readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
@@ -54,11 +61,10 @@ export class CommentsComponent {
             this.commentsState.groupedUnresolvedComments();
     });
 
-    constructor(authService: AuthService, messageBus: MessageBus,
-        protected readonly commentsState: CommentsState,
-        protected readonly router: Router,
-        protected readonly contributorsDataSource: ContributorsDataSource,
-    ) {
+    constructor() {
+        const authService = inject(AuthService);
+        const messageBus = inject(MessageBus);
+
         this.commentUser = authService.user!.token;
 
         this.contributorsDataSource.loadIfNotLoaded();

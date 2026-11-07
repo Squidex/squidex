@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { map, switchMap } from 'rxjs/operators';
 import { ExternalLinkDirective, FromNowPipe, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -36,7 +36,10 @@ export class AssetHistoryComponent {
 
     protected readonly assetEvents;
 
-    constructor(appsState: AppsState, historyService: HistoryService) {
+    constructor() {
+        const appsState = inject(AppsState);
+        const historyService = inject(HistoryService);
+
         this.assetEvents = toSignal(
             toObservable(this.asset).pipe(
                 switchMap(asset => historyService.getHistory(appsState.appName, `assets.${asset.id}`)),

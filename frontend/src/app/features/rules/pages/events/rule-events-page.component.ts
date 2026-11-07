@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, signal } from '@angular/core';
+import { Component, effect, signal, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleElementDto, RuleEventDto, RuleEventsState, RulesService, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -31,16 +31,18 @@ import { RuleEventComponent } from './rule-event.component';
     ],
 })
 export class RuleEventsPageComponent {
+    private readonly ruleEventsRoute = inject(Router2State);
+
+    protected readonly ruleEventsState = inject(RuleEventsState);
+
     protected readonly availableSteps;
 
     protected readonly selectedEventId = signal<string | null>(null);
 
-    constructor(
-        private readonly ruleEventsRoute: Router2State,
-        protected readonly ruleEventsState: RuleEventsState,
-        route: ActivatedRoute,
-        rulesService: RulesService,
-    ) {
+    constructor() {
+        const route = inject(ActivatedRoute);
+        const rulesService = inject(RulesService);
+
         this.availableSteps = toSignal(rulesService.getSteps(), { initialValue: {} as Record<string, RuleElementDto> });
 
         effect(onCleanup => {

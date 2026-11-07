@@ -27,6 +27,12 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
     ],
 })
 export class ContentReferencesComponent {
+    private readonly contentsRoute = inject(Router2State);
+    private readonly changeDetector = inject(ChangeDetectorRef);
+    private readonly toolbar = inject(ToolbarService);
+
+    protected readonly contentsState = inject(ComponentContentsState);
+
     /** The content to show the references for. */
     public readonly content = input.required<ContentDto>();
 
@@ -39,12 +45,7 @@ export class ContentReferencesComponent {
     /** Shows the contents referenced by the content or the contents referencing the content. */
     public readonly mode = input<'references' | 'referencing'>('references');
 
-    constructor(
-        private readonly contentsRoute: Router2State,
-        protected readonly contentsState: ComponentContentsState,
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly toolbar: ToolbarService,
-    ) {
+    constructor() {
         this.toolbar.addButton(this, 'i18n:contents.validate', () => {
             this.validate();
 

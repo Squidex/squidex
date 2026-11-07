@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, Renderer2, signal, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, Renderer2, signal, viewChild, inject } from '@angular/core';
 import { CompensateScrollbarDirective } from './compensate-scrollbar.directive';
 import { LoaderComponent } from './loader.component';
 import { SyncScollingDirective } from './sync-scrolling.directive';
@@ -56,7 +56,9 @@ export class ListViewComponent {
 
     protected readonly isLoadingVisible = signal(false);
 
-    constructor(renderer: Renderer2) {
+    constructor() {
+        const renderer = inject(Renderer2);
+
         effect(onCleanup => {
             if (this.isLoading()) {
                 this.isLoadingVisible.set(true);

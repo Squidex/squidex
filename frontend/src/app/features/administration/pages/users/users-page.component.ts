@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -39,12 +39,13 @@ import { UserComponent } from './user.component';
     ],
 })
 export class UsersPageComponent {
+    private readonly usersRoute = inject(Router2State);
+
+    protected readonly usersState = inject(UsersState);
+
     protected readonly usersFilter = new UntypedFormControl();
 
-    constructor(
-        private readonly usersRoute: Router2State,
-        protected readonly usersState: UsersState,
-    ) {
+    constructor() {
         effect(() => {
             const query = this.usersState.query();
 

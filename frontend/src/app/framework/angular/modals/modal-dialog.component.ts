@@ -6,7 +6,7 @@
  */
 
 import { CdkTrapFocus  } from '@angular/cdk/a11y';
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, input, output, Renderer2, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, input, output, Renderer2, viewChild, inject } from '@angular/core';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ShortcutComponent } from '../shortcut.component';
 import { TourStepDirective } from './tour-step.directive';
@@ -54,7 +54,9 @@ export class ModalDialogComponent {
     /** The ID of the tour step that points to this dialog. */
     public readonly tourId = input<string>();
 
-    constructor(renderer: Renderer2) {
+    constructor() {
+        const renderer = inject(Renderer2);
+
         afterNextRender(() => {
             hideWhenEmpty(renderer, this.tabsElement());
             hideWhenEmpty(renderer, this.footerElement());

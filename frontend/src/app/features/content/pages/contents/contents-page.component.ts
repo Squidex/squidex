@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, signal, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, signal, untracked, viewChild, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -61,8 +61,35 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
     ],
 })
 export class ContentsPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly contributorsState = inject(ContributorsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly localStore = inject(LocalStoreService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly schemasState = inject(SchemasState);
+    private readonly schemasService = inject(SchemasService);
+    private readonly tempService = inject(TempService);
+    private readonly uiState = inject(UIState);
     private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
+
+    private readonly tableConfig = computed(() => {
+        return getTableConfig(this.tableSettings());
+    });
+
+    private readonly selectedItems = signal<Record<string, boolean>>({});
+
+    private readonly schemaName = computed(() => {
+        return this.schemasState.selectedSchema()?.name;
+    });
+
     private schemaLoaded?: SchemaDto;
+
+    protected readonly contentsRoute = inject(Router2State);
+
+    protected readonly contentsState = inject(ContentsState);
+
+    protected readonly languagesState = inject(LanguagesState);
 
     protected readonly schema = computed(() => {
         return this.schemasState.selectedSchema()!;
@@ -74,10 +101,6 @@ export class ContentsPageComponent {
         return untracked(() => new TableSettings(this.uiState, schema));
     });
 
-    private readonly tableConfig = computed(() => {
-        return getTableConfig(this.tableSettings());
-    });
-
     protected readonly tableViewModal = new ModalModel();
 
     protected readonly exportDialog = new DialogModel();
@@ -87,8 +110,6 @@ export class ContentsPageComponent {
     protected readonly contents = computed(() => {
         return this.contentsState.contents();
     });
-
-    private readonly selectedItems = signal<Record<string, boolean>>({});
 
     protected readonly selection = computed(() => {
         const contents = this.contents();
@@ -151,10 +172,6 @@ export class ContentsPageComponent {
         return this.appsState.selectedSettings()?.hideScheduler === true;
     });
 
-    private readonly schemaName = computed(() => {
-        return this.schemasState.selectedSchema()?.name;
-    });
-
     protected readonly queryModel = toSignal(
         toObservable(this.schemaName).pipe(defined(),
             switchMap(x => this.schemasService.getFilters(this.appsState.appName, x))));
@@ -168,21 +185,7 @@ export class ContentsPageComponent {
         return new Queries(this.uiState, `schemas.${schemaName}`);
     });
 
-    constructor(
-        protected readonly contentsRoute: Router2State,
-        protected readonly contentsState: ContentsState,
-        protected readonly languagesState: LanguagesState,
-        private readonly appsState: AppsState,
-        private readonly contributorsState: ContributorsState,
-        private readonly contentsService: ContentsService,
-        private readonly localStore: LocalStoreService,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly schemasState: SchemasState,
-        private readonly schemasService: SchemasService,
-        private readonly tempService: TempService,
-        private readonly uiState: UIState,
-    ) {
+    constructor() {
         if (this.appsState.snapshot.selectedApp?.canReadContributors) {
             this.contributorsState.loadIfNotLoaded();
         }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } from '@app/shared';
 
@@ -21,6 +21,8 @@ import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } fr
     ],
 })
 export class UserInfoValidationComponent {
+    protected readonly rolesState = inject(RolesState);
+
     /** The form group to edit the field properties. */
     public readonly fieldForm = input.required<UntypedFormGroup>();
 
@@ -30,9 +32,7 @@ export class UserInfoValidationComponent {
     /** The type specific properties of the field. */
     public readonly properties = input.required<UserInfoFieldPropertiesDto>();
 
-    constructor(
-        protected readonly rolesState: RolesState,
-    ) {
+    constructor() {
         this.rolesState.loadIfNotLoaded();
     }
 }

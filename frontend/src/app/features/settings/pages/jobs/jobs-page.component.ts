@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -34,9 +34,9 @@ import { JobComponent } from './job.component';
     ],
 })
 export class JobsPageComponent {
-    constructor(
-        protected readonly jobsState: JobsState,
-    ) {
+    protected readonly jobsState = inject(JobsState);
+
+    constructor() {
         this.jobsState.load();
 
         effect(onCleanup => {

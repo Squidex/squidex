@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 
@@ -27,6 +27,8 @@ import { AssignContributorDto, ConfirmClickDirective, ContributorDto, Contributo
     ],
 })
 export class ContributorComponent {
+    private readonly contributorsState = inject(ContributorsState);
+
     /** The roles that can be assigned to the contributor. */
     public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
@@ -35,11 +37,6 @@ export class ContributorComponent {
 
     /** The contributor to show. */
     public readonly contributor = input.required<ContributorDto>({ alias: 'sqxContributor' });
-
-    constructor(
-        private readonly contributorsState: ContributorsState,
-    ) {
-    }
 
     protected remove() {
         this.contributorsState.revoke(this.contributor());

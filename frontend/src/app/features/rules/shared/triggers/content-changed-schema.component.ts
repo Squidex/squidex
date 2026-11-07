@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs';
@@ -37,7 +37,9 @@ export class ContentChangedSchemaComponent {
 
     protected readonly completions;
 
-    constructor(completionsCache: CompletionsCache) {
+    constructor() {
+        const completionsCache = inject(CompletionsCache);
+
         this.completions = toSignal(
             toObservable(this.form).pipe(
                 switchMap(form => value$(form.controls['schemaId'])),

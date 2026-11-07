@@ -6,7 +6,7 @@
  */
 
 import { LowerCasePipe } from '@angular/common';
-import { booleanAttribute, Component, effect, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, effect, input, linkedSignal, output, signal, untracked, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
@@ -35,6 +35,9 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     ],
 })
 export class StepDialogComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly rulesService = inject(RulesService);
+
     /** The step to edit, or undefined to add a new step. */
     public readonly stepDefinition = input.required<DynamicFlowStepDefinitionDto | undefined>();
 
@@ -66,10 +69,7 @@ export class StepDialogComponent {
         return this.stepDefinition()?.ignoreError || false;
     });
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly rulesService: RulesService,
-    ) {
+    constructor() {
         effect(() => {
             const stepDefinition = this.stepDefinition();
             if (!stepDefinition) {

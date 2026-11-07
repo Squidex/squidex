@@ -6,7 +6,7 @@
  */
 
 import { DOCUMENT } from '@angular/common';
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { LocalStoreService } from './local-store.service';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -20,7 +20,7 @@ const THEME_KEY = 'squidex.theme';
 @Injectable({
     providedIn: 'root',
 })
-export class ThemeService implements OnDestroy {
+export class ThemeService {
     private readonly document = inject(DOCUMENT);
     private readonly localStore = inject(LocalStoreService);
     private readonly systemQuery = this.document.defaultView?.matchMedia?.('(prefers-color-scheme: dark)');
@@ -38,11 +38,11 @@ export class ThemeService implements OnDestroy {
     constructor() {
         this.systemQuery?.addEventListener?.('change', this.systemListener);
 
-        this.update(parseMode(this.localStore.get(THEME_KEY)));
-    }
+        inject(DestroyRef).onDestroy(() => {
+            this.systemQuery?.removeEventListener?.('change', this.systemListener);
+        });
 
-    public ngOnDestroy() {
-        this.systemQuery?.removeEventListener?.('change', this.systemListener);
+        this.update(parseMode(this.localStore.get(THEME_KEY)));
     }
 
     public getColor(name: string) {

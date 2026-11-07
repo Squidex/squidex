@@ -42,6 +42,12 @@ type ViewMode = 'day' | 'week' | 'month';
     },
 })
 export class CalendarPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly languagesState = inject(LanguagesState);
+    private readonly localizer = inject(LocalizerService);
+
     private readonly calendarContainer = viewChild.required<ElementRef>('calendarContainer');
     private readonly language: AppLanguageDto;
     private calendar: any;
@@ -55,13 +61,7 @@ export class CalendarPageComponent {
 
     protected readonly isLoading = signal(false);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly resourceLoader: ResourceLoaderService,
-        private readonly languagesState: LanguagesState,
-        private readonly localizer: LocalizerService,
-    ) {
+    constructor() {
         this.language = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
 
         afterNextRender(() => {

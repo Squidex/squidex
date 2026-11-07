@@ -6,7 +6,7 @@
  */
 
 
-import { Component, output, signal } from '@angular/core';
+import { Component, output, signal, inject } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormRowComponent, MarkdownDirective, ModalDialogComponent, TourState, TranslatePipe, UsersService } from '@app/shared';
 
@@ -24,6 +24,10 @@ import { FormRowComponent, MarkdownDirective, ModalDialogComponent, TourState, T
     ],
 })
 export class OnboardingDialogComponent {
+    private readonly formBuilder = inject(FormBuilder);
+    private readonly tourState = inject(TourState);
+    private readonly usersService = inject(UsersService);
+
     /** Emits when the user closes the dialog, by skipping or starting the tour. */
     public readonly dialogClose = output();
 
@@ -35,13 +39,6 @@ export class OnboardingDialogComponent {
         });
 
     protected readonly step = signal(0);
-
-    constructor(
-        private readonly formBuilder: FormBuilder,
-        private readonly tourState: TourState,
-        private readonly usersService: UsersService,
-    ) {
-    }
 
     protected submitAnswers() {
         this.usersService.postUser({ answers: this.answersForm.value as any }).subscribe();

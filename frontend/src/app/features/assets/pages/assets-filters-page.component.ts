@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AssetsState, LayoutComponent, Queries, Query, SavedQueriesComponent, TranslatePipe, UIState } from '@app/shared';
 import { AssetTagsComponent } from './asset-tags.component';
 
@@ -21,11 +21,13 @@ import { AssetTagsComponent } from './asset-tags.component';
     ],
 })
 export class AssetsFiltersPageComponent {
+    protected readonly assetsState = inject(AssetsState);
+
     protected readonly assetsQueries: Queries;
 
-    constructor(uiState: UIState,
-        protected readonly assetsState: AssetsState,
-    ) {
+    constructor() {
+        const uiState = inject(UIState);
+
         this.assetsQueries = new Queries(uiState, 'assets');
     }
 

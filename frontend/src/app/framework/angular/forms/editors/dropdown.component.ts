@@ -48,6 +48,8 @@ const NO_EMIT = { emitEvent: false };
     ],
 })
 export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>> {
+    private readonly templates = contentChildren(TemplateRef);
+
     private value: any;
 
     /** Emits when the dropdown is opened. */
@@ -92,8 +94,6 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
     /** Additional styles for the dropdown. */
     public readonly dropdownStyles = input<any>({});
 
-    private readonly templates = contentChildren(TemplateRef);
-
     protected readonly templateItem = computed(() => {
         return this.templates()[0];
     });
@@ -105,9 +105,13 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
     });
 
     protected readonly dropdown = new ModalModel();
+
     protected readonly suggestedItems = signal<ReadonlyArray<any>>([]);
+
     protected readonly suggestedIndex = signal(-1);
+
     protected readonly selectedItem = signal<any>(undefined);
+
     protected readonly query = signal<RegExp | undefined>(undefined);
 
     protected readonly queryInput = new UntypedFormControl();

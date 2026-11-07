@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, input, linkedSignal, output, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, input, linkedSignal, output, signal, viewChild, inject } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -54,6 +54,10 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
     ],
 })
 export class AssetDialogComponent {
+    private readonly assetsState = inject(AssetsState);
+    private readonly assetUploader = inject(AssetUploaderState);
+    private readonly dialogs = inject(DialogService);
+
     private readonly imageCropper = viewChild(ImageCropperComponent);
     private readonly imageFocus = viewChild(ImageFocusPointComponent);
     private readonly textEditor = viewChild(AssetTextEditorComponent);
@@ -111,11 +115,10 @@ export class AssetDialogComponent {
 
     protected readonly annotateForm = new AnnotateAssetForm();
 
-    constructor(appsState: AppsState, assetsService: AssetsService,
-        private readonly assetsState: AssetsState,
-        private readonly assetUploader: AssetUploaderState,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
+        const appsState = inject(AppsState);
+        const assetsService = inject(AssetsService);
+
         this.assetTags = toSignal(
             assetsService.getTags(appsState.appName).pipe(
                 map(tags => Object.keys(tags))));
