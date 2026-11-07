@@ -32,7 +32,6 @@ import { UserDto, UserForm, UsersState } from '../../internal';
 export class UserPageComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
-
     private user?: UserDto | null;
 
     protected readonly usersState = inject(UsersState);

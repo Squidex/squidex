@@ -34,8 +34,6 @@ export class AppComponent {
     /** Emits the app when the user confirms to leave it. */
     public readonly leave = output<AppDto>();
 
-    protected readonly dropdown = new ModalModel();
-
     protected readonly canShowContents = computed(() => {
         return this.app().canAccessContent;
     });
@@ -49,4 +47,6 @@ export class AppComponent {
     protected readonly canShowSettings = computed(() => {
         return this.app().roleProperties[Settings.AppProperties.HIDE_SETTINGS] !== true;
     });
+
+    protected readonly dropdown = new ModalModel();
 }

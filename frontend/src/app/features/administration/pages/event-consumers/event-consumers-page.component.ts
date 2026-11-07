@@ -38,8 +38,10 @@ import { EventConsumerComponent } from './event-consumer.component';
 })
 export class EventConsumersPageComponent {
     protected readonly eventConsumersState = inject(EventConsumersState);
-    protected readonly eventConsumerErrorDialog = new DialogModel();
+
     protected readonly eventConsumerError = signal<string | undefined>(undefined);
+
+    protected readonly eventConsumerErrorDialog = new DialogModel();
 
     constructor() {
         this.eventConsumersState.load();

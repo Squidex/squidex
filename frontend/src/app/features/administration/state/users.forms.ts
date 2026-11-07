@@ -25,14 +25,14 @@ export class UserForm extends SignalForm<UserFormModel, CreateUserDto, UserDto> 
 
         super({ email: '', displayName: '', password: '', passwordConfirm: '', permissions: '' }, path => {
             email(path.email);
-            required(path.email);
+            SignalValidators.match(path.passwordConfirm, path.password, 'i18n:users.passwordConfirmValidationMessage');
             maxLength(path.email, 100);
-            required(path.displayName);
             maxLength(path.displayName, 100);
-            required(path.password, { when: () => isPasswordRequired() });
             maxLength(path.password, 100);
             maxLength(path.passwordConfirm, 100);
-            SignalValidators.match(path.passwordConfirm, path.password, 'i18n:users.passwordConfirmValidationMessage');
+            required(path.email);
+            required(path.displayName);
+            required(path.password, { when: () => isPasswordRequired() });
         });
 
         this.isPasswordRequired = isPasswordRequired;

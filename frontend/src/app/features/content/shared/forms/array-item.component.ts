@@ -23,8 +23,6 @@ import { ComponentSectionComponent } from './component-section.component';
     ],
 })
 export class ArrayItemComponent {
-    private readonly sections = viewChildren(ComponentSectionComponent);
-
     /** Emits when the user removes the item. */
     public readonly itemRemove = output();
 
@@ -75,6 +73,8 @@ export class ArrayItemComponent {
 
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
+
+    protected readonly sections = viewChildren(ComponentSectionComponent);
 
     protected readonly isInvalidForm = computed(() => {
         return this.formModel().invalid();

@@ -67,9 +67,6 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
 })
 export class FieldEditorComponent {
     private readonly messageBus = inject(MessageBus);
-    private readonly root = viewChild<ElementRef<HTMLElement>>('root');
-    private readonly editor = viewChild<any>('editor');
-    private readonly isSelected = signal(false);
 
     /** Emits when the editor wants to change the expanded state. */
     public readonly expandedChange = output();
@@ -110,9 +107,13 @@ export class FieldEditorComponent {
     /** The text to show after the field name, for example the language. */
     public readonly displaySuffix = input('');
 
-    protected readonly uniqueId = MathHelper.guid();
+    protected readonly root = viewChild<ElementRef<HTMLElement>>('root');
+
+    protected readonly editor = viewChild<any>('editor');
+
+    protected readonly isSelected = signal(false);
+
     protected readonly isExpanded = signal(false);
-    protected readonly chatDialog = new DialogModel();
 
     protected readonly field = computed(() => {
         return this.formModel().field;
@@ -147,6 +148,10 @@ export class FieldEditorComponent {
     protected readonly annotations = computed(() => {
         return this.comments()?.getAnnotations(this.formModel().path);
     }, { equal: Types.equals });
+
+    protected readonly uniqueId = MathHelper.guid();
+
+    protected readonly chatDialog = new DialogModel();
 
     constructor() {
         this.messageBus.on(CommentSelected, message => {

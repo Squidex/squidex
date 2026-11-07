@@ -38,9 +38,6 @@ export class AssetFolderComponent {
     /** The folder to render. */
     public readonly assetPathItem = input.required<AssetPathItem>();
 
-    protected readonly editDropdown = new ModalModel();
-    protected readonly editDialog = new DialogModel();
-
     protected readonly assetFolder = computed(() => {
         return this.assetPathItem() as AssetFolderDto;
     });
@@ -56,6 +53,10 @@ export class AssetFolderComponent {
 
         return Types.is(item, AssetFolderDto) && item.canDelete;
     });
+
+    protected readonly editDropdown = new ModalModel();
+
+    protected readonly editDialog = new DialogModel();
 
     protected preventSelection(mouseEvent: MouseEvent) {
         if (mouseEvent.detail > 1) {

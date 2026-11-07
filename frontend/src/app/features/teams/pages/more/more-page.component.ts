@@ -37,7 +37,8 @@ import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowCo
 export class MorePageComponent {
     private readonly router = inject(Router);
     private readonly teamsState = inject(TeamsState);
-    private readonly team = this.teamsState.selectedTeam;
+
+    protected readonly team = this.teamsState.selectedTeam;
 
     protected readonly isEditable = computed(() => {
         return !!this.team()?.canUpdateGeneral;

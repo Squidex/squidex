@@ -50,21 +50,9 @@ export class AppsPageComponent {
 
     protected readonly uiState = inject(UIState);
 
-    protected readonly addAppDialog = new DialogModel();
-
     protected readonly addAppTemplate = signal<TemplateDto | undefined>(undefined);
 
-    protected readonly onboardingDialog = new DialogModel();
-
     protected readonly newsFeatures = signal<ReadonlyArray<FeatureDto> | undefined>(undefined);
-
-    protected readonly newsDialog = new DialogModel();
-
-    protected readonly generalInfo: string = this.uiOptions.value.showInfo ? this.uiOptions.value.info : '';
-
-    protected readonly starters = this.templatesState.starters;
-
-    protected readonly allAppsFilter = form(signal(''));
 
     protected readonly showAllApps = computed(() => {
         const query = this.allAppsState.query();
@@ -94,6 +82,18 @@ export class AppsPageComponent {
 
         return grouped;
     });
+
+    protected readonly starters = this.templatesState.starters;
+
+    protected readonly addAppDialog = new DialogModel();
+
+    protected readonly onboardingDialog = new DialogModel();
+
+    protected readonly newsDialog = new DialogModel();
+
+    protected readonly generalInfo: string = this.uiOptions.value.showInfo ? this.uiOptions.value.info : '';
+
+    protected readonly allAppsFilter = form(signal(''));
 
     constructor() {
         const apps = this.appsState.apps();

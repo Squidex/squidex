@@ -35,7 +35,8 @@ import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettin
 })
 export class SettingsPageComponent {
     private readonly appsState = inject(AppsState);
-    private readonly editingSettings = this.appsState.selectedSettings;
+
+    protected readonly editingSettings = this.appsState.selectedSettings;
 
     protected readonly isEditable = computed(() => {
         return this.editingSettings()?.canUpdate === true;

@@ -42,11 +42,11 @@ import { UserComponent } from './user.component';
 export class UsersPageComponent {
     private readonly usersRoute = inject(Router2State);
 
-    private readonly usersQuery = linkedSignal(() => {
+    protected readonly usersState = inject(UsersState);
+
+    protected readonly usersQuery = linkedSignal(() => {
         return this.usersState.query() || '';
     });
-
-    protected readonly usersState = inject(UsersState);
 
     protected readonly usersFilter = form(this.usersQuery);
 

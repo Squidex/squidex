@@ -6,6 +6,7 @@
  */
 
 import { inject, InjectionToken } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, Observable, take } from 'rxjs';
 import { MessageBus, StepDefinition, waitForAnchor, waitForAnchorClick, waitForElement } from '@app/framework';
 import { ClientTourStated, QueryExecuted } from '../utils/messages';
@@ -75,9 +76,9 @@ export function buildTasks() {
         onComplete: () => {
             const appsState = inject(AppsState);
 
-            return appsState.changes.pipe(
-                filter(change =>
-                    change.snapshot.apps.length > 0),
+            return toObservable(appsState.value).pipe(
+                filter(snapshot =>
+                    snapshot.apps.length > 0),
                 take(1));
         },
     }, {
@@ -141,9 +142,9 @@ export function buildTasks() {
         onComplete: () => {
             const schemasState = inject(SchemasState);
 
-            return schemasState.changes.pipe(
-                filter(change =>
-                    change.snapshot.schemas.find(s => s.fields.length > 0 && s.isPublished) !== undefined),
+            return toObservable(schemasState.value).pipe(
+                filter(snapshot =>
+                    snapshot.schemas.find(s => s.fields.length > 0 && s.isPublished) !== undefined),
                 take(1));
         },
     }, {
@@ -193,10 +194,10 @@ export function buildTasks() {
         onComplete: () => {
             const contentsState = inject(ContentsState);
 
-            return contentsState.changes.pipe(
-                filter(change =>
-                    change.snapshot.contents.find(s => s.status === 'Published') !== undefined ||
-                    change.snapshot.selectedContent?.status === 'Published'),
+            return toObservable(contentsState.value).pipe(
+                filter(snapshot =>
+                    snapshot.contents.find(s => s.status === 'Published') !== undefined ||
+                    snapshot.selectedContent?.status === 'Published'),
                 take(1));
         },
     }, {
@@ -230,9 +231,9 @@ export function buildTasks() {
         onComplete: () => {
             const assetsState = inject(AssetsState);
 
-            return assetsState.changes.pipe(
-                filter(change =>
-                    change.snapshot.assets.length > 0),
+            return toObservable(assetsState.value).pipe(
+                filter(snapshot =>
+                    snapshot.assets.length > 0),
                 take(1));
         },
     }, {

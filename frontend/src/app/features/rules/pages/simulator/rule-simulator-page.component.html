@@ -28,7 +28,7 @@
 
                 @for (event of ruleSimulatorState.simulatedRuleEvents(); track event.uniqueId) {
                     <tbody
-                        [availableSteps]="availableSteps()"
+                        [availableSteps]="availableSteps.value()"
                         [expanded]="event.uniqueId === selectedRuleEvent()"
                         (expandedChange)="selectEvent(event)"
                         [sqxSimulatedRuleEvent]="event"></tbody>

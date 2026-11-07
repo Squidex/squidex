@@ -33,9 +33,12 @@ export class DueTimeSelectorComponent {
     /** Skips the dialog and changes the status immediately. */
     public readonly disabled = input(false, { transform: booleanAttribute });
 
-    protected readonly dueTimeDialog = new DialogModel();
     protected readonly dueTime = signal<string | null>('');
+
     protected readonly dueTimeAction = signal<string | null>('');
+
+    protected readonly dueTimeDialog = new DialogModel();
+
     protected readonly dueTimeMode = form(signal(OPTION_IMMEDIATELY));
 
     public selectDueTime(action: string): Observable<DateTime | undefined> {

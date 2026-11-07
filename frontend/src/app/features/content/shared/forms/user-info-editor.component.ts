@@ -29,8 +29,6 @@ type UserInfo = { apiKey: string; role: string };
     ],
 })
 export class UserInfoEditorComponent implements FormValueControl<UserInfo | null> {
-    private readonly userInfo = signal<UserInfo>({ apiKey: '', role: '' });
-
     protected readonly rolesState = inject(RolesState);
 
     /** The value of the control. */
@@ -45,14 +43,16 @@ export class UserInfoEditorComponent implements FormValueControl<UserInfo | null
     /** The prefix for the IDs of the inner inputs. */
     public readonly formId = input.required<string>();
 
+    protected readonly userInfo = signal<UserInfo>({ apiKey: '', role: '' });
+
+    protected readonly apiKey = computed(() => {
+        return this.userInfo().apiKey || 'NONE';
+    });
+
     protected readonly userInfoForm = form(this.userInfo, path => {
         disabled(path, () => this.disabled());
         required(path.apiKey);
         required(path.role);
-    });
-
-    protected readonly apiKey = computed(() => {
-        return this.userInfo().apiKey || 'NONE';
     });
 
     constructor() {

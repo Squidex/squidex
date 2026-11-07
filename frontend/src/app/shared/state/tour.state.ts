@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext } from '@angular/core';
-import { filter, skip } from 'rxjs';
+import { effect, EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext, untracked } from '@angular/core';
 import { debug, State, TourService, UIOptions } from '@app/framework';
 import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
@@ -34,8 +33,9 @@ interface Snapshot {
     providedIn: 'root',
 })
 export class TourState extends State<Snapshot> {
+    private readonly uiOptions = inject(UIOptions);
     private readonly injector = inject(EnvironmentInjector);
-    private readonly isDisabled = inject(UIOptions).value.hideOnboarding;
+    private readonly isDisabled = this.uiOptions.value.hideOnboarding;
 
     public readonly completedTasks =
         this.project(x => x.completedTasks);
@@ -58,10 +58,14 @@ export class TourState extends State<Snapshot> {
 
         debug(this, 'tour');
 
-        this.changes.pipe(skip(1), filter(c => c.event !== LoadedEvent))
-            .subscribe(change => {
-                this.uiState.setCommon('tour', change.snapshot);
-            });
+        effect(() => {
+            const change = this.lastChange();
+            if (change.event === 'Initial' || change.event === LoadedEvent) {
+                return;
+            }
+
+            untracked(() => this.uiState.setCommon('tour', change.snapshot));
+        });
 
         this.uiState.waitForCommon('tour', {} as Snapshot)
             .subscribe(change => {

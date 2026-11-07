@@ -25,7 +25,6 @@ export class ReferenceInputComponent implements FormValueControl<ReadonlyArray<s
     private readonly appsState = inject(AppsState);
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
-    private readonly selectedContent = signal<ContentDto | undefined>(undefined);
 
     /** The selected content ID, or an array with the selected content ID. */
     public readonly value = model<ReadonlyArray<string> | string | null>(null);
@@ -54,7 +53,7 @@ export class ReferenceInputComponent implements FormValueControl<ReadonlyArray<s
     /** Renders a small input. */
     public readonly small = input(false, { transform: booleanAttribute });
 
-    protected readonly contentSelectorDialog = new DialogModel();
+    protected readonly selectedContent = signal<ContentDto | undefined>(undefined);
 
     protected readonly selectedName = computed(() => {
         const content = this.selectedContent();
@@ -72,6 +71,8 @@ export class ReferenceInputComponent implements FormValueControl<ReadonlyArray<s
 
         return name || this.localizer.getOrKey('common.noValue');
     });
+
+    protected readonly contentSelectorDialog = new DialogModel();
 
     constructor() {
         effect(() => {

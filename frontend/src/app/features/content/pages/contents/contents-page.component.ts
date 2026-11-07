@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, signal, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -60,32 +60,34 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
 })
 export class ContentsPageComponent {
     private readonly appsState = inject(AppsState);
-    private readonly contributorsState = inject(ContributorsState);
     private readonly contentsService = inject(ContentsService);
+    private readonly contributorsState = inject(ContributorsState);
     private readonly localStore = inject(LocalStoreService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
-    private readonly schemasState = inject(SchemasState);
     private readonly schemasService = inject(SchemasService);
+    private readonly schemasState = inject(SchemasState);
     private readonly tempService = inject(TempService);
     private readonly uiState = inject(UIState);
-    private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
-
-    private readonly tableConfig = computed(() => {
-        return getTableConfig(this.tableSettings());
-    });
-
-    private readonly selectedItems = signal<Record<string, boolean>>({});
-
-    private readonly schemaName = computed(() => {
-        return this.schemasState.selectedSchema()?.name;
-    });
-
     private schemaLoaded?: SchemaDto;
 
     protected readonly contentsRoute = inject(Router2State);
+
     protected readonly contentsState = inject(ContentsState);
+
     protected readonly languagesState = inject(LanguagesState);
+
+    protected readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
+
+    protected readonly selectedItems = signal<Record<string, boolean>>({});
+
+    protected readonly tableConfig = computed(() => {
+        return getTableConfig(this.tableSettings());
+    });
+
+    protected readonly schemaName = computed(() => {
+        return this.schemasState.selectedSchema()?.name;
+    });
 
     protected readonly schema = computed(() => {
         return this.schemasState.selectedSchema()!;
@@ -96,10 +98,6 @@ export class ContentsPageComponent {
 
         return untracked(() => new TableSettings(this.uiState, schema));
     });
-
-    protected readonly tableViewModal = new ModalModel();
-    protected readonly exportDialog = new DialogModel();
-    public readonly searchModal = new ModalModel();
 
     protected readonly contents = computed(() => {
         return this.contentsState.contents();
@@ -170,11 +168,6 @@ export class ContentsPageComponent {
         return this.appsState.selectedSettings()?.hideScheduler === true;
     });
 
-    protected readonly queryModel = rxResource({
-        params: () => this.schemaName(),
-        stream: ({ params: schemaName }) => this.schemasService.getFilters(this.appsState.appName, schemaName),
-    });
-
     protected readonly queries = computed(() => {
         const schemaName = this.schemaName();
         if (!schemaName) {
@@ -183,6 +176,17 @@ export class ContentsPageComponent {
 
         return new Queries(this.uiState, `schemas.${schemaName}`);
     });
+
+    protected readonly queryModel = rxResource({
+        params: () => this.schemaName(),
+        stream: ({ params: schemaName }) => this.schemasService.getFilters(this.appsState.appName, schemaName),
+    });
+
+    protected readonly tableViewModal = new ModalModel();
+
+    protected readonly exportDialog = new DialogModel();
+
+    public readonly searchModal = new ModalModel();
 
     constructor() {
         if (this.appsState.snapshot.selectedApp?.canReadContributors) {

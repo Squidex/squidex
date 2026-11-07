@@ -124,7 +124,11 @@ export class ModalDirective<T = unknown> implements OpenModal {
                 this.rendererFactory.end?.();
             }
 
-            remove(this.renderer, ModalDirective.backdrop);
+            const backdrop = ModalDirective.backdrop;
+            const backdropParent = backdrop ? this.renderer.parentNode(backdrop) : null;
+            if (backdropParent) {
+                this.renderer.removeChild(backdropParent, backdrop);
+            }
         }
 
         this.isOpen = isOpen;
@@ -170,7 +174,11 @@ export class ModalDirective<T = unknown> implements OpenModal {
                 ModalDirective.backdrop = backdrop;
             }
 
-            insertBefore(this.renderer, this.renderRoots[0], backdrop);
+            const rootNode = this.renderRoots[0];
+            const rootParent = rootNode ? this.renderer.parentNode(rootNode) : null;
+            if (backdrop && rootParent) {
+                this.renderer.insertBefore(rootParent, backdrop, rootNode);
+            }
 
             this.viewListeners.push(this.renderer.listen(backdrop, 'click', this.backdropListener));
         }
@@ -219,26 +227,6 @@ export class ModalDirective<T = unknown> implements OpenModal {
 
 export class ModalContext<T = unknown> {
     public $implicit: T = null!;
-}
-
-function insertBefore(renderer: Renderer2, refElement: any, element: any) {
-    if (element && refElement) {
-        const parent = renderer.parentNode(refElement);
-
-        if (parent) {
-            renderer.insertBefore(parent, element, refElement);
-        }
-    }
-}
-
-function remove(renderer: Renderer2, element: any) {
-    if (element) {
-        const parent = renderer.parentNode(element);
-
-        if (parent) {
-            renderer.removeChild(parent, element);
-        }
-    }
 }
 
 function isModel(model: Model): model is DialogModel | ModalModel {

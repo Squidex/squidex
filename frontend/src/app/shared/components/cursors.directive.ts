@@ -15,8 +15,8 @@ import { CollaborationService } from '@app/shared/internal';
     },
 })
 export class CursorsDirective {
-    private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly collaboration = inject(CollaborationService);
+    private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
 
     protected onMouseMove(event: MouseEvent) {
         const rect = this.element.nativeElement.getBoundingClientRect();

@@ -32,9 +32,9 @@ export class OnboardingDialogComponent {
     /** Emits when the user closes the dialog, by skipping or starting the tour. */
     public readonly dialogClose = output();
 
-    protected readonly answersForm = form(signal({ companySize: '', companyRole: '', project: '' }));
-
     protected readonly step = signal(0);
+
+    protected readonly answersForm = form(signal({ companySize: '', companyRole: '', project: '' }));
 
     protected submitAnswers() {
         this.usersService.postUser({ answers: this.answersForm().value() }).subscribe();

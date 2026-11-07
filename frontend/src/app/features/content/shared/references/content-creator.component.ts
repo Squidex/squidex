@@ -65,6 +65,14 @@ export class ContentCreatorComponent {
         return this.language();
     });
 
+    protected readonly schema = linkedSignal<SchemaDto | undefined>(() => {
+        const schemas = this.schemas();
+
+        return schemas.find(x => x.name === this.schemaName()) || schemas[0];
+    });
+
+    protected readonly contentForm = signal<EditContentForm | undefined>(undefined);
+
     protected readonly schemas = computed(() => {
         const schemaIds = this.schemaIds();
 
@@ -76,14 +84,7 @@ export class ContentCreatorComponent {
         return schemas.filter(x => x.type === 'Default' && schemaIds.indexOf(x.id) >= 0);
     });
 
-    protected readonly schema = linkedSignal<SchemaDto | undefined>(() => {
-        const schemas = this.schemas();
-
-        return schemas.find(x => x.name === this.schemaName()) || schemas[0];
-    });
-
     protected readonly schemaForm = form(this.schema);
-    protected readonly contentForm = signal<EditContentForm | undefined>(undefined);
 
     constructor() {
         effect(() => {

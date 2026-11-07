@@ -41,11 +41,11 @@ export class AppsMenuComponent {
         return this.titleService.path().slice(1);
     });
 
+    protected readonly starters = this.templatesState.starters;
+
     protected readonly addAppDialog = new DialogModel();
 
     protected readonly addTeamDialog = new DialogModel();
 
     protected readonly appsMenu = new ModalModel();
-
-    protected readonly starters = this.templatesState.starters;
 }

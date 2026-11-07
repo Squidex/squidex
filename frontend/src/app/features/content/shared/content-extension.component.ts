@@ -27,21 +27,6 @@ export class ContentExtensionComponent {
     private readonly authService = inject(AuthService);
     private readonly router = inject(Router);
     private readonly themeService = inject(ThemeService);
-    private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
-
-    private readonly context = computed(() => {
-        const schema = this.contentSchema();
-
-        return {
-            apiUrl: this.apiUrl.buildUrl('api'),
-            appId: this.appsState.snapshot.selectedApp!.id,
-            appName: this.appsState.snapshot.selectedApp!.name,
-            user: this.authService.user,
-            schemaName: schema?.name,
-            schemaId: schema?.id,
-        };
-    });
-
     private isInitialized = false;
 
     /** The content that is passed to the extension. */
@@ -55,6 +40,21 @@ export class ContentExtensionComponent {
 
     /** The URL of the extension. */
     public readonly editorUrl = input<string | null>();
+
+    protected readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
+
+    protected readonly context = computed(() => {
+        const schema = this.contentSchema();
+
+        return {
+            apiUrl: this.apiUrl.buildUrl('api'),
+            appId: this.appsState.snapshot.selectedApp!.id,
+            appName: this.appsState.snapshot.selectedApp!.name,
+            user: this.authService.user,
+            schemaName: schema?.name,
+            schemaId: schema?.id,
+        };
+    });
 
     protected readonly computedUrl = computed(() => {
         return computeEditorUrl(this.editorUrl(), this.appsState.snapshot.selectedSettings);

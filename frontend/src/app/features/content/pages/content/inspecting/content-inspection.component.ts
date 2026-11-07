@@ -26,8 +26,8 @@ type Mode = 'Content' | 'Data' | 'FlatData';
 })
 export class ContentInspectionComponent {
     private readonly contentsService = inject(ContentsService);
-    private readonly destroyRef = inject(DestroyRef);
     private readonly contentsState = inject(ContentsState);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly toolbar = inject(ToolbarService);
     private contentData: any;
 
@@ -44,6 +44,7 @@ export class ContentInspectionComponent {
     public readonly content = input.required<ContentDto>();
 
     protected readonly mode = signal<Mode>('Content');
+
     protected readonly contentError = signal<ErrorDto | null | undefined>(undefined);
 
     protected readonly actualData = rxResource({

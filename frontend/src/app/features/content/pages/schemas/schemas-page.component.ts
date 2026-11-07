@@ -26,23 +26,23 @@ import { AppDto, AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComp
     ],
 })
 export class SchemasPageComponent {
-    private readonly schemasState = inject(SchemasState);
     private readonly appsState = inject(AppsState);
+    private readonly schemasState = inject(SchemasState);
     private readonly uiOptions = inject(UIOptions);
 
-    private readonly schemas = computed(() => {
+    protected readonly schemas = computed(() => {
         const app = this.appsState.snapshot.selectedApp!;
 
         return this.schemasState.schemas().filter(schema => isVisible(schema, app));
     });
 
-    protected readonly schemasFilter = form(signal(''));
-
-    protected readonly isEmbedded = this.uiOptions.value.embedded;
-
     protected readonly categories = computed(() => {
         return getCategoryTree(this.schemas(), this.schemasState.addedCategories(), this.schemasFilter().value());
     });
+
+    protected readonly schemasFilter = form(signal(''));
+
+    protected readonly isEmbedded = this.uiOptions.value.embedded;
 }
 
 function isVisible(schema: SchemaDto, app: AppDto) {

@@ -39,11 +39,12 @@ export class SchemasPageComponent {
     private readonly messageBus = inject(MessageBus);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
-    private readonly showDialog = routeParam('showDialog');
 
     protected readonly schemasState = inject(SchemasState);
 
     protected readonly source = signal<any>(null);
+
+    protected readonly showDialog = routeParam('showDialog');
 
     protected readonly categories = computed(() => {
         return getCategoryTree(this.schemasState.schemas(), this.schemasState.addedCategories(), this.schemasFilter().value());

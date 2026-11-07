@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Signal, signal, WritableSignal } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { computed, effect, Signal, signal, untracked, WritableSignal } from '@angular/core';
 import { Types } from './utils/types';
 
 export type Mutable<T> = {
@@ -100,22 +99,19 @@ interface Change<T> {
 }
 
 export class State<T extends {}> {
-    private readonly changes$: BehaviorSubject<Change<T>>;
-    private readonly current: WritableSignal<Readonly<T>>;
-
-    public get changes(): Observable<Change<T>> {
-        return this.changes$;
-    }
+    private readonly current: WritableSignal<Change<T>>;
 
     public get snapshot(): Readonly<T> {
-        return this.changes$.value.snapshot;
+        return untracked(this.value);
     }
+
+    public readonly lastChange: Signal<Change<T>>;
 
     public readonly value: Signal<Readonly<T>>;
 
     public project<M>(project: (value: T) => M, compare?: (x: M, y: M) => boolean): Signal<M> {
         return computed(() => {
-            return project(this.current());
+            return project(this.value());
         }, compare ? { equal: compare } : undefined);
     }
 
@@ -134,9 +130,9 @@ export class State<T extends {}> {
     constructor(
         private readonly initialState: Readonly<T>,
     ) {
-        this.changes$ = new BehaviorSubject({ snapshot: initialState, event: 'Initial' });
-        this.current = signal(initialState);
-        this.value = this.current.asReadonly();
+        this.current = signal({ snapshot: initialState, event: 'Initial' });
+        this.lastChange = this.current.asReadonly();
+        this.value = computed(() => this.current().snapshot);
     }
 
     public resetState(update?: ((v: T) => Readonly<T>) | Partial<T> | string, event = 'Reset') {
@@ -178,8 +174,7 @@ export class State<T extends {}> {
         }
 
         if (isChanged) {
-            this.current.set(newState);
-            this.changes$.next({ snapshot: newState, event });
+            this.current.set({ snapshot: newState, event });
         }
 
         return isChanged;
@@ -208,16 +203,13 @@ class Connector {
             return;
         }
 
-        state.changes
-            .subscribe(change => {
-                const eventName = `${slice} - ${change.event}`;
+        effect(() => {
+            const change = state.lastChange();
+            const eventName = `${slice} - ${change.event}`;
 
-                if (this.devTools) {
-                    this.state[slice] = change.snapshot;
-
-                    this.devTools?.send(eventName, this.state);
-                }
-            });
+            this.state[slice] = change.snapshot;
+            this.devTools?.send(eventName, this.state);
+        });
     }
 }
 

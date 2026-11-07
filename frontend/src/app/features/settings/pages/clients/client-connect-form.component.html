@@ -163,7 +163,7 @@
             }
 
             @case ("SDK") {
-                @if (sdks(); as sdks) {
+                @if (sdks.value(); as sdks) {
                     <div>
                         @for (availableSDK of sdks | keyvalue; track availableSDK) {
                             <div class="sdk-header" [class.active]="sdk() === availableSDK.value" (click)="select(availableSDK.value)">

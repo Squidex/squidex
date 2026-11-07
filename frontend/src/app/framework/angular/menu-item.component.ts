@@ -61,7 +61,7 @@ export class MenuItemComponent {
     /** Emits when the button is clicked and the action is confirmed. */
     public readonly action = output();
 
-    protected readonly template = viewChild.required<TemplateRef<any>>('dropdownTemplate');
+    public readonly template = viewChild.required<TemplateRef<any>>('dropdownTemplate');
 
     public readonly actualMenuLabel = computed(() => {
         const key = this.menuLabel() || this.label();

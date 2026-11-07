@@ -34,17 +34,14 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     ],
 })
 export class GeolocationEditorComponent implements FormValueControl<Geolocation | null> {
-    private readonly uiOptions = inject(UIOptions);
-    private readonly resourceLoader = inject(ResourceLoaderService);
-
-    private readonly googleMapsKey = this.uiOptions.value.map.googleMaps.key;
+    private readonly destroyRef = inject(DestroyRef);
     private readonly localStore = inject(LocalStoreService);
-    private readonly editor = viewChild.required<ElementRef<HTMLElement>>('editor');
-    private readonly searchBoxInput = viewChild.required<ElementRef<HTMLInputElement>>('searchBox');
-    private readonly geolocationModel = signal({ latitude: NaN, longitude: NaN });
-    private marker: any;
-    private map: any;
+    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly uiOptions = inject(UIOptions);
+    private readonly googleMapsKey = this.uiOptions.value.map.googleMaps.key;
     private current: Geolocation | null = null;
+    private map: any;
+    private marker: any;
 
     /** The geolocation value. */
     public readonly value = model<Geolocation | null>(null);
@@ -55,11 +52,17 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
     /** Indicates whether the control has been touched. */
     public readonly touched = model(false);
 
-    protected readonly isGoogleMaps = this.uiOptions.value.map.type !== 'OSM';
+    protected readonly editor = viewChild.required<ElementRef<HTMLElement>>('editor');
+
+    protected readonly searchBoxInput = viewChild.required<ElementRef<HTMLInputElement>>('searchBox');
+
+    protected readonly geolocationModel = signal({ latitude: NaN, longitude: NaN });
+
+    protected readonly isCompact = signal(false);
 
     protected readonly isMapHidden = this.localStore.boolean(Settings.Local.HIDE_MAP);
 
-    protected readonly isCompact = signal(false);
+    protected readonly isGoogleMaps = this.uiOptions.value.map.type !== 'OSM';
 
     protected readonly geolocationForm = form(this.geolocationModel, path => {
         SignalValidators.between(path.latitude, -90, 90);
@@ -68,7 +71,7 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
     });
 
     constructor() {
-        const destroyRef = inject(DestroyRef);
+        const destroyRef = this.destroyRef;
 
         effect(() => {
             const value = this.value();

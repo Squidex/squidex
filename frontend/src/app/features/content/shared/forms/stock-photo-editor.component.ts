@@ -31,8 +31,8 @@ type Request = { search?: string; page: number };
     ],
 })
 export class StockPhotoEditorComponent implements FormValueControl<string | null> {
-    private readonly stockPhotoService = inject(StockPhotoService);
     private readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
+    private readonly stockPhotoService = inject(StockPhotoService);
 
     /** The value of the control. */
     public readonly value = model<string | null>(null);
@@ -43,20 +43,23 @@ export class StockPhotoEditorComponent implements FormValueControl<string | null
     /** Indicates whether the control has been touched. */
     public readonly touched = model(false);
 
-    protected readonly stockPhotoThumbnail = computed(() => {
-        const value = this.value();
-
-        return value ? thumbnail(value, undefined, 300) || value : null;
-    });
-
     protected readonly stockPhotoSearch = signal('');
+
     protected readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
+
     protected readonly stockPhotosHasMore = signal(false);
+
     protected readonly stockPhotosLoading = signal(false);
 
     protected readonly thumbnailStatus = linkedSignal<string | null, 'Loaded' | 'Failed' | undefined>({
         source: this.value,
         computation: () => undefined,
+    });
+
+    protected readonly stockPhotoThumbnail = computed(() => {
+        const value = this.value();
+
+        return value ? thumbnail(value, undefined, 300) || value : null;
     });
 
     protected readonly searchDialog = new DialogModel();

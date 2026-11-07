@@ -24,18 +24,6 @@ import { ReferencesTagsConverter } from './references-tag-converter';
 export class ReferencesTagsComponent implements FormValueControl<ReadonlyArray<string> | null> {
     private readonly contentsResolver = inject(ResolveContents);
     private readonly localizer = inject(LocalizerService);
-
-    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
-        source: () => this.schemaId(),
-        computation: () => [],
-    });
-
-    private readonly contentsFailed = signal(false);
-
-    private readonly isValid = computed(() => {
-        return !!this.schemaId() && !!this.language();
-    });
-
     private isOpenedBefore = false;
 
     /** The value of the control. */
@@ -56,6 +44,19 @@ export class ReferencesTagsComponent implements FormValueControl<ReadonlyArray<s
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
+    protected readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
+        source: () => this.schemaId(),
+        computation: () => [],
+    });
+
+    protected readonly contentsFailed = signal(false);
+
+    protected readonly contentsLoading = signal(false);
+
+    protected readonly isValid = computed(() => {
+        return !!this.schemaId() && !!this.language();
+    });
+
     protected readonly selectedIds = computed(() => {
         const value = this.value();
 
@@ -65,8 +66,6 @@ export class ReferencesTagsComponent implements FormValueControl<ReadonlyArray<s
     protected readonly isEditorDisabled = computed(() => {
         return this.disabled() || !this.isValid() || this.contentsFailed();
     });
-
-    protected readonly contentsLoading = signal(false);
 
     protected readonly converter = computed(() => {
         return new ReferencesTagsConverter(this.language(), this.contents(), this.localizer);

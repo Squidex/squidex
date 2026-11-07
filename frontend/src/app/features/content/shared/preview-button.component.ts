@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, TranslatePipe } from '@app/shared';
@@ -36,12 +36,14 @@ export class PreviewButtonComponent {
     /** The schema of the content, with the preview URLs. */
     public readonly schema = input.required<SchemaDto>();
 
-    protected readonly dropdown = new ModalModel();
+    protected readonly previewNameStore = computed(() => {
+        return this.localStore.value(this.configKey());
+    });
 
-    protected readonly previewNameSelected = linkedSignal<string | undefined>(() => {
+    protected readonly previewNameSelected = computed<string | undefined>(() => {
         const previewUrls = this.schema().previewUrls;
 
-        const selectedName = this.localStore.get(this.configKey());
+        const selectedName = this.previewNameStore()();
         if (!selectedName || !previewUrls[selectedName]) {
             return Object.keys(previewUrls)[0];
         }
@@ -58,6 +60,8 @@ export class PreviewButtonComponent {
 
         return previewNames.removed(previewNameSelected).sorted();
     });
+
+    protected readonly dropdown = new ModalModel();
 
     protected follow(name?: string) {
         if (name) {
@@ -87,9 +91,7 @@ export class PreviewButtonComponent {
     }
 
     private selectUrl(selectedName: string) {
-        this.previewNameSelected.set(selectedName);
-
-        this.localStore.set(this.configKey(), selectedName);
+        this.previewNameStore().set(selectedName);
     }
 
     private configKey() {

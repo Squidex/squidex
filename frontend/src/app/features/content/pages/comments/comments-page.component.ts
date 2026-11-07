@@ -23,10 +23,11 @@ type Tab = 'unresolved' | 'all';
     ],
 })
 export class CommentsPageComponent {
-    private readonly route = inject(ActivatedRoute);
     private readonly contentStates = inject(ContentsState);
+    private readonly route = inject(ActivatedRoute);
 
     protected readonly commentsId = routeParam('contentId', this.route.parent!);
+
     protected readonly commentsTab = queryParam<Tab>('commentsTab', 'unresolved');
 
     protected readonly content = this.contentStates.selectedContent;

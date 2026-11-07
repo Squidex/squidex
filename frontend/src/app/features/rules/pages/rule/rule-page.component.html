@@ -79,7 +79,7 @@
                     </div>
                 </div>
                 <sqx-branch
-                    [availableSteps]="availableSteps()"
+                    [availableSteps]="availableSteps.value()"
                     [branchItems]="snapshot.flow.getBranches()[0].items"
                     [branchTitle]="'rules.ruleSyntax.then' | sqxTranslate | lowercase"
                     [flow]="snapshot.flow"
@@ -144,7 +144,7 @@
     *sqxModal="triggerDialog"
     [trigger]="triggerToEdit()" />
 <sqx-step-dialog
-    [availableSteps]="availableSteps()"
+    [availableSteps]="availableSteps.value()"
     (dialogClose)="cancel()"
     (dialogSave)="changeStep($event)"
     [isEditable]="editableRule().isEditable"

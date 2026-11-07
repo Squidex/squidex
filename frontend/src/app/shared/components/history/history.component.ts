@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { merge, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
@@ -26,20 +26,20 @@ import { HistoryListComponent } from './history-list.component';
 })
 export class HistoryComponent {
     private readonly appsState = inject(AppsState);
+    private readonly channel = this.calculateChannel();
     private readonly historyService = inject(HistoryService);
     private readonly messageBus = inject(MessageBus);
     private readonly route = inject(ActivatedRoute);
     private readonly schemasState = inject(SchemasState);
     private readonly teamsState = inject(TeamsState);
-    private readonly channel = this.calculateChannel();
 
-    protected readonly events = toSignal(
-        merge(
+    protected readonly events = rxResource({
+        stream: () => merge(
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000)),
         ).pipe(
             switchSafe(() => this.getHistory())),
-        { initialValue: null });
+    });
 
     private getHistory() {
         if (this.teamsState.teamId) {

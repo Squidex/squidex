@@ -40,10 +40,15 @@ export class ContentHistoryPageComponent {
     private readonly contentsState = inject(ContentsState);
     private readonly historyService = inject(HistoryService);
     private readonly schemasState = inject(SchemasState);
-    private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
+
+    protected readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
 
     protected readonly content = computed(() => {
         return this.contentsState.selectedContent();
+    });
+
+    protected readonly disableScheduler = computed(() => {
+        return this.appsState.selectedSettings()?.hideScheduler === true;
     });
 
     protected readonly contentEvents = rxResource({
@@ -61,11 +66,8 @@ export class ContentHistoryPageComponent {
     });
 
     protected readonly dropdown = new ModalModel();
-    protected readonly dropdownNew = new ModalModel();
 
-    protected readonly disableScheduler = computed(() => {
-        return this.appsState.selectedSettings()?.hideScheduler === true;
-    });
+    protected readonly dropdownNew = new ModalModel();
 
     protected changeStatus(status: string) {
         this.contentPage.checkPendingChangesBeforeChangingStatus().pipe(

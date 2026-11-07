@@ -34,13 +34,14 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
 export class ReferencesPageComponent {
     private readonly contentsRoute = inject(Router2State);
     private readonly languagesState = inject(LanguagesState);
-    private readonly referenceId = routeParam('referenceId');
 
     protected readonly contentsState = inject(ComponentContentsState);
 
     protected readonly language = linkedSignal<AppLanguageDto>(() => {
         return this.languagesState.isoMasterLanguage();
     });
+
+    protected readonly referenceId = routeParam('referenceId');
 
     protected readonly languages = computed(() => {
         return this.languagesState.isoLanguages();

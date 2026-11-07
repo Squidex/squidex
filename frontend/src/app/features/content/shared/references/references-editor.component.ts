@@ -68,11 +68,13 @@ export class ReferencesEditorComponent implements FormValueControl<ReadonlyArray
     public readonly allowDuplicates = input(true, { transform: booleanAttribute });
 
     protected readonly contentItems = signal<ReadonlyArray<ContentDto>>([]);
+
     protected readonly contentCloned = signal<ContentDto | undefined>(undefined);
 
     protected readonly isCompact = signal(false);
 
     protected readonly contentCreatorDialog = new DialogModel();
+
     protected readonly contentSelectorDialog = new DialogModel();
 
     constructor() {

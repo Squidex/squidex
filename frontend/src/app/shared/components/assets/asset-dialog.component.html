@@ -159,7 +159,7 @@
                             </button>
                         </sqx-form-row>
 
-                        @if (assetTags(); as tags) {
+                        @if (assetTags.value(); as tags) {
                             <sqx-form-row [for]="annotateForm.form.tags" label="common.tags" vertical>
                                 <sqx-tag-editor id="tags" allowDuplicates="false" [formField]="annotateForm.form.tags" [itemsSource]="tags" nullWhenEmpty="false" />
                             </sqx-form-row>

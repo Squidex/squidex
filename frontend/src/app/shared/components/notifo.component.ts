@@ -21,13 +21,14 @@ import { TourHintDirective } from './tour-hint.directive';
 })
 export class NotifoComponent {
     private readonly authService = inject(AuthService);
-    private readonly uiOptions = inject(UIOptions);
-    private readonly renderer = inject(Renderer2);
-    private readonly notifoApiUrl: string = this.uiOptions.value.notifoApi;
+    private readonly destroyRef = inject(DestroyRef);
     private readonly notifoApiKey = this.authService.user?.notifoToken;
-    private readonly element = viewChild<ElementRef<Element>>('element');
-    private topicShown = '';
+    private readonly renderer = inject(Renderer2);
+    private readonly resourceLoaderService = inject(ResourceLoaderService);
+    private readonly uiOptions = inject(UIOptions);
+    private readonly notifoApiUrl: string = this.uiOptions.value.notifoApi;
     private isShown = false;
+    private topicShown = '';
 
     /** The topic to subscribe to. Shows all notifications when not defined. */
     public readonly topic = input('');
@@ -35,9 +36,11 @@ export class NotifoComponent {
     /** The position of the notifications popup. */
     public readonly position = input<'bottom-left' | 'bottom-right'>('bottom-left');
 
+    protected readonly element = viewChild<ElementRef<Element>>('element');
+
     constructor() {
-        const resourceLoader = inject(ResourceLoaderService);
-        const destroyRef = inject(DestroyRef);
+        const resourceLoader = this.resourceLoaderService;
+        const destroyRef = this.destroyRef;
 
         if (!this.notifoApiKey || !this.notifoApiUrl) {
             return;

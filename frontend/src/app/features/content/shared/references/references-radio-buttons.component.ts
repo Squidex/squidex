@@ -27,23 +27,6 @@ export class ReferencesRadioButtonsComponent implements FormValueControl<Readonl
     private readonly localizer = inject(LocalizerService);
     private readonly uiOptions = inject(UIOptions);
     private readonly itemCount: number = this.uiOptions.value.referencesDropdownItemCount;
-    private readonly contentItems = rxResource({
-        params: () => this.schemaId() || undefined,
-        stream: ({ params: schemaId }) => this.contentsService.getContents(this.appsState.appName, schemaId, { take: this.itemCount }).pipe(
-            map(contents => contents.items as ReadonlyArray<ContentDto> | null),
-            catchError(() => of(null))),
-        defaultValue: null,
-    });
-
-    private readonly isValid = computed(() => {
-        return !!this.schemaId() && !!this.language();
-    });
-
-    private readonly isSuccess = computed(() => {
-        const contentItems = this.contentItems.value();
-
-        return this.isValid() && !!contentItems && contentItems.length > 0;
-    });
 
     /** The value of the control. */
     public readonly value = model<ReadonlyArray<string> | null>(null);
@@ -60,6 +43,16 @@ export class ReferencesRadioButtonsComponent implements FormValueControl<Readonl
     /** The language to build the names of the contents. */
     public readonly language = input.required<AppLanguageDto>();
 
+    protected readonly isValid = computed(() => {
+        return !!this.schemaId() && !!this.language();
+    });
+
+    protected readonly isSuccess = computed(() => {
+        const contentItems = this.contentItems.value();
+
+        return this.isValid() && !!contentItems && contentItems.length > 0;
+    });
+
     protected readonly isGroupDisabled = computed(() => {
         return this.disabled() || !this.isSuccess();
     });
@@ -75,6 +68,14 @@ export class ReferencesRadioButtonsComponent implements FormValueControl<Readonl
         }
 
         return new ReferencesTagsConverter(this.language(), contentItems, this.localizer);
+    });
+
+    protected readonly contentItems = rxResource({
+        params: () => this.schemaId() || undefined,
+        stream: ({ params: schemaId }) => this.contentsService.getContents(this.appsState.appName, schemaId, { take: this.itemCount }).pipe(
+            map(contents => contents.items as ReadonlyArray<ContentDto> | null),
+            catchError(() => of(null))),
+        defaultValue: null,
     });
 
     protected updateValue(value: string | null | undefined) {

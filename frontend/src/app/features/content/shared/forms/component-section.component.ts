@@ -21,8 +21,6 @@ import { FieldEditorComponent } from './field-editor.component';
     ],
 })
 export class ComponentSectionComponent {
-    private readonly editors = viewChildren(FieldEditorComponent);
-
     /** Enables the AI features of the editors. */
     public readonly hasChatBot = input.required<boolean>();
 
@@ -49,6 +47,8 @@ export class ComponentSectionComponent {
 
     /** The index of the array item the section belongs to. */
     public readonly index = input<number | null | undefined, unknown>(undefined, { transform: numberAttribute });
+
+    protected readonly editors = viewChildren(FieldEditorComponent);
 
     public reset() {
         for (const editor of this.editors()) {

@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { NavigationExtras, Params, Router } from '@angular/router';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { LocalStoreService } from '@app/framework/internal';
@@ -197,21 +198,26 @@ describe('Router2State', () => {
 
             state = new State<any>({});
 
-            router2State = new Router2State(route, router.object, localStore.object);
+            router2State = TestBed.runInInjectionContext(() => new Router2State(route, router.object, localStore.object));
             router2State.mapTo(state)
                 .withString('state1')
                 .withStrings('state2')
                 .listen();
+
+            TestBed.tick();
         });
 
         afterEach(() => {
             router2State.ngOnDestroy();
         });
 
-        it('should unsubscribe from state', () => {
+        it('should not sync to route after unsubscribing from state', () => {
             router2State.ngOnDestroy();
 
-            expect((state.changes as any)['observers'].length).toEqual(0);
+            state.next({ state1: 'other' });
+            TestBed.tick();
+
+            router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.once());
         });
 
         it('Should get values from route', () => {
@@ -233,6 +239,7 @@ describe('Router2State', () => {
                 state1: 'hello',
                 state2: { squidex: true, cms: true },
             });
+            TestBed.tick();
 
             expect(routeExtras!.replaceUrl).toBe(true);
             expect(routeExtras!.queryParamsHandling).toBe('merge');
@@ -250,11 +257,13 @@ describe('Router2State', () => {
                 state1: 'hello',
                 state2: { squidex: true, cms: true },
             });
+            TestBed.tick();
 
             state.next({
                 state1: 'hello',
                 state2: { squidex: true, cms: true },
             });
+            TestBed.tick();
 
             expect(routeExtras!.replaceUrl).toBe(true);
             expect(routeExtras!.queryParamsHandling).toBe('merge');

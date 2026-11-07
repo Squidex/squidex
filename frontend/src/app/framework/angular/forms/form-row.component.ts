@@ -84,7 +84,7 @@ export class FormRowComponent {
     /** Additional CSS classes for the host element. */
     public readonly class = input('');
 
-    protected readonly fieldName = computed(() => {
+    public readonly fieldName = computed(() => {
         const prefix = this.prefix();
 
         const name = this.getName();

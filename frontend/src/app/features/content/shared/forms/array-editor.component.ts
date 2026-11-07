@@ -34,9 +34,6 @@ import { ArrayItemComponent } from './array-item.component';
 export class ArrayEditorComponent {
     private readonly localStore = inject(LocalStoreService);
 
-    private readonly children = viewChildren(ArrayItemComponent);
-    private readonly scroller = viewChild(VirtualScrollerComponent);
-
     /** Enables the AI features of the editors. */
     public readonly hasChatBot = input.required<boolean>();
 
@@ -64,7 +61,9 @@ export class ArrayEditorComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    protected readonly schemasDropdown = new ModalModel();
+    protected readonly children = viewChildren(ArrayItemComponent);
+
+    protected readonly scroller = viewChild(VirtualScrollerComponent);
 
     protected readonly isArray = computed(() => {
         return !Types.is(this.formModel().field.properties, ComponentsFieldPropertiesDto);
@@ -92,13 +91,19 @@ export class ArrayEditorComponent {
         return this.isDisabled() || formModel.items().length >= maxItems;
     });
 
+    protected readonly isCollapsedStore = computed(() => {
+        return this.localStore.boolean(this.isCollapsedKey());
+    });
+
     protected readonly isCollapsedInitial = computed(() => {
-        return this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel() > 0;
+        return this.isCollapsedStore()() || this.formLevel() > 0;
     });
 
     protected readonly hasField = computed(() => {
         return (this.formModel().field as any)['nested']?.length > 0;
     });
+
+    protected readonly schemasDropdown = new ModalModel();
 
     protected removeItem(index: number) {
         this.formModel().removeItemAt(index);
@@ -138,7 +143,7 @@ export class ArrayEditorComponent {
         }
 
         if (this.formLevel() === 0) {
-            this.localStore.setBoolean(this.isCollapsedKey(), true);
+            this.isCollapsedStore().set(true);
         }
 
         this.scroller()?.invalidateAllCachedMeasurements();
@@ -150,7 +155,7 @@ export class ArrayEditorComponent {
         }
 
         if (this.formLevel() === 0) {
-            this.localStore.setBoolean(this.isCollapsedKey(), false);
+            this.isCollapsedStore().set(false);
         }
 
         this.scroller()?.invalidateAllCachedMeasurements();

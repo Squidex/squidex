@@ -40,16 +40,9 @@ export class ContentSelectorComponent {
     private readonly appsState = inject(AppsState);
     private readonly schemasService = inject(SchemasService);
     private readonly schemasState = inject(SchemasState);
-
-    private readonly alreadySelectedIdsAll = computed(() => {
-        return this.alreadySelected()?.map(x => x.id) ?? this.alreadySelectedIds();
-    });
-
-    private readonly selectedItems = signal<Record<string, ContentDto>>({});
     private isInitialQueryUsed = false;
 
     protected readonly contentsState = inject(ComponentContentsState);
-    protected readonly metaFields = META_FIELDS;
 
     /** Emits the selected contents, or an empty array when the dialog is closed. */
     public readonly contentSelect = output<ReadonlyArray<ContentDto>>();
@@ -87,9 +80,15 @@ export class ContentSelectorComponent {
     /** The contents that have already been selected before. Takes precedence over the IDs. */
     public readonly alreadySelected = input<ReadonlyArray<ContentDto> | null>();
 
+    protected readonly selectedItems = signal<Record<string, ContentDto>>({});
+
     protected readonly languageSelected = linkedSignal(() => this.language());
 
     protected readonly schema = signal<SchemaDto | undefined>(undefined);
+
+    protected readonly alreadySelectedIdsAll = computed(() => {
+        return this.alreadySelected()?.map(x => x.id) ?? this.alreadySelectedIds();
+    });
 
     protected readonly schemas = computed(() => {
         const schemas = this.schemasState.snapshot.schemas.filter(x => x.type === 'Default' && x.canReadContents);
@@ -114,6 +113,8 @@ export class ContentSelectorComponent {
         params: () => this.schema()?.name,
         stream: ({ params }) => this.schemasService.getFilters(this.appsState.appName, params),
     });
+
+    protected readonly metaFields = META_FIELDS;
 
     constructor() {
         effect(() => {

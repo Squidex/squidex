@@ -41,20 +41,25 @@ type ViewMode = 'day' | 'week' | 'month';
 })
 export class CalendarPageComponent {
     private readonly appsState = inject(AppsState);
-    private readonly destroyRef = inject(DestroyRef);
     private readonly contentsService = inject(ContentsService);
-    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly languagesState = inject(LanguagesState);
-    private readonly localizer = inject(LocalizerService);
-    private readonly calendarContainer = viewChild.required<ElementRef>('calendarContainer');
     private readonly language: AppLanguageDto = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
+    private readonly localizer = inject(LocalizerService);
+    private readonly resourceLoader = inject(ResourceLoaderService);
     private calendar: any;
 
+    protected readonly calendarContainer = viewChild.required<ElementRef>('calendarContainer');
+
     protected readonly view = signal<ViewMode>('month');
+
     protected readonly contentSelected = signal<ContentDto | undefined>(undefined);
-    protected readonly contentDialog = new DialogModel();
+
     protected readonly title = signal('');
+
     protected readonly isLoading = signal(false);
+
+    protected readonly contentDialog = new DialogModel();
 
     constructor() {
         afterNextRender(() => {

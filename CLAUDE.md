@@ -44,8 +44,10 @@ npm run lint
   7. Resources.
   8. Every other protected field.
 - Signals are `protected`, unless they are part of the public interface (inputs, outputs, public models).
+- Always put an empty line after a signal field (inputs, outputs, models, signals, computeds, resources, queries), even if it is a single line.
 - Never inline `inject()` calls into other expressions. Assign every injection to its own field and use that field.
 - Load data from services with resources (`rxResource`, `resource`), never with `toSignal`.
+- Inline small helper functions that are used only once when the surrounding code already makes clear what they do (e.g. the body of a well-named `computed`). Keep a named helper when its name explains logic that is not obvious at the call site.
 - Do not put blank lines between single-line `private readonly` and `private` fields, neither inside a group nor between the two groups. Fields that span multiple lines are separated by blank lines.
 - Pass submit actions to `submit()`/`submitAndUpdate()` as block-body arrows with an explicit `return`.
 - In signal form schemas, sort the rule calls by validator name, then by the field order of the model.

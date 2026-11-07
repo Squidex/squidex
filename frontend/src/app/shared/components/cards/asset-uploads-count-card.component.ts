@@ -25,8 +25,6 @@ export class AssetUploadsCountCardComponent {
     /** The asset storage usage per day. */
     public readonly usage = input.required<ReadonlyArray<StorageUsagePerDateDto> | undefined>();
 
-    protected readonly chartOptions = ChartOptions.Default;
-
     protected readonly chartData = computed<ChartData | undefined>(() => {
         const usage = this.usage();
         if (!usage) {
@@ -48,4 +46,6 @@ export class AssetUploadsCountCardComponent {
             ],
         };
     });
+
+    protected readonly chartOptions = ChartOptions.Default;
 }

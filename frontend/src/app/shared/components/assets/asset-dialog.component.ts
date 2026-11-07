@@ -6,7 +6,7 @@
  */
 
 import { Component, computed, effect, inject, input, linkedSignal, output, signal, viewChild } from '@angular/core';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
@@ -62,10 +62,6 @@ export class AssetDialogComponent {
     private readonly assetUploader = inject(AssetUploaderState);
     private readonly dialogs = inject(DialogService);
 
-    private readonly imageCropper = viewChild(ImageCropperComponent);
-    private readonly imageFocus = viewChild(ImageFocusPointComponent);
-    private readonly textEditor = viewChild(AssetTextEditorComponent);
-
     /** Emits when the dialog is closed. */
     public readonly dialogClose = output();
 
@@ -78,18 +74,13 @@ export class AssetDialogComponent {
     /** The asset to edit. */
     public readonly asset = input.required<AssetDto>();
 
+    protected readonly imageCropper = viewChild(ImageCropperComponent);
+
+    protected readonly imageFocus = viewChild(ImageFocusPointComponent);
+
+    protected readonly textEditor = viewChild(AssetTextEditorComponent);
+
     protected readonly assetActual = linkedSignal(() => this.asset());
-
-    protected readonly assetPath = rxResource({
-        params: () => this.assetActual().parentId,
-        stream: ({ params }) => this.assetsService.getAssetFolders(this.appsState.appName, params, 'Path').pipe(
-            map(({ path }) => [ROOT_ITEM, ...path])),
-        defaultValue: [],
-    });
-
-    protected readonly assetTags = toSignal(
-        this.assetsService.getTags(this.appsState.appName).pipe(
-            map(tags => Object.keys(tags))));
 
     protected readonly progress = signal(0);
 
@@ -121,6 +112,18 @@ export class AssetDialogComponent {
         const asset = this.assetActual();
 
         return asset.type === 'Unknown' && asset.fileSize < 100_000;
+    });
+
+    protected readonly assetPath = rxResource({
+        params: () => this.assetActual().parentId,
+        stream: ({ params }) => this.assetsService.getAssetFolders(this.appsState.appName, params, 'Path').pipe(
+            map(({ path }) => [ROOT_ITEM, ...path])),
+        defaultValue: [],
+    });
+
+    protected readonly assetTags = rxResource({
+        stream: () => this.assetsService.getTags(this.appsState.appName).pipe(
+            map(tags => Object.keys(tags))),
     });
 
     protected readonly moveForm = new MoveAssetForm();

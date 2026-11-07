@@ -36,22 +36,21 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
     ],
 })
 export class GraphQLPageComponent {
-    private readonly appsState = inject(AppsState);
-    private readonly destroyRef = inject(DestroyRef);
     private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly appsState = inject(AppsState);
     private readonly authService = inject(AuthService);
     private readonly clientsService = inject(ClientsService);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly messageBus = inject(MessageBus);
     private readonly themeService = inject(ThemeService);
-    private readonly graphiQLContainer = viewChild.required<ElementRef<HTMLDivElement>>('graphiQLContainer');
-    private reactRoot?: ReactDOM.Root | null;
     private fetcher?: ReturnType<typeof createGraphiQLFetcher>;
+    private reactRoot?: ReactDOM.Root | null;
 
     protected readonly clientsState = inject(ClientsState);
-    protected readonly clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
-    protected readonly clientsDialog = new DialogModel();
+
+    protected readonly graphiQLContainer = viewChild.required<ElementRef<HTMLDivElement>>('graphiQLContainer');
+
     protected readonly clientSelected = signal<ClientDto | null>(null);
-    protected readonly clientForm = form(this.clientSelected);
 
     protected readonly accessToken = rxResource({
         params: () => ({ client: this.clientSelected() }),
@@ -63,6 +62,12 @@ export class GraphQLPageComponent {
             return this.clientsService.createToken(this.appsState.appName, client).pipe(map(token => token.accessToken));
         },
     });
+
+    protected readonly clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
+
+    protected readonly clientsDialog = new DialogModel();
+
+    protected readonly clientForm = form(this.clientSelected);
 
     constructor() {
         if (this.clientsReadable) {

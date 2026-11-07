@@ -34,8 +34,6 @@ export class ContentValueComponent {
     /** The table settings, to wrap long text. */
     public readonly fields = input<TableSettings>();
 
-    protected readonly previewModal = new ModalModel();
-
     protected readonly wrapping = computed(() => {
         const fieldName = this.field()?.name;
         if (!fieldName) {
@@ -56,6 +54,8 @@ export class ContentValueComponent {
     protected readonly title = computed(() => {
         return this.isString() && this.isPlain() ? this.value() : undefined;
     });
+
+    protected readonly previewModal = new ModalModel();
 
     protected toggle() {
         const field = this.field();

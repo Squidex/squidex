@@ -24,8 +24,6 @@ import { ComponentSectionComponent } from './component-section.component';
     ],
 })
 export class ComponentComponent {
-    private readonly sections = viewChildren(ComponentSectionComponent);
-
     /** Enables the AI features of the editors. */
     public readonly hasChatBot = input.required<boolean>();
 
@@ -50,7 +48,7 @@ export class ComponentComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    protected readonly schemasDropdown = new ModalModel();
+    protected readonly sections = viewChildren(ComponentSectionComponent);
 
     protected readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
         const formModel = this.formModel();
@@ -66,6 +64,8 @@ export class ComponentComponent {
     protected readonly isDisabled = computed(() => {
         return this.formModel().disabled();
     });
+
+    protected readonly schemasDropdown = new ModalModel();
 
     public reset() {
         for (const section of this.sections()) {

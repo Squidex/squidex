@@ -218,28 +218,6 @@ function hasFiles(dataTransfer: DataTransfer | null): boolean {
     }
 }
 
-function getFilesPromise(item: any): Promise<ReadonlyArray<any>> {
-    return new Promise((resolve, reject) => {
-        try {
-            const reader = item.createReader();
-
-            reader.readEntries(resolve);
-        } catch (ex) {
-            reject(ex);
-        }
-    });
-}
-
-function getFilePromise(item: any): Promise<File> {
-    return new Promise((resolve, reject) => {
-        try {
-            item.file(resolve);
-        } catch (ex) {
-            reject(ex);
-        }
-    });
-}
-
 function getItems(dataTransfer: DataTransfer) {
     const result: DataTransferItem[] = [];
 
@@ -270,4 +248,26 @@ function getFiles(dataTransfer: DataTransfer) {
     }
 
     return result;
+}
+
+function getFilesPromise(item: any): Promise<ReadonlyArray<any>> {
+    return new Promise((resolve, reject) => {
+        try {
+            const reader = item.createReader();
+
+            reader.readEntries(resolve);
+        } catch (ex) {
+            reject(ex);
+        }
+    });
+}
+
+function getFilePromise(item: any): Promise<File> {
+    return new Promise((resolve, reject) => {
+        try {
+            item.file(resolve);
+        } catch (ex) {
+            reject(ex);
+        }
+    });
 }

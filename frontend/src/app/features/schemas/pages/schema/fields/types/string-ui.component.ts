@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input, untracked } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldFormModel, StringFieldPropertiesDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -38,40 +38,29 @@ export class StringUIComponent {
     });
 
     protected readonly hideAllowedValues = computed(() => {
-        return hidesAllowedValues(this.form().editor().value());
+        const editor = this.form().editor().value();
+
+        return editor !== 'Radio' && editor !== 'Dropdown';
     });
 
     protected readonly hideClassNames = computed(() => {
-        return hidesClassNames(this.form().editor().value());
+        return this.form().editor().value() !== 'RichText';
     });
 
     protected readonly editors = StringFieldEditorValues;
 
     constructor() {
         effect(() => {
-            const form = this.form();
-            if (hidesAllowedValues(form.editor().value())) {
-                form.allowedValues().value.set(null);
+            if (this.hideAllowedValues()) {
+                untracked(() => this.form().allowedValues().value.set(null));
             }
         });
 
         effect(() => {
-            const form = this.form();
-            if (hidesInlineEditable(form.editor().value())) {
-                form.inlineEditable().value.set(false);
+            const editor = this.form().editor().value();
+            if (editor !== 'Input' && editor !== 'Dropdown' && editor !== 'Slug') {
+                untracked(() => this.form().inlineEditable().value.set(false));
             }
         });
     }
-}
-
-function hidesAllowedValues(editor: string) {
-    return !(editor && (editor === 'Radio' || editor === 'Dropdown'));
-}
-
-function hidesClassNames(editor: string) {
-    return !(editor && editor === 'RichText');
-}
-
-function hidesInlineEditable(editor: string) {
-    return !(editor && (editor === 'Input' || editor === 'Dropdown' || editor === 'Slug'));
 }

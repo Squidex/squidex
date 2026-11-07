@@ -18,10 +18,6 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { StopClickDirective } from '../../stop-click.directive';
 
-function normalizeQuery(query: unknown) {
-    return Types.isString(query) ? query.trim().toLowerCase() : '';
-}
-
 function convertTags(obj: any, converter: TagConverter) {
     const tags: TagValue[] = [];
 
@@ -479,4 +475,8 @@ export class TagEditorComponent implements FormValueControl<any> {
 
         this.resetSize();
     }
+}
+
+function normalizeQuery(query: unknown) {
+    return Types.isString(query) ? query.trim().toLowerCase() : '';
 }

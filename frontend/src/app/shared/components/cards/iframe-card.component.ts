@@ -22,9 +22,20 @@ export class IFrameCardComponent {
     private readonly apiUrl = inject(ApiUrlConfig);
     private readonly authService = inject(AuthService);
     private readonly themeService = inject(ThemeService);
-    private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
+    private isInitialized = false;
 
-    private readonly context = computed(() => {
+    /** The card configuration, with the name and the URL of the page to embed. */
+    public readonly options = input<any>();
+
+    /** The team of the dashboard, passed to the embedded page. */
+    public readonly team = input<TeamDto | null>();
+
+    /** The app of the dashboard, passed to the embedded page. */
+    public readonly app = input<AppDto | null>();
+
+    protected readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
+
+    protected readonly context = computed(() => {
         const team = this.team();
         const app = this.app();
 
@@ -37,17 +48,6 @@ export class IFrameCardComponent {
             appName: app?.name,
         };
     });
-
-    private isInitialized = false;
-
-    /** The card configuration, with the name and the URL of the page to embed. */
-    public readonly options = input<any>();
-
-    /** The team of the dashboard, passed to the embedded page. */
-    public readonly team = input<TeamDto | null>();
-
-    /** The app of the dashboard, passed to the embedded page. */
-    public readonly app = input<AppDto | null>();
 
     constructor() {
         effect(() => {

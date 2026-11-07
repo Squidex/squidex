@@ -30,8 +30,6 @@ export class ApiCallsCardComponent {
     /** The API usage of the app or team. */
     public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    protected readonly chartOptions = ChartOptions.Stacked;
-
     protected readonly chartData = computed<ChartData | undefined>(() => {
         const usage = this.usage();
         if (!usage) {
@@ -50,6 +48,8 @@ export class ApiCallsCardComponent {
                 })),
         };
     });
+
+    protected readonly chartOptions = ChartOptions.Stacked;
 
     protected downloadLog(app: AppDto) {
         this.usagesService.getLog(app.name)

@@ -69,16 +69,12 @@ export class ContentPageComponent implements CanComponentDeactivate {
     private readonly autoSaveService = inject(AutoSaveService);
     private readonly collaboration = inject(CollaborationService);
     private readonly dialogs = inject(DialogService);
-    private readonly messageBus = inject(MessageBus);
+    private readonly injector = inject(Injector);
     private readonly languagesState = inject(LanguagesState);
     private readonly localStore = inject(LocalStoreService);
     private readonly location = inject(Location);
-    private readonly previousUrl = inject(PreviousUrl);
-    private readonly injector = inject(Injector);
-    private readonly route = inject(ActivatedRoute);
-    private readonly router = inject(Router);
-    private readonly schemasState = inject(SchemasState);
-    private readonly tempService = inject(TempService);
+    private readonly messageBus = inject(MessageBus);
+
     private readonly mutableContext: Record<string, any> = {
         action: 'Create',
         apiUrl: this.apiUrl.buildUrl('api'),
@@ -87,34 +83,27 @@ export class ContentPageComponent implements CanComponentDeactivate {
         user: { role: this.appsState.snapshot.selectedApp?.roleName, ...this.authService.user?.export() },
     };
 
-    private autoSaveKey!: AutoSaveKey;
+    private readonly previousUrl = inject(PreviousUrl);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly schemasState = inject(SchemasState);
+    private readonly tempService = inject(TempService);
     private autoSaveIgnore = false;
+    private autoSaveKey!: AutoSaveKey;
 
     protected readonly contentsState = inject(ContentsState);
 
-    protected readonly schema = computed(() => {
-        return this.schemasState.selectedSchema()!;
-    });
-
     protected readonly formContext = signal<any>(undefined);
-    protected readonly contentTab = queryParam<Tab>('tab', 'editor');
+
     protected readonly contentId = signal('');
+
     protected readonly content = signal<ContentDto | null | undefined>(undefined);
+
     protected readonly contentVersion = signal<Version | null>(null);
+
     protected readonly contentFormCompare = signal<EditContentForm | null>(null);
-    protected readonly saveOnlyDropdown = new ModalModel();
-    protected readonly savePublishDropdown = new ModalModel();
-    protected readonly dropdown = new ModalModel();
 
-    protected readonly languages = computed(() => {
-        return this.languagesState.isoLanguages();
-    });
-
-    protected readonly languageStore = computed(() => {
-        return this.localStore.value(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
-    });
-
-    protected readonly language = computed(() => {
+    protected readonly language = linkedSignal(() => {
         const languageKey = this.languageStore()();
         const languageMaster = this.languagesState.isoMasterLanguage();
 
@@ -128,6 +117,26 @@ export class ContentPageComponent implements CanComponentDeactivate {
     });
 
     protected readonly showIdInput = this.localStore.boolean(Settings.Local.CONTENT_ID_INPUT);
+
+    protected readonly schema = computed(() => {
+        return this.schemasState.selectedSchema()!;
+    });
+
+    protected readonly languages = computed(() => {
+        return this.languagesState.isoLanguages();
+    });
+
+    protected readonly languageStore = computed(() => {
+        return this.localStore.value(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
+    });
+
+    protected readonly contentTab = queryParam<Tab>('tab', 'editor');
+
+    protected readonly saveOnlyDropdown = new ModalModel();
+
+    protected readonly savePublishDropdown = new ModalModel();
+
+    protected readonly dropdown = new ModalModel();
 
     protected readonly confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();
@@ -175,7 +184,8 @@ export class ContentPageComponent implements CanComponentDeactivate {
     }
 
     private updateContent(content: ContentDto | null | undefined) {
-        const isNewContent = isOtherContent(content, this.content());
+        const contentPrevious = this.content();
+        const isNewContent = !content || !contentPrevious || content.id !== contentPrevious.id;
 
         this.content.set(content);
         this.updateContext();
@@ -412,8 +422,4 @@ export class ContentPageComponent implements CanComponentDeactivate {
     protected changeShowIdInput(value: boolean) {
         this.showIdInput.set(value);
     }
-}
-
-function isOtherContent(lhs: ContentDto | undefined | null, rhs: ContentDto | undefined | null) {
-    return !lhs || !rhs || lhs.id !== rhs.id;
 }

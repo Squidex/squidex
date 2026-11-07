@@ -24,16 +24,16 @@ import { TaskSnapshot, TourService, TourState } from '@app/shared/internal';
 export class TourGuideComponent {
     private readonly tourService = inject(TourService);
 
-    private readonly tourCollapsed = toSignal(
+    protected readonly tourState = inject(TourState);
+
+    protected readonly isCollapsed = linkedSignal(() => this.tourCollapsed());
+
+    protected readonly tourCollapsed = toSignal(
         merge(
             this.tourService.stepShow$.pipe(map(() => true)),
             this.tourService.end$.pipe(map(() => false)),
         ),
         { initialValue: false, equal: () => false });
-
-    protected readonly tourState = inject(TourState);
-
-    protected readonly isCollapsed = linkedSignal(() => this.tourCollapsed());
 
     protected toggle() {
         this.isCollapsed.update(x => !x);

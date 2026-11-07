@@ -67,7 +67,14 @@ export class ContentsColumnsPipe implements PipeTransform {
 export class ContentListWidthDirective {
     private readonly element = inject(ElementRef);
     private readonly renderer = inject(Renderer2);
-    private readonly size = computed(() => {
+
+    /** The fields to calculate the minimum width of the table from. */
+    public readonly fields = input<ReadonlyArray<TableField> | null | undefined>(undefined, { alias: 'sqxContentListWidth' });
+
+    /** The table settings that provide the custom column sizes. */
+    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
+
+    protected readonly size = computed(() => {
         const fields = this.fields();
         if (!fields) {
             return undefined;
@@ -83,12 +90,6 @@ export class ContentListWidthDirective {
 
         return size;
     });
-
-    /** The fields to calculate the minimum width of the table from. */
-    public readonly fields = input<ReadonlyArray<TableField> | null | undefined>(undefined, { alias: 'sqxContentListWidth' });
-
-    /** The table settings that provide the custom column sizes. */
-    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
 
     constructor() {
         effect(() => {
@@ -108,7 +109,14 @@ export class ContentListWidthDirective {
 export class ContentListCellDirective {
     private readonly element = inject(ElementRef);
     private readonly renderer = inject(Renderer2);
-    private readonly size = computed(() => {
+
+    /** The field of the cell to calculate the width for. */
+    public readonly field = input.required<TableField>();
+
+    /** The table settings that provide the custom column sizes. */
+    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
+
+    protected readonly size = computed(() => {
         const field = this.field();
         if (!field.name) {
             return undefined;
@@ -116,12 +124,6 @@ export class ContentListCellDirective {
 
         return getCellWidth(field, this.tableSettings()?.fieldSizes());
     });
-
-    /** The field of the cell to calculate the width for. */
-    public readonly field = input.required<TableField>();
-
-    /** The table settings that provide the custom column sizes. */
-    public readonly tableSettings = input<TableSettings | null | undefined>(undefined, { alias: 'fields' });
 
     constructor() {
         effect(() => {
@@ -145,15 +147,12 @@ export class ContentListCellDirective {
 export class ContentListCellResizeDirective {
     private readonly element = inject<ElementRef<HTMLTableCellElement>>(ElementRef);
     private readonly renderer = inject(Renderer2);
-    private readonly isResizable = computed(() => {
-        return !!this.field() && !!this.tableFields();
-    });
     private mouseMove?: Function;
     private mouseUp?: Function;
-    private windowBlur?: Function;
+    private resizer: any;
     private startOffset = 0;
     private startWidth = 0;
-    private resizer: any;
+    private windowBlur?: Function;
 
     /** The field of the cell to resize. */
     public readonly field = input<TableField>();
@@ -163,6 +162,10 @@ export class ContentListCellResizeDirective {
 
     /** The minimum width of the cell in pixels. */
     public readonly minimumWidth = input(50, { transform: numberAttribute });
+
+    protected readonly isResizable = computed(() => {
+        return !!this.field() && !!this.tableFields();
+    });
 
     constructor() {
         effect(onCleanup => {

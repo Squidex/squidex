@@ -39,8 +39,6 @@ export class FieldCopyButtonComponent {
         return this.languages()[0]?.iso2Code;
     });
 
-    protected readonly copySourceForm = form(this.copySource);
-
     protected readonly copyTargets = linkedSignal<ReadonlyArray<string>>(() => {
         this.copySource();
 
@@ -60,6 +58,8 @@ export class FieldCopyButtonComponent {
     protected readonly isLocalized = computed(() => {
         return this.formModel().field.isLocalizable && this.languages().length > 1;
     });
+
+    protected readonly copySourceForm = form(this.copySource);
 
     protected readonly dropdown = new ModalModel();
 

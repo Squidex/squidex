@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core
 import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { ExternalLinkDirective, FromNowPipe, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/shared/internal';
+import { AppsState, AssetDto, HistoryService } from '@app/shared/internal';
 import { HistoryMessagePipe } from '../history/pipes';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { AssetUrlPipe } from './pipes';
@@ -40,11 +40,11 @@ export class AssetHistoryComponent {
     protected readonly assetEvents = rxResource({
         params: () => ({ asset: this.asset() }),
         stream: ({ params }) => this.historyService.getHistory(this.appsState.appName, `assets.${params.asset.id}`).pipe(
-            map(events => events.map((event, version) => ({ event, version, canDownload: isDownloadable(event) })))),
+            map(events => events.map((event, version) => ({
+                event,
+                version,
+                canDownload: event.eventType === 'AssetUpdatedEventV2' || event.eventType === 'AssetCreatedEventV2',
+            })))),
         defaultValue: [],
     });
-}
-
-function isDownloadable(event: HistoryEventDto) {
-    return event.eventType === 'AssetUpdatedEventV2' || event.eventType === 'AssetCreatedEventV2';
 }

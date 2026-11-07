@@ -55,7 +55,7 @@ export class SchemaCategoryComponent {
     });
 
     protected readonly isCollapsedStore = computed(() => {
-        return this.localStore.boolean(getCollapsedKey(this.schemaCategory()));
+        return this.localStore.boolean(`squidex.schema.category.${this.schemaCategory().name}.collapsed`);
     });
 
     protected readonly forContent = computed(() => {
@@ -112,8 +112,4 @@ export class SchemaCategoryComponent {
             }
         });
     }
-}
-
-function getCollapsedKey(schemaCategory: SchemaCategory) {
-    return `squidex.schema.category.${schemaCategory.name}.collapsed`;
 }

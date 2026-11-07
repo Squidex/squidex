@@ -67,12 +67,16 @@ export class ImportContributorsDialogComponent {
 
         of(...this.importStatus()).pipe(
             mergeMap(s =>
-                this.contributorsState.assign(createRequest(s), { silent: true }).pipe(
+                this.contributorsState.assign(new AssignContributorDto({ contributorId: s.email, role: s.role, invite: true }), { silent: true }).pipe(
                     tap(created => {
-                        this.updateStatus(s.email, 'Success', getSuccess(created));
+                        const resultText = created ?
+                            'i18n:contributors.contributorAssignedInvited' :
+                            'i18n:contributors.contributorAssignedExisting';
+
+                        this.updateStatus(s.email, 'Success', resultText);
                     }),
                     catchError((error: ErrorDto) => {
-                        this.updateStatus(s.email, 'Failed', getError(error));
+                        this.updateStatus(s.email, 'Failed', error.details[0].originalMessage);
 
                         return EMPTY;
                     }),
@@ -87,18 +91,4 @@ export class ImportContributorsDialogComponent {
     private updateStatus(email: string, result: ImportStatus['result'], resultText: string) {
         this.importStatus.update(statuses => statuses.map(x => x.email === email ? { ...x, result, resultText } : x));
     }
-}
-
-function createRequest(status: ImportStatus) {
-    return new AssignContributorDto({ contributorId: status.email, role: status.role, invite: true });
-}
-
-function getError(error: ErrorDto): string {
-    return error.details[0].originalMessage;
-}
-
-function getSuccess(created: boolean | undefined): string {
-    return created ?
-        'i18n:contributors.contributorAssignedInvited' :
-        'i18n:contributors.contributorAssignedExisting';
 }

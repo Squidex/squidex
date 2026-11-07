@@ -37,7 +37,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
 export class ContentComponent {
     private readonly contentsState = inject(ContentsState);
     private readonly injector = inject(Injector);
-    private readonly fields = viewChildren(ContentListFieldComponent);
 
     /** Emits when the user clones the content. */
     public readonly clone = output();
@@ -78,7 +77,7 @@ export class ContentComponent {
     /** The content to render. */
     public readonly content = input.required<ContentDto>({ alias: 'sqxContent' });
 
-    protected readonly dropdown = new ModalModel();
+    protected readonly fields = viewChildren(ContentListFieldComponent);
 
     protected readonly patchAllowed = computed(() => {
         return this.content().canUpdate;
@@ -95,6 +94,8 @@ export class ContentComponent {
     protected readonly isDirty = computed(() => {
         return this.patchForm()?.dirty() === true;
     });
+
+    protected readonly dropdown = new ModalModel();
 
     protected async save() {
         const content = this.content();

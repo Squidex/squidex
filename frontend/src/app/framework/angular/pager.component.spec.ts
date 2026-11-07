@@ -13,81 +13,81 @@ describe('Pager', () => {
     it('should init with default values', () => {
         const pager = createPager({ page: 0, pageSize: 10, count: 0, total: 0 });
 
-        expect(pager.canGoNext()).toBe(false);
-        expect(pager.canGoPrev()).toBe(false);
+        expect(pager['canGoNext']()).toBe(false);
+        expect(pager['canGoPrev']()).toBe(false);
 
-        expect(pager.itemFirst()).toEqual(0);
-        expect(pager.itemLast()).toEqual(0);
+        expect(pager['itemFirst']()).toEqual(0);
+        expect(pager['itemLast']()).toEqual(0);
     });
 
     it('should init with first full page', () => {
         const pager = createPager({ page: 0, pageSize: 10, count: 10, total: 100 });
 
-        expect(pager.canGoNext()).toBe(true);
-        expect(pager.canGoPrev()).toBe(false);
+        expect(pager['canGoNext']()).toBe(true);
+        expect(pager['canGoPrev']()).toBe(false);
 
-        expect(pager.itemFirst()).toEqual(1);
-        expect(pager.itemLast()).toEqual(10);
+        expect(pager['itemFirst']()).toEqual(1);
+        expect(pager['itemLast']()).toEqual(10);
     });
 
     it('should init with middle page', () => {
         const pager = createPager({ page: 4, pageSize: 10, count: 10, total: 100 });
 
-        expect(pager.canGoNext()).toBe(true);
-        expect(pager.canGoPrev()).toBe(true);
+        expect(pager['canGoNext']()).toBe(true);
+        expect(pager['canGoPrev']()).toBe(true);
 
-        expect(pager.itemFirst()).toEqual(41);
-        expect(pager.itemLast()).toEqual(50);
+        expect(pager['itemFirst']()).toEqual(41);
+        expect(pager['itemLast']()).toEqual(50);
     });
 
     it('should init with last full page', () => {
         const pager = createPager({ page: 9, pageSize: 10, count: 10, total: 100 });
 
-        expect(pager.canGoNext()).toBe(false);
-        expect(pager.canGoPrev()).toBe(true);
+        expect(pager['canGoNext']()).toBe(false);
+        expect(pager['canGoPrev']()).toBe(true);
 
-        expect(pager.itemFirst()).toEqual(91);
-        expect(pager.itemLast()).toEqual(100);
+        expect(pager['itemFirst']()).toEqual(91);
+        expect(pager['itemLast']()).toEqual(100);
     });
 
     it('should init with last partly page', () => {
         const pager = createPager({ page: 9, pageSize: 10, count: 4, total: 100 });
 
-        expect(pager.canGoNext()).toBe(false);
-        expect(pager.canGoPrev()).toBe(true);
+        expect(pager['canGoNext']()).toBe(false);
+        expect(pager['canGoPrev']()).toBe(true);
 
-        expect(pager.itemFirst()).toEqual(91);
-        expect(pager.itemLast()).toEqual(94);
+        expect(pager['itemFirst']()).toEqual(91);
+        expect(pager['itemLast']()).toEqual(94);
     });
 
     it('should init with last partly page 2', () => {
         const pager = createPager({ page: 9, pageSize: 10, count: 9, total: 100 });
 
-        expect(pager.canGoNext()).toBe(false);
-        expect(pager.canGoPrev()).toBe(true);
+        expect(pager['canGoNext']()).toBe(false);
+        expect(pager['canGoPrev']()).toBe(true);
 
-        expect(pager.itemFirst()).toEqual(91);
-        expect(pager.itemLast()).toEqual(99);
+        expect(pager['itemFirst']()).toEqual(91);
+        expect(pager['itemLast']()).toEqual(99);
     });
 
     it('should init without total and full page size', () => {
         const pager = createPager({ page: 9, pageSize: 10, count: 10, total: -1 });
 
-        expect(pager.canGoNext()).toBe(true);
-        expect(pager.canGoPrev()).toBe(true);
+        expect(pager['canGoNext']()).toBe(true);
+        expect(pager['canGoPrev']()).toBe(true);
 
-        expect(pager.itemFirst()).toEqual(91);
-        expect(pager.itemLast()).toEqual(100);
+        expect(pager['itemFirst']()).toEqual(91);
+        expect(pager['itemLast']()).toEqual(100);
     });
 
     it('should init without total and partial page size', () => {
         const pager = createPager({ page: 9, pageSize: 10, count: 5, total: -1 });
 
-        expect(pager.canGoNext()).toBe(false);
-        expect(pager.canGoPrev()).toBe(true);
+        expect(pager['canGoNext']()).toBe(false);
+        expect(pager['canGoPrev']()).toBe(true);
 
-        expect(pager.itemFirst()).toEqual(91);
-        expect(pager.itemLast()).toEqual(95);
+        expect(pager['itemFirst']()).toEqual(91);
+        expect(pager['itemLast']()).toEqual(95);
     });
 
     it('should emit if changing size', () => {

@@ -42,7 +42,9 @@ export class AuthPageComponent {
     private readonly authState = inject(TeamAuthState);
     private readonly teamsState = inject(TeamsState);
 
-    protected readonly urlToTest = this.apiUrl.buildUrl('/identity-server/test');
+    protected readonly isEditable = signal(false);
+
+    protected readonly isEditing = signal(false);
 
     protected readonly urlToRedirect = computed(() => {
         const team = this.teamsState.selectedTeam();
@@ -53,8 +55,8 @@ export class AuthPageComponent {
         return this.apiUrl.buildUrl(`/identity-server/signin-${team.id}`);
     });
 
-    protected readonly isEditable = signal(false);
-    protected readonly isEditing = signal(false);
+    protected readonly urlToTest = this.apiUrl.buildUrl('/identity-server/test');
+
     protected readonly updateForm = new UpdateTeamAuthForm();
 
     constructor() {

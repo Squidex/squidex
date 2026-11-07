@@ -30,8 +30,6 @@ export class ChatItemComponent {
     private readonly apiUrl = inject(ApiUrlConfig);
     private readonly assetUploader = inject(AssetUploaderState);
 
-    private readonly focusElement = viewChild<ElementRef<HTMLElement>>('focusElement');
-
     /** Emits when the answer has been completely received or has failed. */
     public readonly done = output();
 
@@ -59,11 +57,16 @@ export class ChatItemComponent {
     /** The text of the message, or the stream of the answer. */
     public readonly content = input.required<string | Observable<ChatEventDto>>();
 
+    protected readonly focusElement = viewChild<ElementRef<HTMLElement>>('focusElement');
+
     protected readonly contentText = signal('');
+
     protected readonly contentTools = signal<ReadonlyArray<string>>([]);
 
     protected readonly isRunning = signal(false);
+
     protected readonly isFailed = signal(false);
+
     protected readonly isCopying = signal(false);
 
     constructor() {

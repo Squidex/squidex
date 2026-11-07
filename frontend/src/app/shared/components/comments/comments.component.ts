@@ -34,11 +34,11 @@ import { ContributorsDataSource } from './data-source';
 export class CommentsComponent {
     private readonly authService = inject(AuthService);
     private readonly messageBus = inject(MessageBus);
-    private readonly input = viewChild<AutocompleteComponent>('input');
-    private readonly selection = signal<ReadonlyArray<string>>([]);
 
     protected readonly commentsState = inject(CommentsState);
+
     protected readonly router = inject(Router);
+
     protected readonly contributorsDataSource = inject(ContributorsDataSource);
 
     /** Shows all comments instead of only the unresolved comments. */
@@ -50,8 +50,10 @@ export class CommentsComponent {
     /** The ID of the comments thread. */
     public readonly commentsId = input<string | null>('');
 
-    protected readonly commentForm = new UpsertCommentForm();
-    protected readonly commentUser = this.authService.user!.token;
+    protected readonly input = viewChild<AutocompleteComponent>('input');
+
+    protected readonly selection = signal<ReadonlyArray<string>>([]);
+
     protected readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
 
     protected readonly commentItems = computed(() => {
@@ -59,6 +61,10 @@ export class CommentsComponent {
             this.commentsState.groupedComments() :
             this.commentsState.groupedUnresolvedComments();
     });
+
+    protected readonly commentForm = new UpsertCommentForm();
+
+    protected readonly commentUser = this.authService.user!.token;
 
     constructor() {
         this.contributorsDataSource.loadIfNotLoaded();

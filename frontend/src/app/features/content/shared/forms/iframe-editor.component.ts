@@ -32,19 +32,10 @@ export class IFrameEditorComponent {
     private readonly renderer = inject(Renderer2);
     private readonly router = inject(Router);
     private readonly themeService = inject(ThemeService);
-    private readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
-    private readonly container = viewChild.required<ElementRef<HTMLElement>>('container');
-    private readonly inner = viewChild.required<ElementRef<HTMLElement>>('inner');
-    private readonly isDisabledByControl = signal(false);
-
-    private readonly isDisabled = computed(() => {
-        return this.disabled() || this.isDisabledByControl();
-    });
-
-    private value: any;
-    private isInitialized = false;
     private assetsCorrelationId: any;
     private contentsCorrelationId: any;
+    private isInitialized = false;
+    private value: any;
 
     /** Emits when the editor wants to toggle the expanded mode. */
     public readonly isExpandedChange = output();
@@ -82,15 +73,32 @@ export class IFrameEditorComponent {
     /** The URL of the editor. */
     public readonly url = input<string | null>();
 
+    protected readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
+
+    protected readonly container = viewChild.required<ElementRef<HTMLElement>>('container');
+
+    protected readonly inner = viewChild.required<ElementRef<HTMLElement>>('inner');
+
+    protected readonly isDisabledByControl = signal(false);
+
+    protected readonly isFullscreen = signal(false);
+
+    protected readonly contentsQuery = signal<string | undefined>(undefined);
+
+    protected readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
+
+    protected readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
+
+    protected readonly isDisabled = computed(() => {
+        return this.disabled() || this.isDisabledByControl();
+    });
+
     protected readonly computedUrl = computed(() => {
         return computeEditorUrl(this.url(), this.appsState.snapshot.selectedSettings);
     });
 
-    protected readonly isFullscreen = signal(false);
     protected readonly assetsDialog = new DialogModel();
-    protected readonly contentsQuery = signal<string | undefined>(undefined);
-    protected readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
-    protected readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
+
     protected readonly contentsDialog = new DialogModel();
 
     constructor() {

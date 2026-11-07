@@ -25,8 +25,6 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
     ],
 })
 export class ContentSelectorItemComponent {
-    protected readonly metaFields = META_FIELDS;
-
     /** Emits when the user selects or deselects the content. */
     public readonly selectedChange = output<boolean>();
 
@@ -47,6 +45,8 @@ export class ContentSelectorItemComponent {
 
     /** The content to render. */
     public readonly content = input.required<ContentDto>({ alias: 'sqxContentSelectorItem' });
+
+    protected readonly metaFields = META_FIELDS;
 
     protected toggle() {
         if (this.selectable()) {

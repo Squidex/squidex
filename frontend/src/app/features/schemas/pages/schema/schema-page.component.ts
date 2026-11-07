@@ -60,11 +60,11 @@ export class SchemaPageComponent {
 
     protected readonly languageState = inject(LanguagesState);
 
-    protected readonly hideIndexes = this.uiOptions.value.hideIndexes;
-
     protected readonly schema = this.schemasState.selectedSchema;
 
     protected readonly schemaTab = queryParam('tab', 'fields');
+
+    protected readonly hideIndexes = this.uiOptions.value.hideIndexes;
 
     protected readonly editOptionsDropdown = new ModalModel();
 

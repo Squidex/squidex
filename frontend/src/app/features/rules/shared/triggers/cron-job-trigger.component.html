@@ -38,7 +38,7 @@
     <sqx-form-row [for]="form.cronTimezone" hint="rules.conditions.cronTimezoneHint" label="rules.conditions.cronTimezone">
         <select class="form-select" id="cronTimezone" [formField]="form.cronTimezone">
             <option></option>
-            @for (timezone of timezones(); track timezone) {
+            @for (timezone of timezones.value(); track timezone) {
                 <option [ngValue]="timezone">{{ timezone }}</option>
             }
         </select>

@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
 import { FormValueControl } from '@angular/forms/signals';
 import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, TranslatePipe, Types } from '@app/shared';
 
@@ -41,8 +41,8 @@ class AssetUpdated {
     },
 })
 export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<string> | null> {
-    private readonly localStore = inject(LocalStoreService);
     private readonly assetsResolver = inject(ResolveAssets);
+    private readonly localStore = inject(LocalStoreService);
     private readonly messageBus = inject(MessageBus);
 
     /** The value of the control. */
@@ -64,11 +64,21 @@ export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<str
     public readonly isExpanded = input(false, { transform: booleanAttribute });
 
     protected readonly assetFiles = signal<ReadonlyArray<HTTP.UploadFile>>([]);
+
     protected readonly assetItems = signal<ReadonlyArray<AssetDto>>([]);
+
     protected readonly assetEdit = signal<AssetDto | undefined>(undefined);
-    protected readonly isListView = signal(!this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
+
     protected readonly isCompact = signal(false);
+
+    protected readonly isTileView = this.localStore.boolean(Settings.Local.ASSETS_MODE);
+
+    protected readonly isListView = computed(() => {
+        return !this.isTileView();
+    });
+
     protected readonly chatDialog = new DialogModel();
+
     protected readonly assetsDialog = new DialogModel();
 
     constructor() {
@@ -183,9 +193,7 @@ export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<str
     }
 
     protected changeView(isListView: boolean) {
-        this.isListView.set(isListView);
-
-        this.localStore.setBoolean(Settings.Local.ASSETS_MODE, !isListView);
+        this.isTileView.set(!isListView);
     }
 
     protected editStart(asset: AssetDto) {

@@ -20,11 +20,7 @@ import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
     ],
 })
 export class ImageFocusPointComponent {
-    private readonly image = viewChild.required<ElementRef<HTMLImageElement>>('image');
-    private readonly previewWide = viewChild.required<ElementRef<HTMLImageElement>>('previewWide');
-    private readonly previewSmall = viewChild.required<ElementRef<HTMLImageElement>>('previewSmall');
-    private readonly previewNormal = viewChild.required<ElementRef<HTMLImageElement>>('previewNormal');
-    private readonly focus = linkedSignal(() => getFocusPoint(this.focusPoint()));
+    private readonly destroyRef = inject(DestroyRef);
 
     /** The URL of the image. */
     public readonly imageSource = input('');
@@ -32,8 +28,18 @@ export class ImageFocusPointComponent {
     /** The asset metadata with the initial focus point (focusX and focusY). */
     public readonly focusPoint = input<any>();
 
+    protected readonly image = viewChild.required<ElementRef<HTMLImageElement>>('image');
+
+    protected readonly previewWide = viewChild.required<ElementRef<HTMLImageElement>>('previewWide');
+
+    protected readonly previewSmall = viewChild.required<ElementRef<HTMLImageElement>>('previewSmall');
+
+    protected readonly previewNormal = viewChild.required<ElementRef<HTMLImageElement>>('previewNormal');
+
+    protected readonly focus = linkedSignal(() => getFocusPoint(this.focusPoint()));
+
     constructor() {
-        const destroyRef = inject(DestroyRef);
+        const destroyRef = this.destroyRef;
 
         afterNextRender(() => {
             const properties = { focus: this.focus(), debounceTime: 50 };

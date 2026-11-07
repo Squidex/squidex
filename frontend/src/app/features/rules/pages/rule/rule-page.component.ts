@@ -85,12 +85,12 @@ export class RulePageComponent {
         defaultValue: null,
     });
 
-    protected readonly availableTriggers = ALL_TRIGGERS;
-
     protected readonly availableSteps = rxResource({
         stream: () => this.rulesService.getSteps(),
         defaultValue: {} as { [name: string]: RuleElementDto },
     });
+
+    protected readonly availableTriggers = ALL_TRIGGERS;
 
     protected readonly stepDialog = new DialogModel();
 

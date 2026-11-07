@@ -26,18 +26,6 @@ type ContentName = { name: string; id?: string };
 export class ReferenceDropdownComponent implements FormValueControl<ReadonlyArray<string> | string | null> {
     private readonly contentsResolver = inject(ResolveContents);
     private readonly localizer = inject(LocalizerService);
-
-    private readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
-        source: () => this.schemaId(),
-        computation: () => [],
-    });
-
-    private readonly contentsFailed = signal(false);
-
-    private readonly isValid = computed(() => {
-        return !!this.schemaId() && !!this.language();
-    });
-
     private isOpenedBefore = false;
 
     /** The value of the control. */
@@ -61,6 +49,19 @@ export class ReferenceDropdownComponent implements FormValueControl<ReadonlyArra
     /** Defines whether the value is a single ID or an array with one ID. */
     public readonly mode = input.required<'Array' | 'Single'>();
 
+    protected readonly contents = linkedSignal<string, ReadonlyArray<ContentDto>>({
+        source: () => this.schemaId(),
+        computation: () => [],
+    });
+
+    protected readonly contentsFailed = signal(false);
+
+    protected readonly contentsLoading = signal(false);
+
+    protected readonly isValid = computed(() => {
+        return !!this.schemaId() && !!this.language();
+    });
+
     protected readonly selectedId = computed(() => {
         const value = this.value();
 
@@ -76,8 +77,6 @@ export class ReferenceDropdownComponent implements FormValueControl<ReadonlyArra
     protected readonly isDropdownDisabled = computed(() => {
         return this.disabled() || !this.isValid() || this.contentsFailed();
     });
-
-    protected readonly contentsLoading = signal(false);
 
     protected readonly contentNames = computed(() => {
         const language = this.language();

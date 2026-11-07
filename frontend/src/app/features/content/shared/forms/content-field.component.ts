@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, numberAttribute, output, signal } from '@angular/core';
 import { AppLanguageDto, AppsState, CommentSelected, CommentsState, EditContentForm, FieldForm, FocusMarkerComponent, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, Types, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
@@ -39,13 +39,7 @@ export class ContentFieldComponent {
     private readonly uiOptions = inject(UIOptions);
     private readonly hasTranslator = this.uiOptions.value.canUseTranslator;
 
-    private readonly isHalfWidth = computed(() => {
-        return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
-    });
-
-    private readonly isLocalizable = computed(() => {
-        return this.formModel().field.isLocalizable;
-    });
+    protected readonly commentsState = inject(CommentsState, { optional: true });
 
     /** Emits when the user selects another language. */
     public readonly languageChange = output<AppLanguageDto>();
@@ -80,15 +74,25 @@ export class ContentFieldComponent {
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    protected readonly commentsState = inject(CommentsState, { optional: true });
-    protected readonly hasChatBot = this.uiOptions.value.canUseChatBot;
+    protected readonly isCollapsed = signal(false);
 
-    protected readonly showAllControls = linkedSignal(() => {
-        return this.localStore.getBoolean(this.showAllControlsKey());
+    protected readonly isSelected = signal(false);
+
+    protected readonly isHalfWidth = computed(() => {
+        return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
     });
 
-    protected readonly isCollapsed = signal(false);
-    protected readonly isSelected = signal(false);
+    protected readonly isLocalizable = computed(() => {
+        return this.formModel().field.isLocalizable;
+    });
+
+    protected readonly showAllControlsStore = computed(() => {
+        return this.localStore.boolean(this.showAllControlsKey());
+    });
+
+    protected readonly showAllControls = computed(() => {
+        return this.showAllControlsStore()();
+    });
 
     protected readonly isInvalid = computed(() => {
         return this.formModel().invalid();
@@ -123,6 +127,8 @@ export class ContentFieldComponent {
         return this.isHalfWidth() ? 'col-6 half-field' : 'col-12';
     });
 
+    protected readonly hasChatBot = this.uiOptions.value.canUseChatBot;
+
     constructor() {
         this.messageBus.on(CommentSelected, message => {
             this.isSelected.set(message.editorId.indexOf(this.formModel().path) === 0);
@@ -130,9 +136,7 @@ export class ContentFieldComponent {
     }
 
     protected changeShowAllControls(showAllControls: boolean) {
-        this.showAllControls.set(showAllControls);
-
-        this.localStore.setBoolean(this.showAllControlsKey(), showAllControls);
+        this.showAllControlsStore().set(showAllControls);
     }
 
     protected copy() {

@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectorRef, Component, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { booleanAttribute, ChangeDetectorRef, Component, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
 import { FormValueControl } from '@angular/forms/signals';
 import { ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
@@ -39,12 +39,13 @@ export class AssetFolderDropdownComponent implements FormValueControl<string | n
     /** Indicates whether the control has been touched. */
     public readonly touched = model(false);
 
+    protected readonly selection = linkedSignal(() => this.root);
+
+    protected readonly selectionPath = signal('');
+
     protected readonly appName = this.appsState.appName;
 
     protected readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
-
-    protected readonly selection = signal(this.root);
-    protected readonly selectionPath = signal('');
 
     protected readonly dropdown = new ModalModel();
 

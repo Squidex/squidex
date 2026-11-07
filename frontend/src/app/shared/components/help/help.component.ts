@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '@app/framework';
 import { HelpService } from '@app/shared/internal';
@@ -26,5 +26,7 @@ export class HelpComponent {
     private readonly helpService = inject(HelpService);
     private readonly route = inject(ActivatedRoute);
 
-    protected readonly helpMarkdown = toSignal(this.helpService.getHelp(this.route.snapshot.data.helpPage));
+    protected readonly helpMarkdown = rxResource({
+        stream: () => this.helpService.getHelp(this.route.snapshot.data.helpPage),
+    });
 }

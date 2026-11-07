@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
+import { effect, EffectRef, inject, Injectable, Injector, OnDestroy, untracked } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { LocalStoreService, Types } from '@app/framework/internal';
 import { State } from '@app/framework/state';
 
@@ -163,6 +162,7 @@ export interface StateSynchronizerMap<T> {
 
 @Injectable()
 export class Router2State implements OnDestroy, StateSynchronizer {
+    private readonly injector = inject(Injector);
     private mapper?: Router2StateMap<any>;
 
     constructor(
@@ -190,7 +190,7 @@ export class Router2State implements OnDestroy, StateSynchronizer {
 
     public mapTo<T extends {}>(state: State<T>) {
         this.mapper?.unlisten();
-        this.mapper = new Router2StateMap<T>(state, this.route, this.router, this.localStore);
+        this.mapper = new Router2StateMap<T>(state, this.route, this.router, this.localStore, this.injector);
 
         return this.mapper;
     }
@@ -199,28 +199,31 @@ export class Router2State implements OnDestroy, StateSynchronizer {
 export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
     private readonly syncs: RouteSynchronizer[] = [];
     private lastSyncedQuery?: QueryParams;
-    private stateSubscription?: Subscription;
+    private stateEffect?: EffectRef;
 
     constructor(
         private readonly state: State<T>,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly localStore: LocalStoreService,
+        private readonly injector: Injector,
     ) {
     }
 
     public listen() {
-        this.stateSubscription =
-            this.state.changes
-                .subscribe(change => {
-                    this.syncToRoute(change.snapshot);
-                });
+        this.stateEffect?.destroy();
+        this.stateEffect = effect(() => {
+            const value = this.state.value();
+
+            untracked(() => this.syncToRoute(value));
+        }, { injector: this.injector });
 
         return this;
     }
 
     public unlisten() {
-        this.stateSubscription?.unsubscribe();
+        this.stateEffect?.destroy();
+        this.stateEffect = undefined;
     }
 
     private syncToRoute(state: T) {

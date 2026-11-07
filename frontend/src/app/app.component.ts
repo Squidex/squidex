@@ -25,12 +25,12 @@ import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootVie
     ],
 })
 export class AppComponent {
+    private readonly injector = inject(Injector);
+
     public isLoaded?: boolean | null;
 
     constructor() {
-        const injector = inject(Injector);
-
-        injector.get(AnalyticsService);
-        syncChartTheme(injector.get(ThemeService));
+        this.injector.get(AnalyticsService);
+        syncChartTheme(this.injector.get(ThemeService));
     }
 }

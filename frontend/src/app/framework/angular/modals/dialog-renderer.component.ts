@@ -18,22 +18,6 @@ import { ModalPlacementDirective } from './modal-placement.directive';
 import { ModalDirective } from './modal.directive';
 import { TooltipDirective } from './tooltip.directive';
 
-function addTooltip(tooltips: ReadonlyArray<Tooltip>, tooltip: Tooltip) {
-    if (tooltip.multiple || !tooltip.text) {
-        tooltips = tooltips.filter(x => x.target !== tooltip.target);
-    }
-
-    if (!tooltip.text) {
-        return tooltips;
-    }
-
-    if (tooltip.multiple) {
-        return [tooltip, ...tooltips];
-    }
-
-    return [tooltip];
-}
-
 @Component({
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
@@ -91,7 +75,7 @@ export class DialogRendererComponent {
 
         this.dialogs.tooltips.pipe(takeUntilDestroyed())
             .subscribe(tooltip => {
-                this.tooltips.update(x => addTooltip(x, tooltip));
+                this.tooltips.update(tooltips => addTooltip(tooltips, tooltip));
             });
     }
 
@@ -115,4 +99,20 @@ export class DialogRendererComponent {
         this.dialogRequest()?.complete(value);
         this.dialogRequest.set(null);
     }
+}
+
+function addTooltip(tooltips: ReadonlyArray<Tooltip>, tooltip: Tooltip) {
+    if (tooltip.multiple || !tooltip.text) {
+        tooltips = tooltips.filter(x => x.target !== tooltip.target);
+    }
+
+    if (!tooltip.text) {
+        return tooltips;
+    }
+
+    if (tooltip.multiple) {
+        return [tooltip, ...tooltips];
+    }
+
+    return [tooltip];
 }

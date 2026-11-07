@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, input, linkedSignal, numberAttribute, output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, linkedSignal, numberAttribute, output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldDto, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, SchemaDto, Settings } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
 
@@ -54,19 +54,20 @@ export class ContentSectionComponent {
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
     protected readonly isCollapsed = linkedSignal(() => {
+        return this.isCollapsedStore()?.() === true;
+    });
+
+    protected readonly isCollapsedStore = computed(() => {
         if (!this.formSection().separator) {
-            return false;
+            return undefined;
         }
 
-        return this.localStore.getBoolean(this.isCollapsedKey());
+        return this.localStore.boolean(this.isCollapsedKey());
     });
 
     protected toggle() {
         this.isCollapsed.update(x => !x);
-
-        if (this.formSection().separator) {
-            this.localStore.setBoolean(this.isCollapsedKey(), this.isCollapsed());
-        }
+        this.isCollapsedStore()?.set(this.isCollapsed());
     }
 
     protected getFieldFormCompare(formState: FieldForm) {

@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
 import { IResourceDto, ResourceLinkDto, UIService, UIState, UsersService } from '@app/shared/internal';
@@ -68,7 +69,7 @@ describe('UIState', () => {
         usersService.setup(x => x.getResources())
             .returns(() => of(resource));
 
-        uiState = new UIState(uiService.object, usersService.object);
+        uiState = TestBed.runInInjectionContext(() => new UIState(uiService.object, usersService.object));
         uiState.load();
         uiState.loadApp(app);
     });
@@ -254,13 +255,13 @@ describe('UIState', () => {
     });
 
     it('should return default value from signal if settings not loaded', () => {
-        const uiStateUnloaded = new UIState(uiService.object, usersService.object);
+        const uiStateUnloaded = TestBed.runInInjectionContext(() => new UIState(uiService.object, usersService.object));
 
         expect(uiStateUnloaded.getAppUser('map.onlyUser', 'default')()).toEqual('default');
     });
 
     it('should wait for app user settings to be loaded', () => {
-        const uiStateUnloaded = new UIState(uiService.object, usersService.object);
+        const uiStateUnloaded = TestBed.runInInjectionContext(() => new UIState(uiService.object, usersService.object));
 
         let value: string | undefined;
         uiStateUnloaded.waitForAppUser('map.onlyUser', 'default').subscribe(x => {
@@ -270,12 +271,13 @@ describe('UIState', () => {
         expect(value).toBeUndefined();
 
         uiStateUnloaded.loadApp(app);
+        TestBed.tick();
 
         expect(value).toEqual('user2');
     });
 
     it('should wait for common settings to be loaded', () => {
-        const uiStateUnloaded = new UIState(uiService.object, usersService.object);
+        const uiStateUnloaded = TestBed.runInInjectionContext(() => new UIState(uiService.object, usersService.object));
 
         let value: string | undefined;
         uiStateUnloaded.waitForCommon('map.onlyCommon', 'default').subscribe(x => {
@@ -285,6 +287,7 @@ describe('UIState', () => {
         expect(value).toBeUndefined();
 
         uiStateUnloaded.load();
+        TestBed.tick();
 
         expect(value).toEqual('common3');
     });

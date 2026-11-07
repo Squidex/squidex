@@ -32,18 +32,17 @@ import { ContentSelectorComponent } from '../references/content-selector.compone
 export class RichEditorComponent implements FormValueControl<EditorValue> {
     private readonly apiUrl = inject(ApiUrlConfig);
     private readonly appsState = inject(AppsState);
-    private readonly assetUploader = inject(AssetUploaderState);
     private readonly assetService = inject(AssetsService);
+    private readonly assetUploader = inject(AssetUploaderState);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly themeService = inject(ThemeService);
-    private readonly editor = viewChild.required<ElementRef>('editor');
-    private readonly assetId = signal<string | null>(null);
-    private editorWrapper?: SquidexEditorWrapper;
-    private currentValue: EditorValue = null;
-    private isDestroyed = false;
-    private currentContents?: ResolvablePromise<any>;
     private currentAssets?: ResolvablePromise<any>;
     private currentChat?: ResolvablePromise<string | undefined | null>;
+    private currentContents?: ResolvablePromise<any>;
+    private currentValue: EditorValue = null;
+    private editorWrapper?: SquidexEditorWrapper;
+    private isDestroyed = false;
 
     /** The value of the editor. */
     public readonly value = model<EditorValue>(null);
@@ -93,9 +92,9 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
     /** The format of the value. */
     public readonly mode = input.required<SquidexEditorMode>();
 
-    protected readonly chatDialog = new DialogModel();
-    protected readonly assetsDialog = new DialogModel();
-    protected readonly contentsDialog = new DialogModel();
+    protected readonly editor = viewChild.required<ElementRef>('editor');
+
+    protected readonly assetId = signal<string | null>(null);
 
     protected readonly assetToEdit = rxResource({
         params: () => this.assetId() ?? undefined,
@@ -104,8 +103,14 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
         defaultValue: null,
     });
 
+    protected readonly chatDialog = new DialogModel();
+
+    protected readonly assetsDialog = new DialogModel();
+
+    protected readonly contentsDialog = new DialogModel();
+
     constructor() {
-        const destroyRef = inject(DestroyRef);
+        const destroyRef = this.destroyRef;
 
         effect(() => {
             const value = this.value();
@@ -312,23 +317,21 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
     }
 
     private buildContent(content: ContentDto): Content {
-        return { ...content, title: buildContentTitle(content, this.language()) };
+        const language = this.language();
+
+        const title =
+            content.referenceFields
+                .map(f => getContentValue(content, language, f, false))
+                .map(v => v.formatted)
+                .defined()
+                .join(', ');
+
+        return { ...content, title: title || 'Content' };
     }
 
     protected closeAssetDialog() {
         this.assetId.set(null);
     }
-}
-
-function buildContentTitle(content: ContentDto, language: AppLanguageDto) {
-    const name =
-        content.referenceFields
-            .map(f => getContentValue(content, language, f, false))
-            .map(v => v.formatted)
-            .defined()
-            .join(', ');
-
-    return name || 'Content';
 }
 
 class ResolvablePromise<T> {

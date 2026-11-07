@@ -28,8 +28,35 @@ export class StateStepPropertyComponent {
     /** The configured value of the property. */
     public readonly value = input<any>();
 
-    protected readonly valueParsed = computed(() => {
-        return parseValue(this.value());
+    protected readonly valueParsed = computed<{ type: ValueType; formatted: any }>(() => {
+        const value = this.value();
+        if (Types.isNull(value) || Types.isUndefined(value)) {
+            return { type: 'Raw', formatted: '-' };
+        }
+
+        if (Types.isNumber(value) || Types.isBoolean(value)) {
+            return { type: 'Raw', formatted: value };
+        }
+
+        if (!Types.isString(value)) {
+            return { type: 'MultilineJson', formatted: JSON.stringify(value, undefined, 2) };
+        }
+
+        const hasNewLine = value.indexOf('\n') >= 0;
+        if (!hasNewLine) {
+            return { type: 'Singleline', formatted: value };
+        }
+
+        const truncated = value.trim();
+        if (truncated.indexOf('{') !== 0 && truncated.indexOf('[') !== 0) {
+            return { type: 'MultilineAny', formatted: value };
+        }
+
+        try {
+            return { type: 'MultilineJson', formatted: JSON.stringify(JSON.parse(value), undefined, 2) };
+        } catch {
+            return { type: 'MultilineAny', formatted: value };
+        }
     });
 
     protected readonly valueFormatted = computed(() => {
@@ -39,34 +66,4 @@ export class StateStepPropertyComponent {
     protected readonly valueType = computed(() => {
         return this.valueParsed().type;
     });
-}
-
-function parseValue(value: any): { type: ValueType; formatted: any } {
-    if (Types.isNull(value) || Types.isUndefined(value)) {
-        return { type: 'Raw', formatted: '-' };
-    }
-
-    if (Types.isNumber(value) || Types.isBoolean(value)) {
-        return { type: 'Raw', formatted: value };
-    }
-
-    if (!Types.isString(value)) {
-        return { type: 'MultilineJson', formatted: JSON.stringify(value, undefined, 2) };
-    }
-
-    const hasNewLine = value.indexOf('\n') >= 0;
-    if (!hasNewLine) {
-        return { type: 'Singleline', formatted: value };
-    }
-
-    const truncated = value.trim();
-    if (truncated.indexOf('{') !== 0 && truncated.indexOf('[') !== 0) {
-        return { type: 'MultilineAny', formatted: value };
-    }
-
-    try {
-        return { type: 'MultilineJson', formatted: JSON.stringify(JSON.parse(value), undefined, 2) };
-    } catch {
-        return { type: 'MultilineAny', formatted: value };
-    }
 }

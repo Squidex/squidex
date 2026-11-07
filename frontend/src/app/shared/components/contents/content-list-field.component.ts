@@ -35,8 +35,6 @@ import { TranslationStatusComponent } from './translation-status.component';
     ],
 })
 export class ContentListFieldComponent {
-    protected readonly metaFields = META_FIELDS;
-
     /** The field or meta field to render. */
     public readonly field = input.required<TableField>();
 
@@ -73,6 +71,8 @@ export class ContentListFieldComponent {
 
         return getContentValue(this.content(), this.language(), rootField).formatted;
     });
+
+    protected readonly metaFields = META_FIELDS;
 
     constructor() {
         effect(() => {

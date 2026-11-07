@@ -104,8 +104,9 @@ abstract class ResolverBase<T extends { id: string }, TResult extends { items: R
 
 @Injectable()
 export class ResolveContents extends ResolverBase<ContentDto, ContentsDto> {
+    private readonly uiOptions = inject(UIOptions);
     private readonly schemas: { [name: string]: Observable<ContentsDto> } = {};
-    private readonly itemCount = inject(UIOptions).value.referencesDropdownItemCount;
+    private readonly itemCount = this.uiOptions.value.referencesDropdownItemCount;
 
     constructor(
         private readonly appsState: AppsState,

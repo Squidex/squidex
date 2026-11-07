@@ -10,6 +10,8 @@ import { FormValueControl } from '@angular/forms/signals';
 import { MathHelper } from '@app/framework/internal';
 import { FocusComponent } from '../forms-helper';
 
+let canvas: HTMLCanvasElement;
+
 @Component({
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
@@ -35,7 +37,18 @@ export class ColorPickerComponent implements FormValueControl<string | null>, Fo
     protected readonly inputElement = viewChild<ElementRef<HTMLElement>>('input');
 
     protected readonly valueParsed = computed(() => {
-        return parseColor(this.value());
+        const color = this.value();
+        if (!canvas) {
+            canvas = document.createElement('canvas');
+        }
+
+        const ctx = canvas.getContext('2d')!;
+        if (!ctx) {
+            return color || '';
+        }
+
+        ctx.fillStyle = color || '';
+        return ctx.fillStyle;
     });
 
     protected readonly valueForeground = computed(() => {
@@ -71,19 +84,4 @@ export class ColorPickerComponent implements FormValueControl<string | null>, Fo
             this.value.set(value);
         }
     }
-}
-
-let canvas: HTMLCanvasElement;
-function parseColor(color: string | null) {
-    if (!canvas) {
-        canvas = document.createElement('canvas');
-    }
-
-    const ctx = canvas.getContext('2d')!;
-    if (!ctx) {
-        return color || '';
-    }
-
-    ctx.fillStyle = color || '';
-    return ctx.fillStyle;
 }

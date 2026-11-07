@@ -24,12 +24,12 @@ import { CollaborationService } from '@app/shared/internal';
 export class FocusMarkerComponent {
     private readonly collaboration = inject(CollaborationService, { optional: true });
 
-    private readonly users = computed(() => {
-        return this.collaboration?.users() ?? [];
-    });
-
     /** The ID of the control, to show which other user has focused it. */
     public readonly controlId = input.required<string>();
+
+    protected readonly users = computed(() => {
+        return this.collaboration?.users() ?? [];
+    });
 
     protected readonly focusedUser = computed(() => {
         const controlId = this.controlId();

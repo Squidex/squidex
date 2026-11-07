@@ -28,8 +28,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     ],
 })
 export class ReferenceItemComponent {
-    protected readonly metaFields = META_FIELDS;
-
     /** Emits when the user removes the reference. */
     public readonly delete = output();
 
@@ -88,4 +86,6 @@ export class ReferenceItemComponent {
 
         return !validations ? undefined : validations[this.content().id];
     });
+
+    protected readonly metaFields = META_FIELDS;
 }

@@ -37,11 +37,11 @@ export class RulesPageComponent {
 
     protected readonly rulesState = inject(RulesState);
 
-    protected readonly availableTriggers = ALL_TRIGGERS;
-
     protected readonly availableSteps = rxResource({
         stream: () => this.rulesService.getSteps(),
     });
+
+    protected readonly availableTriggers = ALL_TRIGGERS;
 
     constructor() {
         this.rulesState.load();

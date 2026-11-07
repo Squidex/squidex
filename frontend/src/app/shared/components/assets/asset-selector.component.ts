@@ -40,11 +40,11 @@ export class AssetSelectorComponent {
 
     protected readonly selectedAssets = signal<Record<string, AssetDto>>({});
 
+    protected readonly isListView = this.localStore.boolean(Settings.Local.ASSETS_MODE);
+
     protected readonly selectionCount = computed(() => {
         return Object.keys(this.selectedAssets()).length;
     });
-
-    protected readonly isListView = this.localStore.boolean(Settings.Local.ASSETS_MODE);
 
     constructor() {
         this.assetsState.load();

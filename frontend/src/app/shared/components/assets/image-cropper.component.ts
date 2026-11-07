@@ -20,15 +20,17 @@ import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
     ],
 })
 export class ImageCropperComponent {
-    private readonly editor = viewChild.required<ElementRef<HTMLCanvasElement>>('editor');
+    private readonly destroyRef = inject(DestroyRef);
     private cropper: Cropper | null = null;
     private data?: Cropper.Data;
 
     /** The URL of the image to edit. */
     public readonly imageSource = input('');
 
+    protected readonly editor = viewChild.required<ElementRef<HTMLCanvasElement>>('editor');
+
     constructor() {
-        const destroyRef = inject(DestroyRef);
+        const destroyRef = this.destroyRef;
 
         effect(() => {
             const imageSource = this.imageSource();

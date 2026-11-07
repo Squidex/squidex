@@ -42,14 +42,13 @@ export class AssetScriptsPageComponent {
 
     protected readonly assetScript = signal('query');
 
+    protected readonly isEditable = this.assetScriptsState.canUpdate;
+
     protected readonly assetCompletions = rxResource({
         stream: () => this.assetsService.getCompletions(this.appsState.appName),
-        defaultValue: null,
     });
 
     protected readonly editForm = new EditAssetScriptsForm();
-
-    protected readonly isEditable = this.assetScriptsState.canUpdate;
 
     constructor() {
         effect(() => {

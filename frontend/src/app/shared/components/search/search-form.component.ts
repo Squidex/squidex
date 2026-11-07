@@ -73,6 +73,8 @@ export class SearchFormComponent {
     /** Focuses the search input when CTRL + I is pressed. */
     public readonly enableShortcut = input(false, { transform: booleanAttribute });
 
+    protected readonly cleanedQuery = linkedSignal(() => sanitize(this.query()));
+
     protected readonly filterModel = computed(() => {
         return this.buildFilterModel(this.queryModel());
     });
@@ -88,8 +90,8 @@ export class SearchFormComponent {
     });
 
     protected readonly saveQueryDialog = new DialogModel();
+
     protected readonly saveQueryForm = new SaveQueryForm();
-    protected readonly cleanedQuery = linkedSignal(() => sanitize(this.query()));
 
     protected readonly options: FilterOptions = {
         cssClasses: {

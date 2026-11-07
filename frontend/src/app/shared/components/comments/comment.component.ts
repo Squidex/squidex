@@ -78,10 +78,6 @@ export class CommentComponent {
     /** The selector of the container to scroll when the comment is selected. */
     public readonly scrollContainer = input<string>();
 
-    protected readonly replyForm = new UpsertCommentForm();
-
-    protected readonly updateForm = new UpsertCommentForm();
-
     protected readonly mode = signal<'Normal' | 'Edit' | 'Reply'>('Normal');
 
     protected readonly isMyComment = computed(() => {
@@ -92,6 +88,10 @@ export class CommentComponent {
         // A single icon without context is hard to understand, therefore we show a label in this case.
         return !this.canAnswer() && !(this.isMyComment() && this.canEdit()) && !this.canResolve();
     });
+
+    protected readonly replyForm = new UpsertCommentForm();
+
+    protected readonly updateForm = new UpsertCommentForm();
 
     protected select() {
         const editorId = this.commentItem().comment.editorId;

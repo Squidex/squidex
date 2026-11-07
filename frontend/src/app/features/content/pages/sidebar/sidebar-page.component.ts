@@ -21,6 +21,7 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
 })
 export class SidebarPageComponent {
     protected readonly contentsState = inject(ContentsState);
+
     protected readonly schemasState = inject(SchemasState);
 
     protected readonly url = computed(() => {

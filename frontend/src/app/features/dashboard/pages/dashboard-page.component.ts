@@ -7,8 +7,8 @@
 
 import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { catchError, of } from 'rxjs';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
+import { catchError, of } from 'rxjs';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
 import { ApiCardComponent } from './cards/api-card.component';
 import { ContentSummaryCardComponent } from './cards/content-summary-card.component';
@@ -53,15 +53,22 @@ export class DashboardPageComponent {
     private readonly authState = inject(AuthService);
     private readonly localStore = inject(LocalStoreService);
     private readonly renderer = inject(Renderer2);
+    private readonly usageDateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
+    private readonly usageDateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
     private readonly usagesService = inject(UsagesService);
     private readonly zone = inject(NgZone);
-    private readonly usageDateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
-    private readonly usageDateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
-    private readonly grid = viewChild<Gridster>('grid');
+
+    protected readonly grid = viewChild<Gridster>('grid');
+
+    protected readonly isScrolled = signal(false);
+
+    protected readonly gridConfig = signal<GridsterItemConfig[] | undefined>(undefined);
+
+    protected readonly extendedHeight = signal('');
+
+    protected readonly isStacked = this.localStore.boolean(Settings.Local.DASHBOARD_CHART_STACKED);
 
     protected readonly selectedApp = this.appsState.selectedApp;
-    protected readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
-    protected readonly isScrolled = signal(false);
 
     protected readonly storageCurrent = rxResource({
         params: () => this.selectedApp()?.name,
@@ -81,11 +88,12 @@ export class DashboardPageComponent {
             catchError(() => of(undefined))),
     });
 
-    protected readonly gridConfig = signal<GridsterItemConfig[] | undefined>(undefined);
     protected readonly gridConfigAvailable = [...DEFAULT_CELLS, ...ADDITIONAL_CELLS];
+
     protected readonly gridConfigDefaults = DEFAULT_CELLS;
+
     protected readonly gridOptions = DEFAULT_OPTIONS;
-    protected readonly extendedHeight = signal('');
+
     protected readonly user = this.authState.user?.displayName;
 
     constructor() {
@@ -125,8 +133,6 @@ export class DashboardPageComponent {
     }
 
     protected changeIsStacked(value: boolean) {
-        this.localStore.setBoolean(Settings.Local.DASHBOARD_CHART_STACKED, value);
-
         this.isStacked.set(value);
     }
 

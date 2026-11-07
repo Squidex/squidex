@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, input } from '@angular/core';
+import { Component, computed, effect, input, untracked } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldFormModel, NumberFieldPropertiesDto, TagEditorComponent } from '@app/shared';
 
@@ -34,7 +34,9 @@ export class NumberUIComponent {
     });
 
     protected readonly hideAllowedValues = computed(() => {
-        return hidesAllowedValues(this.form().editor().value());
+        const editor = this.form().editor().value();
+
+        return editor !== 'Radio' && editor !== 'Dropdown';
     });
 
     protected readonly converter = FloatConverter.INSTANCE;
@@ -43,25 +45,16 @@ export class NumberUIComponent {
 
     constructor() {
         effect(() => {
-            const form = this.form();
-            if (hidesAllowedValues(form.editor().value())) {
-                form.allowedValues().value.set(null);
+            if (this.hideAllowedValues()) {
+                untracked(() => this.form().allowedValues().value.set(null));
             }
         });
 
         effect(() => {
             const form = this.form();
-            if (hidesInlineEditable(form.editor().value())) {
-                form.inlineEditable().value.set(false);
+            if (form.editor().value() === 'Radio') {
+                untracked(() => form.inlineEditable().value.set(false));
             }
         });
     }
-}
-
-function hidesAllowedValues(editor: string) {
-    return !(editor && (editor === 'Radio' || editor === 'Dropdown'));
-}
-
-function hidesInlineEditable(editor: string) {
-    return editor === 'Radio';
 }

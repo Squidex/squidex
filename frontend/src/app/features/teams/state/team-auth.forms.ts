@@ -39,17 +39,17 @@ export class UpdateTeamAuthForm extends SignalForm<UpdateTeamAuthFormModel, Auth
 
     constructor() {
         super({ domain: '', displayName: '', clientId: '', clientSecret: '', authority: '', signoutRedirectUrl: '' }, path => {
-            required(path.domain);
             maxLength(path.domain, 40);
-            required(path.displayName);
             maxLength(path.displayName, 40);
-            required(path.clientId);
             maxLength(path.clientId, 200);
-            required(path.clientSecret);
             maxLength(path.clientSecret, 200);
-            required(path.authority);
             maxLength(path.authority, 200);
             maxLength(path.signoutRedirectUrl, 500);
+            required(path.domain);
+            required(path.displayName);
+            required(path.clientId);
+            required(path.clientSecret);
+            required(path.authority);
         });
     }
 

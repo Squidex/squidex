@@ -46,12 +46,13 @@ export class ChatDialogComponent {
     /** Defines what is copied when the user uses an answer. */
     public readonly copyMode = input<'Text' | 'Image'>();
 
-    protected readonly user = this.authService.user!;
-
     protected readonly chatQuestion = signal('');
+
     protected readonly chatItems = signal<ReadonlyArray<ChatItem>>([]);
 
     protected readonly isRunning = signal(false);
+
+    protected readonly user = this.authService.user!;
 
     constructor() {
         effect(onCleanup => {

@@ -26,8 +26,8 @@ import { AppDto, CodeEditorComponent, ConfirmClickDirective, DialogModel, Dialog
     ],
 })
 export class DashboardConfigComponent {
-    private readonly localizer = inject(LocalizerService);
     private readonly dialogs = inject(DialogService);
+    private readonly localizer = inject(LocalizerService);
     private readonly uiState = inject(UIState);
 
     /** The app of the dashboard. The stored grid configuration is loaded when it changes. */
@@ -48,6 +48,8 @@ export class DashboardConfigComponent {
     /** Emits the new grid configuration when it is loaded, reset or edited in expert mode. */
     public readonly configChange = output<GridsterItemConfig[]>();
 
+    protected readonly expertConfig = signal<GridsterItemConfig[] | undefined>(undefined);
+
     protected readonly configOptions = computed<ReadonlyArray<GridsterItemConfig>>(() => {
         return this.configAvailable().map(item => {
             const name = this.localizer.getOrKey(item.name);
@@ -57,7 +59,7 @@ export class DashboardConfigComponent {
     });
 
     protected readonly expertDialog = new DialogModel();
-    protected readonly expertConfig = signal<GridsterItemConfig[] | undefined>(undefined);
+
     protected readonly dropdownModal = new ModalModel();
 
     constructor() {

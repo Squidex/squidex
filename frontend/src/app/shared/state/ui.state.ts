@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable, Signal } from '@angular/core';
+import { computed, inject, Injectable, Injector, Signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map, take, tap } from 'rxjs/operators';
 import { debug, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
@@ -44,6 +45,8 @@ interface Snapshot {
     providedIn: 'root',
 })
 export class UIState extends State<Snapshot> {
+    private readonly injector = inject(Injector);
+
     public readonly settings =
         this.project(mergeSettings);
 
@@ -103,8 +106,8 @@ export class UIState extends State<Snapshot> {
     }
 
     private waitForValue<T>(select: (snapshot: Snapshot) => Settings | null | undefined, path: string, defaultValue: T): Observable<T> {
-        return this.changes.pipe(
-            map(x => select(x.snapshot)),
+        return toObservable(this.value, { injector: this.injector }).pipe(
+            map(x => select(x)),
             filter(x => !!x),
             take(1),
             map(x => getValue(x, path, defaultValue)));

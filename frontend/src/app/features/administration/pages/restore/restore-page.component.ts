@@ -38,11 +38,11 @@ export class RestorePageComponent {
     private readonly dialogs = inject(DialogService);
     private readonly jobsService = inject(JobsService);
 
-    protected readonly restoreForm = new RestoreForm();
-
     protected readonly restoreJob = rxResource({
         stream: () => timer(0, 2000).pipe(switchSafe(() => this.jobsService.getRestore())),
     });
+
+    protected readonly restoreForm = new RestoreForm();
 
     protected restore() {
         this.restoreForm.submit(value => {

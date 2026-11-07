@@ -36,8 +36,6 @@ export class ContentsExportDialogComponent {
     /** All languages of the app, to build the paths of localized fields. */
     public readonly languages = input<ReadonlyArray<AppLanguageDto>>([]);
 
-    protected readonly metaPaths = ['id', 'created', 'createdBy', 'lastModified', 'lastModifiedBy', 'status', 'newStatus', 'version'];
-
     protected readonly fieldPaths = computed<ReadonlyArray<FieldPaths>>(() => {
         const languages = this.languages();
 
@@ -50,6 +48,8 @@ export class ContentsExportDialogComponent {
             return { label: field.displayName, paths };
         });
     });
+
+    protected readonly metaPaths = ['id', 'created', 'createdBy', 'lastModified', 'lastModifiedBy', 'status', 'newStatus', 'version'];
 
     protected readonly exportForm = form(signal({ format: 'Csv' as ExportFormat, fields: '', unpublished: false }));
 

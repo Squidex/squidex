@@ -23,13 +23,6 @@ import { CodeEditorComponent } from '@app/framework';
 export class AssetTextEditorComponent {
     private readonly httpClient = inject(HttpClient);
 
-    private readonly textLoaded = rxResource({
-        params: () => ({ fileSource: this.fileSource() }),
-        stream: ({ params }) => this.httpClient.get(params.fileSource, { responseType: 'text' }).pipe(
-            catchError(() => of(''))),
-        defaultValue: '',
-    });
-
     /** The URL to load the text from. */
     public readonly fileSource = input('');
 
@@ -40,6 +33,13 @@ export class AssetTextEditorComponent {
     public readonly mimeType = input('');
 
     protected readonly text = linkedSignal(() => this.textLoaded.value());
+
+    protected readonly textLoaded = rxResource({
+        params: () => ({ fileSource: this.fileSource() }),
+        stream: ({ params }) => this.httpClient.get(params.fileSource, { responseType: 'text' }).pipe(
+            catchError(() => of(''))),
+        defaultValue: '',
+    });
 
     public toFile(): Promise<File | null> {
         return new Promise<File | null>(resolve => {
