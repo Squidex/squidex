@@ -5,44 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 import { ShortcutService } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-shortcut',
     template: '',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ShortcutComponent implements OnDestroy, OnInit {
-    private subscription?: Function;
+export class ShortcutComponent {
+    /** Emits when the shortcut is pressed while the component is enabled. */
+    public readonly trigger = output<boolean>();
 
-    @Output()
-    public trigger = new EventEmitter();
+    /** The key combination to listen to, for example "ctrl+s". */
+    public readonly keys = input('');
 
-    @Input()
-    public keys = '';
+    /** Ignores the shortcut while true. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disabled?: boolean | null;
+    constructor(shortcutService: ShortcutService) {
+        effect(onCleanup => {
+            const keys = this.keys();
+            if (!keys) {
+                return;
+            }
 
-    constructor(changeDetector: ChangeDetectorRef,
-        private readonly shortcutService: ShortcutService,
-    ) {
-        changeDetector.detach();
-    }
-
-    public ngOnDestroy() {
-        this.subscription?.();
-    }
-
-    public ngOnInit() {
-        if (this.keys) {
-            this.subscription = this.shortcutService.listen(this.keys, () => {
-                if (!this.disabled) {
-                    this.trigger.next(true);
+            const unsubscribe = shortcutService.listen(keys, () => {
+                if (!this.disabled()) {
+                    this.trigger.emit(true);
                 }
 
                 return false;
             });
-        }
+
+            onCleanup(unsubscribe);
+        });
     }
 }

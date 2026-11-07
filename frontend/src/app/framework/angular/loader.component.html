@@ -1,11 +1,11 @@
 <svg
-    [attr.height]="size"
-    [attr.width]="size"
+    [attr.height]="size()"
+    [attr.width]="size()"
     preserveAspectRatio="xMidYMid"
     style="margin: auto; background: none; display: block; shape-rendering: auto"
     viewBox="0 0 100 100"
     xmlns="http://www.w3.org/2000/svg">
-    <circle [class]="color" cx="50" cy="50" fill="none" r="35" stroke-dasharray="164.93361431346415 56.97787143782138" stroke-width="12">
+    <circle [class]="color()" cx="50" cy="50" fill="none" r="35" stroke-dasharray="164.93361431346415 56.97787143782138" stroke-width="12">
         <animateTransform
             attributeName="transform"
             dur="1s"

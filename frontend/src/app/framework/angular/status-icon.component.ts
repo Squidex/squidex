@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TooltipDirective } from './modals/tooltip.directive';
 
 @Component({
@@ -19,12 +19,12 @@ import { TooltipDirective } from './modals/tooltip.directive';
     ],
 })
 export class StatusIconComponent {
-    @Input({ required: true })
-    public status?: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending' | string;
+    /** The status to visualize. Unknown values are rendered as pending. */
+    public readonly status = input.required<'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending' | string | undefined>();
 
-    @Input()
-    public statusText: string | undefined | null;
+    /** The tooltip text for the icon. */
+    public readonly statusText = input<string | undefined | null>();
 
-    @Input()
-    public size: 'lg' | 'sm' = 'lg';
+    /** The size of the icon. */
+    public readonly size = input<'lg' | 'sm'>('lg');
 }

@@ -1,7 +1,8 @@
-@if (errorMessages && errorMessages.length > 0) {
+@let messages = errorMessages();
+@if (messages && messages.length > 0) {
     <div class="errors-container" animate.enter="fade-in" animate.leave="fade-out">
         <div class="errors">
-            @for (message of errorMessages; track message) {
+            @for (message of messages; track message) {
                 {{ message }}
             }
         </div>

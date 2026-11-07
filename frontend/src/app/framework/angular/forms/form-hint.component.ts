@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-form-hint',
@@ -14,12 +14,12 @@ import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@ang
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormHintComponent {
-    @Input()
-    public class = '';
+    /** Additional CSS classes for the hint element. */
+    public readonly class = input('');
 
-    @Input({ transform: numberAttribute })
-    public marginTop: number | string = 0;
+    /** The top margin as Bootstrap spacing level (0-5). */
+    public readonly marginTop = input(0, { transform: numberAttribute });
 
-    @Input({ transform: numberAttribute })
-    public marginBottom: number | string = 0;
+    /** The bottom margin as Bootstrap spacing level (0-5). */
+    public readonly marginBottom = input(0, { transform: numberAttribute });
 }

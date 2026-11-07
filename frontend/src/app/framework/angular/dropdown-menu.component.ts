@@ -6,7 +6,7 @@
  */
 
 import { CdkTrapFocus  } from '@angular/cdk/a11y';
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, input } from '@angular/core';
 
 @Component({
     selector: 'sqx-dropdown-menu',
@@ -14,6 +14,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input } fr
     templateUrl: './dropdown-menu.component.html',
     host: {
         class: 'dropdown-menu',
+        ['[class]']: 'class()',
         ['animate.enter']: 'fade-in',
         ['animate.leave']: 'fade-out',
     },
@@ -23,9 +24,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input } fr
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownMenuComponent {
-    @HostBinding('class')
-    @Input()
-    public class?: string;
+    /** Additional CSS classes for the host element. */
+    public readonly class = input<string>();
 
     public get nativeElement() {
         return this.element.nativeElement;

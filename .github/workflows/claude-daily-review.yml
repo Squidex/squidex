@@ -92,6 +92,8 @@ jobs:
                PR title, then category,
                severity, affected files, explanation of the problem, how it could be
                triggered, and what the fix does.
+               The title is a plain summary: no prefix like "[backend]" or "[frontend]",
+               no issue or PR numbers like "#123" and no Co-authored-by or other attribution.
 
             Do NOT commit, push or create the PR yourself.
           claude_args: >-
@@ -111,7 +113,8 @@ jobs:
           if [ ! -s "$RUNNER_TEMP/pr-body.md" ]; then echo "PR description missing."; exit 1; fi
 
           branch="claude/daily-$AREA-$(date +%Y-%m-%d)"
-          title=$(head -n 1 "$RUNNER_TEMP/pr-body.md")
+          # Remove area prefixes like "[backend]" and issue references like "#123", in case the prompt was not followed.
+          title=$(head -n 1 "$RUNNER_TEMP/pr-body.md" | sed -E 's/^\s*\[[^]]*\]\s*//; s/\s*\(?#[0-9]+\)?//g')
           tail -n +2 "$RUNNER_TEMP/pr-body.md" > "$RUNNER_TEMP/body.md"
 
           git config user.name "claude[bot]"

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-form-alert',
@@ -14,18 +14,18 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttr
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormAlertComponent {
-    @Input()
-    public class = '';
+    /** Additional CSS classes for the alert element. */
+    public readonly class = input('');
 
-    @Input({ transform: numberAttribute })
-    public marginTop: number | undefined | null = 2;
+    /** The top margin as Bootstrap spacing level (0-5). */
+    public readonly marginTop = input(2, { transform: numberAttribute });
 
-    @Input({ transform: numberAttribute })
-    public marginBottom: number | undefined | null = 4;
+    /** The bottom margin as Bootstrap spacing level (0-5). */
+    public readonly marginBottom = input(4, { transform: numberAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public light?: boolean | null;
+    /** Renders the alert with a lighter background. */
+    public readonly light = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public large?: boolean | null;
+    /** Renders the alert with a larger font and padding. */
+    public readonly large = input(false, { transform: booleanAttribute });
 }

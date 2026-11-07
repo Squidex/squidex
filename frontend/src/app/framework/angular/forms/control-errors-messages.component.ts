@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
     selector: 'sqx-errors-messages',
@@ -15,6 +15,6 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlErrorsMessagesComponent {
-    @Input()
-    public errorMessages?: ReadonlyArray<string>;
+    /** The error messages to render. Nothing is rendered when empty. */
+    public readonly errorMessages = input<ReadonlyArray<string>>();
 }

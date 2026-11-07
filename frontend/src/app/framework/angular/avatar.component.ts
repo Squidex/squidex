@@ -6,8 +6,8 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
-import { picasso, TypedSimpleChanges } from '@app/framework/internal';
+import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, numberAttribute } from '@angular/core';
+import { picasso } from '@app/framework/internal';
 import { SafeUrlPipe } from './safe-html.pipe';
 
 @Component({
@@ -20,47 +20,27 @@ import { SafeUrlPipe } from './safe-html.pipe';
     ],
 })
 export class AvatarComponent {
-    @Input()
-    public identifier: string | undefined | null;
+    /** The identifier to generate the fallback image from, for example the user ID. */
+    public readonly identifier = input<string | undefined | null>();
 
-    @Input()
-    public image: string | undefined | null;
+    /** The URL of the image. Falls back to a generated image when not set or not loadable. */
+    public readonly image = input<string | undefined | null>();
 
-    @Input({ transform: numberAttribute })
-    public size = 50;
+    /** The width and height of the avatar in pixels. */
+    public readonly size = input(50, { transform: numberAttribute });
 
-    public imageSource?: string | null;
-    public imageSize = '50px';
+    public readonly actualImage = linkedSignal(() => this.image());
 
-    public actualImage: string | undefined | null;
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.image) {
-            this.actualImage = this.image;
-        }
-
-        if (changes.image || changes.identifier) {
-            this.updateSource();
-        }
-
-        if (changes.size) {
-            this.imageSize = `${this.size}px`;
-        }
-    }
-
-    private updateSource() {
-        this.imageSource = this.actualImage || this.createSvg();
-    }
+    public readonly imageSource = computed(() => this.actualImage() || this.createSvg(this.identifier()));
+    public readonly imageSize = computed(() => `${this.size()}px`);
 
     public unsetImage() {
-        this.actualImage = null;
-
-        this.updateSource();
+        this.actualImage.set(null);
     }
 
-    private createSvg() {
-        if (this.identifier) {
-            return `data:image/svg+xml;utf8,${picasso(this.identifier)}`;
+    private createSvg(identifier: string | undefined | null) {
+        if (identifier) {
+            return `data:image/svg+xml;utf8,${picasso(identifier)}`;
         } else {
             return null;
         }
