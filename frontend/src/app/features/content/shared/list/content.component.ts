@@ -9,8 +9,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, Injector, input, output, viewChildren } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, Injector, input, output, viewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
 
@@ -27,7 +26,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
         ContentStatusComponent,
         DropdownMenuComponent,
         ExternalLinkDirective,
-        FormsModule,
         ModalDirective,
         ModalPlacementDirective,
         RouterLink,
@@ -37,10 +35,8 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     ],
 })
 export class ContentComponent {
-    private readonly changeDetector = inject(ChangeDetectorRef);
     private readonly contentsState = inject(ContentsState);
     private readonly injector = inject(Injector);
-
     private readonly fields = viewChildren(ContentListFieldComponent);
 
     /** Emits when the user clones the content. */
@@ -110,8 +106,6 @@ export class ContentComponent {
         await patchForm.submit(value => {
             return this.contentsState.patch(content, value);
         });
-
-        this.changeDetector.detectChanges();
     }
 
     protected shouldStop(field: TableField) {

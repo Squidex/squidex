@@ -41,11 +41,8 @@ export class SchemasPageComponent {
     private readonly showDialog = routeParam('showDialog');
 
     protected readonly schemasState = inject(SchemasState);
-
     protected readonly addSchemaDialog = new DialogModel();
-
     protected readonly addCategoryForm = new CreateCategoryForm();
-
     protected readonly schemasFilter = form(signal(''));
 
     protected readonly categories = computed(() => {
@@ -55,18 +52,10 @@ export class SchemasPageComponent {
     protected readonly source = signal<any>(null);
 
     constructor() {
-        const messageBus = inject(MessageBus);
+        inject(MessageBus).on(SchemaCloning, event => {
+            this.source.set(event.schema);
 
-        effect(onCleanup => {
-            const subscription =
-                messageBus.of(SchemaCloning)
-                    .subscribe(event => {
-                        this.source.set(event.schema);
-
-                        this.addSchemaDialog.show();
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+            this.addSchemaDialog.show();
         });
 
         effect(() => {

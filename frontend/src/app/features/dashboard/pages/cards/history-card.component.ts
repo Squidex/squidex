@@ -6,8 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs/operators';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { AppDto, HistoryListComponent, HistoryService, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -21,16 +20,13 @@ import { AppDto, HistoryListComponent, HistoryService, TranslatePipe } from '@ap
     ],
 })
 export class HistoryCardComponent {
+    private readonly historyService = inject(HistoryService);
+
     /** The app to show the latest history events for. */
     public readonly app = input.required<AppDto>();
 
-    protected readonly history;
-
-    constructor() {
-        const historyService = inject(HistoryService);
-
-        this.history = toSignal(
-            toObservable(this.app).pipe(
-                switchMap(app => historyService.getHistory(app.name, ''))));
-    }
+    protected readonly history = rxResource({
+        params: () => ({ app: this.app() }),
+        stream: ({ params }) => this.historyService.getHistory(params.app.name, ''),
+    });
 }

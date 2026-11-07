@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent, ListViewComponent, MessageBus, RuleElementDto, RuleSimulatorState, RulesService, SimulatedRuleEventDto, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleConfigured } from '../messages';
@@ -27,36 +27,19 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 })
 export class RuleSimulatorPageComponent {
     protected readonly ruleSimulatorState = inject(RuleSimulatorState);
-
-    protected readonly availableSteps;
-
+    protected readonly availableSteps = toSignal(inject(RulesService).getSteps(), { initialValue: {} as Record<string, RuleElementDto> });
     protected readonly selectedRuleEvent = signal<string | null | undefined>(undefined);
 
     constructor() {
-        const route = inject(ActivatedRoute);
-        const rulesService = inject(RulesService);
-        const messageBus = inject(MessageBus);
-
-        this.availableSteps = toSignal(rulesService.getSteps(), { initialValue: {} as Record<string, RuleElementDto> });
-
-        effect(onCleanup => {
-            const subscriptions = [
-                messageBus.of(RuleConfigured)
-                    .subscribe(message => {
-                        this.ruleSimulatorState.setRule(message.trigger, message.flow);
-                    }),
-                route.queryParams
-                    .subscribe(query => {
-                        this.ruleSimulatorState.selectRule(query['ruleId']);
-                    }),
-            ];
-
-            onCleanup(() => {
-                for (const subscription of subscriptions) {
-                    subscription.unsubscribe();
-                }
-            });
+        inject(MessageBus).on(RuleConfigured, message => {
+            this.ruleSimulatorState.setRule(message.trigger, message.flow);
         });
+
+        inject(ActivatedRoute).queryParams
+            .pipe(takeUntilDestroyed())
+            .subscribe(query => {
+                this.ruleSimulatorState.selectRule(query['ruleId']);
+            });
     }
 
     protected simulate() {

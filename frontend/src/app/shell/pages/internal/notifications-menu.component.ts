@@ -21,15 +21,5 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     ],
 })
 export class NotificationsMenuComponent {
-    protected readonly isNotifoConfigured: boolean;
-
-    constructor() {
-        const authService = inject(AuthService);
-        const uiOptions = inject(UIOptions);
-
-        const notifoApiKey = authService.user?.notifoToken;
-        const notifoApiUrl = uiOptions.value.notifoApi;
-
-        this.isNotifoConfigured = !!notifoApiKey && !!notifoApiUrl;
-    }
+    protected readonly isNotifoConfigured = !!inject(AuthService).user?.notifoToken && !!inject(UIOptions).value.notifoApi;
 }

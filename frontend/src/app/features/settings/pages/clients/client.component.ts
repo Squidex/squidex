@@ -7,7 +7,7 @@
 
 
 import { ChangeDetectionStrategy, Component, inject, input, linkedSignal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { disabled, form, FormField } from '@angular/forms/signals';
 import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormRowComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, UpdateClientDto } from '@app/shared';
 import { ClientConnectFormComponent } from './client-connect-form.component';
 
@@ -21,8 +21,8 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
         ConfirmClickDirective,
         CopyDirective,
         EditableTitleComponent,
+        FormField,
         FormRowComponent,
-        FormsModule,
         ModalDirective,
         TooltipDirective,
         TourStepDirective,
@@ -40,7 +40,9 @@ export class ClientComponent {
     /** The roles that can be assigned to the client. */
     public readonly clientRoles = input.required<ReadonlyArray<RoleDto>>();
 
-    protected readonly apiCallsLimit = linkedSignal(() => this.client().apiCallsLimit);
+    protected readonly apiCallsLimit = form(linkedSignal(() => this.client().apiCallsLimit), path => {
+        disabled(path, () => !this.client().canUpdate);
+    });
 
     protected readonly connectDialog = new DialogModel(false);
 

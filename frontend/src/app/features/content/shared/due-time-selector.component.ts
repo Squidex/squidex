@@ -6,7 +6,7 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { Observable, of, Subject } from 'rxjs';
 import { DateTime, DateTimeEditorComponent, DialogModel, FocusOnInitDirective, ModalDialogComponent, ModalDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 
@@ -20,7 +20,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
     imports: [
         DateTimeEditorComponent,
         FocusOnInitDirective,
-        FormsModule,
+        FormField,
         ModalDialogComponent,
         ModalDirective,
         TooltipDirective,
@@ -36,7 +36,7 @@ export class DueTimeSelectorComponent {
     protected readonly dueTimeDialog = new DialogModel();
     protected readonly dueTime = signal<string | null>('');
     protected readonly dueTimeAction = signal<string | null>('');
-    protected readonly dueTimeMode = signal(OPTION_IMMEDIATELY);
+    protected readonly dueTimeMode = form(signal(OPTION_IMMEDIATELY));
 
     public selectDueTime(action: string): Observable<DateTime | undefined> {
         if (this.disabled()) {
@@ -51,7 +51,7 @@ export class DueTimeSelectorComponent {
     }
 
     protected confirmStatusChange() {
-        const result = this.dueTimeMode() === OPTION_IMMEDIATELY ? null : this.dueTime();
+        const result = this.dueTimeMode().value() === OPTION_IMMEDIATELY ? null : this.dueTime();
 
         this.dueTimeResult?.next(result ? DateTime.parseISO(result) : undefined);
         this.dueTimeResult?.complete();
@@ -60,7 +60,7 @@ export class DueTimeSelectorComponent {
     }
 
     protected cancelStatusChange() {
-        this.dueTimeMode.set(OPTION_IMMEDIATELY);
+        this.dueTimeMode().value.set(OPTION_IMMEDIATELY);
         this.dueTimeDialog.hide();
         this.dueTimeResult = null!;
         this.dueTime.set(null);

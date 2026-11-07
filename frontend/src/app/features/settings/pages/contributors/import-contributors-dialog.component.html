@@ -19,9 +19,9 @@
                             <div class="col truncate aligned">{{ status.email }}</div>
 
                             <div class="col-5 ps-1">
-                                <select class="form-select" [(ngModel)]="status.role" [ngModelOptions]="{ standalone: true }">
+                                <select class="form-select" (change)="changeRole(status, $any($event.target).value)">
                                     @for (role of roles(); track role) {
-                                        <option [ngValue]="role.name">{{ role.name }}</option>
+                                        <option [selected]="role.name === status.role" [value]="role.name">{{ role.name }}</option>
                                     }
                                 </select>
                             </div>

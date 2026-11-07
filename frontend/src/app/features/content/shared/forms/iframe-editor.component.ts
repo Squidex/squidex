@@ -86,22 +86,15 @@ export class IFrameEditorComponent {
     });
 
     protected readonly isFullscreen = signal(false);
-
     protected readonly assetsDialog = new DialogModel();
-
     protected readonly contentsQuery = signal<string | undefined>(undefined);
-
     protected readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
-
     protected readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
-
     protected readonly contentsDialog = new DialogModel();
 
     constructor() {
-        const themeService = this.themeService;
-
         effect(() => {
-            this.sendMessage('themeChanged', { theme: themeService.theme() });
+            this.sendMessage('themeChanged', { theme: this.themeService.theme() });
         });
 
         effect(() => {

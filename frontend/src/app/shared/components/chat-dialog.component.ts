@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { HTTP, MathHelper, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AppsState, AuthService, ChatEventDto, Profile, TranslationsService } from '@app/shared/internal';
+import { AppsState, AuthService, ChatEventDto, TranslationsService } from '@app/shared/internal';
 import { ChatItemComponent } from './chat-item.component';
 
 type ChatItem = { content: string | Observable<ChatEventDto>; type: 'User' | 'Assistant' | 'System' };
@@ -46,7 +45,7 @@ export class ChatDialogComponent {
     /** Defines what is copied when the user uses an answer. */
     public readonly copyMode = input<'Text' | 'Image'>();
 
-    protected readonly user: Profile;
+    protected readonly user = inject(AuthService).user!;
 
     protected readonly chatQuestion = signal('');
     protected readonly chatItems = signal<ReadonlyArray<ChatItem>>([]);
@@ -54,10 +53,6 @@ export class ChatDialogComponent {
     protected readonly isRunning = signal(false);
 
     constructor() {
-        const authService = inject(AuthService);
-
-        this.user = authService.user!;
-
         effect(onCleanup => {
             const configuration = this.configuration();
             const conversationId = this.conversationId();

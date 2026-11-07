@@ -54,7 +54,8 @@ export class MenuItemRegistry {
     }]
 })
 export class MenuComponent implements ResizeListener {
-    private readonly menuItemsRegistry: MenuItemRegistry;
+    private readonly menuItemsRegistry = inject(MenuItemRegistry, { optional: true, skipSelf: true }) ?? new MenuItemRegistry();
+    private readonly resizeService = inject(ResizeService);
     private readonly measuredContainer = signal(-1);
     private readonly measuredMenu = signal(-1);
     private readonly container = viewChild<ElementRef<HTMLDivElement>>('container');
@@ -86,18 +87,13 @@ export class MenuComponent implements ResizeListener {
     });
 
     constructor() {
-        const resizeService = inject(ResizeService);
-        const parentMenuItemRegistry = inject(MenuItemRegistry, { optional: true, skipSelf: true });
-
-        this.menuItemsRegistry = parentMenuItemRegistry ?? new MenuItemRegistry();
-
         effect(onCleanup => {
             const container = this.container();
             if (!container) {
                 return;
             }
 
-            const unlistenContainer = resizeService.listen(container.nativeElement, this);
+            const unlistenContainer = this.resizeService.listen(container.nativeElement, this);
             onCleanup(unlistenContainer);
         });
 
@@ -107,7 +103,7 @@ export class MenuComponent implements ResizeListener {
                 return;
             }
 
-            const unlistenMenu = resizeService.listen(menu.nativeElement, this);
+            const unlistenMenu = this.resizeService.listen(menu.nativeElement, this);
             onCleanup(unlistenMenu);
         });
     }

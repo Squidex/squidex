@@ -7,7 +7,6 @@
 
 
 import { Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { DateTimeFieldEditorValues, DateTimeFieldFormModel, DateTimeFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent } from '@app/shared';
 
@@ -18,7 +17,6 @@ import { DateTimeFieldEditorValues, DateTimeFieldFormModel, DateTimeFieldPropert
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
     ],
 })
 export class DateTimeUIComponent {

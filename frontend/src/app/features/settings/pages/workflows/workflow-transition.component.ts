@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView, WorkflowView } from '@app/shared';
 
 @Component({
@@ -15,14 +14,11 @@ import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTr
     templateUrl: './workflow-transition.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class WorkflowTransitionComponent {
-    protected readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
-
     /** Emits the updated workflow when the transition is changed or removed. */
     public readonly update = output<WorkflowView>();
 

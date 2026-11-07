@@ -6,9 +6,9 @@
  */
 
 import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, model, output, signal, untracked, viewChild } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormValueControl } from '@angular/forms/signals';
-import { catchError, of, switchMap } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { HTTP, ModalDirective, ThemeService } from '@app/framework';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
@@ -36,7 +36,6 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
     private readonly assetService = inject(AssetsService);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly themeService = inject(ThemeService);
-
     private readonly editor = viewChild.required<ElementRef>('editor');
     private readonly assetId = signal<string | null>(null);
     private editorWrapper?: SquidexEditorWrapper;
@@ -95,26 +94,18 @@ export class RichEditorComponent implements FormValueControl<EditorValue> {
     public readonly mode = input.required<SquidexEditorMode>();
 
     protected readonly chatDialog = new DialogModel();
-
     protected readonly assetsDialog = new DialogModel();
-    protected readonly assetToEdit;
-
     protected readonly contentsDialog = new DialogModel();
+
+    protected readonly assetToEdit = rxResource({
+        params: () => this.assetId() ?? undefined,
+        stream: ({ params }) => this.assetService.getAsset(this.appsState.appName, params).pipe(
+            catchError(() => of<AssetDto | null>(null))),
+        defaultValue: null,
+    });
 
     constructor() {
         const destroyRef = inject(DestroyRef);
-
-        this.assetToEdit = toSignal(
-            toObservable(this.assetId).pipe(
-                switchMap(id => {
-                    if (id) {
-                        return this.assetService.getAsset(this.appsState.appName, id);
-                    } else {
-                        return of<AssetDto | null>(null);
-                    }
-                }),
-                catchError(() => of<AssetDto | null>(null))),
-            { initialValue: null });
 
         effect(() => {
             const value = this.value();

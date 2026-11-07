@@ -7,11 +7,9 @@
 
 import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { map, switchMap } from 'rxjs';
-import { ALL_TRIGGERS, ConfirmClickDirective, defined, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { ALL_TRIGGERS, ConfirmClickDirective, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { RuleConfigured } from '../messages';
 import { BranchComponent } from './branch.component';
@@ -35,7 +33,6 @@ type Snapshot = {
     imports: [
         BranchComponent,
         ConfirmClickDirective,
-        FormsModule,
         LayoutComponent,
         LowerCasePipe,
         ModalDirective,
@@ -56,24 +53,19 @@ type Snapshot = {
 })
 export class RulePageComponent {
     private readonly dialogs = inject(DialogService);
+    private readonly messageBus = inject(MessageBus);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly rulesService = inject(RulesService);
     private readonly error = signal<ErrorDto | undefined>(undefined);
 
     protected readonly rulesState = inject(RulesState);
-
     protected readonly availableTriggers = ALL_TRIGGERS;
-
-    protected readonly availableSteps;
-
+    protected readonly availableSteps = toSignal(this.rulesService.getSteps(), { initialValue: {} as { [name: string]: RuleElementDto } });
     protected readonly stepDialog = new DialogModel();
-
     protected readonly stepToUpsert = signal<{ step?: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd } | undefined>(undefined);
-
     protected readonly triggerToEdit = signal<RuleTriggerDto | undefined>(undefined);
-
     protected readonly triggerDialog = new DialogModel();
-
     protected readonly rule = signal<DynamicRuleDto | null | undefined>(undefined);
 
     protected readonly editableRule = signal<Snapshot>({
@@ -82,33 +74,23 @@ export class RulePageComponent {
         isEnabled: true,
     });
 
-    protected readonly scriptCompletions;
+    protected readonly scriptCompletions = rxResource({
+        params: () => this.editableRule().trigger?.triggerType || undefined,
+        stream: ({ params }) => this.rulesService.getCompletions(this.rulesState.appName, params),
+        defaultValue: null,
+    });
 
     protected readonly isManual = computed(() => {
         return this.rule()?.trigger?.triggerType === 'Manual';
     });
 
     constructor() {
-        const rulesState = this.rulesState;
-        const rulesService = inject(RulesService);
-        const schemasState = inject(SchemasState);
-        const messageBus = inject(MessageBus);
-
-        this.availableSteps = toSignal(rulesService.getSteps(), { initialValue: {} as { [name: string]: RuleElementDto } });
-
-        this.scriptCompletions = toSignal(
-            toObservable(this.editableRule).pipe(
-                map(x => x.trigger?.triggerType!),
-                defined(),
-                switchMap(x => rulesService.getCompletions(rulesState.appName, x))),
-            { initialValue: null });
-
         effect(onCleanup => {
             const { trigger, flow } = this.editableRule();
 
             const timer = setTimeout(() => {
                 if (trigger) {
-                    messageBus.emit(new RuleConfigured(trigger, flow.dto));
+                    this.messageBus.emit(new RuleConfigured(trigger, flow.dto));
                 }
             }, 100);
 
@@ -116,10 +98,10 @@ export class RulePageComponent {
         });
 
         effect(() => {
-            this.initFromRule(rulesState.selectedRule());
+            this.initFromRule(this.rulesState.selectedRule());
         });
 
-        schemasState.loadIfNotLoaded();
+        inject(SchemasState).loadIfNotLoaded();
     }
 
     private initFromRule(rule?: DynamicRuleDto | null) {

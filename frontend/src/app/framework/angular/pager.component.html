@@ -5,10 +5,9 @@
                 <select
                     class="form-select form-select-sm"
                     attr.aria-label="{{ 'common.pageSize' | sqxTranslate }}"
-                    [ngModel]="paging.pageSize"
-                    (ngModelChange)="setPageSize($event)">
+                    (change)="setPageSize(+$any($event.target).value)">
                     @for (pageSize of pageSizes; track pageSize) {
-                        <option [ngValue]="pageSize">{{ pageSize }}</option>
+                        <option [selected]="pageSize === paging.pageSize" [value]="pageSize">{{ pageSize }}</option>
                     }
                 </select>
                 <span class="page-info d-flex align-items-center justify-content-end">

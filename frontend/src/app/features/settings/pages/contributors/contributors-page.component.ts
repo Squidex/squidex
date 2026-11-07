@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ContributorsState, LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, RolesState, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ContributorAddFormComponent } from './contributor-add-form.component';
@@ -23,7 +22,6 @@ import { ContributorComponent } from './contributor.component';
     imports: [
         ContributorAddFormComponent,
         ContributorComponent,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
         NotifoComponent,

@@ -7,7 +7,6 @@
 
 
 import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FormRowComponent, FullDateTimePipe, getContentValue, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
@@ -25,7 +24,6 @@ type ViewMode = 'day' | 'week' | 'month';
         ContentStatusComponent,
         CopyDirective,
         FormRowComponent,
-        FormsModule,
         FullDateTimePipe,
         LayoutComponent,
         ModalDialogComponent,
@@ -48,21 +46,16 @@ export class CalendarPageComponent {
     private readonly languagesState = inject(LanguagesState);
     private readonly localizer = inject(LocalizerService);
     private readonly calendarContainer = viewChild.required<ElementRef>('calendarContainer');
-    private readonly language: AppLanguageDto;
+    private readonly language: AppLanguageDto = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
     private calendar: any;
 
     protected readonly view = signal<ViewMode>('month');
-
     protected readonly contentSelected = signal<ContentDto | undefined>(undefined);
     protected readonly contentDialog = new DialogModel();
-
     protected readonly title = signal('');
-
     protected readonly isLoading = signal(false);
 
     constructor() {
-        this.language = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
-
         afterNextRender(() => {
             this.initCalendar();
         });

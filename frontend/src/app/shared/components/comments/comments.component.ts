@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -32,13 +32,12 @@ import { ContributorsDataSource } from './data-source';
     ],
 })
 export class CommentsComponent {
+    private readonly messageBus = inject(MessageBus);
     private readonly input = viewChild<AutocompleteComponent>('input');
     private readonly selection = signal<ReadonlyArray<string>>([]);
 
     protected readonly commentsState = inject(CommentsState);
-
     protected readonly router = inject(Router);
-
     protected readonly contributorsDataSource = inject(ContributorsDataSource);
 
     /** Shows all comments instead of only the unresolved comments. */
@@ -51,9 +50,7 @@ export class CommentsComponent {
     public readonly commentsId = input<string | null>('');
 
     protected readonly commentForm = new UpsertCommentForm();
-
-    protected readonly commentUser: string;
-
+    protected readonly commentUser = inject(AuthService).user!.token;
     protected readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
 
     protected readonly commentItems = computed(() => {
@@ -63,39 +60,23 @@ export class CommentsComponent {
     });
 
     constructor() {
-        const authService = inject(AuthService);
-        const messageBus = inject(MessageBus);
-
-        this.commentUser = authService.user!.token;
-
         this.contributorsDataSource.loadIfNotLoaded();
 
-        effect(onCleanup => {
-            const subscriptions = [
-                messageBus.of(FieldSelected)
-                    .subscribe(message => {
-                        for (const content of this.commentsState.items()) {
-                            if (content.editorId === message.editorId) {
-                                this.selection.set([content.id!]);
-                            }
-                        }
-                    }),
-                messageBus.of(AnnotationsSelectedAfterNavigate)
-                    .subscribe(message => {
-                        this.selection.set(message.commentIds);
-                    }),
-                messageBus.of(AnnotationCreateAfterNavigate)
-                    .subscribe(message => {
-                        this.reference.set(message);
-                        this.input()?.focus();
-                    }),
-            ];
-
-            onCleanup(() => {
-                for (const subscription of subscriptions) {
-                    subscription.unsubscribe();
+        this.messageBus.on(FieldSelected, message => {
+            for (const content of this.commentsState.items()) {
+                if (content.editorId === message.editorId) {
+                    this.selection.set([content.id!]);
                 }
-            });
+            }
+        });
+
+        this.messageBus.on(AnnotationsSelectedAfterNavigate, message => {
+            this.selection.set(message.commentIds);
+        });
+
+        this.messageBus.on(AnnotationCreateAfterNavigate, message => {
+            this.reference.set(message);
+            this.input()?.focus();
         });
     }
 

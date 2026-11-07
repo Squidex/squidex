@@ -107,7 +107,7 @@
                                 } @else {
                                     <div class="row align-items-center g-2">
                                         <div class="col">
-                                            <sqx-asset-path all="true" (navigate)="navigate($event.id)" [path]="assetPath()" />
+                                            <sqx-asset-path all="true" (navigate)="navigate($event.id)" [path]="assetPath.value()" />
                                         </div>
 
                                         @if (isMoveable()) {

@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormRowComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowView } from '@app/shared';
 import { WorkflowDiagramComponent } from './workflow-diagram.component';
 import { WorkflowStepComponent } from './workflow-step.component';
@@ -20,7 +19,6 @@ import { WorkflowStepComponent } from './workflow-step.component';
         ConfirmClickDirective,
         FormErrorComponent,
         FormRowComponent,
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
         WorkflowDiagramComponent,
@@ -29,8 +27,6 @@ import { WorkflowStepComponent } from './workflow-step.component';
 })
 export class WorkflowComponent {
     private readonly workflowsState = inject(WorkflowsState);
-
-    protected readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     /** The workflow to show and edit. */
     public readonly workflow = input.required<WorkflowDto>();
@@ -42,7 +38,6 @@ export class WorkflowComponent {
     public readonly schemasSource = input.required<SchemaTagSource>();
 
     protected readonly error = signal<ErrorDto | null | undefined>(undefined);
-
     protected readonly isEditing = signal(false);
 
     protected readonly isEditable = computed(() => {
@@ -50,7 +45,6 @@ export class WorkflowComponent {
     });
 
     protected readonly workflowView = linkedSignal(() => new WorkflowView(this.workflow()));
-
     protected readonly selectedTab = signal(0);
 
     protected toggleEditing() {

@@ -2,7 +2,7 @@
 <sqx-layout innerWidth="70" layout="main" titleIcon="backup" titleText="i18n:jobs.restoreTitle">
     <ng-container>
         <sqx-list-view innerWidth="70rem">
-            @if (restoreJob | async; as job) {
+            @if (restoreJob(); as job) {
                 <div class="card section">
                     <div class="card-header">
                         <div class="row gx-2 align-items-center">

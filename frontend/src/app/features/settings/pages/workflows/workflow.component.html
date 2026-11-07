@@ -68,11 +68,10 @@
                     <sqx-form-row #nameRow for="name" hint="workflows.workflowNameHint" label="common.name" [prefix]="workflowViewValue.dto.id" vertical>
                         <input
                             class="form-control"
-                            [id]="nameRow.fieldName()"
+                            (change)="rename($any($event.target).value)"
                             [disabled]="!isEditable()"
-                            [ngModel]="workflowViewValue.dto.name"
-                            (ngModelChange)="rename($event)"
-                            [ngModelOptions]="onBlur" />
+                            [id]="nameRow.fieldName()"
+                            [value]="workflowViewValue.dto.name ?? ''" />
                     </sqx-form-row>
 
                     <sqx-form-row #schemaIdsRow for="schemaIds" hint="workflows.schemasHint" label="common.schemas" [prefix]="workflowViewValue.dto.id" vertical>

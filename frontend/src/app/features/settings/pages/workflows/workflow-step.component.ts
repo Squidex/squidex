@@ -7,7 +7,6 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, linkedSignal, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, WorkflowStepValues, WorkflowStepView, WorkflowView } from '@app/shared';
 import { WorkflowTransitionComponent } from './workflow-transition.component';
 
@@ -20,15 +19,12 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
         ColorPickerComponent,
         DropdownComponent,
         EditableTitleComponent,
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
         WorkflowTransitionComponent,
     ],
 })
 export class WorkflowStepComponent {
-    protected readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
-
     /** Emits the updated workflow when the step or one of its transitions is changed. */
     public readonly update = output<WorkflowView>();
 

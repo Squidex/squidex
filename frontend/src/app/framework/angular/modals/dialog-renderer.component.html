@@ -7,7 +7,7 @@
                 <span [sqxMarkdown]="request.text | sqxTranslate"></span>
                 @if (request.canRemember) {
                     <div class="form-check mt-4">
-                        <input class="form-check-input" id="remember" [(ngModel)]="request.remember" type="checkbox" />
+                        <input class="form-check-input" id="remember" [checked]="request.remember" (change)="request.remember = $any($event.target).checked" type="checkbox" />
                         <label class="form-check-label" for="remember"> {{ "common.remember" | sqxTranslate }}</label>
                     </div>
                 }

@@ -26,6 +26,7 @@ import { TourStepDirective } from './tour-step.directive';
 export class ModalDialogComponent {
     private readonly tabsElement = viewChild<ElementRef<ParentNode>>('tabsElement');
     private readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
+    private readonly renderer = inject(Renderer2);
 
     /** Emits when the dialog is closed with the close button or the escape key. */
     public readonly dialogClose = output();
@@ -55,11 +56,9 @@ export class ModalDialogComponent {
     public readonly tourId = input<string>();
 
     constructor() {
-        const renderer = inject(Renderer2);
-
         afterNextRender(() => {
-            hideWhenEmpty(renderer, this.tabsElement());
-            hideWhenEmpty(renderer, this.footerElement());
+            hideWhenEmpty(this.renderer, this.tabsElement());
+            hideWhenEmpty(this.renderer, this.footerElement());
         });
     }
 }

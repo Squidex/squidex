@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { catchError, map, of } from 'rxjs';
 import { AppDto, ContentsService, TranslatePipe, Types } from '@app/shared';
 
 @Component({
@@ -18,21 +20,19 @@ import { AppDto, ContentsService, TranslatePipe, Types } from '@app/shared';
     ],
 })
 export class ContentSummaryCardComponent {
+    private readonly contentsService = inject(ContentsService);
+
     /** The app of the dashboard. */
     public readonly app = input.required<AppDto>();
 
     /** The card configuration, with the name, the schema and the optional query to count the items. */
     public readonly options = input<any>();
 
-    protected readonly itemCount = signal(0);
-
-    constructor() {
-        const contentsService = inject(ContentsService);
-
-        effect(onCleanup => {
+    protected readonly itemCount = rxResource({
+        params: () => {
             const options = this.options();
             if (!Types.isString(options?.schema)) {
-                return;
+                return undefined;
             }
 
             let query = options.query;
@@ -41,20 +41,11 @@ export class ContentSummaryCardComponent {
                 query = {};
             }
 
-            query = { ...query, take: 0 };
-
-            const subscription =
-                contentsService.getContents(this.app().name, options.schema, { query })
-                    .subscribe({
-                        next: ({ total: itemCount }) => {
-                            this.itemCount.set(itemCount);
-                        },
-                        error: () => {
-                            this.itemCount.set(0);
-                        },
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
-    }
+            return { appName: this.app().name, schema: options.schema as string, query: { ...query, take: 0 } };
+        },
+        stream: ({ params: { appName, schema, query } }) => this.contentsService.getContents(appName, schema, { query }).pipe(
+            map(({ total }) => total),
+            catchError(() => of(0))),
+        defaultValue: 0,
+    });
 }

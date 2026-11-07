@@ -25,6 +25,7 @@ import { TranslatePipe } from './pipes/translate.pipe';
 })
 export class MenuItemComponent {
     private readonly localizerService = inject(LocalizerService);
+    private readonly menuItemRegistry = inject(MenuItemRegistry, { optional: true });
 
     /** The text of the button. */
     public readonly label = input('');
@@ -71,13 +72,10 @@ export class MenuItemComponent {
     });
 
     constructor() {
-        const menuItemRegistry = inject(MenuItemRegistry, { optional: true });
-        const destroyRef = inject(DestroyRef);
+        this.menuItemRegistry?.registerItem(this);
 
-        menuItemRegistry?.registerItem(this);
-
-        destroyRef.onDestroy(() => {
-            menuItemRegistry?.unregisterItem(this);
+        inject(DestroyRef).onDestroy(() => {
+            this.menuItemRegistry?.unregisterItem(this);
         });
     }
 }

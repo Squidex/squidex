@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { FileSizePipe, TranslatePipe } from '@app/framework';
@@ -20,7 +19,6 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared/internal'
     imports: [
         BaseChartDirective,
         FileSizePipe,
-        FormsModule,
         TranslatePipe,
     ],
 })

@@ -2,7 +2,7 @@
     <ng-container title>
         @let schemaItems = schemas();
         @if (schemaItems.length > 1) {
-            <select class="form-select" [ngModel]="schema()" (ngModelChange)="selectSchema($event)">
+            <select class="form-select" [formField]="schemaForm">
                 @for (schemaItem of schemaItems; track schemaItem) {
                     <option [ngValue]="schemaItem">
                         {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemaItem.displayName } }}

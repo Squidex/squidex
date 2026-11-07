@@ -38,31 +38,26 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     ],
 })
 export class AuthPageComponent {
+    private readonly apiUrl = inject(ApiUrlConfig);
     private readonly authState = inject(TeamAuthState);
+    private readonly teamsState = inject(TeamsState);
 
-    protected readonly urlToRedirect;
-    protected readonly urlToTest;
+    protected readonly urlToTest = this.apiUrl.buildUrl('/identity-server/test');
+
+    protected readonly urlToRedirect = computed(() => {
+        const team = this.teamsState.selectedTeam();
+        if (!team) {
+            return '';
+        }
+
+        return this.apiUrl.buildUrl(`/identity-server/signin-${team.id}`);
+    });
 
     protected readonly isEditable = signal(false);
     protected readonly isEditing = signal(false);
-
     protected readonly updateForm = new UpdateTeamAuthForm();
 
     constructor() {
-        const apiUrl = inject(ApiUrlConfig);
-        const teamsState = inject(TeamsState);
-
-        this.urlToTest = apiUrl.buildUrl('/identity-server/test');
-
-        this.urlToRedirect = computed(() => {
-            const team = teamsState.selectedTeam();
-            if (!team) {
-                return '';
-            }
-
-            return apiUrl.buildUrl(`/identity-server/signin-${team.id}`);
-        });
-
         effect(() => {
             const scheme = this.authState.scheme();
             const isEditable = this.authState.canUpdate();

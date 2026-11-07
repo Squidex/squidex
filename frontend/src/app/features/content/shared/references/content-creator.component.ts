@@ -7,8 +7,9 @@
 
 import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { tap } from 'rxjs';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, SignalSelectDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ContentSectionComponent } from '../forms/content-section.component';
 
 @Component({
@@ -23,9 +24,11 @@ import { ContentSectionComponent } from '../forms/content-section.component';
     ],
     imports: [
         FormErrorComponent,
+        FormField,
         FormsModule,
         LanguageSelectorComponent,
         ModalDialogComponent,
+        SignalSelectDirective,
         TooltipDirective,
         TranslatePipe,
         forwardRef(() => ContentSectionComponent),
@@ -35,7 +38,6 @@ export class ContentCreatorComponent {
     private readonly contentsState = inject(ComponentContentsState);
     private readonly injector = inject(Injector);
     private readonly schemasState = inject(SchemasState);
-
     private isInitialDataLoaded = false;
 
     /** Emits the created content, or an empty array when the dialog is closed. */
@@ -80,6 +82,7 @@ export class ContentCreatorComponent {
         return schemas.find(x => x.name === this.schemaName()) || schemas[0];
     });
 
+    protected readonly schemaForm = form(this.schema);
     protected readonly contentForm = signal<EditContentForm | undefined>(undefined);
 
     constructor() {
@@ -91,10 +94,6 @@ export class ContentCreatorComponent {
 
             untracked(() => this.createForm(schema));
         });
-    }
-
-    protected selectSchema(schema: SchemaDto) {
-        this.schema.set(schema);
     }
 
     private createForm(schema: SchemaDto) {

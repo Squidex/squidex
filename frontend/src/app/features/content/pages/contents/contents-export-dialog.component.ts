@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, ExportContentsDto, ExportFormat, FormRowComponent, MarkdownDirective, ModalDialogComponent, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
 type FieldPaths = { label: string; paths: ReadonlyArray<string> };
@@ -18,7 +18,7 @@ type FieldPaths = { label: string; paths: ReadonlyArray<string> };
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormRowComponent,
-        FormsModule,
+        FormField,
         MarkdownDirective,
         ModalDialogComponent,
         TranslatePipe,
@@ -51,14 +51,13 @@ export class ContentsExportDialogComponent {
         });
     });
 
-    protected readonly format = signal<ExportFormat>('Csv');
-    protected readonly fields = signal('');
-    protected readonly unpublished = signal(false);
+    protected readonly exportForm = form(signal({ format: 'Csv' as ExportFormat, fields: '', unpublished: false }));
 
     protected addPath(path: string) {
-        const current = this.fields().trim();
+        const fields = this.exportForm.fields().value;
+        const fieldsCurrent = fields().trim();
 
-        this.fields.set(current ? `${current}, ${path}` : path);
+        fields.set(fieldsCurrent ? `${fieldsCurrent}, ${path}` : path);
     }
 
     protected export() {
@@ -67,10 +66,12 @@ export class ContentsExportDialogComponent {
             return;
         }
 
+        const { format, fields, unpublished } = this.exportForm().value();
+
         const request = new ExportContentsDto({
-            format: this.format(),
-            fields: this.fields().trim() || undefined,
-            unpublished: this.unpublished(),
+            format,
+            fields: fields.trim() || undefined,
+            unpublished,
         });
 
         this.schemasState.exportContents(schema, request)

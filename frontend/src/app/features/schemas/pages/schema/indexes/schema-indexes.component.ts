@@ -6,7 +6,8 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap, timer } from 'rxjs';
 import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, TranslatePipe, UIOptions } from '@app/shared';
 import { IndexFormComponent } from './index-form.component';
@@ -30,7 +31,6 @@ import { IndexComponent } from './index.component';
 export class SchemaIndexesComponent {
     protected readonly indexesState = inject(IndexesState);
     protected readonly languagesState = inject(LanguagesState);
-
     protected readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
 
     /** The schema to manage the indexes for. */
@@ -41,14 +41,10 @@ export class SchemaIndexesComponent {
     constructor() {
         this.indexesState.load();
 
-        effect(onCleanup => {
-            const subscription =
-                timer(3000, 3000).pipe(
-                    switchMap(() => this.indexesState.load(false, true)))
-                .subscribe();
-
-            onCleanup(() => subscription.unsubscribe());
-        });
+        timer(3000, 3000).pipe(
+            switchMap(() => this.indexesState.load(false, true)),
+            takeUntilDestroyed())
+            .subscribe();
 
         this.languagesState.load();
     }

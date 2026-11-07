@@ -89,7 +89,7 @@
                                 </div>
                             }
 
-                            @if (otherLanguageSelected() && isEditable()) {
+                            @if (otherLanguageSelected().value() && isEditable()) {
                                 <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()">
                                     <div class="row gx-2">
                                         <div class="col">
@@ -97,7 +97,7 @@
                                                 class="form-select fallback-select"
                                                 id="{{ languageValue.iso2Code }}_fallback"
                                                 name="otherLanguage"
-                                                [(ngModel)]="otherLanguageSelected">
+                                                [formField]="otherLanguageSelected">
                                                 @for (otherLanguage of fallbackLanguagesNewLocal(); track otherLanguage.iso2Code) {
                                                     <option [ngValue]="otherLanguage">
                                                         {{ otherLanguage.englishName || otherLanguage.iso2Code }}

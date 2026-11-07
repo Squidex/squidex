@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { FormValueControl } from '@angular/forms/signals';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, linkedSignal, model, signal, untracked } from '@angular/core';
+import { disabled, form, FormField, FormValueControl } from '@angular/forms/signals';
 import { Types } from '@app/framework/internal';
 import { Language, LanguageSelectorComponent } from '../../language-selector.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -26,7 +25,7 @@ type LocalizedValue = { [key: string]: any };
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DateTimeEditorComponent,
-        FormsModule,
+        FormField,
         IndeterminateValueDirective,
         LanguageSelectorComponent,
         TagEditorComponent,
@@ -75,6 +74,25 @@ export class LocalizedInputComponent implements FormValueControl<LocalizedValue 
 
         return !value.hasOwnProperty(this.language().iso2Code);
     });
+
+    protected readonly booleanForm = form(linkedSignal<boolean | null>(() => this.valueCurrent()), path => {
+        disabled(path, () => this.disabled());
+    });
+
+    constructor() {
+        effect(() => {
+            const value = this.booleanForm().value();
+
+            untracked(() => {
+                // Only emit changes from the checkbox, not values that have been synced from the input.
+                if (value === this.valueCurrent()) {
+                    return;
+                }
+
+                this.setValue(value);
+            });
+        });
+    }
 
     protected setLanguage(language: Language) {
         this.language.set(language);

@@ -8,7 +8,8 @@
 
 import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe } from '@app/shared';
+import { form, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, SignalSelectDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-copy-button',
@@ -18,9 +19,11 @@ import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldFor
     imports: [
         CheckboxGroupComponent,
         DropdownMenuComponent,
+        FormField,
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
+        SignalSelectDirective,
         TooltipDirective,
         TranslatePipe,
     ],
@@ -35,6 +38,8 @@ export class FieldCopyButtonComponent {
     protected readonly copySource = linkedSignal<string | undefined>(() => {
         return this.languages()[0]?.iso2Code;
     });
+
+    protected readonly copySourceForm = form(this.copySource);
 
     protected readonly copyTargets = linkedSignal<ReadonlyArray<string>>(() => {
         this.copySource();

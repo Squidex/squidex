@@ -34,7 +34,7 @@
 
                         <div class="col">
                             <sqx-control-errors [for]="rule.condition" />
-                            <sqx-code-editor [completion]="fieldCompletions()" [formField]="rule.condition" singleLine="true" />
+                            <sqx-code-editor [completion]="fieldCompletions.value()" [formField]="rule.condition" singleLine="true" />
                         </div>
 
                         <div class="col-auto">

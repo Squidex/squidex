@@ -7,7 +7,6 @@
 
 
 import { Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { BooleanFieldEditorValues, BooleanFieldFormModel, BooleanFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent } from '@app/shared';
 
@@ -18,7 +17,6 @@ import { BooleanFieldEditorValues, BooleanFieldFormModel, BooleanFieldProperties
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
     ],
 })
 export class BooleanUIComponent {

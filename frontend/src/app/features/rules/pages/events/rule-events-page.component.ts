@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleElementDto, RuleEventDto, RuleEventsState, RulesService, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleEventComponent } from './rule-event.component';
@@ -34,32 +34,22 @@ export class RuleEventsPageComponent {
     private readonly ruleEventsRoute = inject(Router2State);
 
     protected readonly ruleEventsState = inject(RuleEventsState);
-
-    protected readonly availableSteps;
-
+    protected readonly availableSteps = toSignal(inject(RulesService).getSteps(), { initialValue: {} as Record<string, RuleElementDto> });
     protected readonly selectedEventId = signal<string | null>(null);
 
     constructor() {
-        const route = inject(ActivatedRoute);
-        const rulesService = inject(RulesService);
+        inject(ActivatedRoute).queryParams
+            .pipe(takeUntilDestroyed())
+            .subscribe(() => {
+                const initial =
+                    this.ruleEventsRoute.mapTo(this.ruleEventsState)
+                        .withPaging('rules', 30)
+                        .withString('ruleId')
+                        .withString('query')
+                        .getInitial();
 
-        this.availableSteps = toSignal(rulesService.getSteps(), { initialValue: {} as Record<string, RuleElementDto> });
-
-        effect(onCleanup => {
-            const subscription = route.queryParams
-                .subscribe(() => {
-                    const initial =
-                        this.ruleEventsRoute.mapTo(this.ruleEventsState)
-                            .withPaging('rules', 30)
-                            .withString('ruleId')
-                            .withString('query')
-                            .getInitial();
-
-                    this.ruleEventsState.load(false, initial);
-                });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
+                this.ruleEventsState.load(false, initial);
+            });
     }
 
     protected reload() {

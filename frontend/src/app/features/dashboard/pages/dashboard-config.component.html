@@ -15,8 +15,8 @@
                     <input
                         class="form-check-input"
                         id="field_{{ item.type }}"
-                        [ngModel]="isSelected(item)"
-                        (ngModelChange)="addOrRemove(item)"
+                        [checked]="!!isSelected(item)"
+                        (change)="addOrRemove(item)"
                         type="checkbox" />
                     <label class="form-check-label" for="field_{{ item.type }}"> {{ item.name }} </label>
                 </div>

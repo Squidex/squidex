@@ -24,9 +24,8 @@
                         class="form-control"
                         #input
                         [disabled]="isRunning()"
-                        [ngModel]="chatQuestion()"
-                        (ngModelChange)="setQuestion($event)"
-                        [ngModelOptions]="{ standalone: true }"
+                        [value]="chatQuestion()"
+                        (input)="setQuestion($any($event.target).value)"
                         placeholder="{{ 'chat.prompt' | sqxTranslate }}"
                         sqxFocusOnInit />
                 </div>

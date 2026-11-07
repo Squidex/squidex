@@ -6,10 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { switchMap } from 'rxjs';
 import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, SchemaDto, SchemasService, SchemasState, ScriptNamePipe, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -26,13 +25,19 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, SchemaDto, Schem
     ],
 })
 export class SchemaScriptsFormComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly schemasService = inject(SchemasService);
     private readonly schemasState = inject(SchemasState);
 
     /** The schema to edit the scripts for. */
     public readonly schema = input.required<SchemaDto>();
 
     protected readonly schemaScript = signal('query');
-    protected readonly schemaCompletions;
+
+    protected readonly schemaCompletions = rxResource({
+        params: () => this.schema(),
+        stream: ({ params }) => this.schemasService.getContentScriptsCompletion(this.appsState.appName, params.name),
+    });
 
     protected readonly editForm = new EditSchemaScriptsForm();
 
@@ -41,13 +46,6 @@ export class SchemaScriptsFormComponent {
     });
 
     constructor() {
-        const appsState = inject(AppsState);
-        const schemasService = inject(SchemasService);
-
-        this.schemaCompletions = toSignal(
-            toObservable(this.schema).pipe(
-                switchMap(schema => schemasService.getContentScriptsCompletion(appsState.appName, schema.name))));
-
         effect(() => {
             const schema = this.schema();
 

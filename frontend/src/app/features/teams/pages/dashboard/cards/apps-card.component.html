@@ -2,7 +2,7 @@
     <div class="card-header">{{ "common.apps" | sqxTranslate }}</div>
 
     <div class="card-body">
-        @if (apps(); as apps) {
+        @if (apps.value(); as apps) {
             @for (app of apps; track app) {
                 <div class="row">
                     <div class="col">{{ app.displayName }}</div>

@@ -6,10 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { TranslatePipe } from '@app/framework';
 import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState, SignalSelectDirective } from '@app/shared';
 
@@ -29,15 +28,19 @@ import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, Co
     ],
 })
 export class SchemaFieldRulesFormComponent {
+    private readonly schemasService = inject(SchemasService);
     private readonly schemasState = inject(SchemasState);
 
     /** The schema to configure the field rules for. */
     public readonly schema = input.required<SchemaDto>();
 
     protected readonly editForm = new ConfigureFieldRulesForm();
-
     protected readonly fieldActions = FIELD_RULE_ACTIONS;
-    protected readonly fieldCompletions;
+
+    protected readonly fieldCompletions = rxResource({
+        params: () => this.schema().name,
+        stream: ({ params }) => this.schemasService.getFieldRulesCompletion(this.schemasState.appName, params),
+    });
 
     protected readonly fieldOptions = computed(() => {
         const fieldNames = new Set<string>();
@@ -80,15 +83,6 @@ export class SchemaFieldRulesFormComponent {
     });
 
     constructor() {
-        const schemasService = inject(SchemasService);
-        const schemasState = this.schemasState;
-
-        this.fieldCompletions = toSignal(
-            toObservable(this.schema).pipe(
-                map(schema => schema.name),
-                distinctUntilChanged(),
-                switchMap(name => schemasService.getFieldRulesCompletion(schemasState.appName, name))));
-
         effect(() => {
             const schema = this.schema();
 

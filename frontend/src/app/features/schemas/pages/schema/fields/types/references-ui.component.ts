@@ -7,7 +7,6 @@
 
 
 import { Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldEditorValues, ReferencesFieldFormModel, ReferencesFieldPropertiesDto } from '@app/shared';
 
@@ -18,7 +17,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldEditorValues
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
     ],
 })
 export class ReferencesUIComponent {

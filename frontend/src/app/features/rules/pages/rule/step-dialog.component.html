@@ -14,11 +14,11 @@
             @if (currentStep) {
                 <div class="form-horizontal">
                     <sqx-form-row for="stepName" hint="rules.stepNameHint" label="common.name">
-                        <input class="form-control" id="stepName" maxlength="40" [(ngModel)]="stepName" [ngModelOptions]="{ standalone: true }" />
+                        <input class="form-control" id="stepName" maxlength="40" [formField]="stepName" />
                     </sqx-form-row>
 
                     <sqx-form-row check for="stepIgnore" hint="rules.stepIgnoreErrorHint" label="rules.stepIgnoreError">
-                        <input class="form-check-input" id="stepIgnore" [(ngModel)]="stepIgnoreError" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+                        <input class="form-check-input" id="stepIgnore" [formField]="stepIgnoreError" type="checkbox" />
                     </sqx-form-row>
 
                     <hr />

@@ -1,7 +1,7 @@
 <tr [sqxTabRouterLink]="link()">
     <td class="cell-select inline-edit" sqxStopClick>
         <div class="form-check">
-            <input class="form-check-input" id="{{ content().id }}_selected" [ngModel]="selected()" (ngModelChange)="selectedChange.emit($event)" type="checkbox" />
+            <input class="form-check-input" id="{{ content().id }}_selected" [checked]="selected()" (change)="selectedChange.emit($any($event.target).checked)" type="checkbox" />
             <label class="form-check-label" for="{{ content().id }}_selected"></label>
         </div>
 

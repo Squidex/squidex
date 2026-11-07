@@ -73,12 +73,11 @@
             <sqx-form-row #roleRow for="role" hideError label="common.role" [prefix]="clientValue.id">
                 <select
                     class="form-select"
-                    [id]="roleRow.fieldName()"
+                    (change)="updateRole($any($event.target).value)"
                     [disabled]="!clientValue.canUpdate"
-                    [ngModel]="clientValue.role"
-                    (ngModelChange)="updateRole($event)">
+                    [id]="roleRow.fieldName()">
                     @for (role of clientRoles(); track role.name) {
-                        <option [ngValue]="role.name">{{ role.name }}</option>
+                        <option [selected]="role.name === clientValue.role" [value]="role.name">{{ role.name }}</option>
                     }
                 </select>
             </sqx-form-row>
@@ -86,10 +85,10 @@
             <sqx-form-row #allowAnonymousRow check for="allowAnonymous" hints="clients.allowAnonymousHint" label="clients.allowAnonymous" [prefix]="clientValue.id">
                 <input
                     class="form-check-input"
-                    [id]="allowAnonymousRow.fieldName()"
+                    (change)="updateAllowAnonymous($any($event.target).checked)"
+                    [checked]="clientValue.allowAnonymous"
                     [disabled]="!clientValue.canUpdate"
-                    [ngModel]="clientValue.allowAnonymous"
-                    (ngModelChange)="updateAllowAnonymous($event)"
+                    [id]="allowAnonymousRow.fieldName()"
                     type="checkbox" />
             </sqx-form-row>
 
@@ -98,16 +97,15 @@
                     <div class="col">
                         <input
                             class="form-control"
+                            [formField]="apiCallsLimit"
                             [id]="apiCallsLimitRow.fieldName()"
-                            [disabled]="!clientValue.canUpdate"
                             min="0"
-                            [(ngModel)]="apiCallsLimit"
                             type="number" />
                     </div>
 
                     @if (clientValue.canUpdate) {
                         <div class="col-auto">
-                            <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit(apiCallsLimit())" type="button">
+                            <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit(apiCallsLimit().value())" type="button">
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         </div>

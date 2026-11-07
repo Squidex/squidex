@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, Directive, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import { afterNextRender, Directive, DestroyRef, ElementRef, inject, input, Renderer2 } from '@angular/core';
 import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
@@ -20,11 +20,9 @@ export class SyncWidthDirective implements ResizeListener {
     public readonly target = input<HTMLElement | null | undefined>(undefined, { alias: 'sqxSyncWidth' });
 
     constructor() {
-        effect(onCleanup => {
-            const unlisten = this.resizeService.listen(this.element.nativeElement, this);
+        const unlisten = this.resizeService.listen(this.element.nativeElement, this);
 
-            onCleanup(unlisten);
-        });
+        inject(DestroyRef).onDestroy(unlisten);
 
         afterNextRender(() => {
             this.resize(this.element.nativeElement.clientWidth);

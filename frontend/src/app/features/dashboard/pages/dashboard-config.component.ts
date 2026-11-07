@@ -6,11 +6,8 @@
  */
 
 
-import { booleanAttribute, Component, computed, inject, input, output, signal } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { GridsterItemConfig } from 'angular-gridster2';
-import { switchMap } from 'rxjs/operators';
 import { AppDto, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, Types, UIState } from '@app/shared';
 
 @Component({
@@ -21,7 +18,6 @@ import { AppDto, CodeEditorComponent, ConfirmClickDirective, DialogModel, Dialog
         CodeEditorComponent,
         ConfirmClickDirective,
         DropdownMenuComponent,
-        FormsModule,
         ModalDialogComponent,
         ModalDirective,
         ModalPlacementDirective,
@@ -62,16 +58,19 @@ export class DashboardConfigComponent {
 
     protected readonly expertDialog = new DialogModel();
     protected readonly expertConfig = signal<GridsterItemConfig[] | undefined>(undefined);
-
     protected readonly dropdownModal = new ModalModel();
 
     constructor() {
-        toObservable(this.app).pipe(
-            switchMap(() => this.uiState.waitForAppShared('dashboard.grid', this.configDefaults())),
-            takeUntilDestroyed())
-            .subscribe(dto => {
-                this.setConfig(dto);
-            });
+        effect(onCleanup => {
+            this.app();
+
+            const subscription = untracked(() => this.uiState.waitForAppShared('dashboard.grid', this.configDefaults()))
+                .subscribe(dto => {
+                    this.setConfig(dto);
+                });
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     private setConfig(config: any) {

@@ -6,7 +6,7 @@
  */
 
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, model, output, signal, untracked, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, model, output, signal, untracked, viewChild } from '@angular/core';
 import { FormValueControl } from '@angular/forms/signals';
 import { getTagValues, Keys, ModalModel, StringConverter, TagConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
@@ -64,6 +64,7 @@ export class TagEditorComponent implements FormValueControl<any> {
     private readonly formElement = viewChild.required<ElementRef<HTMLElement>>('form');
     private readonly inputElement = viewChild<ElementRef<HTMLInputElement>>('input');
     private readonly textMeasurer = new TextMeasurer(() => this.inputElement());
+    private readonly injector = inject(Injector);
     private lastValue: any;
     private latestInput?: string;
 
@@ -145,7 +146,6 @@ export class TagEditorComponent implements FormValueControl<any> {
     protected readonly suggestedItems = signal<ReadonlyArray<TagValue>>([]);
     protected readonly suggestedIndex = signal(0);
     protected readonly tags = signal<ReadonlyArray<TagValue>>([]);
-
     protected readonly addText = signal('');
 
     constructor() {
@@ -255,11 +255,11 @@ export class TagEditorComponent implements FormValueControl<any> {
         input.style.width = `${width + 5}px`;
 
         if (this.styleScrollable()) {
-            setTimeout(() => {
+            afterNextRender(() => {
                 const form = this.formElement().nativeElement;
 
                 form.scrollLeft = form.scrollWidth;
-            }, 0);
+            }, { injector: this.injector });
         }
     }
 

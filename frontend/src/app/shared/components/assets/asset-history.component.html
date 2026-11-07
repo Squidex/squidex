@@ -1,5 +1,5 @@
 <div class="events">
-    @for (assetEvent of assetEvents(); track assetEvent.event.eventId) {
+    @for (assetEvent of assetEvents.value(); track assetEvent.event.eventId) {
         <div class="event row g-0">
             <div class="col-auto">
                 <img class="user-picture" [src]="assetEvent.event.actor | sqxUserPictureRef" title="{{ assetEvent.event.actor | sqxUserNameRef }}" />

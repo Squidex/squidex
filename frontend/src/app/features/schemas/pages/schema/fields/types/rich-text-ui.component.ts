@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, RichTextFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -19,7 +18,6 @@ import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponen
         AssetFolderDropdownComponent,
         FormField,
         FormRowComponent,
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],

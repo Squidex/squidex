@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { ComponentFieldFormModel, FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -18,7 +17,6 @@ import { ComponentFieldFormModel, FieldDto, FieldFormModel, FormRowComponent, Re
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],

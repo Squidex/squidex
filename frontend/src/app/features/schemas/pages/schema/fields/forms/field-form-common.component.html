@@ -1,6 +1,6 @@
 <div>
     <sqx-form-row #nameRow for="name" hint="schemas.field.nameHint" label="common.name" [prefix]="field().fieldId">
-        <input class="form-control" [id]="nameRow.fieldName()" [ngModel]="field().name" [ngModelOptions]="{ standalone: true }" readonly />
+        <input class="form-control" [id]="nameRow.fieldName()" readonly [value]="field().name" />
     </sqx-form-row>
 
     <sqx-form-row #labelRow [for]="fieldForm().label" hint="schemas.field.labelHint" label="common.label" [prefix]="field().fieldId">

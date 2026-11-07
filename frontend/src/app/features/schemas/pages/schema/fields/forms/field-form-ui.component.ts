@@ -7,7 +7,6 @@
 
 
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayUIComponent } from '../types/array-ui.component';
@@ -39,7 +38,6 @@ import { UserInfoUIComponent } from '../types/user-info-ui.component';
         DateTimeUIComponent,
         FormField,
         FormRowComponent,
-        FormsModule,
         GeolocationUIComponent,
         JsonUIComponent,
         NumberUIComponent,

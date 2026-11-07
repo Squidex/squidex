@@ -20,7 +20,7 @@
             <div class="row">
                 <label class="col-auto col-form-label" for="languageSource">{{ "common.from" | sqxTranslate }}</label>
                 <div class="col">
-                    <select class="form-select" id="languagesSource" [(ngModel)]="copySource">
+                    <select class="form-select" id="languagesSource" [formField]="copySourceForm">
                         @for (language of languages(); track language) {
                             <option [ngValue]="language.iso2Code">{{ language.iso2Code }}</option>
                         }

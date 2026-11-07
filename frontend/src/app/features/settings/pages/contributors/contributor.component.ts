@@ -9,7 +9,6 @@
 
 
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 
 @Component({
@@ -19,7 +18,6 @@ import { AssignContributorDto, ConfirmClickDirective, ContributorDto, Contributo
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
-        FormsModule,
         HighlightPipe,
         TooltipDirective,
         TranslatePipe,

@@ -6,7 +6,9 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, linkedSignal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
 import { CodeEditorComponent } from '@app/framework';
 
 @Component({
@@ -19,6 +21,15 @@ import { CodeEditorComponent } from '@app/framework';
     ],
 })
 export class AssetTextEditorComponent {
+    private readonly httpClient = inject(HttpClient);
+
+    private readonly textLoaded = rxResource({
+        params: () => ({ fileSource: this.fileSource() }),
+        stream: ({ params }) => this.httpClient.get(params.fileSource, { responseType: 'text' }).pipe(
+            catchError(() => of(''))),
+        defaultValue: '',
+    });
+
     /** The URL to load the text from. */
     public readonly fileSource = input('');
 
@@ -28,21 +39,7 @@ export class AssetTextEditorComponent {
     /** The mime type of the file that is created from the text. */
     public readonly mimeType = input('');
 
-    protected readonly text = signal('');
-
-    constructor() {
-        const httpClient = inject(HttpClient);
-
-        effect(onCleanup => {
-            const subscription =
-                httpClient.get(this.fileSource(), { responseType: 'text' })
-                    .subscribe(text => {
-                        this.text.set(text);
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
-    }
+    protected readonly text = linkedSignal(() => this.textLoaded.value());
 
     public toFile(): Promise<File | null> {
         return new Promise<File | null>(resolve => {

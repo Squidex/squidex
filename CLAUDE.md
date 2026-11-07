@@ -35,7 +35,10 @@ npm run lint
 - Document component inputs and outputs with a short `/** ... */` comment. Do not add any other comments to components.
 - Use `inject()` in components instead of constructor parameters.
 - Order class members: `private readonly` fields first, then other `private` fields, then everything else.
+- Do not put blank lines between single-line `private readonly` and `private` fields, neither inside a group nor between the two groups. Fields that span multiple lines are separated by blank lines.
 - Pass submit actions to `submit()`/`submitAndUpdate()` as block-body arrows with an explicit `return`.
+- In signal form schemas, sort the rule calls by validator name, then by the field order of the model.
+- Component constructors only contain effects. Initialize everything else (signals, computeds, resources, forms) directly in the field declaration, so fields stay type safe.
 
 ## Backend
 

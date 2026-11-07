@@ -25,8 +25,8 @@
             <div>
                 <input
                     class="form-control"
-                    [ngModel]="contentId()"
-                    (ngModelChange)="contentIdChange.emit($event)"
+                    [value]="contentId()"
+                    (input)="contentIdChange.emit($any($event.target).value)"
                     placeholder="{{ 'contents.idPlaceholder' | sqxTranslate }}" />
             </div>
         }

@@ -61,10 +61,8 @@ export class ContentExtensionComponent {
     });
 
     constructor() {
-        const themeService = this.themeService;
-
         effect(() => {
-            this.sendMessage('themeChanged', { theme: themeService.theme() });
+            this.sendMessage('themeChanged', { theme: this.themeService.theme() });
         });
 
         effect(() => {

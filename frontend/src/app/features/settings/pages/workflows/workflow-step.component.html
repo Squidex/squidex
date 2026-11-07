@@ -91,9 +91,9 @@
                     <input
                         class="form-check-input step-prevent-updates-checkbox"
                         id="preventUpdates_{{ stepValue.name }}"
+                        (change)="changeNoUpdate($any($event.target).checked)"
+                        [checked]="stepValue.values.noUpdate"
                         [disabled]="disabled()"
-                        [ngModel]="stepValue.values.noUpdate"
-                        (ngModelChange)="changeNoUpdate($event)"
                         type="checkbox" />
                     <label class="form-check-label" for="preventUpdates_{{ stepValue.name }}">
                         {{ "workflows.preventUpdates" | sqxTranslate }}
@@ -110,12 +110,11 @@
                     <input
                         class="form-control"
                         [class.dashed]="!stepValue.values.noUpdateExpression"
+                        (change)="changeNoUpdateExpression($any($event.target).value)"
                         [disabled]="disabled()"
-                        [ngModel]="stepValue.values.noUpdateExpression"
-                        (ngModelChange)="changeNoUpdateExpression($event)"
-                        [ngModelOptions]="onBlur"
                         placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
-                        spellcheck="false" />
+                        spellcheck="false"
+                        [value]="stepValue.values.noUpdateExpression ?? ''" />
                 </div>
 
                 <div class="col-auto col-label">
@@ -146,9 +145,9 @@
                     <input
                         class="form-check-input step-validate-checkbox"
                         id="validate_{{ stepValue.name }}"
+                        (change)="changeValidate($any($event.target).checked)"
+                        [checked]="stepValue.values.validate"
                         [disabled]="disabled()"
-                        [ngModel]="stepValue.values.validate"
-                        (ngModelChange)="changeValidate($event)"
                         type="checkbox" />
                     <label class="form-check-label" for="validate_{{ stepValue.name }}"> {{ "workflows.validate" | sqxTranslate }}</label>
                 </div>

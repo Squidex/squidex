@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, DestroyRef, inject, Pipe, PipeTransform } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { inject, Pipe, PipeTransform, Signal } from '@angular/core';
 import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@app/shared/internal';
 
 @Pipe({
@@ -14,37 +13,20 @@ import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@ap
     pure: false,
 })
 export class HistoryMessagePipe implements PipeTransform {
-    private readonly changeDetector = inject(ChangeDetectorRef);
     private readonly users = inject(UsersProviderService);
-    private subscription?: Subscription;
     private lastMessage?: string;
-    private lastValue: string | null = null;
-
-    constructor() {
-        inject(DestroyRef).onDestroy(() => {
-            this.subscription?.unsubscribe();
-        });
-    }
+    private lastValue?: Signal<string | null>;
 
     public transform(event: HistoryEventDto): string | null {
         if (!event) {
-            return this.lastValue;
+            return this.lastValue?.() ?? null;
         }
 
-        if (this.lastMessage !== event.message) {
+        if (this.lastMessage !== event.message || !this.lastValue) {
             this.lastMessage = event.message;
-
-            if (this.subscription) {
-                this.subscription.unsubscribe();
-            }
-
-            this.subscription = formatHistoryMessage(event.message, this.users).subscribe(value => {
-                this.lastValue = value;
-
-                this.changeDetector.markForCheck();
-            });
+            this.lastValue = formatHistoryMessage(event.message, this.users);
         }
 
-        return this.lastValue;
+        return this.lastValue();
     }
 }

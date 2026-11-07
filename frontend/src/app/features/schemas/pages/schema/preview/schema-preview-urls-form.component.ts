@@ -6,10 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, SchemaDto, SchemasService, SchemasState, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -28,6 +27,7 @@ import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, C
     ],
 })
 export class SchemaPreviewUrlsFormComponent {
+    private readonly schemasService = inject(SchemasService);
     private readonly schemasState = inject(SchemasState);
 
     /** The schema to configure the preview URLs for. */
@@ -35,22 +35,16 @@ export class SchemaPreviewUrlsFormComponent {
 
     protected readonly editForm = new ConfigurePreviewUrlsForm();
 
-    protected readonly fieldCompletions;
+    protected readonly fieldCompletions = rxResource({
+        params: () => this.schema().name,
+        stream: ({ params }) => this.schemasService.getFieldRulesCompletion(this.schemasState.appName, params),
+    });
 
     protected readonly isEditable = computed(() => {
         return this.schema().canUpdateUrls;
     });
 
     constructor() {
-        const schemasService = inject(SchemasService);
-        const schemasState = this.schemasState;
-
-        this.fieldCompletions = toSignal(
-            toObservable(this.schema).pipe(
-                map(schema => schema.name),
-                distinctUntilChanged(),
-                switchMap(name => schemasService.getFieldRulesCompletion(schemasState.appName, name))));
-
         effect(() => {
             const schema = this.schema();
 

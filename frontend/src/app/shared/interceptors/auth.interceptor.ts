@@ -10,7 +10,7 @@ import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angul
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { EMPTY, from, Observable, throwError } from 'rxjs';
-import { catchError, switchMap, take } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { ApiUrlConfig, ErrorDto } from '@app/framework';
 import { AuthService, Profile } from '../services/auth.service';
 
@@ -58,8 +58,7 @@ export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn) 
     };
 
     if (req.url.indexOf(baseUrl) === 0 && !req.headers.has('NoAuth')) {
-        return authService.userChanges.pipe(
-            take(1),
+        return authService.userLoaded.pipe(
             switchMap(user => {
                 return makeRequest(user, true);
             }));

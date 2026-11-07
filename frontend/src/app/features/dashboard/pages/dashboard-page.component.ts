@@ -6,9 +6,10 @@
  */
 
 import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
-import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, defined, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, switchSafe, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
+import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, SupportCardComponent, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
 import { ApiCardComponent } from './cards/api-card.component';
 import { ContentSummaryCardComponent } from './cards/content-summary-card.component';
 import { GithubCardComponent } from './cards/github-card.component';
@@ -51,49 +52,43 @@ export class DashboardPageComponent {
     private readonly appsState = inject(AppsState);
     private readonly authState = inject(AuthService);
     private readonly localStore = inject(LocalStoreService);
-
+    private readonly renderer = inject(Renderer2);
+    private readonly usagesService = inject(UsagesService);
+    private readonly zone = inject(NgZone);
+    private readonly usageDateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
+    private readonly usageDateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
     private readonly grid = viewChild<Gridster>('grid');
 
-    protected readonly selectedApp;
-
+    protected readonly selectedApp = this.appsState.selectedApp;
     protected readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
     protected readonly isScrolled = signal(false);
 
-    protected readonly storageCurrent;
-    protected readonly storageUsage;
+    protected readonly storageCurrent = rxResource({
+        params: () => this.selectedApp()?.name,
+        stream: ({ params: appName }) => this.usagesService.getTodayStorage(appName).pipe(
+            catchError(() => of(undefined))),
+    });
 
-    protected readonly callsUsage;
+    protected readonly storageUsage = rxResource({
+        params: () => this.selectedApp()?.name,
+        stream: ({ params: appName }) => this.usagesService.getStorageUsages(appName, this.usageDateFrom, this.usageDateTo).pipe(
+            catchError(() => of(undefined))),
+    });
+
+    protected readonly callsUsage = rxResource({
+        params: () => this.selectedApp()?.name,
+        stream: ({ params: appName }) => this.usagesService.getCallsUsages(appName, this.usageDateFrom, this.usageDateTo).pipe(
+            catchError(() => of(undefined))),
+    });
 
     protected readonly gridConfig = signal<GridsterItemConfig[] | undefined>(undefined);
     protected readonly gridConfigAvailable = [...DEFAULT_CELLS, ...ADDITIONAL_CELLS];
     protected readonly gridConfigDefaults = DEFAULT_CELLS;
     protected readonly gridOptions = DEFAULT_OPTIONS;
-
     protected readonly extendedHeight = signal('');
-
     protected readonly user = this.authState.user?.displayName;
 
     constructor() {
-        const renderer = inject(Renderer2);
-        const usagesService = inject(UsagesService);
-        const zone = inject(NgZone);
-
-        const dateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
-        const dateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
-
-        this.selectedApp = this.appsState.selectedApp;
-
-        const selectedApp = toObservable(this.appsState.selectedApp).pipe(defined());
-
-        this.storageCurrent = toSignal(
-            selectedApp.pipe(switchSafe(app => usagesService.getTodayStorage(app.name))));
-
-        this.storageUsage = toSignal(
-            selectedApp.pipe(switchSafe(app => usagesService.getStorageUsages(app.name, dateFrom, dateTo))));
-
-        this.callsUsage = toSignal(
-            selectedApp.pipe(switchSafe(app => usagesService.getCallsUsages(app.name, dateFrom, dateTo))));
-
         effect(onCleanup => {
             const grid = this.grid();
             if (!grid) {
@@ -102,12 +97,12 @@ export class DashboardPageComponent {
 
             const gridElement = grid.el;
 
-            const unlisten = zone.runOutsideAngular(() => {
-                return renderer.listen(gridElement, 'scroll', () => {
+            const unlisten = this.zone.runOutsideAngular(() => {
+                return this.renderer.listen(gridElement, 'scroll', () => {
                     const isScrolled = gridElement.scrollTop > 0;
 
                     if (isScrolled !== this.isScrolled()) {
-                        zone.run(() => {
+                        this.zone.run(() => {
                             this.isScrolled.set(isScrolled);
                         });
                     }

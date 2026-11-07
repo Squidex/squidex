@@ -15,6 +15,9 @@ import { TitleService, Types } from '@app/framework/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TitleComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly titleService = inject(TitleService);
     private previousIndex: undefined | number;
 
     /** The route of the title in the breadcrumb, relative to the current route. */
@@ -24,22 +27,17 @@ export class TitleComponent {
     public readonly message = input.required<string>();
 
     constructor() {
-        const route = inject(ActivatedRoute);
-        const router = inject(Router);
-        const titleService = inject(TitleService);
-        const destroyRef = inject(DestroyRef);
-
         effect(() => {
             const message = this.message();
-            const routeTree = router.createUrlTree(this.url(), { relativeTo: route });
-            const routeUrl = router.serializeUrl(routeTree);
+            const routeTree = this.router.createUrlTree(this.url(), { relativeTo: this.route });
+            const routeUrl = this.router.serializeUrl(routeTree);
 
-            this.previousIndex = titleService.push(message, this.previousIndex, routeUrl);
+            this.previousIndex = this.titleService.push(message, this.previousIndex, routeUrl);
         });
 
-        destroyRef.onDestroy(() => {
+        inject(DestroyRef).onDestroy(() => {
             if (Types.isNumber(this.previousIndex)) {
-                titleService.pop();
+                this.titleService.pop();
             }
         });
     }

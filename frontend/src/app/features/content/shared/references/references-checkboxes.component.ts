@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormValueControl } from '@angular/forms/signals';
+import { catchError, map, of } from 'rxjs';
 import { AppLanguageDto, AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LocalizerService, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
@@ -24,14 +26,20 @@ export class ReferencesCheckboxesComponent implements FormValueControl<ReadonlyA
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
     private readonly itemCount: number = inject(UIOptions).value.referencesDropdownItemCount;
-    private readonly contentItems = signal<ReadonlyArray<ContentDto> | null>(null);
+    private readonly contentItems = rxResource({
+        params: () => this.schemaId() || undefined,
+        stream: ({ params: schemaId }) => this.contentsService.getContents(this.appsState.appName, schemaId, { take: this.itemCount }).pipe(
+            map(contents => contents.items as ReadonlyArray<ContentDto> | null),
+            catchError(() => of(null))),
+        defaultValue: null,
+    });
 
     private readonly isValid = computed(() => {
         return !!this.schemaId() && !!this.language();
     });
 
     private readonly isSuccess = computed(() => {
-        const contentItems = this.contentItems();
+        const contentItems = this.contentItems.value();
 
         return this.isValid() && !!contentItems && contentItems.length > 0;
     });
@@ -56,36 +64,13 @@ export class ReferencesCheckboxesComponent implements FormValueControl<ReadonlyA
     });
 
     protected readonly converter = computed(() => {
-        const contentItems = this.contentItems();
+        const contentItems = this.contentItems.value();
         if (!this.isSuccess() || !contentItems) {
             return new ReferencesTagsConverter(null!, [], this.localizer);
         }
 
         return new ReferencesTagsConverter(this.language(), contentItems, this.localizer);
     });
-
-    constructor() {
-        effect(onCleanup => {
-            const schemaId = this.schemaId();
-            if (!schemaId) {
-                this.contentItems.set(null);
-                return;
-            }
-
-            const subscription =
-                this.contentsService.getContents(this.appsState.appName, schemaId, { take: this.itemCount })
-                    .subscribe({
-                        next: contents => {
-                            this.contentItems.set(contents.items);
-                        },
-                        error: () => {
-                            this.contentItems.set(null);
-                        },
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
-    }
 
     protected updateValue(value: ReadonlyArray<string> | null | undefined) {
         this.touched.set(true);

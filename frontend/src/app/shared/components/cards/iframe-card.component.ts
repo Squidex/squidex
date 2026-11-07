@@ -50,8 +50,6 @@ export class IFrameCardComponent {
     public readonly app = input<AppDto | null>();
 
     constructor() {
-        const themeService = this.themeService;
-
         effect(() => {
             const iframe = this.iframe();
             if (iframe) {
@@ -60,7 +58,7 @@ export class IFrameCardComponent {
         });
 
         effect(() => {
-            this.sendMessage('themeChanged', { theme: themeService.theme() });
+            this.sendMessage('themeChanged', { theme: this.themeService.theme() });
         });
     }
 

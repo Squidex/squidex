@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ToolbarService, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../../shared/references/reference-item.component';
 
@@ -28,7 +28,6 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
 })
 export class ContentReferencesComponent {
     private readonly contentsRoute = inject(Router2State);
-    private readonly changeDetector = inject(ChangeDetectorRef);
     private readonly toolbar = inject(ToolbarService);
 
     protected readonly contentsState = inject(ComponentContentsState);
@@ -48,14 +47,10 @@ export class ContentReferencesComponent {
     constructor() {
         this.toolbar.addButton(this, 'i18n:contents.validate', () => {
             this.validate();
-
-            this.changeDetector.detectChanges();
         });
 
         this.toolbar.addButton(this, 'i18n:contents.publishAll', () => {
             this.publishAll();
-
-            this.changeDetector.detectChanges();
         });
 
         inject(DestroyRef).onDestroy(() => {

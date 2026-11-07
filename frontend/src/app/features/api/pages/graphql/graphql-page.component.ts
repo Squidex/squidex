@@ -5,25 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL } from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, FormRowComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, ThemeService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { map, of } from 'rxjs';
+import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, FormRowComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, SignalSelectDirective, ThemeService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html',
     imports: [
+        FormField,
         FormHintComponent,
         FormsModule,
         FormRowComponent,
         LayoutComponent,
         ModalDialogComponent,
         ModalDirective,
+        SignalSelectDirective,
         TitleComponent,
         TooltipDirective,
         TourStepDirective,
@@ -38,30 +43,44 @@ export class GraphQLPageComponent {
     private readonly messageBus = inject(MessageBus);
     private readonly themeService = inject(ThemeService);
     private readonly graphiQLContainer = viewChild.required<ElementRef<HTMLDivElement>>('graphiQLContainer');
-
     private reactRoot?: ReactDOM.Root | null;
     private fetcher?: ReturnType<typeof createGraphiQLFetcher>;
 
     protected readonly clientsState = inject(ClientsState);
-
-    protected readonly clientsReadable: boolean;
-
+    protected readonly clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
     protected readonly clientsDialog = new DialogModel();
-
     protected readonly clientSelected = signal<ClientDto | null>(null);
+    protected readonly clientForm = form(this.clientSelected);
+
+    protected readonly accessToken = rxResource({
+        params: () => ({ client: this.clientSelected() }),
+        stream: ({ params: { client } }) => {
+            if (!client) {
+                return of(this.authService.user?.accessToken!);
+            }
+
+            return this.clientsService.createToken(this.appsState.appName, client).pipe(map(token => token.accessToken));
+        },
+    });
 
     constructor() {
-        const destroyRef = inject(DestroyRef);
-
-        this.clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
-
         if (this.clientsReadable) {
             this.clientsState.load();
         }
 
         afterNextRender(() => {
             this.reactRoot = ReactDOM.createRoot(this.graphiQLContainer().nativeElement);
-            this.selectClient(null);
+            this.render();
+        });
+
+        effect(() => {
+            if (!this.accessToken.hasValue()) {
+                return;
+            }
+
+            const accessToken = this.accessToken.value();
+
+            untracked(() => this.initOrUpdateGraphQL(accessToken));
         });
 
         effect(() => {
@@ -69,25 +88,10 @@ export class GraphQLPageComponent {
             this.render();
         });
 
-        destroyRef.onDestroy(() => {
+        inject(DestroyRef).onDestroy(() => {
             this.reactRoot?.unmount();
             this.reactRoot = null;
         });
-    }
-
-    protected selectClient(client: ClientDto | null) {
-        this.clientSelected.set(client);
-
-        if (!client) {
-            this.initOrUpdateGraphQL(this.authService.user?.accessToken!);
-        } else {
-            this.clientsService.createToken(this.appsState.appName, client)
-                .subscribe(token => {
-                    if (this.clientSelected() === client) {
-                        this.initOrUpdateGraphQL(token.accessToken);
-                    }
-                });
-        }
     }
 
     private initOrUpdateGraphQL(accessToken: string) {

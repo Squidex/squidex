@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FormAlertComponent, LayoutComponent, ListViewComponent, ScriptLogsState, ShortcutDirective, TitleComponent, TranslatePipe } from '@app/shared';
 import { ScriptLogComponent } from './script-log.component';
 
@@ -17,7 +16,6 @@ import { ScriptLogComponent } from './script-log.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormAlertComponent,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
         ScriptLogComponent,

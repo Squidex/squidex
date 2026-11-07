@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { DialogService, LoadingService, Notification, UIOptions } from '@app/shared';
 import { AssetUploaderComponent } from '@app/shared/components/assets/asset-uploader.component';
@@ -37,27 +38,22 @@ export class InternalAreaComponent {
     private readonly route = inject(ActivatedRoute);
 
     protected readonly loadingService = inject(LoadingService);
-
     protected readonly isEmbedded = inject(UIOptions).value.embedded;
 
     constructor() {
-        effect(onCleanup => {
-            const subscription =
-                this.route.queryParams.subscribe(params => {
-                    const successMessage = params['successMessage'];
+        this.route.queryParams.pipe(takeUntilDestroyed())
+            .subscribe(params => {
+                const successMessage = params['successMessage'];
 
-                    if (successMessage) {
-                        this.dialogs.notify(Notification.info(successMessage));
-                    }
+                if (successMessage) {
+                    this.dialogs.notify(Notification.info(successMessage));
+                }
 
-                    const errorMessage = params['errorMessage'];
+                const errorMessage = params['errorMessage'];
 
-                    if (errorMessage) {
-                        this.dialogs.notify(Notification.error(errorMessage));
-                    }
-                });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
+                if (errorMessage) {
+                    this.dialogs.notify(Notification.error(errorMessage));
+                }
+            });
     }
 }

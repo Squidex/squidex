@@ -7,7 +7,6 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, TagEditorComponent, TagsFieldFormModel, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
@@ -19,7 +18,6 @@ import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedIn
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
         LocalizedInputComponent,
         TagEditorComponent,
         TranslatePipe,

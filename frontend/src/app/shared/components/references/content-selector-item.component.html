@@ -1,6 +1,6 @@
 <tr (click)="toggle()">
     <td class="cell-select" sqxStopClick>
-        <input class="form-check" [disabled]="!selectable()" [ngModel]="selected() || !selectable()" (ngModelChange)="select($event)" type="checkbox" />
+        <input class="form-check" [disabled]="!selectable()" [checked]="selected() || !selectable()" (change)="select($any($event.target).checked)" type="checkbox" />
     </td>
 
     <td [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>

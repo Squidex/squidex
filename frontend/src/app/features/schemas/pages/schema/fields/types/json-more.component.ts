@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { CodeEditorComponent, FieldDto, FieldFormModel, FormRowComponent, JsonFieldFormModel, JsonFieldPropertiesDto } from '@app/shared';
 
@@ -19,7 +18,6 @@ import { CodeEditorComponent, FieldDto, FieldFormModel, FormRowComponent, JsonFi
         CodeEditorComponent,
         FormField,
         FormRowComponent,
-        FormsModule,
     ],
 })
 export class JsonMoreComponent {

@@ -3,12 +3,12 @@
 <sqx-layout hideSidebar="true" layout="main" titleText="i18n:contents.calendar">
     <ng-container menu>
         {{ title() }}
-        <select class="form-select ms-4" [disabled]="isLoading()" [ngModel]="view()" (ngModelChange)="changeView($event)">
-            <option ngValue="day">{{ "common.daily" | sqxTranslate }}</option>
+        <select class="form-select ms-4" [disabled]="isLoading()" [value]="view()" (change)="changeView($any($event.target).value)">
+            <option value="day">{{ "common.daily" | sqxTranslate }}</option>
 
-            <option ngValue="week">{{ "common.weekly" | sqxTranslate }}</option>
+            <option value="week">{{ "common.weekly" | sqxTranslate }}</option>
 
-            <option ngValue="month">{{ "common.monthly" | sqxTranslate }}</option>
+            <option value="month">{{ "common.monthly" | sqxTranslate }}</option>
         </select>
         <button
             class="btn btn-text-secondary btn-navigate ms-2"

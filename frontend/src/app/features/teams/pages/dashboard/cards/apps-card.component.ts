@@ -7,9 +7,8 @@
 
 
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
 import { AppsService, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -24,16 +23,13 @@ import { AppsService, StopClickDirective, TeamDto, TranslatePipe } from '@app/sh
     ],
 })
 export class AppsCardComponent {
+    private readonly appsService = inject(AppsService);
+
     /** The team to show the apps for. */
     public readonly team = input.required<TeamDto>();
 
-    protected readonly apps;
-
-    constructor() {
-        const appsService = inject(AppsService);
-
-        this.apps = toSignal(
-            toObservable(this.team).pipe(
-                switchMap(team => appsService.getTeamApps(team.id))));
-    }
+    protected readonly apps = rxResource({
+        params: () => ({ team: this.team() }),
+        stream: ({ params }) => this.appsService.getTeamApps(params.team.id),
+    });
 }

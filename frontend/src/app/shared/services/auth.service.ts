@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
-import { Observable, ReplaySubject } from 'rxjs';
+import { defer, from, map, Observable, of } from 'rxjs';
 import { ApiUrlConfig } from '@app/framework';
 
 export class Profile {
@@ -79,17 +79,24 @@ export class Profile {
 })
 export class AuthService {
     private readonly userManager!: UserManager;
-    private readonly user$ = new ReplaySubject<Profile | null>(1);
-    private readonly currentUser = signal<Profile | null>(null);
+    private readonly currentUser = signal<Profile | null | undefined>(undefined);
+    private readonly currentUserLoaded: Promise<unknown> = Promise.resolve();
 
-    public readonly userValue = this.currentUser.asReadonly();
+    public readonly userValue = computed(() => this.currentUser() ?? null);
 
     public get user(): Profile | null {
-        return this.currentUser();
+        return this.userValue();
     }
 
-    public get userChanges(): Observable<Profile | null> {
-        return this.user$;
+    public get userLoaded(): Observable<Profile | null> {
+        return defer(() => {
+            if (this.currentUser() !== undefined) {
+                return of(this.userValue());
+            }
+
+            // Wait for the initial check, otherwise requests and guards would see an anonymous user.
+            return from(this.currentUserLoaded).pipe(map(() => this.userValue()));
+        });
     }
 
     constructor(apiUrl: ApiUrlConfig) {
@@ -111,18 +118,14 @@ export class AuthService {
         });
 
         this.userManager.events.addUserLoaded(user => {
-            this.user$.next(new Profile(user));
+            this.currentUser.set(new Profile(user));
         });
 
         this.userManager.events.addUserUnloaded(() => {
-            this.user$.next(null);
+            this.currentUser.set(null);
         });
 
-        this.user$.subscribe(user => {
-            this.currentUser.set(user);
-        });
-
-        this.checkState(this.userManager.getUser());
+        this.currentUserLoaded = this.checkState(this.userManager.getUser());
     }
 
     public logoutRedirect(redirectPath: string) {
@@ -177,14 +180,14 @@ export class AuthService {
             const user = await promise;
 
             if (user) {
-                this.user$.next(getProfile(user));
+                this.currentUser.set(getProfile(user));
             } else {
-                this.user$.next(null);
+                this.currentUser.set(null);
             }
 
             return true;
         } catch {
-            this.user$.next(null);
+            this.currentUser.set(null);
 
             return false;
         }

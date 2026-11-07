@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, KeyValuePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
+import { KeyValuePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
+import { ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',
@@ -15,7 +17,6 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
     templateUrl: './client-connect-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeComponent,
         ExternalLinkDirective,
         FormHintComponent,
@@ -50,13 +51,19 @@ export class ClientConnectFormComponent {
     /** The client to show the connection instructions for. */
     public readonly client = input.required<ClientDto>();
 
-    protected readonly sdks = this.helpService.getSDKs();
-
+    protected readonly sdks = toSignal(this.helpService.getSDKs());
     protected readonly sdk = signal<SDKEntry | undefined>(undefined);
-
     protected readonly appName: string;
 
-    protected readonly appToken = signal<AccessTokenDto | undefined>(undefined);
+    protected readonly appToken = rxResource({
+        params: () => this.client(),
+        stream: ({ params }) => this.clientsService.createToken(this.appName, params).pipe(
+            catchError(error => {
+                this.dialogs.notifyError(error);
+
+                return of(undefined);
+            })),
+    });
 
     protected readonly step = signal('Start');
 
@@ -89,20 +96,6 @@ export class ClientConnectFormComponent {
         const messageBus = inject(MessageBus);
 
         this.appName = appsState.appName;
-
-        effect(onCleanup => {
-            const subscription = this.clientsService.createToken(this.appName, this.client())
-                .subscribe({
-                    next: dto => {
-                        this.appToken.set(dto);
-                    },
-                    error: error => {
-                        this.dialogs.notifyError(error);
-                    },
-                });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
 
         messageBus.emit(new ClientTourStated());
     }

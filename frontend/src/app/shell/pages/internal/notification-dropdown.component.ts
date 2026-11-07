@@ -29,18 +29,11 @@ export class NotificationDropdownComponent {
     private readonly collaboration = inject(CollaborationService);
 
     protected readonly commentsState = inject(CommentsState);
-
     protected readonly modalMenu = new ModalModel();
-
-    protected readonly commentUser: string;
-
+    protected readonly commentUser = inject(AuthService).user!.token;
     protected readonly commentItems = this.commentsState.groupedUnresolvedComments;
 
     constructor() {
-        const authService = inject(AuthService);
-
-        this.commentUser = authService.user!.token;
-
         this.collaboration.connect('users/collaboration');
 
         effect(() => {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, numberAttribute, Renderer2, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, numberAttribute, signal } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
 import { ThemeService } from '@app/framework/internal';
 
@@ -17,11 +17,14 @@ import { ThemeService } from '@app/framework/internal';
         }`,
     ],
     template: '',
+    host: {
+        style: 'display: block',
+    },
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressBarComponent {
+    private readonly element = inject(ElementRef);
     private readonly themeService = inject(ThemeService);
-
     private readonly progressBar = signal<any>(null);
 
     /** Renders a horizontal line or a circle. */
@@ -49,12 +52,6 @@ export class ProgressBarComponent {
     public readonly value = input(0, { transform: numberAttribute });
 
     constructor() {
-        const element = inject(ElementRef);
-        const renderer = inject(Renderer2);
-        const themeService = this.themeService;
-
-        renderer.setStyle(element.nativeElement, 'display', 'block');
-
         effect(onCleanup => {
             const options = {
                 color: this.getColor(),
@@ -65,8 +62,8 @@ export class ProgressBarComponent {
             };
 
             const progressBar = this.mode() === 'Circle' ?
-                new ProgressBar.Circle(element.nativeElement, options) :
-                new ProgressBar.Line(element.nativeElement, options);
+                new ProgressBar.Circle(this.element.nativeElement, options) :
+                new ProgressBar.Line(this.element.nativeElement, options);
 
             this.progressBar.set(progressBar);
 
@@ -92,7 +89,7 @@ export class ProgressBarComponent {
         });
 
         effect(() => {
-            themeService.theme();
+            this.themeService.theme();
 
             const progressBar = this.progressBar();
 

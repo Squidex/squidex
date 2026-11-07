@@ -8,7 +8,6 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { StopClickDirective } from '@app/framework';
 import { AppLanguageDto, ContentDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
 import { ContentListCellDirective } from '../contents/content-list-cell.directive';
@@ -22,7 +21,6 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
     imports: [
         ContentListCellDirective,
         ContentListFieldComponent,
-        FormsModule,
         StopClickDirective,
     ],
 })

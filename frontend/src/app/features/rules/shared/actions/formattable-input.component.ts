@@ -7,7 +7,6 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, model, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FormValueControl } from '@angular/forms/signals';
 import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
 
@@ -20,7 +19,6 @@ type TemplateMode = 'Text' | 'Script' | 'Liquid';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
     ],
 })
 export class FormattableInputComponent implements FormValueControl<string | null> {
@@ -42,9 +40,7 @@ export class FormattableInputComponent implements FormValueControl<string | null
     public readonly completion = input<ScriptCompletions | undefined | null>();
 
     protected readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
-
     protected readonly mode = signal<TemplateMode>('Text');
-
     protected readonly text = signal<string | null>(null);
 
     protected readonly editorMode = computed(() => {

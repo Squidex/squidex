@@ -7,7 +7,6 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, AppSettingsDto, FieldDto, FieldFormModel, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayValidationComponent } from '../types/array-validation.component';
@@ -39,7 +38,6 @@ import { UserInfoValidationComponent } from '../types/user-info-validation.compo
         DateTimeValidationComponent,
         FormField,
         FormRowComponent,
-        FormsModule,
         GeolocationValidationComponent,
         JsonValidationComponent,
         NumberValidationComponent,

@@ -9,7 +9,6 @@
 /* eslint-disable @angular-eslint/no-output-native */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, FlowView, FromNowPipe, RuleElementDto, RuleEventDto, TranslatePipe } from '@app/shared';
 import { RuleClassPipe } from '../../shared/pipes';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -22,7 +21,6 @@ import { StateDetailsComponent } from '../../shared/state-details.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
-        FormsModule,
         FromNowPipe,
         RuleClassPipe,
         RuleElementComponent,

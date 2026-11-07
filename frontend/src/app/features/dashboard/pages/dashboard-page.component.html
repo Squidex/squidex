@@ -25,35 +25,35 @@
                         }
 
                         @case ("api-calls") {
-                            <sqx-api-calls-card [app]="app" [usage]="callsUsage()" />
+                            <sqx-api-calls-card [app]="app" [usage]="callsUsage.value()" />
                         }
 
                         @case ("api-traffic-summary") {
-                            <sqx-api-traffic-summary-card [usage]="callsUsage()" />
+                            <sqx-api-traffic-summary-card [usage]="callsUsage.value()" />
                         }
 
                         @case ("api-calls-summary") {
-                            <sqx-api-calls-summary-card [usage]="callsUsage()" />
+                            <sqx-api-calls-summary-card [usage]="callsUsage.value()" />
                         }
 
                         @case ("asset-uploads-count") {
-                            <sqx-asset-uploads-count-card [usage]="storageUsage()" />
+                            <sqx-asset-uploads-count-card [usage]="storageUsage.value()" />
                         }
 
                         @case ("asset-uploads-size-summary") {
-                            <sqx-asset-uploads-size-summary-card [usage]="storageCurrent()" />
+                            <sqx-asset-uploads-size-summary-card [usage]="storageCurrent.value()" />
                         }
 
                         @case ("asset-uploads-size") {
-                            <sqx-asset-uploads-size-card [usage]="storageUsage()" />
+                            <sqx-asset-uploads-size-card [usage]="storageUsage.value()" />
                         }
 
                         @case ("api-traffic") {
-                            <sqx-api-traffic-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage()" />
+                            <sqx-api-traffic-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage.value()" />
                         }
 
                         @case ("api-performance") {
-                            <sqx-api-performance-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage()" />
+                            <sqx-api-performance-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage.value()" />
                         }
 
                         @case ("random-dog") {

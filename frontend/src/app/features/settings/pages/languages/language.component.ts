@@ -9,8 +9,8 @@ import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/d
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FormField } from '@angular/forms/signals';
-import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
+import { form, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, SignalSelectDirective, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-language',
@@ -25,6 +25,7 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowCompone
         FormField,
         FormRowComponent,
         FormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
@@ -41,11 +42,8 @@ export class LanguageComponent {
     public readonly fallbackLanguagesNew = input.required<ReadonlyArray<LanguageDto>>();
 
     protected readonly fallbackLanguagesLocal = linkedSignal(() => this.fallbackLanguages());
-
     protected readonly fallbackLanguagesNewLocal = linkedSignal(() => this.fallbackLanguagesNew());
-
-    protected readonly otherLanguageSelected = linkedSignal<LanguageDto | undefined>(() => this.fallbackLanguagesNewLocal()[0]);
-
+    protected readonly otherLanguageSelected = form(linkedSignal<LanguageDto | undefined>(() => this.fallbackLanguagesNewLocal()[0]));
     protected readonly isEditing = signal(false);
 
     protected readonly isEditable = computed(() => {
@@ -91,7 +89,7 @@ export class LanguageComponent {
     }
 
     protected addFallbackLanguage() {
-        const otherLanguage = this.otherLanguageSelected();
+        const otherLanguage = this.otherLanguageSelected().value();
         if (!otherLanguage) {
             return;
         }

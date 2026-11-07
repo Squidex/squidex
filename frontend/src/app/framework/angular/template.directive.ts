@@ -7,14 +7,11 @@
 
 /* eslint-disable @angular-eslint/directive-selector */
 
-import { Directive, TemplateRef } from '@angular/core';
+import { Directive, inject, TemplateRef } from '@angular/core';
 
 @Directive({
     selector: '[sidebarMenu]',
 })
 export class SidebarMenuDirective {
-    constructor(
-        public readonly templateRef: TemplateRef<unknown>,
-    ) {
-    }
+    public readonly templateRef = inject<TemplateRef<unknown>>(TemplateRef);
 }

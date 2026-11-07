@@ -14,12 +14,11 @@
         <input
             class="form-control"
             [class.dashed]="!transitionValue.values.expression"
+            (change)="changeExpression($any($event.target).value)"
             [disabled]="disabled()"
-            [ngModel]="transitionValue.values.expression"
-            (ngModelChange)="changeExpression($event)"
-            [ngModelOptions]="onBlur"
             placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
-            spellcheck="false" />
+            spellcheck="false"
+            [value]="transitionValue.values.expression ?? ''" />
     </div>
 
     <div class="col-auto col-label">

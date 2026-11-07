@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
 import { AppLanguageDto, AppsState, CommentSelected, CommentsState, EditContentForm, FieldForm, FocusMarkerComponent, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, Types, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
@@ -34,6 +34,7 @@ import { FieldLanguagesComponent } from './field-languages.component';
 export class ContentFieldComponent {
     private readonly appsState = inject(AppsState);
     private readonly localStore = inject(LocalStoreService);
+    private readonly messageBus = inject(MessageBus);
     private readonly translations = inject(TranslationsService);
     private readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
 
@@ -79,7 +80,6 @@ export class ContentFieldComponent {
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
     protected readonly commentsState = inject(CommentsState, { optional: true });
-
     protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
     protected readonly showAllControls = linkedSignal(() => {
@@ -87,7 +87,6 @@ export class ContentFieldComponent {
     });
 
     protected readonly isCollapsed = signal(false);
-
     protected readonly isSelected = signal(false);
 
     protected readonly isInvalid = computed(() => {
@@ -124,16 +123,8 @@ export class ContentFieldComponent {
     });
 
     constructor() {
-        const messageBus = inject(MessageBus);
-
-        effect(onCleanup => {
-            const subscription =
-                messageBus.of(CommentSelected)
-                    .subscribe(message => {
-                        this.isSelected.set(message.editorId.indexOf(this.formModel().path) === 0);
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+        this.messageBus.on(CommentSelected, message => {
+            this.isSelected.set(message.editorId.indexOf(this.formModel().path) === 0);
         });
     }
 

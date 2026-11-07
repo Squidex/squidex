@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { computed, Directive, effect, ElementRef, inject, input, NgZone, numberAttribute, output } from '@angular/core';
+import { computed, Directive, DestroyRef, ElementRef, inject, input, NgZone, numberAttribute, output } from '@angular/core';
 import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
@@ -31,6 +31,7 @@ export class ResizedDirective implements ResizeListener {
             return undefined;
         }
     });
+
     private conditionValue = false;
 
     /** The condition is true when the element is smaller than this width. */
@@ -46,11 +47,9 @@ export class ResizedDirective implements ResizeListener {
     public readonly resizeChange = output<DOMRect>({ alias: 'sqxResized' });
 
     constructor() {
-        effect(onCleanup => {
-            const unlisten = this.resizeService.listen(this.element.nativeElement, this);
+        const unlisten = this.resizeService.listen(this.element.nativeElement, this);
 
-            onCleanup(unlisten);
-        });
+        inject(DestroyRef).onDestroy(unlisten);
     }
 
     public onResize(rect: DOMRect) {

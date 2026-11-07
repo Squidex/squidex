@@ -14,6 +14,8 @@ import { ShortcutService } from '@app/framework/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShortcutComponent {
+    private readonly shortcutService = inject(ShortcutService);
+
     /** Emits when the shortcut is pressed while the component is enabled. */
     public readonly trigger = output<boolean>();
 
@@ -24,15 +26,13 @@ export class ShortcutComponent {
     public readonly disabled = input(false, { transform: booleanAttribute });
 
     constructor() {
-        const shortcutService = inject(ShortcutService);
-
         effect(onCleanup => {
             const keys = this.keys();
             if (!keys) {
                 return;
             }
 
-            const unsubscribe = shortcutService.listen(keys, () => {
+            const unsubscribe = this.shortcutService.listen(keys, () => {
                 if (!this.disabled()) {
                     this.trigger.emit(true);
                 }

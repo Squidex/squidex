@@ -6,10 +6,7 @@
  */
 
 import { booleanAttribute, Component, computed, effect, forwardRef, inject, input, linkedSignal, numberAttribute, output, signal, untracked } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
-import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { LanguageSelectorComponent, ListViewComponent, ModalDialogComponent, PagerComponent, SyncWidthDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppLanguageDto, AppsState, ComponentContentsState, ContentDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
 import { ContentListCellDirective, ContentListWidthDirective } from '../contents/content-list-cell.directive';
@@ -29,7 +26,6 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         ContentListHeaderComponent,
         ContentListWidthDirective,
         ContentSelectorItemComponent,
-        FormsModule,
         LanguageSelectorComponent,
         ListViewComponent,
         ModalDialogComponent,
@@ -41,6 +37,8 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
     ],
 })
 export class ContentSelectorComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly schemasService = inject(SchemasService);
     private readonly schemasState = inject(SchemasState);
 
     private readonly alreadySelectedIdsAll = computed(() => {
@@ -48,11 +46,9 @@ export class ContentSelectorComponent {
     });
 
     private readonly selectedItems = signal<Record<string, ContentDto>>({});
-
     private isInitialQueryUsed = false;
 
     protected readonly contentsState = inject(ComponentContentsState);
-
     protected readonly metaFields = META_FIELDS;
 
     /** Emits the selected contents, or an empty array when the dialog is closed. */
@@ -114,23 +110,13 @@ export class ContentSelectorComponent {
         return this.selectionCount() === this.contentsState.snapshot.contents.length;
     });
 
-    protected readonly queryModel;
+    protected readonly queryModel = rxResource({
+        params: () => this.schema()?.name,
+        stream: ({ params }) => this.schemasService.getFilters(this.appsState.appName, params),
+        defaultValue: null,
+    });
 
     constructor() {
-        const appsState = inject(AppsState);
-        const schemasService = inject(SchemasService);
-
-        this.queryModel = toSignal(
-            toObservable(this.schema).pipe(map(x => x?.name), distinctUntilChanged(),
-                switchMap(x => {
-                    if (x) {
-                        return schemasService.getFilters(appsState.appName, x);
-                    } else {
-                        return of(null);
-                    }
-                })),
-            { initialValue: null });
-
         effect(() => {
             const schemas = this.schemas();
 

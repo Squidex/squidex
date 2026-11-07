@@ -8,11 +8,10 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, signal, untracked, viewChild } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { switchMap, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DialogModel, DropdownMenuComponent, EntriesPipe, getTableConfig, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
+import { tap } from 'rxjs/operators';
+import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, DialogModel, DropdownMenuComponent, EntriesPipe, getTableConfig, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentComponent } from '../../shared/list/content.component';
 import { ContentsExportDialogComponent } from './contents-export-dialog.component';
@@ -39,7 +38,6 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         DropdownMenuComponent,
         DueTimeSelectorComponent,
         EntriesPipe,
-        FormsModule,
         LanguageSelectorComponent,
         LayoutComponent,
         ListViewComponent,
@@ -86,9 +84,7 @@ export class ContentsPageComponent {
     private schemaLoaded?: SchemaDto;
 
     protected readonly contentsRoute = inject(Router2State);
-
     protected readonly contentsState = inject(ContentsState);
-
     protected readonly languagesState = inject(LanguagesState);
 
     protected readonly schema = computed(() => {
@@ -102,9 +98,7 @@ export class ContentsPageComponent {
     });
 
     protected readonly tableViewModal = new ModalModel();
-
     protected readonly exportDialog = new DialogModel();
-
     public readonly searchModal = new ModalModel();
 
     protected readonly contents = computed(() => {
@@ -172,9 +166,10 @@ export class ContentsPageComponent {
         return this.appsState.selectedSettings()?.hideScheduler === true;
     });
 
-    protected readonly queryModel = toSignal(
-        toObservable(this.schemaName).pipe(defined(),
-            switchMap(x => this.schemasService.getFilters(this.appsState.appName, x))));
+    protected readonly queryModel = rxResource({
+        params: () => this.schemaName(),
+        stream: ({ params: schemaName }) => this.schemasService.getFilters(this.appsState.appName, schemaName),
+    });
 
     protected readonly queries = computed(() => {
         const schemaName = this.schemaName();

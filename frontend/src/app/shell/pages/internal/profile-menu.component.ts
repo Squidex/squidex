@@ -29,14 +29,12 @@ export class ProfileMenuComponent {
     private readonly authService = inject(AuthService);
 
     protected readonly uiState = inject(UIState);
-
     protected readonly themeService = inject(ThemeService);
-
     protected readonly modalMenu = new ModalModel();
-
     protected readonly language = inject(UIOptions).value.culture;
-
     protected readonly languages = UILanguages.ALL;
+    protected readonly profileUrl = inject(ApiUrlConfig).buildUrl('/identity-server/account/profile');
+    protected readonly submenu = signal<'language' | 'theme' | null>(null);
 
     protected readonly themeModes: ReadonlyArray<{ mode: ThemeMode; label: string }> = [
         { mode: 'light', label: 'common.themeLight' },
@@ -51,16 +49,6 @@ export class ProfileMenuComponent {
     protected readonly profileEmail = computed(() => {
         return this.authService.userValue()?.email ?? '';
     });
-
-    protected readonly profileUrl: string;
-
-    protected readonly submenu = signal<'language' | 'theme' | null>(null);
-
-    constructor() {
-        const apiUrl = inject(ApiUrlConfig);
-
-        this.profileUrl = apiUrl.buildUrl('/identity-server/account/profile');
-    }
 
     protected changeLanguage(code: string) {
         Cookies.replace('.AspNetCore.Culture', `c=${code}|uic=${code}`, 365);

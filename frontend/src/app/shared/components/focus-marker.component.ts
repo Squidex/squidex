@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { StringColorPipe } from '@app/framework';
 import { CollaborationService } from '@app/shared/internal';
 
@@ -14,6 +14,9 @@ import { CollaborationService } from '@app/shared/internal';
     styleUrls: ['./focus-marker.component.scss'],
     templateUrl: './focus-marker.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        '(window:click)': 'onWindowClick($event)',
+    },
     imports: [
         StringColorPipe,
     ],
@@ -34,21 +37,8 @@ export class FocusMarkerComponent {
         return this.users().find(x => x['focusedControl'] === controlId)?.user;
     });
 
-    constructor() {
-        const renderer = inject(Renderer2);
-        const collaboration = this.collaboration;
-
-        effect(onCleanup => {
-            if (!collaboration) {
-                return;
-            }
-
-            const unlisten = renderer.listen('window', 'click', (event: MouseEvent) => {
-                this.updateFocusedControl(event, null);
-            });
-
-            onCleanup(unlisten);
-        });
+    protected onWindowClick(event: MouseEvent) {
+        this.updateFocusedControl(event, null);
     }
 
     protected onClick(event: MouseEvent) {

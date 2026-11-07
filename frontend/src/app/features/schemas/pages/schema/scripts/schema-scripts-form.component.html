@@ -17,7 +17,7 @@
     <div class="inner-main">
         @for (script of editForm.scripts; track script) {
             @if (schemaScript() === script) {
-                <sqx-code-editor borderless="true" [completion]="schemaCompletions()" [formField]="editForm.form[script]" />
+                <sqx-code-editor borderless="true" [completion]="schemaCompletions.value()" [formField]="editForm.form[script]" />
             }
         }
     </div>

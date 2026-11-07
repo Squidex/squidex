@@ -7,7 +7,7 @@
 
 
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { ConfirmClickDirective, FormRowComponent, MarkdownDirective, MigrateContentsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -16,8 +16,8 @@ import { ConfirmClickDirective, FormRowComponent, MarkdownDirective, MigrateCont
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
+        FormField,
         FormRowComponent,
-        FormsModule,
         MarkdownDirective,
         TranslatePipe,
     ],
@@ -28,9 +28,8 @@ export class SchemaMigrateFormComponent {
     /** The schema to migrate the contents for. */
     public readonly schema = input.required<SchemaDto>();
 
-    protected readonly migrateDraft = signal(true);
-
-    protected readonly migratePublished = signal(true);
+    protected readonly migrateDraft = form(signal(true));
+    protected readonly migratePublished = form(signal(true));
 
     protected migrateContents() {
         const schema = this.schema();
@@ -38,8 +37,8 @@ export class SchemaMigrateFormComponent {
             return;
         }
 
-        const migrateDraft = this.migrateDraft();
-        const migratePublished = this.migratePublished();
+        const migrateDraft = this.migrateDraft().value();
+        const migratePublished = this.migratePublished().value();
         if (!migrateDraft && !migratePublished) {
             return;
         }

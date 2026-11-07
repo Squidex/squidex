@@ -8,11 +8,11 @@
         <div class="form-inline">
             <input
                 class="form-control"
-                [ngModel]="contributorsState.query()"
-                (ngModelChange)="search($event)"
+                (input)="search($any($event.target).value)"
                 placeholder="{{ 'contributors.search' | sqxTranslate }}"
                 shortcut="CTRL + I"
-                shortcutAction="focus" />
+                shortcutAction="focus"
+                [value]="contributorsState.query()" />
         </div>
     </ng-container>
     <ng-container>

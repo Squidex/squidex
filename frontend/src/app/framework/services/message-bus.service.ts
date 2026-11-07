@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, NgZone } from '@angular/core';
+import { DestroyRef, inject, Injectable, NgZone } from '@angular/core';
 import { filter, map, Observable, Subject } from 'rxjs';
 
 interface Message {
@@ -16,11 +16,13 @@ interface Message {
     data: any;
 }
 
+type MessageType<T> = { new(...args: ReadonlyArray<any>): T };
+
 @Injectable({
     providedIn: 'root',
 })
 export class MessageBus {
-    private message$ = new Subject<Message>();
+    private readonly message$ = new Subject<Message>();
 
     constructor(
         private readonly zone: NgZone,
@@ -35,9 +37,16 @@ export class MessageBus {
         });
     }
 
-    public of<T>(messageType: { new(...args: ReadonlyArray<any>): T }): Observable<T> {
+    public of<T>(messageType: MessageType<T>): Observable<T> {
         const channel = (<any>messageType).name;
 
         return this.message$.pipe(filter(m => m.channel === channel), map(m => m.data));
+    }
+
+    public on<T>(messageType: MessageType<T>, handler: (message: T) => void, destroyRef = inject(DestroyRef)) {
+        // Unsubscribes automatically when the calling component or service is destroyed.
+        const subscription = this.of(messageType).subscribe(handler);
+
+        destroyRef.onDestroy(() => subscription.unsubscribe());
     }
 }

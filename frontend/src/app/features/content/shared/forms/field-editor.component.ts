@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, numberAttribute, output, signal, viewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, numberAttribute, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, HTTP, IndeterminateValueDirective, isValidValue, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, SignalSelectDirective, SignalSelectMultipleDirective, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, Types } from '@app/shared';
@@ -111,9 +111,7 @@ export class FieldEditorComponent {
     public readonly displaySuffix = input('');
 
     protected readonly uniqueId = MathHelper.guid();
-
     protected readonly isExpanded = signal(false);
-
     protected readonly chatDialog = new DialogModel();
 
     protected readonly field = computed(() => {
@@ -151,20 +149,14 @@ export class FieldEditorComponent {
     }, { equal: Types.equals });
 
     constructor() {
-        effect(onCleanup => {
-            const subscription =
-                this.messageBus.of(CommentSelected)
-                    .subscribe(message => {
-                        const isSelected = message.editorId.indexOf(this.formModel().path) === 0;
+        this.messageBus.on(CommentSelected, message => {
+            const isSelected = message.editorId.indexOf(this.formModel().path) === 0;
 
-                        if (isSelected) {
-                            this.root()?.nativeElement.scrollIntoView();
-                        }
+            if (isSelected) {
+                this.root()?.nativeElement.scrollIntoView();
+            }
 
-                        this.isSelected.set(isSelected);
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+            this.isSelected.set(isSelected);
         });
     }
 

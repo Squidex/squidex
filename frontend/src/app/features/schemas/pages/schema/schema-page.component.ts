@@ -56,22 +56,13 @@ export class SchemaPageComponent {
     private readonly messageBus = inject(MessageBus);
 
     protected readonly schemasState = inject(SchemasState);
-
     protected readonly languageState = inject(LanguagesState);
-
     protected readonly hideIndexes = inject(UIOptions).value.hideIndexes;
-
-    protected readonly schema;
-
-    protected readonly schemaTab;
-
+    protected readonly schema = this.schemasState.selectedSchema;
+    protected readonly schemaTab = queryParam('tab', 'fields');
     protected readonly editOptionsDropdown = new ModalModel();
 
     constructor() {
-        this.schema = this.schemasState.selectedSchema;
-
-        this.schemaTab = queryParam('tab', 'fields');
-
         this.languageState.load();
     }
 

@@ -49,7 +49,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
     });
 
     bit('should navigate to app page if authenticated', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(<any>{}));
 
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({} as any));
@@ -59,7 +59,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
     });
 
     bit('should return true if not authenticated', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(null));
 
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({} as any));
@@ -71,7 +71,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
     bit('should login redirect and return false if redirect enabled', async () => {
         uiOptions.value.redirectToLogin = true;
 
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(null));
 
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({ queryParams: {} } as any));
@@ -83,7 +83,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
     bit('should not redirect after logout', async () => {
         uiOptions.value.redirectToLogin = true;
 
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(null));
 
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({ queryParams: { logout: true } } as any));

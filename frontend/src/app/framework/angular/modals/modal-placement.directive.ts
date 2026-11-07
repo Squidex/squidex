@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, computed, Directive, effect, ElementRef, inject, input, numberAttribute, Renderer2, untracked } from '@angular/core';
+import { afterNextRender, booleanAttribute, computed, Directive, effect, ElementRef, inject, Injector, input, numberAttribute, Renderer2, untracked } from '@angular/core';
 import { autoUpdate, computePosition, flip, Middleware, offset, Placement, shift, size } from '@floating-ui/dom';
 import { FloatingPlacement, Types } from '@app/framework/internal';
 
@@ -15,6 +15,7 @@ import { FloatingPlacement, Types } from '@app/framework/internal';
 export class ModalPlacementDirective {
     private readonly renderer = inject(Renderer2);
     private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+    private readonly injector = inject(Injector);
     private readonly options = computed(() => {
         return {
             target: this.target(),
@@ -79,9 +80,9 @@ export class ModalPlacementDirective {
         effect(() => {
             this.options();
 
-            setTimeout(() => {
+            afterNextRender(() => {
                 this.updatePosition();
-            });
+            }, { injector: this.injector });
         });
 
         afterNextRender(() => {

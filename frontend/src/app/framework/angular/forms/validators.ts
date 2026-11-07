@@ -5,165 +5,235 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types } from '@app/framework/internal';
+
+export type ValueError = { readonly kind: string } & Record<string, any>;
+
+export type ValueValidator = (value: any) => ValueError | null;
 
 function isEmptyInputValue(value: any): boolean {
     return value == null || value === undefined || value.length === 0;
 }
 
 export module ValidatorsEx {
-    export function pattern(regex: string | RegExp, message?: string): ValidatorFn {
+    export const nullValidator: ValueValidator = () => null;
+
+    export function required(): ValueValidator {
+        return value => {
+            if (isEmptyInputValue(value)) {
+                return { kind: 'required' };
+            }
+
+            return null;
+        };
+    }
+
+    export function min(minValue: number): ValueValidator {
+        return value => {
+            if (isEmptyInputValue(value)) {
+                return null;
+            }
+
+            const actual = parseFloat(value);
+            if (!Number.isNaN(actual) && actual < minValue) {
+                return { kind: 'min', min: minValue, actual };
+            }
+
+            return null;
+        };
+    }
+
+    export function max(maxValue: number): ValueValidator {
+        return value => {
+            if (isEmptyInputValue(value)) {
+                return null;
+            }
+
+            const actual = parseFloat(value);
+            if (!Number.isNaN(actual) && actual > maxValue) {
+                return { kind: 'max', max: maxValue, actual };
+            }
+
+            return null;
+        };
+    }
+
+    export function minLength(requiredLength: number): ValueValidator {
+        return value => {
+            if (isEmptyInputValue(value) || !Types.isNumber(value.length)) {
+                return null;
+            }
+
+            if (value.length < requiredLength) {
+                return { kind: 'minlength', requiredLength, actualLength: value.length };
+            }
+
+            return null;
+        };
+    }
+
+    export function maxLength(requiredLength: number): ValueValidator {
+        return value => {
+            if (isEmptyInputValue(value) || !Types.isNumber(value.length)) {
+                return null;
+            }
+
+            if (value.length > requiredLength) {
+                return { kind: 'maxlength', requiredLength, actualLength: value.length };
+            }
+
+            return null;
+        };
+    }
+
+    export function pattern(regex: string | RegExp, message?: string): ValueValidator {
         if (!regex) {
-            return Validators.nullValidator;
+            return nullValidator;
         }
 
-        const inner = Validators.pattern(regex);
+        let requiredPattern: string;
+        let compiled: RegExp;
 
-        return (control: AbstractControl) => {
-            const error = inner(control);
+        if (Types.isString(regex)) {
+            requiredPattern = regex;
 
-            if (!!error && error.pattern && message) {
-                return { patternmessage: { requiredPattern: error.pattern.requiredPattern, actualValue: error.pattern.actualValue, message } };
+            if (!requiredPattern.startsWith('^')) {
+                requiredPattern = `^${requiredPattern}`;
             }
 
-            return error;
-        };
-    }
+            if (!requiredPattern.endsWith('$')) {
+                requiredPattern = `${requiredPattern}$`;
+            }
 
-    export function match(otherControlName: string, message: string): ValidatorFn {
-        let otherControl: AbstractControl | null = null;
+            compiled = new RegExp(requiredPattern);
+        } else {
+            requiredPattern = regex.toString();
+            compiled = regex;
+        }
 
-        return (control: AbstractControl) => {
-            if (!control.parent) {
+        return value => {
+            if (isEmptyInputValue(value)) {
                 return null;
             }
 
-            if (otherControl === null) {
-                otherControl = control.parent.get(otherControlName);
-
-                if (!otherControl) {
-                    throw new Error('matchValidator(): other control is not found in parent group');
-                }
-
-                otherControl.valueChanges.subscribe(() => {
-                    control.updateValueAndValidity({ onlySelf: true });
-                });
+            if (compiled.test(value)) {
+                return null;
             }
 
-            if (otherControl && otherControl.value !== control.value) {
-                return { match: { message } };
+            if (message) {
+                return { kind: 'patternmessage', requiredPattern, actualValue: value, message };
+            }
+
+            return { kind: 'pattern', requiredPattern, actualValue: value };
+        };
+    }
+
+    export function validDateTime(): ValueValidator {
+        return value => {
+            if (!value) {
+                return null;
+            }
+
+            try {
+                DateTime.parseISO(value);
+                return null;
+            } catch {
+                return { kind: 'validdatetime' };
+            }
+        };
+    }
+
+    export function between(minValue?: number, maxValue?: number): ValueValidator {
+        if (!minValue && !maxValue) {
+            return nullValidator;
+        }
+
+        if (!maxValue) {
+            return min(minValue!);
+        }
+
+        if (!minValue) {
+            return max(maxValue);
+        }
+
+        return value => {
+            if (isEmptyInputValue(value)) {
+                return null;
+            }
+
+            const actual = parseFloat(value);
+
+            if (minValue === maxValue) {
+                if (Number.isNaN(actual) || actual !== minValue) {
+                    return { kind: 'exactly', expected: minValue, actual };
+                }
+            } else if (Number.isNaN(actual) || actual < minValue || actual > maxValue) {
+                return { kind: 'between', min: minValue, max: maxValue, actual };
             }
 
             return null;
         };
     }
 
-    export function validDateTime(): ValidatorFn {
-        return (control: AbstractControl) => {
-            const v: string = control.value;
+    export function betweenLength(minValue?: number, maxValue?: number): ValueValidator {
+        if (!minValue && !maxValue) {
+            return nullValidator;
+        }
 
-            if (v) {
-                try {
-                    DateTime.parseISO(v);
-                } catch {
-                    return { validdatetime: false };
+        if (!maxValue) {
+            return minLength(minValue!);
+        }
+
+        if (!minValue) {
+            return maxLength(maxValue);
+        }
+
+        return value => {
+            if (isEmptyInputValue(value)) {
+                return null;
+            }
+
+            const actual: number = value?.length || 0;
+
+            if (minValue === maxValue) {
+                if (actual !== minValue) {
+                    return { kind: 'exactlylength', expected: minValue, actual };
                 }
+            } else if (actual < minValue || actual > maxValue) {
+                return { kind: 'betweenlength', minlength: minValue, maxlength: maxValue, actual };
             }
 
             return null;
         };
     }
 
-    export function between(min?: number, max?: number): ValidatorFn {
-        if (!min && !max) {
-            return Validators.nullValidator;
-        }
-
-        if (max && min) {
-            return (control: AbstractControl) => {
-                if (isEmptyInputValue(control.value)) {
-                    return null;
-                }
-
-                const value = parseFloat(control.value);
-
-                if (min === max) {
-                    if (!Types.isNumber(value) || Number.isNaN(value) || value !== min) {
-                        return { exactly: { expected: min, actual: value } };
-                    }
-                } else if (!Types.isNumber(value) || Number.isNaN(value) || value < min || value > max) {
-                    return { between: { min, max, actual: value } };
-                }
-
-                return null;
-            };
-        } else if (max) {
-            return Validators.max(max);
-        } else {
-            return Validators.min(min!);
-        }
-    }
-
-    export function betweenLength(minLength?: number, maxLength?: number): ValidatorFn {
-        if (!minLength && !maxLength) {
-            return Validators.nullValidator;
-        }
-
-        if (maxLength && minLength) {
-            return (control: AbstractControl) => {
-                if (isEmptyInputValue(control.value)) {
-                    return null;
-                }
-
-                const length: number = control.value?.length || 0;
-
-                if (minLength === maxLength) {
-                    if (!Types.isNumber(length) || Number.isNaN(length) || length !== minLength) {
-                        return { exactlylength: { expected: minLength, actual: length } };
-                    }
-                } else if (!Types.isNumber(length) || Number.isNaN(length) || length < minLength || length > maxLength) {
-                    return { betweenlength: { minlength: minLength, maxlength: maxLength, actual: length } };
-                }
-
-                return null;
-            };
-        } else if (maxLength) {
-            return Validators.maxLength(maxLength);
-        } else {
-            return Validators.minLength(minLength!);
-        }
-    }
-
-    export function validValues<T>(allowed: ReadonlyArray<T>): ValidatorFn {
+    export function validValues<T>(allowed: ReadonlyArray<T>): ValueValidator {
         if (!allowed || allowed.length === 0) {
-            return Validators.nullValidator;
+            return nullValidator;
         }
 
-        return (control: AbstractControl) => {
-            const value: T = control.value;
-
+        return value => {
             if (!allowed.includes(value)) {
-                return { validvalues: false };
+                return { kind: 'validvalues' };
             }
 
             return null;
         };
     }
 
-    export function validArrayValues<T>(allowed: ReadonlyArray<T>): ValidatorFn {
+    export function validArrayValues<T>(allowed: ReadonlyArray<T>): ValueValidator {
         if (!allowed || allowed.length === 0) {
-            return Validators.nullValidator;
+            return nullValidator;
         }
 
-        return (control: AbstractControl) => {
-            const values: T[] = control.value;
+        return value => {
+            if (!Types.isArray(value)) {
+                return null;
+            }
 
-            if (values) {
-                for (const value of values) {
-                    if (allowed.indexOf(value) < 0) {
-                        return { validarrayvalues: { invalidvalue: value } };
-                    }
+            for (const item of value) {
+                if (allowed.indexOf(item) < 0) {
+                    return { kind: 'validarrayvalues', invalidvalue: item };
                 }
             }
 
@@ -171,63 +241,75 @@ export module ValidatorsEx {
         };
     }
 
-    export function uniqueStrings(): ValidatorFn {
-        return (control: AbstractControl) => {
-            if (isEmptyInputValue(control.value) || !Types.isArrayOfString(control.value)) {
+    export function uniqueStrings(): ValueValidator {
+        return value => {
+            if (isEmptyInputValue(value) || !Types.isArrayOfString(value)) {
                 return null;
             }
 
-            const values: string[] = control.value;
             const valuesUnique: { [key: string]: boolean } = {};
 
-            for (const value of values) {
-                if (valuesUnique[value]) {
-                    return { uniquestrings: false };
-                } else {
-                    valuesUnique[value] = true;
+            for (const item of value) {
+                if (valuesUnique[item]) {
+                    return { kind: 'uniquestrings' };
                 }
+
+                valuesUnique[item] = true;
             }
 
             return null;
         };
     }
 
-    export function uniqueObjectValues(fields: ReadonlyArray<string>): ValidatorFn {
-        return (control: AbstractControl) => {
-            if (isEmptyInputValue(control.value) || !Types.isArrayOfObject(control.value)) {
+    export function uniqueObjectValues(fields: ReadonlyArray<string>): ValueValidator {
+        return value => {
+            if (isEmptyInputValue(value) || !Types.isArrayOfObject(value)) {
                 return null;
             }
-
-            const items: any[] = control.value;
 
             const duplicateKeys = {} as Record<string, boolean>;
 
             for (const field of fields) {
                 const values: any[] = [];
 
-                for (const item of items) {
-                    if (item.hasOwnProperty(field)) {
-                        const fieldValue = item[field];
-
-                        for (const other of values) {
-                            if (Types.equals(other, fieldValue)) {
-                                duplicateKeys[field] = true;
-                                break;
-                            }
-                        }
-
-                        values.push(fieldValue);
+                for (const item of value as Record<string, any>[]) {
+                    if (!item.hasOwnProperty(field)) {
+                        continue;
                     }
+
+                    const fieldValue = item[field];
+
+                    for (const other of values) {
+                        if (Types.equals(other, fieldValue)) {
+                            duplicateKeys[field] = true;
+                            break;
+                        }
+                    }
+
+                    values.push(fieldValue);
                 }
             }
 
             const keys = Object.keys(duplicateKeys);
-
             if (keys.length > 0) {
-                return { uniqueobjectvalues: { fields: keys.join(', ') } };
+                return { kind: 'uniqueobjectvalues', fields: keys.join(', ') };
             }
 
             return null;
         };
     }
+}
+
+export function validateValue(validators: ReadonlyArray<ValueValidator>, value: any) {
+    const result: ValueError[] = [];
+
+    for (const validator of validators) {
+        const error = validator(value);
+
+        if (error) {
+            result.push(error);
+        }
+    }
+
+    return result;
 }

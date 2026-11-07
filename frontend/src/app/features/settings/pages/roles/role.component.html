@@ -116,10 +116,9 @@
                                         <input
                                             class="form-check-input"
                                             id="{{ roleValue.name }}_{{ property.key }}"
+                                            (change)="setProperty(property.key, $any($event.target).checked)"
+                                            [checked]="getProperty(property.key)"
                                             [disabled]="!isEditable()"
-                                            [ngModel]="getProperty(property.key)"
-                                            (ngModelChange)="setProperty(property.key, $event)"
-                                            [ngModelOptions]="{ standalone: true }"
                                             type="checkbox" />
                                         <label class="form-check-label" for="{{ roleValue.name }}_{{ property.key }}">
                                             {{ property.name | sqxTranslate }}
@@ -139,10 +138,9 @@
                                                     <input
                                                         class="form-check-input"
                                                         id="{{ roleValue.name }}_schema_{{ schema.name }}"
+                                                        (change)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $any($event.target).checked)"
+                                                        [checked]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                                         [disabled]="!isEditable()"
-                                                        [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
-                                                        (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
-                                                        [ngModelOptions]="{ standalone: true }"
                                                         type="checkbox" />
                                                     <label class="form-check-label" for="{{ roleValue.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">
@@ -159,10 +157,9 @@
                                                     <input
                                                         class="form-check-input"
                                                         id="{{ roleValue.name }}_schema_{{ schema.name }}"
+                                                        (change)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $any($event.target).checked)"
+                                                        [checked]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                                         [disabled]="!isEditable()"
-                                                        [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
-                                                        (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
-                                                        [ngModelOptions]="{ standalone: true }"
                                                         type="checkbox" />
                                                     <label class="form-check-label" for="{{ roleValue.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">

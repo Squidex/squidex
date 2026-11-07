@@ -8,7 +8,7 @@
 import { LowerCasePipe } from '@angular/common';
 import { booleanAttribute, Component, effect, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FormField } from '@angular/forms/signals';
+import { form, FormField } from '@angular/forms/signals';
 import { lastValueFrom } from 'rxjs';
 import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, SignalSelectDirective, StepForm, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
@@ -65,13 +65,13 @@ export class StepDialogComponent {
 
     protected readonly currentStep = signal<StepForm | undefined>(undefined);
 
-    protected readonly stepName = linkedSignal(() => {
-        return this.stepDefinition()?.name;
-    });
+    protected readonly stepName = form(linkedSignal(() => {
+        return this.stepDefinition()?.name ?? '';
+    }));
 
-    protected readonly stepIgnoreError = linkedSignal(() => {
+    protected readonly stepIgnoreError = form(linkedSignal(() => {
         return this.stepDefinition()?.ignoreError || false;
-    });
+    }));
 
     constructor() {
         effect(() => {
@@ -110,7 +110,7 @@ export class StepDialogComponent {
         currentStep.submit(async values => {
             await lastValueFrom(this.rulesService.validateStep(this.appsState.appName, values), { defaultValue: undefined });
 
-            this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName(), ignoreError: this.stepIgnoreError(), step: values }));
+            this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName().value() || undefined, ignoreError: this.stepIgnoreError().value(), step: values }));
         });
     }
 }

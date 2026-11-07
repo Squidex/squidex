@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, linkedSignal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { map, merge } from 'rxjs';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
 import { TaskSnapshot, TourService, TourState } from '@app/shared/internal';
@@ -21,25 +22,18 @@ import { TaskSnapshot, TourService, TourState } from '@app/shared/internal';
     ],
 })
 export class TourGuideComponent {
+    private readonly tourService = inject(TourService);
+
+    private readonly tourCollapsed = toSignal(
+        merge(
+            this.tourService.stepShow$.pipe(map(() => true)),
+            this.tourService.end$.pipe(map(() => false)),
+        ),
+        { initialValue: false, equal: () => false });
+
     protected readonly tourState = inject(TourState);
 
-    protected readonly isCollapsed = signal(false);
-
-    constructor() {
-        const tourService = inject(TourService);
-
-        effect(onCleanup => {
-            const subscription =
-                merge(
-                    tourService.stepShow$.pipe(map(() => true)),
-                    tourService.end$.pipe(map(() => false)),
-                ).subscribe(isCollapsed => {
-                    this.isCollapsed.set(isCollapsed);
-                });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
-    }
+    protected readonly isCollapsed = linkedSignal(() => this.tourCollapsed());
 
     protected toggle() {
         this.isCollapsed.update(x => !x);

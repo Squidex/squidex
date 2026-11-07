@@ -53,9 +53,7 @@
                 class="form-check-input"
                 [attr.id]="id()"
                 (blur)="touched.set(true)"
-                [disabled]="disabled()"
-                [ngModel]="valueCurrent()"
-                (ngModelChange)="setValue($event)"
+                [formField]="booleanForm"
                 sqxIndeterminateValue
                 type="checkbox" />
             <label class="form-check-label" [attr.for]="id()"></label>

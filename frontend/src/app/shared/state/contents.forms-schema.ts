@@ -6,9 +6,8 @@
  */
 
 import { Signal } from '@angular/core';
-import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { applyEach, applyWhenValue, disabled, FieldContext, hidden, schema, Schema, SchemaPath, SchemaPathTree, validate, ValidationError } from '@angular/forms/signals';
-import { Types } from '@app/framework';
+import { Types, validateValue, ValueValidator } from '@app/framework';
 import { FieldDto, SchemaDto } from './../model';
 import { ContentRules, RuleAction } from './contents.form-rules';
 import { AnyFieldDto, PartitionConfig } from './contents.forms-helpers';
@@ -26,7 +25,7 @@ type AnyPath = SchemaPath<any, any, any>;
 
 export class ContentSchemaBuilder {
     private readonly componentSchemas = new Map<string, Schema<any>>();
-    private readonly validators = new WeakMap<AnyFieldDto, ReadonlyArray<ValidatorFn>[]>();
+    private readonly validators = new WeakMap<AnyFieldDto, ReadonlyArray<ValueValidator>[]>();
 
     constructor(
         private readonly globals: ContentSchemaGlobals,
@@ -136,21 +135,6 @@ export function isEmpty(value: any) {
     return Types.isUndefined(value) || Types.isNull(value) || value === '' || (Types.isArray(value) && value.length === 0);
 }
 
-export function toErrors(validators: ReadonlyArray<ValidatorFn>, value: any) {
-    const result: ValidationError.WithoutField[] = [];
-
-    const control = { value } as AbstractControl;
-
-    for (const validator of validators) {
-        const errors = validator(control);
-        if (!errors) {
-            continue;
-        }
-
-        for (const [kind, properties] of Object.entries(errors)) {
-            result.push({ ...Types.isObject(properties) ? properties : {}, kind });
-        }
-    }
-
-    return result;
+export function toErrors(validators: ReadonlyArray<ValueValidator>, value: any): ValidationError.WithoutField[] {
+    return validateValue(validators, value);
 }

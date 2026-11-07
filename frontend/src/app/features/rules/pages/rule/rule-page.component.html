@@ -42,9 +42,9 @@
                     </div>
                     <input
                         class="input-name form-control"
-                        [ngModel]="snapshot.name"
-                        (ngModelChange)="rename($event)"
-                        placeholder="{{ 'common.name' | sqxTranslate }}" />
+                        (input)="rename($any($event.target).value)"
+                        placeholder="{{ 'common.name' | sqxTranslate }}"
+                        [value]="snapshot.name ?? ''" />
                 </div>
             }
 
@@ -148,7 +148,7 @@
     (dialogClose)="cancel()"
     (dialogSave)="changeStep($event)"
     [isEditable]="editableRule().isEditable"
-    [scriptCompletions]="scriptCompletions()"
+    [scriptCompletions]="scriptCompletions.value()"
     *sqxModal="stepDialog"
     [stepDefinition]="stepToUpsert()?.step" />
 <router-outlet />

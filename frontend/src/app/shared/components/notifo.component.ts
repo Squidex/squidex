@@ -21,9 +21,8 @@ import { TourHintDirective } from './tour-hint.directive';
 })
 export class NotifoComponent {
     private readonly renderer = inject(Renderer2);
-
     private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;
-    private readonly notifoApiKey: string | undefined;
+    private readonly notifoApiKey = inject(AuthService).user?.notifoToken;
     private readonly element = viewChild<ElementRef<Element>>('element');
     private topicShown = '';
     private isShown = false;
@@ -36,10 +35,7 @@ export class NotifoComponent {
 
     constructor() {
         const resourceLoader = inject(ResourceLoaderService);
-        const authService = inject(AuthService);
         const destroyRef = inject(DestroyRef);
-
-        this.notifoApiKey = authService.user?.notifoToken;
 
         if (!this.notifoApiKey || !this.notifoApiUrl) {
             return;

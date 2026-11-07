@@ -9,10 +9,10 @@
                 class="form-control"
                 #nameInput
                 (change)="filter(nameInput.value)"
-                [ngModel]="scriptLogsState.name()"
                 placeholder="{{ 'scriptLogs.filterPlaceholder' | sqxTranslate }}"
                 shortcut="CTRL + I"
-                shortcutAction="focus" />
+                shortcutAction="focus"
+                [value]="scriptLogsState.name() ?? ''" />
         </div>
     </ng-container>
     <ng-container>

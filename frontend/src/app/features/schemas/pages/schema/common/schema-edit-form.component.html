@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-body">
             <sqx-form-row for="name" label="common.name" vertical>
-                <input class="form-control" id="name" [ngModel]="schema().name" [ngModelOptions]="{ standalone: true }" readonly />
+                <input class="form-control" id="name" readonly [value]="schema().name" />
             </sqx-form-row>
 
             <sqx-form-row [for]="schemaForm.form.label" hint="schemas.schemaLabelHint" label="common.label" vertical>

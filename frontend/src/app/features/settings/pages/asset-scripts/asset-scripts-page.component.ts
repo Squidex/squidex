@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Observable, shareReplay } from 'rxjs';
-import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditAssetScriptsForm, LayoutComponent, ScriptCompletions, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditAssetScriptsForm, LayoutComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ScriptNamePipe } from '@app/shared/components/pipes';
 
 @Component({
@@ -20,7 +19,6 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     templateUrl: './asset-scripts-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         FormField,
         FormsModule,
@@ -41,17 +39,15 @@ export class AssetScriptsPageComponent {
     private readonly assetScriptsState = inject(AssetScriptsState);
 
     protected readonly assetScript = signal('query');
-    protected readonly assetCompletions: Observable<ScriptCompletions>;
-
+    protected readonly assetCompletions;
     protected readonly editForm = new EditAssetScriptsForm();
-
     protected readonly isEditable = this.assetScriptsState.canUpdate;
 
     constructor() {
         const appsState = inject(AppsState);
         const assetsService = inject(AssetsService);
 
-        this.assetCompletions = assetsService.getCompletions(appsState.appName).pipe(shareReplay(1));
+        this.assetCompletions = toSignal(assetsService.getCompletions(appsState.appName), { initialValue: null });
 
         effect(() => {
             this.editForm.load(this.assetScriptsState.scripts());

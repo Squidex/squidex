@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, effect, ElementRef, inject, input, NgZone, Renderer2 } from '@angular/core';
+import { DestroyRef, Directive, effect, ElementRef, inject, input, NgZone, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxImageUrl]',
@@ -22,21 +22,19 @@ export class ImageUrlDirective {
     public readonly imageUrl = input.required<string>({ alias: 'sqxImageUrl' });
 
     constructor() {
-        effect(onCleanup => {
-            const unlisteners = this.zone.runOutsideAngular(() => [
-                this.renderer.listen(this.element.nativeElement, 'load', () => {
-                    this.onLoad();
-                }),
-                this.renderer.listen(this.element.nativeElement, 'error', () => {
-                    this.onError();
-                }),
-            ]);
+        const unlisteners = this.zone.runOutsideAngular(() => [
+            this.renderer.listen(this.element.nativeElement, 'load', () => {
+                this.onLoad();
+            }),
+            this.renderer.listen(this.element.nativeElement, 'error', () => {
+                this.onError();
+            }),
+        ]);
 
-            onCleanup(() => {
-                for (const unlisten of unlisteners) {
-                    unlisten();
-                }
-            });
+        inject(DestroyRef).onDestroy(() => {
+            for (const unlisten of unlisteners) {
+                unlisten();
+            }
         });
 
         effect(() => {

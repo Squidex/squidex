@@ -6,7 +6,6 @@
  */
 
 import { Component, computed, effect, inject, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldFormModel, StringFieldPropertiesDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -18,14 +17,12 @@ import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponen
         AssetFolderDropdownComponent,
         FormField,
         FormRowComponent,
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class StringUIComponent {
     protected readonly schemasSource = inject(SchemaTagSource);
-
     protected readonly editors = StringFieldEditorValues;
 
     /** The form to edit the field properties. */

@@ -19,6 +19,8 @@ declare const videojs: any;
 export class VideoPlayerComponent {
     private readonly player = signal<any>(null);
     private readonly video = viewChild.required<ElementRef<HTMLVideoElement>>('video');
+    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly renderer = inject(Renderer2);
 
     /** The URL of the video. */
     public readonly source = input('');
@@ -27,19 +29,15 @@ export class VideoPlayerComponent {
     public readonly mimeType = input('');
 
     constructor() {
-        const resourceLoader = inject(ResourceLoaderService);
-        const renderer = inject(Renderer2);
-        const destroyRef = inject(DestroyRef);
-
         afterNextRender(async () => {
             await Promise.all([
-                resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
-                resourceLoader.loadLocalStyle('dependencies/videojs/videojs.min.css'),
+                this.resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
+                this.resourceLoader.loadLocalStyle('dependencies/videojs/videojs.min.css'),
             ]);
 
             const video = this.video().nativeElement;
 
-            renderer.removeClass(video, 'hidden');
+            this.renderer.removeClass(video, 'hidden');
             this.player.set(videojs(video, { fluid: true }));
         });
 
@@ -57,7 +55,7 @@ export class VideoPlayerComponent {
             }
         });
 
-        destroyRef.onDestroy(() => {
+        inject(DestroyRef).onDestroy(() => {
             this.player()?.dispose();
         });
     }

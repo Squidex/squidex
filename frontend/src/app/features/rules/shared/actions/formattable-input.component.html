@@ -12,9 +12,9 @@
             [value]="text()"
             (valueChange)="setText($event)" />
         <div class="input-group-apppend">
-            <select class="form-select" [disabled]="isDisabled" [ngModel]="mode" (ngModelChange)="setMode($event)" tabindex="-1">
+            <select class="form-select" (change)="setMode($any($event.target).value)" [disabled]="isDisabled" tabindex="-1">
                 @for (supportedMode of modes; track supportedMode) {
-                    <option [ngValue]="supportedMode">{{ supportedMode }}</option>
+                    <option [selected]="supportedMode === mode" [value]="supportedMode">{{ supportedMode }}</option>
                 }
             </select>
         </div>

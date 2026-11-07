@@ -6,9 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, viewChild } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { timer } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AppsState, ConfirmClickDirective, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
 import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentEventComponent } from './content-event.component';
@@ -41,20 +40,25 @@ export class ContentHistoryPageComponent {
     private readonly contentsState = inject(ContentsState);
     private readonly historyService = inject(HistoryService);
     private readonly schemasState = inject(SchemasState);
-
     private readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
 
     protected readonly content = computed(() => {
         return this.contentsState.selectedContent();
     });
 
-    protected readonly contentEvents = toSignal(
-        toObservable(this.contentsState.selectedContent).pipe(
-            defined(),
-            map(content => `schemas.${this.schemasState.schemaId}.contents.${content.id}`),
-            switchSafe(channel => timer(0, 5000).pipe(map(() => channel))),
-            switchSafe(channel => this.historyService.getHistory(this.appsState.appName, channel))),
-        { initialValue: [] });
+    protected readonly contentEvents = rxResource({
+        params: () => {
+            const content = this.contentsState.selectedContent();
+            if (!content) {
+                return undefined;
+            }
+
+            return `schemas.${this.schemasState.schemaId}.contents.${content.id}`;
+        },
+        stream: ({ params: channel }) => timer(0, 5000).pipe(
+            switchSafe(() => this.historyService.getHistory(this.appsState.appName, channel))),
+        defaultValue: [],
+    });
 
     protected readonly dropdown = new ModalModel();
     protected readonly dropdownNew = new ModalModel();

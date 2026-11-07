@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ValidatorFn, Validators } from '@angular/forms';
-import { DateTime, Types, ValidatorsEx } from '@app/framework';
+import { DateTime, Types, ValidatorsEx, ValueValidator } from '@app/framework';
 import { AppLanguageDto, ContentDto, FieldDto, NestedFieldDto, UserInfoFieldPropertiesDto } from '../model';
 import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../model';
 
@@ -309,7 +308,7 @@ export function thumbnail(url: string, width?: number, height?: number) {
     return url;
 }
 
-export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<ValidatorFn>> {
+export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<ValueValidator>> {
     private constructor(
         private readonly isOptional: boolean,
     ) {
@@ -319,7 +318,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         const validators = [...field.properties.accept(new FieldsValidators(isOptional))];
 
         if (field.properties.isRequired && !isOptional) {
-            validators.push(Validators.required);
+            validators.push(ValidatorsEx.required());
         }
 
         return validators;
@@ -329,8 +328,8 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return field.properties.accept(new FieldsValidators(isOptional));
     }
 
-    public visitArray(properties: ArrayFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
+    public visitArray(properties: ArrayFieldPropertiesDto): ReadonlyArray<ValueValidator> {
+        const validators: ValueValidator[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
@@ -341,8 +340,8 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitAssets(properties: AssetsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
+    public visitAssets(properties: AssetsFieldPropertiesDto): ReadonlyArray<ValueValidator> {
+        const validators: ValueValidator[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
@@ -353,8 +352,8 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitComponents(properties: ComponentsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
+    public visitComponents(properties: ComponentsFieldPropertiesDto): ReadonlyArray<ValueValidator> {
+        const validators: ValueValidator[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
@@ -365,8 +364,8 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitNumber(properties: NumberFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
+    public visitNumber(properties: NumberFieldPropertiesDto): ReadonlyArray<ValueValidator> {
+        const validators: ValueValidator[] = [
             ValidatorsEx.between(properties.minValue, properties.maxValue),
         ];
 
@@ -383,8 +382,8 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitReferences(properties: ReferencesFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
+    public visitReferences(properties: ReferencesFieldPropertiesDto): ReadonlyArray<ValueValidator> {
+        const validators: ValueValidator[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
@@ -395,8 +394,8 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitString(properties: StringFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
+    public visitString(properties: StringFieldPropertiesDto): ReadonlyArray<ValueValidator> {
+        const validators: ValueValidator[] = [
             ValidatorsEx.betweenLength(properties.minLength, properties.maxLength),
         ];
 
@@ -417,8 +416,8 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitTags(properties: TagsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        const validators: ValidatorFn[] = [
+    public visitTags(properties: TagsFieldPropertiesDto): ReadonlyArray<ValueValidator> {
+        const validators: ValueValidator[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
@@ -431,35 +430,35 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitBoolean(_: BooleanFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitBoolean(_: BooleanFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 
-    public visitComponent(_: ComponentFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitComponent(_: ComponentFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 
-    public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitGeolocation(_: GeolocationFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 
-    public visitJson(_: JsonFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitJson(_: JsonFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 
-    public visitRichText(_: RichTextFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitRichText(_: RichTextFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 
-    public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 
-    public visitUserInfo(_: UserInfoFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+    public visitUserInfo(_: UserInfoFieldPropertiesDto): ReadonlyArray<ValueValidator> {
         return [];
     }
 }

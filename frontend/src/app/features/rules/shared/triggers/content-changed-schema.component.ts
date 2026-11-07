@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, inject, input, output } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, input, output } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
-import { switchMap } from 'rxjs';
 import { CodeEditorComponent, ConfirmClickDirective, ContentChangedSchemaModel, ControlErrorsComponent, SchemaDto, SignalSelectDirective, TranslatePipe } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 
@@ -28,6 +27,8 @@ import { CompletionsCache } from './completions-cache';
     ],
 })
 export class ContentChangedSchemaComponent {
+    private readonly completionsCache = inject(CompletionsCache);
+
     /** The schemas the user can choose from. */
     public readonly schemas = input.required<ReadonlyArray<SchemaDto> | null | undefined>();
 
@@ -37,18 +38,9 @@ export class ContentChangedSchemaComponent {
     /** Emits when the user confirms to remove the schema. */
     public readonly remove = output();
 
-    protected readonly completions;
-
-    constructor() {
-        const completionsCache = inject(CompletionsCache);
-
-        const schemaId = computed(() => {
-            return this.field().schemaId().value();
-        });
-
-        this.completions = toSignal(
-            toObservable(schemaId).pipe(
-                switchMap(id => completionsCache.getCompletions(id, true))),
-            { initialValue: null });
-    }
+    protected readonly completions = rxResource({
+        params: () => this.field().schemaId().value() || undefined,
+        stream: ({ params }) => this.completionsCache.getCompletions(params, true),
+        defaultValue: null,
+    });
 }

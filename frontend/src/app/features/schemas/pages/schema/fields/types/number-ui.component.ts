@@ -6,7 +6,6 @@
  */
 
 import { Component, computed, effect, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldFormModel, NumberFieldPropertiesDto, TagEditorComponent } from '@app/shared';
 
@@ -17,7 +16,6 @@ import { FieldDto, FieldFormModel, FloatConverter, FormRowComponent, NumberField
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
         TagEditorComponent,
     ],
 })

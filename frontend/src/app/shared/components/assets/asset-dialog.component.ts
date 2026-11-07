@@ -6,14 +6,14 @@
  */
 
 import { Component, computed, effect, inject, input, linkedSignal, output, signal, viewChild } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { EMPTY, lastValueFrom } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormRowComponent, HTTP, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
+import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormRowComponent, HTTP, ModalDialogComponent, ProgressBarComponent, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
 import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsService, AssetsState, AssetUploaderState, MoveAssetForm, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
 import { AssetFolderDropdownComponent } from './asset-folder-dropdown.component';
 import { AssetHistoryComponent } from './asset-history.component';
@@ -56,6 +56,8 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
     ],
 })
 export class AssetDialogComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
     private readonly assetsState = inject(AssetsState);
     private readonly assetUploader = inject(AssetUploaderState);
     private readonly dialogs = inject(DialogService);
@@ -78,8 +80,16 @@ export class AssetDialogComponent {
 
     protected readonly assetActual = linkedSignal(() => this.asset());
 
-    protected readonly assetPath;
-    protected readonly assetTags;
+    protected readonly assetPath = rxResource({
+        params: () => this.assetActual().parentId,
+        stream: ({ params }) => this.assetsService.getAssetFolders(this.appsState.appName, params, 'Path').pipe(
+            map(({ path }) => [ROOT_ITEM, ...path])),
+        defaultValue: [],
+    });
+
+    protected readonly assetTags = toSignal(
+        this.assetsService.getTags(this.appsState.appName).pipe(
+            map(tags => Object.keys(tags))));
 
     protected readonly progress = signal(0);
 
@@ -118,20 +128,6 @@ export class AssetDialogComponent {
     protected readonly annotateForm = new AnnotateAssetForm();
 
     constructor() {
-        const appsState = inject(AppsState);
-        const assetsService = inject(AssetsService);
-
-        this.assetTags = toSignal(
-            assetsService.getTags(appsState.appName).pipe(
-                map(tags => Object.keys(tags))));
-
-        this.assetPath = toSignal(
-            toObservable(this.assetActual).pipe(
-                map(asset => asset.parentId),
-                switchMapCached(x => assetsService.getAssetFolders(appsState.appName, x, 'Path')),
-                map(({ path }) => [ROOT_ITEM, ...path])),
-            { initialValue: [] });
-
         effect(() => {
             const asset = this.assetActual();
 

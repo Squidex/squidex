@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
@@ -19,7 +18,6 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         BaseChartDirective,
-        FormsModule,
         TranslatePipe,
     ],
 })

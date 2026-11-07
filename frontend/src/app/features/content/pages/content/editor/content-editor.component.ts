@@ -6,7 +6,6 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FormErrorComponent, ListViewComponent, MarkdownDirective, SchemaDto, TranslatePipe, Version } from '@app/shared';
 import { ContentSectionComponent } from '../../../shared/forms/content-section.component';
 
@@ -20,7 +19,6 @@ import { ContentSectionComponent } from '../../../shared/forms/content-section.c
         CursorsComponent,
         CursorsDirective,
         FormErrorComponent,
-        FormsModule,
         ListViewComponent,
         MarkdownDirective,
         TranslatePipe,

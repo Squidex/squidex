@@ -63,6 +63,9 @@ type Tab = 'editor' | 'references' | 'referencing' | 'inspect' | 'extension';
     ],
 })
 export class ContentPageComponent implements CanComponentDeactivate {
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly appsState = inject(AppsState);
+    private readonly authService = inject(AuthService);
     private readonly autoSaveService = inject(AutoSaveService);
     private readonly collaboration = inject(CollaborationService);
     private readonly dialogs = inject(DialogService);
@@ -76,7 +79,13 @@ export class ContentPageComponent implements CanComponentDeactivate {
     private readonly router = inject(Router);
     private readonly schemasState = inject(SchemasState);
     private readonly tempService = inject(TempService);
-    private readonly mutableContext: Record<string, any>;
+    private readonly mutableContext: Record<string, any> = {
+        action: 'Create',
+        apiUrl: this.apiUrl.buildUrl('api'),
+        appId: inject(ContentsState).appId,
+        appName: inject(ContentsState).appName,
+        user: { role: this.appsState.snapshot.selectedApp?.roleName, ...this.authService.user?.export() },
+    };
 
     private autoSaveKey!: AutoSaveKey;
     private autoSaveIgnore = false;
@@ -88,21 +97,13 @@ export class ContentPageComponent implements CanComponentDeactivate {
     });
 
     protected readonly formContext = signal<any>(undefined);
-
     protected readonly contentTab = queryParam<Tab>('tab', 'editor');
-
     protected readonly contentId = signal('');
-
     protected readonly content = signal<ContentDto | null | undefined>(undefined);
-
     protected readonly contentVersion = signal<Version | null>(null);
-
     protected readonly contentFormCompare = signal<EditContentForm | null>(null);
-
     protected readonly saveOnlyDropdown = new ModalModel();
-
     protected readonly savePublishDropdown = new ModalModel();
-
     protected readonly dropdown = new ModalModel();
 
     protected readonly languages = computed(() => {
@@ -129,51 +130,25 @@ export class ContentPageComponent implements CanComponentDeactivate {
     };
 
     constructor() {
-        const apiUrl = inject(ApiUrlConfig);
-        const authService = inject(AuthService);
-        const appsState = inject(AppsState);
-        const contentsState = this.contentsState;
-
-        const role = appsState.snapshot.selectedApp?.roleName;
-
-        this.mutableContext = {
-            action: 'Create',
-            apiUrl: apiUrl.buildUrl('api'),
-            appId: contentsState.appId,
-            appName: contentsState.appName,
-            user: { role, ...authService.user?.export() },
-        };
-
         this.contentsState.loadIfNotLoaded();
 
-        effect(onCleanup => {
-            const subscriptions = [
-                this.messageBus.of(AnnotationCreate)
-                    .subscribe(async message => {
-                        if (message.annotation) {
-                            await this.router.navigate(['comments'], { relativeTo: this.route });
-                        }
+        this.messageBus.on(AnnotationCreate, async message => {
+            if (message.annotation) {
+                await this.router.navigate(['comments'], { relativeTo: this.route });
+            }
 
-                        setTimeout(() => {
-                            this.messageBus.emit(new AnnotationCreateAfterNavigate(message.editorId, message.annotation));
-                        });
-                    }),
-                this.messageBus.of(AnnotationsSelected)
-                    .subscribe(async message => {
-                        if (message.commentIds.length > 0) {
-                            await this.router.navigate(['comments'], { relativeTo: this.route });
-                        }
+            setTimeout(() => {
+                this.messageBus.emit(new AnnotationCreateAfterNavigate(message.editorId, message.annotation));
+            });
+        });
 
-                        setTimeout(() => {
-                            this.messageBus.emit(new AnnotationsSelectedAfterNavigate(message.commentIds));
-                        });
-                    }),
-            ];
+        this.messageBus.on(AnnotationsSelected, async message => {
+            if (message.commentIds.length > 0) {
+                await this.router.navigate(['comments'], { relativeTo: this.route });
+            }
 
-            onCleanup(() => {
-                for (const subscription of subscriptions) {
-                    subscription.unsubscribe();
-                }
+            setTimeout(() => {
+                this.messageBus.emit(new AnnotationsSelectedAfterNavigate(message.commentIds));
             });
         });
 

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, Directive, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import { afterNextRender, booleanAttribute, Directive, DestroyRef, ElementRef, inject, input, Renderer2 } from '@angular/core';
 import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
@@ -24,11 +24,9 @@ export class CompensateScrollbarDirective implements ResizeListener {
     public readonly enabled = input(true, { alias: 'sqxCompensateScrollbar', transform: booleanAttribute });
 
     constructor() {
-        effect(onCleanup => {
-            const unlisten = this.resizeService.listen(this.element.nativeElement, this);
+        const unlisten = this.resizeService.listen(this.element.nativeElement, this);
 
-            onCleanup(unlisten);
-        });
+        inject(DestroyRef).onDestroy(unlisten);
 
         afterNextRender(() => {
             this.resize();

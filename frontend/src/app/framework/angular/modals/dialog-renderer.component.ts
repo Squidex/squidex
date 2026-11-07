@@ -6,9 +6,9 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Subscription, timer } from 'rxjs';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, Notification, Tooltip } from '@app/framework/internal';
 import { FocusOnInitDirective } from '../forms/focus-on-init.directive';
 import { MarkdownDirective } from '../markdown.directive';
@@ -41,7 +41,6 @@ function addTooltip(tooltips: ReadonlyArray<Tooltip>, tooltip: Tooltip) {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,
-        FormsModule,
         MarkdownDirective,
         ModalDialogComponent,
         ModalDirective,
@@ -51,52 +50,46 @@ function addTooltip(tooltips: ReadonlyArray<Tooltip>, tooltip: Tooltip) {
     ],
 })
 export class DialogRendererComponent {
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly dialogs = inject(DialogService);
+
     protected readonly dialogView = new DialogModel();
     protected readonly dialogRequest = signal<DialogRequest | null | undefined>(undefined);
     protected readonly notifications = signal<ReadonlyArray<Notification>>([]);
     protected readonly tooltips = signal<ReadonlyArray<Tooltip>>([]);
 
     constructor() {
-        const dialogs = inject(DialogService);
-
-        effect(onCleanup => {
-            const subscriptions = new Subscription();
-
-            untracked(() => {
-                subscriptions.add(
-                    this.dialogView.isOpenChanges.subscribe(isOpen => {
-                        if (!isOpen) {
-                            this.finishRequest(false);
-                        }
-                    }));
-
-                subscriptions.add(
-                    dialogs.notifications.subscribe(notification => {
-                        this.notifications.update(x => [...x, notification]);
-
-                        if (notification.displayTime > 0) {
-                            subscriptions.add(timer(notification.displayTime).subscribe(() => {
-                                this.close(notification);
-                            }));
-                        }
-                    }));
-
-                subscriptions.add(
-                    dialogs.dialogs.subscribe(dialogRequest => {
-                        this.cancel();
-
-                        this.dialogView.show();
-                        this.dialogRequest.set(dialogRequest);
-                    }));
-
-                subscriptions.add(
-                    dialogs.tooltips.subscribe(tooltip => {
-                        this.tooltips.update(x => addTooltip(x, tooltip));
-                    }));
+        this.dialogView.isOpenChanges.pipe(takeUntilDestroyed())
+            .subscribe(isOpen => {
+                if (!isOpen) {
+                    this.finishRequest(false);
+                }
             });
 
-            onCleanup(() => subscriptions.unsubscribe());
-        });
+        this.dialogs.notifications.pipe(takeUntilDestroyed())
+            .subscribe(notification => {
+                this.notifications.update(x => [...x, notification]);
+
+                if (notification.displayTime > 0) {
+                    timer(notification.displayTime).pipe(takeUntilDestroyed(this.destroyRef))
+                        .subscribe(() => {
+                            this.close(notification);
+                        });
+                }
+            });
+
+        this.dialogs.dialogs.pipe(takeUntilDestroyed())
+            .subscribe(dialogRequest => {
+                this.cancel();
+
+                this.dialogView.show();
+                this.dialogRequest.set(dialogRequest);
+            });
+
+        this.dialogs.tooltips.pipe(takeUntilDestroyed())
+            .subscribe(tooltip => {
+                this.tooltips.update(x => addTooltip(x, tooltip));
+            });
     }
 
     protected cancel() {

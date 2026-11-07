@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -39,14 +40,10 @@ export class JobsPageComponent {
     constructor() {
         this.jobsState.load();
 
-        effect(onCleanup => {
-            const subscription =
-                timer(3000, 3000).pipe(
-                    switchMap(() => this.jobsState.load(false, true)))
-                .subscribe();
-
-            onCleanup(() => subscription.unsubscribe());
-        });
+        timer(3000, 3000).pipe(
+            switchMap(() => this.jobsState.load(false, true)),
+            takeUntilDestroyed())
+            .subscribe();
     }
 
     protected reload() {

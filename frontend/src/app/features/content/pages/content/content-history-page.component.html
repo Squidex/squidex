@@ -134,7 +134,7 @@
             <div class="section">
                 <h3 class="bordered">{{ "common.history" | sqxTranslate }}</h3>
 
-                @for (event of contentEvents(); track event.eventId) {
+                @for (event of contentEvents.value(); track event.eventId) {
                     <sqx-content-event [content]="content" (dataCompare)="compareVersion(event)" (dataLoad)="loadVersion(event)" [event]="event" />
                 }
             </div>

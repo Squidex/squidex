@@ -33,20 +33,13 @@ import { RuleComponent } from './rule.component';
 })
 export class RulesPageComponent {
     protected readonly rulesState = inject(RulesState);
-
     protected readonly availableTriggers = ALL_TRIGGERS;
-    protected readonly availableSteps;
+    protected readonly availableSteps = toSignal(inject(RulesService).getSteps());
 
     constructor() {
-        const rulesState = this.rulesState;
-        const rulesService = inject(RulesService);
-        const schemasState = inject(SchemasState);
+        this.rulesState.load();
 
-        this.availableSteps = toSignal(rulesService.getSteps());
-
-        rulesState.load();
-
-        schemasState.loadIfNotLoaded();
+        inject(SchemasState).loadIfNotLoaded();
     }
 
     protected reload() {

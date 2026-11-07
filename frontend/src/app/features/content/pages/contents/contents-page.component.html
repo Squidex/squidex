@@ -30,7 +30,7 @@
                     [queriesTypes]="'common.contents' | sqxTranslate"
                    
                     (queryChange)="search($event)"
-                    [queryModel]="queryModel()" />
+                    [queryModel]="queryModel.value()" />
             </div>
 
             @if (languages.length > 1) {
@@ -121,8 +121,8 @@
                                             <input
                                                 class="form-check-input"
                                                 id="all_selected"
-                                                [ngModel]="selection.selectedAll"
-                                                (ngModelChange)="selectAll($event)"
+                                                [checked]="selection.selectedAll"
+                                                (change)="selectAll($any($event.target).checked)"
                                                 type="checkbox" />
                                             <label class="form-check-label" for="all_selected"></label>
                                         </div>

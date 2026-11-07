@@ -117,7 +117,7 @@
                     <h5><span class="badge rounded-pill bg-dark">2</span> {{ "clients.connectWizard.manuallyStep2" | sqxTranslate }}</h5>
 
                     <p>
-                        <sqx-code>{{ appToken()?.accessToken }}</sqx-code>
+                        <sqx-code>{{ appToken.value()?.accessToken }}</sqx-code>
                     </p>
                 </div>
 
@@ -163,7 +163,7 @@
             }
 
             @case ("SDK") {
-                @if (sdks | async; as sdks) {
+                @if (sdks(); as sdks) {
                     <div>
                         @for (availableSDK of sdks | keyvalue; track availableSDK) {
                             <div class="sdk-header" [class.active]="sdk() === availableSDK.value" (click)="select(availableSDK.value)">

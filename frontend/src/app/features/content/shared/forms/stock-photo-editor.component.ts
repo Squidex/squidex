@@ -6,6 +6,7 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormValueControl } from '@angular/forms/signals';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
@@ -49,11 +50,8 @@ export class StockPhotoEditorComponent implements FormValueControl<string | null
     });
 
     protected readonly stockPhotoSearch = signal('');
-
     protected readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
-
     protected readonly stockPhotosHasMore = signal(false);
-
     protected readonly stockPhotosLoading = signal(false);
 
     protected readonly thumbnailStatus = linkedSignal<string | null, 'Loaded' | 'Failed' | undefined>({
@@ -68,30 +66,26 @@ export class StockPhotoEditorComponent implements FormValueControl<string | null
             this.stockPhotoRequests.next({ search: this.stockPhotoSearch(), page: 1 });
         });
 
-        effect(onCleanup => {
-            const subscription =
-                this.stockPhotoRequests.pipe(
-                    debounceTime(500),
-                    tap(request => {
-                        if (request.search && request.search.length > 0) {
-                            this.stockPhotosLoading.set(true);
-                        }
-                    }),
-                    switchMap(request => {
-                        if (request.search && request.search.length > 0) {
-                            return this.stockPhotoService.getImages(request.search, request.page).pipe(map(result => ({ request, result })));
-                        } else {
-                            return of(({ request, result: [] }));
-                        }
-                    }))
-                .subscribe(({ request, result }) => {
-                    this.stockPhotosLoading.set(false);
-                    this.stockPhotos.update(x => request.page > 1 ? [...x, ...result] : result);
-                    this.stockPhotosHasMore.set(result.length === 20);
-                });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
+        this.stockPhotoRequests.pipe(
+                debounceTime(500),
+                tap(request => {
+                    if (request.search && request.search.length > 0) {
+                        this.stockPhotosLoading.set(true);
+                    }
+                }),
+                switchMap(request => {
+                    if (request.search && request.search.length > 0) {
+                        return this.stockPhotoService.getImages(request.search, request.page).pipe(map(result => ({ request, result })));
+                    } else {
+                        return of(({ request, result: [] }));
+                    }
+                }),
+                takeUntilDestroyed())
+            .subscribe(({ request, result }) => {
+                this.stockPhotosLoading.set(false);
+                this.stockPhotos.update(x => request.page > 1 ? [...x, ...result] : result);
+                this.stockPhotosHasMore.set(result.length === 20);
+            });
     }
 
     protected selectPhoto(photo: StockPhotoDto) {

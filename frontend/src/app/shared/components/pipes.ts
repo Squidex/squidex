@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, DestroyRef, inject, Pipe, PipeTransform } from '@angular/core';
-import { Observable, of, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { inject, Pipe, PipeTransform } from '@angular/core';
 import { ApiUrlConfig, UserDto, UsersProviderService } from '@app/shared/internal';
 
 @Pipe({
@@ -24,63 +22,19 @@ export class ScriptNamePipe implements PipeTransform {
     }
 }
 
-class UserAsyncPipe {
-    private readonly users = inject(UsersProviderService);
-    private readonly changeDetector = inject(ChangeDetectorRef);
-    private lastUserId?: string;
-    private lastValue: string | undefined = undefined;
-    private subscription?: Subscription;
-    private current?: Observable<string | null>;
-
-    constructor(loading: string) {
-        this.lastValue = loading;
-
-        inject(DestroyRef).onDestroy(() => {
-            this.subscription?.unsubscribe();
-        });
-    }
-
-    protected transformInternal(userId: string | undefined | null, transform: (users: UsersProviderService, userId: string) => Observable<string | null>) {
-        if (!userId) {
-            return undefined;
-        }
-
-        if (this.lastUserId !== userId) {
-            this.lastUserId = userId;
-
-            if (this.subscription) {
-                this.subscription.unsubscribe();
-            }
-
-            const pipe = transform(this.users, userId);
-
-            this.subscription = pipe.subscribe(value => {
-                this.lastValue = value || undefined;
-
-                if (this.current === pipe) {
-                    this.changeDetector.markForCheck();
-                }
-            });
-
-            this.current = pipe;
-        }
-
-        return this.lastValue;
-    }
-}
-
 @Pipe({
     name: 'sqxUserName',
     pure: false,
 })
-export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
-    constructor() {
-        super('Loading...');
-    }
+export class UserNamePipe implements PipeTransform {
+    private readonly users = inject(UsersProviderService);
 
     public transform(userId: string | undefined | null, placeholder = 'Me') {
-        return super.transformInternal(userId, (users, userId) =>
-            users.getUser(userId, placeholder).pipe(map(u => u.displayName)));
+        if (!userId) {
+            return undefined;
+        }
+
+        return getDisplayName(this.users.user(userId, placeholder)());
     }
 }
 
@@ -88,29 +42,29 @@ export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
     name: 'sqxUserNameRef',
     pure: false,
 })
-export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
-    constructor() {
-        super('Loading...');
-    }
+export class UserNameRefPipe implements PipeTransform {
+    private readonly users = inject(UsersProviderService);
 
     public transform(userId: string | undefined | null, placeholder: string | null = 'Me') {
-        return super.transformInternal(userId, (users, userId) => {
-            const { type, id } = split(userId);
+        if (!userId) {
+            return undefined;
+        }
 
-            if (type === 'subject') {
-                return users.getUser(id, placeholder).pipe(map(u => u.displayName));
-            } else if (id.endsWith('client')) {
-                return of(id);
-            } else {
-                return of(`${id} client`);
-            }
-        });
+        const { type, id } = split(userId);
+
+        if (type === 'subject') {
+            return getDisplayName(this.users.user(id, placeholder)());
+        } else if (id.endsWith('client')) {
+            return id;
+        } else {
+            return `${id} client`;
+        }
     }
 }
 
 @Pipe({
     name: 'sqxUserDtoPicture',
-    pure: false,
+    pure: true,
 })
 export class UserDtoPicture implements PipeTransform {
     private readonly apiUrl = inject(ApiUrlConfig);
@@ -122,7 +76,7 @@ export class UserDtoPicture implements PipeTransform {
 
 @Pipe({
     name: 'sqxUserIdPicture',
-    pure: false,
+    pure: true,
 })
 export class UserIdPicturePipe implements PipeTransform {
     private readonly apiUrl = inject(ApiUrlConfig);
@@ -136,16 +90,16 @@ export class UserIdPicturePipe implements PipeTransform {
     name: 'sqxUserPicture',
     pure: false,
 })
-export class UserPicturePipe extends UserAsyncPipe implements PipeTransform {
+export class UserPicturePipe implements PipeTransform {
     private readonly apiUrl = inject(ApiUrlConfig);
-
-    constructor() {
-        super('');
-    }
+    private readonly users = inject(UsersProviderService);
 
     public transform(userId: string | undefined | null) {
-        return super.transformInternal(userId, (users, userId) =>
-            users.getUser(userId).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`))));
+        if (!userId) {
+            return undefined;
+        }
+
+        return getPicture(this.users.user(userId)(), this.apiUrl);
     }
 }
 
@@ -153,24 +107,39 @@ export class UserPicturePipe extends UserAsyncPipe implements PipeTransform {
     name: 'sqxUserPictureRef',
     pure: false,
 })
-export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
+export class UserPictureRefPipe implements PipeTransform {
     private readonly apiUrl = inject(ApiUrlConfig);
-
-    constructor() {
-        super('');
-    }
+    private readonly users = inject(UsersProviderService);
 
     public transform(userId: string | undefined | null) {
-        return super.transformInternal(userId, (users, userId) => {
-            const { type, id } = split(userId);
+        if (!userId) {
+            return undefined;
+        }
 
-            if (type === 'subject') {
-                return users.getUser(id).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
-            } else {
-                return of('./images/squid.svg');
-            }
-        });
+        const { type, id } = split(userId);
+
+        if (type === 'subject') {
+            return getPicture(this.users.user(id)(), this.apiUrl);
+        } else {
+            return './images/squid.svg';
+        }
     }
+}
+
+function getDisplayName(user: UserDto | undefined) {
+    if (!user) {
+        return 'Loading...';
+    }
+
+    return user.displayName || undefined;
+}
+
+function getPicture(user: UserDto | undefined, apiUrl: ApiUrlConfig) {
+    if (!user) {
+        return '';
+    }
+
+    return apiUrl.buildUrl(`api/users/${user.id}/picture`);
 }
 
 function split(token: string) {

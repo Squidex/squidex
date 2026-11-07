@@ -6,7 +6,6 @@
  */
 
 import { Component, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, GeolocationFieldPropertiesDto } from '@app/shared';
 
@@ -17,7 +16,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, GeolocationFieldPropertiesD
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
     ],
 })
 export class GeolocationUIComponent {

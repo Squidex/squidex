@@ -78,6 +78,10 @@ export class ImportContributorsDialogComponent {
         ).subscribe();
     }
 
+    protected changeRole(status: ImportStatus, role: string) {
+        this.importStatus.update(statuses => statuses.map(x => x === status ? { ...x, role } : x));
+    }
+
     private updateStatus(email: string, result: ImportStatus['result'], resultText: string) {
         this.importStatus.update(statuses => statuses.map(x => x.email === email ? { ...x, result, resultText } : x));
     }

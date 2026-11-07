@@ -7,9 +7,9 @@
         <div class="row">
             <div class="col-selector">
                 @if (schemas.length > 1) {
-                    <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+                    <select class="form-select" (change)="selectSchema(schemas[$any($event.target).selectedIndex])">
                         @for (item of schemas; track item) {
-                            <option [ngValue]="item">
+                            <option [selected]="item === schema">
                                 {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: item.displayName } }}
                             </option>
                         }
@@ -43,7 +43,7 @@
                         placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                         [query]="contentsState.query()"
                         (queryChange)="search($event)"
-                        [queryModel]="queryModel()" />
+                        [queryModel]="queryModel.value()" />
                 </div>
 
                 @if (languages.length > 1) {
@@ -62,7 +62,7 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input class="form-check" [ngModel]="selectedAll()" (ngModelChange)="selectAll($event)" type="checkbox" />
+                                    <input class="form-check" [checked]="selectedAll()" (change)="selectAll($any($event.target).checked)" type="checkbox" />
                                 </th>
 
                                 <th [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>

@@ -7,7 +7,6 @@
 
 
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, SchemaDto, SignalSelectDirective, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -19,7 +18,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, SchemaDto, SignalSelectDire
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
         SignalSelectDirective,
         TagEditorComponent,
         TranslatePipe,

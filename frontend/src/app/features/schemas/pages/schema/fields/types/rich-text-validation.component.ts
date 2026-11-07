@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
@@ -18,7 +17,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, Ric
     imports: [
         FormField,
         FormRowComponent,
-        FormsModule,
         TranslatePipe,
     ],
 })

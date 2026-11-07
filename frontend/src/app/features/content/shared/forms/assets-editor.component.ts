@@ -66,23 +66,14 @@ export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<str
     protected readonly assetFiles = signal<ReadonlyArray<HTTP.UploadFile>>([]);
     protected readonly assetItems = signal<ReadonlyArray<AssetDto>>([]);
     protected readonly assetEdit = signal<AssetDto | undefined>(undefined);
-
     protected readonly isListView = signal(!this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
     protected readonly isCompact = signal(false);
-
     protected readonly chatDialog = new DialogModel();
-
     protected readonly assetsDialog = new DialogModel();
 
     constructor() {
-        effect(onCleanup => {
-            const subscription =
-                this.messageBus.of(AssetUpdated)
-                    .subscribe(event => {
-                        this.setAssets(this.assetItems().replacedBy('id', event.asset));
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+        this.messageBus.on(AssetUpdated, event => {
+            this.setAssets(this.assetItems().replacedBy('id', event.asset));
         });
 
         effect(onCleanup => {

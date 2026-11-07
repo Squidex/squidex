@@ -29,6 +29,7 @@ import { SyncScollingDirective } from './sync-scrolling.directive';
 export class ListViewComponent {
     private readonly headerElement = viewChild<ElementRef<ParentNode>>('headerElement');
     private readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
+    private readonly renderer = inject(Renderer2);
 
     /** Lets the content overflow the list instead of scrolling inside. */
     public readonly overflow = input(false, { transform: booleanAttribute });
@@ -57,8 +58,6 @@ export class ListViewComponent {
     protected readonly isLoadingVisible = signal(false);
 
     constructor() {
-        const renderer = inject(Renderer2);
-
         effect(onCleanup => {
             if (this.isLoading()) {
                 this.isLoadingVisible.set(true);
@@ -71,8 +70,8 @@ export class ListViewComponent {
         });
 
         afterNextRender(() => {
-            hideWhenEmpty(renderer, this.headerElement());
-            hideWhenEmpty(renderer, this.footerElement());
+            hideWhenEmpty(this.renderer, this.headerElement());
+            hideWhenEmpty(this.renderer, this.footerElement());
         });
     }
 }

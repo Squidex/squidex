@@ -21,7 +21,7 @@
 
                         <div class="col">
                             <sqx-control-errors [for]="previewUrl.url" />
-                            <sqx-code-editor [completion]="fieldCompletions()" [formField]="previewUrl.url" mode="ace/mode/liquid" singleLine="true" />
+                            <sqx-code-editor [completion]="fieldCompletions.value()" [formField]="previewUrl.url" mode="ace/mode/liquid" singleLine="true" />
                         </div>
 
                         <div class="col-auto">
