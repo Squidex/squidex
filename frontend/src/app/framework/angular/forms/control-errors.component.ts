@@ -23,7 +23,16 @@ import { formatSignalErrors, getFieldKey } from './signal-validators';
 export class ControlErrorsComponent {
     private readonly localizer = inject(LocalizerService);
 
-    private readonly field = computed(() => {
+    /** The field to show the errors for. */
+    public readonly for = input.required<string | FieldTree<unknown>>();
+
+    /** Shows the errors only when the form has been submitted, if set. */
+    public readonly submitCount = input<number | null>();
+
+    /** The field name in the error messages. Falls back to a name derived from the control. */
+    public readonly fieldName = input<string | null>();
+
+    protected readonly field = computed(() => {
         const control = this.for();
         if (!Types.isFunction(control)) {
             return null;
@@ -32,7 +41,7 @@ export class ControlErrorsComponent {
         return control as FieldTree<unknown>;
     });
 
-    private readonly controlDisplayName = computed(() => {
+    protected readonly controlDisplayName = computed(() => {
         const fieldName = this.fieldName();
         if (fieldName) {
             return fieldName;
@@ -49,15 +58,6 @@ export class ControlErrorsComponent {
 
         return this.localizer.get(`common.${control}`) || control.substring(0, 1).toUpperCase() + control.substring(1);
     });
-
-    /** The field to show the errors for. */
-    public readonly for = input.required<string | FieldTree<unknown>>();
-
-    /** Shows the errors only when the form has been submitted, if set. */
-    public readonly submitCount = input<number | null>();
-
-    /** The field name in the error messages. Falls back to a name derived from the control. */
-    public readonly fieldName = input<string | null>();
 
     protected readonly errorMessages = computed(() => {
         const field = this.field();

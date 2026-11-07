@@ -26,21 +26,15 @@ import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLink
     ],
 })
 export class ProfileMenuComponent {
+    private readonly apiUrlConfig = inject(ApiUrlConfig);
     private readonly authService = inject(AuthService);
+    private readonly uiOptions = inject(UIOptions);
 
     protected readonly uiState = inject(UIState);
-    protected readonly themeService = inject(ThemeService);
-    protected readonly modalMenu = new ModalModel();
-    protected readonly language = inject(UIOptions).value.culture;
-    protected readonly languages = UILanguages.ALL;
-    protected readonly profileUrl = inject(ApiUrlConfig).buildUrl('/identity-server/account/profile');
-    protected readonly submenu = signal<'language' | 'theme' | null>(null);
 
-    protected readonly themeModes: ReadonlyArray<{ mode: ThemeMode; label: string }> = [
-        { mode: 'light', label: 'common.themeLight' },
-        { mode: 'dark', label: 'common.themeDark' },
-        { mode: 'system', label: 'common.themeSystem' },
-    ];
+    protected readonly themeService = inject(ThemeService);
+
+    protected readonly submenu = signal<'language' | 'theme' | null>(null);
 
     protected readonly profileId = computed(() => {
         return this.authService.userValue()?.id ?? '';
@@ -49,6 +43,20 @@ export class ProfileMenuComponent {
     protected readonly profileEmail = computed(() => {
         return this.authService.userValue()?.email ?? '';
     });
+
+    protected readonly modalMenu = new ModalModel();
+
+    protected readonly language = this.uiOptions.value.culture;
+
+    protected readonly languages = UILanguages.ALL;
+
+    protected readonly profileUrl = this.apiUrlConfig.buildUrl('/identity-server/account/profile');
+
+    protected readonly themeModes: ReadonlyArray<{ mode: ThemeMode; label: string }> = [
+        { mode: 'light', label: 'common.themeLight' },
+        { mode: 'dark', label: 'common.themeDark' },
+        { mode: 'system', label: 'common.themeSystem' },
+    ];
 
     protected changeLanguage(code: string) {
         Cookies.replace('.AspNetCore.Culture', `c=${code}|uic=${code}`, 365);

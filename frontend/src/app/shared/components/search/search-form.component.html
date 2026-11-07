@@ -60,7 +60,7 @@
                         </ng-template>
                     </sqx-dropdown>
                 } @else {
-                    <input class="form-control" [ngModel]="value" (ngModelChange)="onChange($event)" />
+                    <input class="form-control" [value]="value" (input)="onChange($any($event.target).value)" />
                 }
             }
         }

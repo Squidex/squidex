@@ -17,8 +17,6 @@ import { FocusComponent } from '../forms-helper';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorPickerComponent implements FormValueControl<string | null>, FocusComponent {
-    private readonly inputElement = viewChild<ElementRef<HTMLElement>>('input');
-
     /** The color value. */
     public readonly value = model<string | null>(null);
 
@@ -33,6 +31,8 @@ export class ColorPickerComponent implements FormValueControl<string | null>, Fo
 
     /** Renders a text input or only a colored circle. */
     public readonly mode = input<'Input' | 'Circle'>('Input');
+
+    protected readonly inputElement = viewChild<ElementRef<HTMLElement>>('input');
 
     protected readonly valueParsed = computed(() => {
         return parseColor(this.value());

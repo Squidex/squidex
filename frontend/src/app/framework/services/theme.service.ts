@@ -21,6 +21,7 @@ const THEME_KEY = 'squidex.theme';
     providedIn: 'root',
 })
 export class ThemeService {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly document = inject(DOCUMENT);
     private readonly localStore = inject(LocalStoreService);
     private readonly systemQuery = this.document.defaultView?.matchMedia?.('(prefers-color-scheme: dark)');
@@ -38,7 +39,7 @@ export class ThemeService {
     constructor() {
         this.systemQuery?.addEventListener?.('change', this.systemListener);
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.systemQuery?.removeEventListener?.('change', this.systemListener);
         });
 

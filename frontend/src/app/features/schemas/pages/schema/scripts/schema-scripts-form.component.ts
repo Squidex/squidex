@@ -34,16 +34,16 @@ export class SchemaScriptsFormComponent {
 
     protected readonly schemaScript = signal('query');
 
+    protected readonly isEditable = computed(() => {
+        return this.schema().canUpdateScripts;
+    });
+
     protected readonly schemaCompletions = rxResource({
         params: () => this.schema(),
         stream: ({ params }) => this.schemasService.getContentScriptsCompletion(this.appsState.appName, params.name),
     });
 
     protected readonly editForm = new EditSchemaScriptsForm();
-
-    protected readonly isEditable = computed(() => {
-        return this.schema().canUpdateScripts;
-    });
 
     constructor() {
         effect(() => {

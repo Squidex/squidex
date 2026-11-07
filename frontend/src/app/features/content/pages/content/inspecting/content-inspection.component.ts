@@ -26,6 +26,7 @@ type Mode = 'Content' | 'Data' | 'FlatData';
 })
 export class ContentInspectionComponent {
     private readonly contentsService = inject(ContentsService);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly contentsState = inject(ContentsState);
     private readonly toolbar = inject(ToolbarService);
     private contentData: any;
@@ -67,7 +68,7 @@ export class ContentInspectionComponent {
     });
 
     constructor() {
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.toolbar.remove(this);
         });
 

@@ -43,9 +43,11 @@ export class ImportContributorsDialogComponent {
     /** The roles that can be assigned to the imported contributors. */
     public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    protected readonly importForm = new ImportContributorsForm();
     protected readonly importStatus = signal<ReadonlyArray<ImportStatus>>([]);
+
     protected readonly importStage = signal<'Start' | 'Change' | 'Wait'>('Start');
+
+    protected readonly importForm = new ImportContributorsForm();
 
     protected detect() {
         this.importStage.set('Change');

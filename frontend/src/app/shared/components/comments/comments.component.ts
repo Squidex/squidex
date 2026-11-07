@@ -32,6 +32,7 @@ import { ContributorsDataSource } from './data-source';
     ],
 })
 export class CommentsComponent {
+    private readonly authService = inject(AuthService);
     private readonly messageBus = inject(MessageBus);
     private readonly input = viewChild<AutocompleteComponent>('input');
     private readonly selection = signal<ReadonlyArray<string>>([]);
@@ -50,7 +51,7 @@ export class CommentsComponent {
     public readonly commentsId = input<string | null>('');
 
     protected readonly commentForm = new UpsertCommentForm();
-    protected readonly commentUser = inject(AuthService).user!.token;
+    protected readonly commentUser = this.authService.user!.token;
     protected readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
 
     protected readonly commentItems = computed(() => {

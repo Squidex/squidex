@@ -42,13 +42,16 @@ export class LanguageComponent {
     public readonly fallbackLanguagesNew = input.required<ReadonlyArray<LanguageDto>>();
 
     protected readonly fallbackLanguagesLocal = linkedSignal(() => this.fallbackLanguages());
+
     protected readonly fallbackLanguagesNewLocal = linkedSignal(() => this.fallbackLanguagesNew());
-    protected readonly otherLanguageSelected = form(linkedSignal<LanguageDto | undefined>(() => this.fallbackLanguagesNewLocal()[0]));
+
     protected readonly isEditing = signal(false);
 
     protected readonly isEditable = computed(() => {
         return this.language().canUpdate;
     });
+
+    protected readonly otherLanguageSelected = form(linkedSignal<LanguageDto | undefined>(() => this.fallbackLanguagesNewLocal()[0]));
 
     protected readonly editForm = new EditLanguageForm();
 

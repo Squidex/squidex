@@ -26,11 +26,15 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
     ],
 })
 export class NotificationDropdownComponent {
+    private readonly authService = inject(AuthService);
     private readonly collaboration = inject(CollaborationService);
 
     protected readonly commentsState = inject(CommentsState);
+
     protected readonly modalMenu = new ModalModel();
-    protected readonly commentUser = inject(AuthService).user!.token;
+
+    protected readonly commentUser = this.authService.user!.token;
+
     protected readonly commentItems = this.commentsState.groupedUnresolvedComments;
 
     constructor() {

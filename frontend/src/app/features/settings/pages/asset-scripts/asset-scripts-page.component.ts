@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -36,19 +36,22 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     ],
 })
 export class AssetScriptsPageComponent {
+    private readonly appsState = inject(AppsState);
     private readonly assetScriptsState = inject(AssetScriptsState);
+    private readonly assetsService = inject(AssetsService);
 
     protected readonly assetScript = signal('query');
-    protected readonly assetCompletions;
+
+    protected readonly assetCompletions = rxResource({
+        stream: () => this.assetsService.getCompletions(this.appsState.appName),
+        defaultValue: null,
+    });
+
     protected readonly editForm = new EditAssetScriptsForm();
+
     protected readonly isEditable = this.assetScriptsState.canUpdate;
 
     constructor() {
-        const appsState = inject(AppsState);
-        const assetsService = inject(AssetsService);
-
-        this.assetCompletions = toSignal(assetsService.getCompletions(appsState.appName), { initialValue: null });
-
         effect(() => {
             this.editForm.load(this.assetScriptsState.scripts());
         });

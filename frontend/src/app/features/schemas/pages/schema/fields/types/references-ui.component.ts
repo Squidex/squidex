@@ -20,8 +20,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldEditorValues
     ],
 })
 export class ReferencesUIComponent {
-    protected readonly editors = ReferencesFieldEditorValues;
-
     /** The form to edit the field properties. */
     public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
@@ -34,4 +32,6 @@ export class ReferencesUIComponent {
     protected readonly form = computed(() => {
         return this.fieldForm() as FieldTree<ReferencesFieldFormModel>;
     });
+
+    protected readonly editors = ReferencesFieldEditorValues;
 }

@@ -41,6 +41,7 @@ export class ContributorsPageComponent {
     private readonly contributorsRoute = inject(Router2State);
 
     protected readonly contributorsState = inject(ContributorsState);
+
     protected readonly rolesState = inject(RolesState);
 
     constructor() {

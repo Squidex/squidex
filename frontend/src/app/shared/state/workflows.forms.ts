@@ -21,8 +21,8 @@ export class AddWorkflowForm extends SignalForm<AddWorkflowFormModel, AddWorkflo
 
     constructor() {
         super({ name: '' }, path => {
-            required(path.name);
             maxLength(path.name, 40);
+            required(path.name);
         });
     }
 

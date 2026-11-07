@@ -29,12 +29,16 @@ import { IndexComponent } from './index.component';
     ],
 })
 export class SchemaIndexesComponent {
+    private readonly uiOptions = inject(UIOptions);
+
     protected readonly indexesState = inject(IndexesState);
+
     protected readonly languagesState = inject(LanguagesState);
-    protected readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
 
     /** The schema to manage the indexes for. */
     public readonly schema = input.required<SchemaDto>();
+
+    protected readonly canCreateIndexes = this.uiOptions.value.canCreateIndexes;
 
     protected readonly addIndexDialog = new DialogModel();
 

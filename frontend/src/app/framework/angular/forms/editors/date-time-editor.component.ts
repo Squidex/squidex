@@ -25,9 +25,9 @@ import { FocusComponent } from '../forms-helper';
     ],
 })
 export class DateTimeEditorComponent implements FormValueControl<string | null>, FocusComponent {
-    private readonly hideDateButtonsSettings = !!inject(UIOptions).value.hideDateButtons;
-    private readonly hideDateTimeModeButtonSetting = !!inject(UIOptions).value.hideDateTimeModeButton;
-    private readonly dateInput = viewChild.required<ElementRef<HTMLInputElement>>('dateInput');
+    private readonly uiOptions = inject(UIOptions);
+    private readonly hideDateTimeModeButtonSetting = !!this.uiOptions.value.hideDateTimeModeButton;
+    private readonly hideDateButtonsSettings = !!this.uiOptions.value.hideDateButtons;
 
     /** The date as ISO string. */
     public readonly value = model<string | null>(null);
@@ -61,6 +61,8 @@ export class DateTimeEditorComponent implements FormValueControl<string | null>,
 
     /** The initial size of the editor. It is adjusted to the available width. */
     public readonly size = input<'Normal' | 'Compact' | 'Mini'>('Normal');
+
+    protected readonly dateInput = viewChild.required<ElementRef<HTMLInputElement>>('dateInput');
 
     protected readonly sizeActual = linkedSignal(() => this.size());
 

@@ -25,7 +25,8 @@ export class ReferencesRadioButtonsComponent implements FormValueControl<Readonl
     private readonly appsState = inject(AppsState);
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
-    private readonly itemCount: number = inject(UIOptions).value.referencesDropdownItemCount;
+    private readonly uiOptions = inject(UIOptions);
+    private readonly itemCount: number = this.uiOptions.value.referencesDropdownItemCount;
     private readonly contentItems = rxResource({
         params: () => this.schemaId() || undefined,
         stream: ({ params: schemaId }) => this.contentsService.getContents(this.appsState.appName, schemaId, { take: this.itemCount }).pipe(

@@ -88,46 +88,38 @@ export class SearchFormComponent {
     });
 
     protected readonly saveQueryDialog = new DialogModel();
-
     protected readonly saveQueryForm = new SaveQueryForm();
-
     protected readonly cleanedQuery = linkedSignal(() => sanitize(this.query()));
 
-    protected readonly options: FilterOptions;
-
-    constructor() {
-        const localizer = this.localizer;
-
-        this.options = {
-            cssClasses: {
-                ...BootstrapClasses,
-                buttonAdd: 'btn btn-success',
-                buttonAddOutline: 'btn btn-outline-success btn-sm',
-                buttonDefault: (active: boolean) => `btn ${active ? 'fw-bold' : ''}`,
-                buttonLogical: active => `btn btn-sm btn-secondary btn-toggle ${active ? 'btn-primary' : ''}`,
-                dropdown: 'bg-white',
-                dropdownItem: active => `control-dropdown-item control-dropdown-item-selectable separated ${active ? 'active' : ''}`,
-                dropdownSearch: 'p-2',
-            },
-            texts: {
-                addComparison: localizer.getOrKey('search.addFilter'),
-                addGroup: localizer.getOrKey('search.addGroup'),
-                addSorting: localizer.getOrKey('search.addSorting'),
-                apply: localizer.getOrKey('common.search'),
-                and: 'AND',
-                not: 'NOT',
-                noResults: ' - ',
-                or: 'OR',
-                reset: localizer.getOrKey('common.reset'),
-                save: localizer.getOrKey('common.save'),
-                searchPlaceholder: localizer.getOrKey('common.search'),
-                searchShortcut: 'CTRL + I',
-                sortAsc: 'ascending',
-                sortDesc: 'descending',
-                sorting: localizer.getOrKey('search.sorting'),
-            },
-        };
-    }
+    protected readonly options: FilterOptions = {
+        cssClasses: {
+            ...BootstrapClasses,
+            buttonAdd: 'btn btn-success',
+            buttonAddOutline: 'btn btn-outline-success btn-sm',
+            buttonDefault: (active: boolean) => `btn ${active ? 'fw-bold' : ''}`,
+            buttonLogical: active => `btn btn-sm btn-secondary btn-toggle ${active ? 'btn-primary' : ''}`,
+            dropdown: 'bg-white',
+            dropdownItem: active => `control-dropdown-item control-dropdown-item-selectable separated ${active ? 'active' : ''}`,
+            dropdownSearch: 'p-2',
+        },
+        texts: {
+            addComparison: this.localizer.getOrKey('search.addFilter'),
+            addGroup: this.localizer.getOrKey('search.addGroup'),
+            addSorting: this.localizer.getOrKey('search.addSorting'),
+            apply: this.localizer.getOrKey('common.search'),
+            and: 'AND',
+            not: 'NOT',
+            noResults: ' - ',
+            or: 'OR',
+            reset: this.localizer.getOrKey('common.reset'),
+            save: this.localizer.getOrKey('common.save'),
+            searchPlaceholder: this.localizer.getOrKey('common.search'),
+            searchShortcut: 'CTRL + I',
+            sortAsc: 'ascending',
+            sortDesc: 'descending',
+            sorting: this.localizer.getOrKey('search.sorting'),
+        },
+    };
 
     private buildFilterModel(model: QueryModel | null | undefined) {
         if (!model) {

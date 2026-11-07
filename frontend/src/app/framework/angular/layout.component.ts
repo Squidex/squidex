@@ -32,36 +32,14 @@ type DisplayMode = 'Normal' | 'Expanded' | 'Collapsed';
 export class LayoutComponent {
     private readonly changeDetector = inject(ChangeDetectorRef);
     private readonly container = inject(LayoutContainerDirective);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly renderer = inject(Renderer2);
     private readonly router = inject(Router, { optional: true });
-    private readonly panel = viewChild.required<ElementRef<HTMLElement>>('panel');
-
-    private readonly actualWidth = computed(() => {
-        const displayMode = this.displayMode();
-        const layout = this.layout();
-
-        if (layout === 'left') {
-            const expandedWidth = this.expandedWidth();
-            if (displayMode === 'Expanded' && expandedWidth > 0) {
-                return expandedWidth;
-            }
-
-            const collapsedWidth = this.collapsedWidth();
-            if (displayMode === 'Collapsed' && collapsedWidth > 0) {
-                return collapsedWidth;
-            }
-        } else if (layout === 'right') {
-            if (displayMode === 'Collapsed' || this.isMinimized()) {
-                return 0;
-            }
-        }
-
-        return this.width();
-    });
-
+    private isViewInitField = false;
     private widthPrevious?: string;
     private widthToRender = 0;
-    private isViewInitField = false;
+
+    protected readonly route = inject(ActivatedRoute, { optional: true });
 
     /** How the query parameters are handled when the layout is closed. */
     public readonly closeQueryParamsHandling = input<QueryParamsHandling>('preserve');
@@ -111,13 +89,36 @@ export class LayoutComponent {
     /** The width in rem of the left layout when collapsed. */
     public readonly collapsedWidth = input(3, { transform: numberAttribute });
 
-    protected readonly sidebarMenuTemplate = contentChild(SidebarMenuDirective);
+    protected readonly panel = viewChild.required<ElementRef<HTMLElement>>('panel');
 
-    protected readonly route = inject(ActivatedRoute, { optional: true });
+    protected readonly sidebarMenuTemplate = contentChild(SidebarMenuDirective);
 
     protected readonly displayMode = signal<DisplayMode>('Normal');
 
     protected readonly isMinimized = signal(false);
+
+    protected readonly actualWidth = computed(() => {
+        const displayMode = this.displayMode();
+        const layout = this.layout();
+
+        if (layout === 'left') {
+            const expandedWidth = this.expandedWidth();
+            if (displayMode === 'Expanded' && expandedWidth > 0) {
+                return expandedWidth;
+            }
+
+            const collapsedWidth = this.collapsedWidth();
+            if (displayMode === 'Collapsed' && collapsedWidth > 0) {
+                return collapsedWidth;
+            }
+        } else if (layout === 'right') {
+            if (displayMode === 'Collapsed' || this.isMinimized()) {
+                return 0;
+            }
+        }
+
+        return this.width();
+    });
 
     protected readonly desiredInnerWidth = computed(() => {
         const innerWidth = this.innerWidth();
@@ -154,7 +155,7 @@ export class LayoutComponent {
     constructor() {
         this.container.push(this);
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.container.peek();
         });
 

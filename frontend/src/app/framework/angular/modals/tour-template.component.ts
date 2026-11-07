@@ -36,8 +36,6 @@ export class TourTemplateComponent {
 
     protected readonly currentElement = signal<any>(null);
 
-    protected readonly hasPrev = false;
-
     protected readonly hasNext = computed(() => {
         const step = this.currentStep();
         if (!step) {
@@ -67,6 +65,8 @@ export class TourTemplateComponent {
 
         return `${100 * stepIndex / stepCount}%`;
     });
+
+    protected readonly hasPrev = false;
 
     constructor() {
         const tourService = this.tourService;

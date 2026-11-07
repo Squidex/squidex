@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, Directive, DestroyRef, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import { afterNextRender, booleanAttribute, DestroyRef, Directive, ElementRef, inject, input, Renderer2 } from '@angular/core';
 import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
@@ -15,6 +15,7 @@ import { ResizeListener, ResizeService } from '@app/framework/internal';
     },
 })
 export class CompensateScrollbarDirective implements ResizeListener {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly renderer = inject(Renderer2);
     private readonly resizeService = inject(ResizeService);
@@ -26,7 +27,7 @@ export class CompensateScrollbarDirective implements ResizeListener {
     constructor() {
         const unlisten = this.resizeService.listen(this.element.nativeElement, this);
 
-        inject(DestroyRef).onDestroy(unlisten);
+        this.destroyRef.onDestroy(unlisten);
 
         afterNextRender(() => {
             this.resize();

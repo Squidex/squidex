@@ -35,8 +35,6 @@ import { FocusOnInitDirective } from '../focus-on-init.directive';
     ],
 })
 export class DropdownComponent implements FormValueControl<any> {
-    private readonly templates = contentChildren(TemplateRef);
-
     private lastValue: any;
 
     /** The value of the control. */
@@ -93,6 +91,18 @@ export class DropdownComponent implements FormValueControl<any> {
     /** Additional styles for the dropdown. */
     public readonly dropdownStyles = input<any>({});
 
+    protected readonly templates = contentChildren(TemplateRef);
+
+    protected readonly suggestedItems = signal<ReadonlyArray<any>>([]);
+
+    protected readonly suggestedIndex = signal(-1);
+
+    protected readonly selectedItem = signal<any>(undefined);
+
+    protected readonly query = signal<RegExp | undefined>(undefined);
+
+    protected readonly queryText = signal('');
+
     protected readonly templateItem = computed(() => {
         return this.templates()[0];
     });
@@ -104,16 +114,6 @@ export class DropdownComponent implements FormValueControl<any> {
     });
 
     protected readonly dropdown = new ModalModel();
-
-    protected readonly suggestedItems = signal<ReadonlyArray<any>>([]);
-
-    protected readonly suggestedIndex = signal(-1);
-
-    protected readonly selectedItem = signal<any>(undefined);
-
-    protected readonly query = signal<RegExp | undefined>(undefined);
-
-    protected readonly queryText = signal('');
 
     constructor() {
         effect(() => {

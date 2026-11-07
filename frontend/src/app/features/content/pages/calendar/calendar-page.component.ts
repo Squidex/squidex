@@ -41,6 +41,7 @@ type ViewMode = 'day' | 'week' | 'month';
 })
 export class CalendarPageComponent {
     private readonly appsState = inject(AppsState);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly contentsService = inject(ContentsService);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly languagesState = inject(LanguagesState);
@@ -60,7 +61,7 @@ export class CalendarPageComponent {
             this.initCalendar();
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.calendar?.destroy();
         });
     }

@@ -24,8 +24,6 @@ import { TourStepDirective } from './tour-step.directive';
     ],
 })
 export class ModalDialogComponent {
-    private readonly tabsElement = viewChild<ElementRef<ParentNode>>('tabsElement');
-    private readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
     private readonly renderer = inject(Renderer2);
 
     /** Emits when the dialog is closed with the close button or the escape key. */
@@ -54,6 +52,10 @@ export class ModalDialogComponent {
 
     /** The ID of the tour step that points to this dialog. */
     public readonly tourId = input<string>();
+
+    protected readonly tabsElement = viewChild<ElementRef<ParentNode>>('tabsElement');
+
+    protected readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
 
     constructor() {
         afterNextRender(() => {

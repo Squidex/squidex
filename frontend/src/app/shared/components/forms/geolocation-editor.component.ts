@@ -34,9 +34,10 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     ],
 })
 export class GeolocationEditorComponent implements FormValueControl<Geolocation | null> {
+    private readonly uiOptions = inject(UIOptions);
     private readonly resourceLoader = inject(ResourceLoaderService);
 
-    private readonly googleMapsKey = inject(UIOptions).value.map.googleMaps.key;
+    private readonly googleMapsKey = this.uiOptions.value.map.googleMaps.key;
     private readonly localStore = inject(LocalStoreService);
     private readonly editor = viewChild.required<ElementRef<HTMLElement>>('editor');
     private readonly searchBoxInput = viewChild.required<ElementRef<HTMLInputElement>>('searchBox');
@@ -54,16 +55,16 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
     /** Indicates whether the control has been touched. */
     public readonly touched = model(false);
 
-    protected readonly isGoogleMaps = inject(UIOptions).value.map.type !== 'OSM';
+    protected readonly isGoogleMaps = this.uiOptions.value.map.type !== 'OSM';
 
-    protected readonly isMapHidden = signal(this.localStore.getBoolean(Settings.Local.HIDE_MAP));
+    protected readonly isMapHidden = this.localStore.boolean(Settings.Local.HIDE_MAP);
 
     protected readonly isCompact = signal(false);
 
     protected readonly geolocationForm = form(this.geolocationModel, path => {
-        disabled(path, () => this.disabled());
         SignalValidators.between(path.latitude, -90, 90);
         SignalValidators.between(path.longitude, -180, 180);
+        disabled(path, () => this.disabled());
     });
 
     constructor() {
@@ -75,10 +76,6 @@ export class GeolocationEditorComponent implements FormValueControl<Geolocation 
             untracked(() => {
                 this.applyValue(value);
             });
-        });
-
-        effect(() => {
-            this.localStore.setBoolean(Settings.Local.HIDE_MAP, this.isMapHidden());
         });
 
         effect(() => {

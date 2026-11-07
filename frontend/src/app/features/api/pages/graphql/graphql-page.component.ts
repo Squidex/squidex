@@ -37,6 +37,7 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
 })
 export class GraphQLPageComponent {
     private readonly appsState = inject(AppsState);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly apiUrl = inject(ApiUrlConfig);
     private readonly authService = inject(AuthService);
     private readonly clientsService = inject(ClientsService);
@@ -88,7 +89,7 @@ export class GraphQLPageComponent {
             this.render();
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.reactRoot?.unmount();
             this.reactRoot = null;
         });

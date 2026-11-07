@@ -14,16 +14,14 @@ const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
     selector: '[sqxImageSource]',
 })
 export class ImageSourceDirective {
-    private readonly zone = inject(NgZone);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly element = inject(ElementRef);
     private readonly renderer = inject(Renderer2);
-    private readonly parentElement = computed(() => {
-        return this.parent() || this.renderer.parentNode(this.element.nativeElement);
-    });
-    private size: any;
-    private loadTimer: any;
-    private loadRetries = 0;
+    private readonly zone = inject(NgZone);
     private loadQuery: string | null = null;
+    private loadRetries = 0;
+    private loadTimer: any;
+    private size: any;
 
     /** The URL of the image, without the size query. */
     public readonly imageSource = input.required<string>({ alias: 'sqxImageSource' });
@@ -36,6 +34,10 @@ export class ImageSourceDirective {
 
     /** The element to calculate the size from. Defaults to the parent element. */
     public readonly parent = input<any>(null);
+
+    protected readonly parentElement = computed(() => {
+        return this.parent() || this.renderer.parentNode(this.element.nativeElement);
+    });
 
     constructor() {
         effect(onCleanup => {
@@ -71,7 +73,7 @@ export class ImageSourceDirective {
             this.resize();
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             clearTimeout(this.loadTimer);
         });
     }

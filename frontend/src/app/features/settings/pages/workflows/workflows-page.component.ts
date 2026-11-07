@@ -36,6 +36,7 @@ export class WorkflowsPageComponent {
     private readonly rolesState = inject(RolesState);
 
     protected readonly schemasSource = inject(SchemaTagSource);
+
     protected readonly workflowsState = inject(WorkflowsState);
 
     protected readonly roles = computed(() => {

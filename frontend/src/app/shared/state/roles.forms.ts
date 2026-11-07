@@ -45,8 +45,8 @@ export class AddRoleForm extends SignalForm<{ name: string }, AddRoleDto> {
 
     constructor() {
         super({ name: '' }, path => {
-            required(path.name);
             maxLength(path.name, 40);
+            required(path.name);
         });
     }
 

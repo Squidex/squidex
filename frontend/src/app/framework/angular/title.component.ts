@@ -15,6 +15,7 @@ import { TitleService, Types } from '@app/framework/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TitleComponent {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly titleService = inject(TitleService);
@@ -35,7 +36,7 @@ export class TitleComponent {
             this.previousIndex = this.titleService.push(message, this.previousIndex, routeUrl);
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             if (Types.isNumber(this.previousIndex)) {
                 this.titleService.pop();
             }

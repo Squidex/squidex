@@ -36,9 +36,11 @@ import { SearchMenuComponent } from './search-menu.component';
 export class InternalAreaComponent {
     private readonly dialogs = inject(DialogService);
     private readonly route = inject(ActivatedRoute);
+    private readonly uiOptions = inject(UIOptions);
 
     protected readonly loadingService = inject(LoadingService);
-    protected readonly isEmbedded = inject(UIOptions).value.embedded;
+
+    protected readonly isEmbedded = this.uiOptions.value.embedded;
 
     constructor() {
         this.route.queryParams.pipe(takeUntilDestroyed())

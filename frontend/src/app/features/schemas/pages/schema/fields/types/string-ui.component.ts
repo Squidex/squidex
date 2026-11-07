@@ -23,7 +23,6 @@ import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponen
 })
 export class StringUIComponent {
     protected readonly schemasSource = inject(SchemaTagSource);
-    protected readonly editors = StringFieldEditorValues;
 
     /** The form to edit the field properties. */
     public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
@@ -45,6 +44,8 @@ export class StringUIComponent {
     protected readonly hideClassNames = computed(() => {
         return hidesClassNames(this.form().editor().value());
     });
+
+    protected readonly editors = StringFieldEditorValues;
 
     constructor() {
         effect(() => {

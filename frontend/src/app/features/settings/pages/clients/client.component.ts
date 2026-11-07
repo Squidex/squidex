@@ -7,7 +7,7 @@
 
 
 import { ChangeDetectionStrategy, Component, inject, input, linkedSignal } from '@angular/core';
-import { disabled, form, FormField } from '@angular/forms/signals';
+import { disabled, form, FormField, min } from '@angular/forms/signals';
 import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormRowComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, UpdateClientDto } from '@app/shared';
 import { ClientConnectFormComponent } from './client-connect-form.component';
 
@@ -42,6 +42,7 @@ export class ClientComponent {
 
     protected readonly apiCallsLimit = form(linkedSignal(() => this.client().apiCallsLimit), path => {
         disabled(path, () => !this.client().canUpdate);
+        min(path, 0);
     });
 
     protected readonly connectDialog = new DialogModel(false);

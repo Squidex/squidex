@@ -33,16 +33,16 @@ export class SchemaPreviewUrlsFormComponent {
     /** The schema to configure the preview URLs for. */
     public readonly schema = input.required<SchemaDto>();
 
-    protected readonly editForm = new ConfigurePreviewUrlsForm();
+    protected readonly isEditable = computed(() => {
+        return this.schema().canUpdateUrls;
+    });
 
     protected readonly fieldCompletions = rxResource({
         params: () => this.schema().name,
         stream: ({ params }) => this.schemasService.getFieldRulesCompletion(this.schemasState.appName, params),
     });
 
-    protected readonly isEditable = computed(() => {
-        return this.schema().canUpdateUrls;
-    });
+    protected readonly editForm = new ConfigurePreviewUrlsForm();
 
     constructor() {
         effect(() => {

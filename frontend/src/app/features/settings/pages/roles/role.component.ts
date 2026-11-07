@@ -63,11 +63,7 @@ export class RoleComponent {
     /** The schemas of the app, used to hide individual schemas for the role. */
     public readonly schemas = input.required<ReadonlyArray<SchemaDto>>();
 
-    protected readonly descriptions = DESCRIPTIONS as Record<string, string>;
-
-    protected readonly propertiesList = Settings.AppProperties;
     protected readonly properties = linkedSignal<Record<string, any>>(() => ({ ...this.role().properties }));
-    protected readonly propertiesSimple = SIMPLE_PROPERTIES;
 
     protected readonly isEditing = signal(false);
 
@@ -75,11 +71,17 @@ export class RoleComponent {
         return this.role().canUpdate;
     });
 
-    protected readonly editForm = new EditRoleForm();
-
     protected readonly halfSchemas = computed(() => {
         return Math.ceil(this.schemas().length / 2);
     });
+
+    protected readonly descriptions = DESCRIPTIONS as Record<string, string>;
+
+    protected readonly propertiesList = Settings.AppProperties;
+
+    protected readonly propertiesSimple = SIMPLE_PROPERTIES;
+
+    protected readonly editForm = new EditRoleForm();
 
     constructor() {
         effect(() => {

@@ -17,16 +17,19 @@ declare const videojs: any;
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoPlayerComponent {
-    private readonly player = signal<any>(null);
-    private readonly video = viewChild.required<ElementRef<HTMLVideoElement>>('video');
-    private readonly resourceLoader = inject(ResourceLoaderService);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly renderer = inject(Renderer2);
+    private readonly resourceLoader = inject(ResourceLoaderService);
 
     /** The URL of the video. */
     public readonly source = input('');
 
     /** The mime type of the video, for example "video/mp4". */
     public readonly mimeType = input('');
+
+    protected readonly player = signal<any>(null);
+
+    protected readonly video = viewChild.required<ElementRef<HTMLVideoElement>>('video');
 
     constructor() {
         afterNextRender(async () => {
@@ -55,7 +58,7 @@ export class VideoPlayerComponent {
             }
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.player()?.dispose();
         });
     }

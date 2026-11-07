@@ -24,8 +24,8 @@ export class HomePageComponent {
     private readonly location = inject(Location);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
-
-    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
+    private readonly uiOptions = inject(UIOptions);
+    private readonly redirectToLogin = this.uiOptions.value.redirectToLogin;
 
     protected async login() {
         const redirectPath =

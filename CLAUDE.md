@@ -34,7 +34,18 @@ npm run lint
 - Make all signal fields `readonly`.
 - Document component inputs and outputs with a short `/** ... */` comment. Do not add any other comments to components.
 - Use `inject()` in components instead of constructor parameters.
-- Order class members: `private readonly` fields first, then other `private` fields, then everything else.
+- Order class members:
+  1. `private readonly` fields, sorted by name.
+  2. Other `private` fields, sorted by name.
+  3. Protected injections (`inject()`).
+  4. Inputs and outputs, including models that are part of the public interface.
+  5. Basic signals (`signal()`, `linkedSignal()`, internal models, view and content queries).
+  6. Computeds.
+  7. Resources.
+  8. Every other protected field.
+- Signals are `protected`, unless they are part of the public interface (inputs, outputs, public models).
+- Never inline `inject()` calls into other expressions. Assign every injection to its own field and use that field.
+- Load data from services with resources (`rxResource`, `resource`), never with `toSignal`.
 - Do not put blank lines between single-line `private readonly` and `private` fields, neither inside a group nor between the two groups. Fields that span multiple lines are separated by blank lines.
 - Pass submit actions to `submit()`/`submitAndUpdate()` as block-body arrows with an explicit `return`.
 - In signal form schemas, sort the rule calls by validator name, then by the field order of the model.

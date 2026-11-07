@@ -20,9 +20,6 @@ import { FieldDto, FieldFormModel, FloatConverter, FormRowComponent, NumberField
     ],
 })
 export class NumberUIComponent {
-    protected readonly converter = FloatConverter.INSTANCE;
-    protected readonly editors = NumberFieldEditorValues;
-
     /** The form to edit the field properties. */
     public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
@@ -39,6 +36,10 @@ export class NumberUIComponent {
     protected readonly hideAllowedValues = computed(() => {
         return hidesAllowedValues(this.form().editor().value());
     });
+
+    protected readonly converter = FloatConverter.INSTANCE;
+
+    protected readonly editors = NumberFieldEditorValues;
 
     constructor() {
         effect(() => {

@@ -82,8 +82,8 @@ export class ContentPageComponent implements CanComponentDeactivate {
     private readonly mutableContext: Record<string, any> = {
         action: 'Create',
         apiUrl: this.apiUrl.buildUrl('api'),
-        appId: inject(ContentsState).appId,
-        appName: inject(ContentsState).appName,
+        appId: this.appsState.appId,
+        appName: this.appsState.appName,
         user: { role: this.appsState.snapshot.selectedApp?.roleName, ...this.authService.user?.export() },
     };
 
@@ -110,8 +110,12 @@ export class ContentPageComponent implements CanComponentDeactivate {
         return this.languagesState.isoLanguages();
     });
 
-    protected readonly language = linkedSignal(() => {
-        const languageKey = this.localStore.get(this.languageKey());
+    protected readonly languageStore = computed(() => {
+        return this.localStore.value(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
+    });
+
+    protected readonly language = computed(() => {
+        const languageKey = this.languageStore()();
         const languageMaster = this.languagesState.isoMasterLanguage();
 
         return this.languages().find(x => x.iso2Code === languageKey) || languageMaster;
@@ -123,7 +127,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
         return untracked(() => this.createForm(schema));
     });
 
-    protected readonly showIdInput = signal(this.localStore.getBoolean(Settings.Local.CONTENT_ID_INPUT));
+    protected readonly showIdInput = this.localStore.boolean(Settings.Local.CONTENT_ID_INPUT);
 
     protected readonly confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();
@@ -325,8 +329,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     }
 
     protected changeLanguage(language: AppLanguageDto) {
-        this.language.set(language);
-        this.localStore.set(this.languageKey(), language.iso2Code);
+        this.languageStore().set(language.iso2Code);
 
         this.updateContext();
     }
@@ -407,13 +410,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     }
 
     protected changeShowIdInput(value: boolean) {
-        this.localStore.setBoolean(Settings.Local.CONTENT_ID_INPUT, value);
-
         this.showIdInput.set(value);
-    }
-
-    private languageKey(): any {
-        return Settings.Local.CONTENT_LANGUAGE(this.schema().id);
     }
 }
 

@@ -20,9 +20,11 @@ import { TourHintDirective } from './tour-hint.directive';
     ],
 })
 export class NotifoComponent {
+    private readonly authService = inject(AuthService);
+    private readonly uiOptions = inject(UIOptions);
     private readonly renderer = inject(Renderer2);
-    private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;
-    private readonly notifoApiKey = inject(AuthService).user?.notifoToken;
+    private readonly notifoApiUrl: string = this.uiOptions.value.notifoApi;
+    private readonly notifoApiKey = this.authService.user?.notifoToken;
     private readonly element = viewChild<ElementRef<Element>>('element');
     private topicShown = '';
     private isShown = false;

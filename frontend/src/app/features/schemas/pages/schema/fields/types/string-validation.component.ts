@@ -28,8 +28,6 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FieldF
     ],
 })
 export class StringValidationComponent {
-    protected readonly contentTypes = StringContentTypeValues;
-
     /** The form to edit the field properties. */
     public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
@@ -54,8 +52,6 @@ export class StringValidationComponent {
     protected readonly form = computed(() => {
         return this.fieldForm() as FieldTree<StringFieldFormModel>;
     });
-
-    protected readonly patternsModal = new ModalModel();
 
     protected readonly showPatternMessage = computed(() => {
         return !!this.form().pattern().value();
@@ -84,6 +80,10 @@ export class StringValidationComponent {
 
         return Types.is(field, FieldDto) && !field.isLocalizable && this.schema().type !== 'Component';
     });
+
+    protected readonly contentTypes = StringContentTypeValues;
+
+    protected readonly patternsModal = new ModalModel();
 
     constructor() {
         effect(() => {

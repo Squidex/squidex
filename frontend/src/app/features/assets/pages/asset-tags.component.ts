@@ -41,11 +41,12 @@ export class AssetTagsComponent {
     public readonly canRename = input(false, { transform: booleanAttribute });
 
     protected readonly tagRenaming = signal<TagItem | undefined>(undefined);
-    protected readonly tagRenameDialog = new DialogModel();
 
     protected readonly isEmpty = computed(() => {
         return Object.keys(this.tagsSelected()).length === 0;
     });
+
+    protected readonly tagRenameDialog = new DialogModel();
 
     protected isSelected(tag: TagItem) {
         return this.tagsSelected()[tag.name] === true;

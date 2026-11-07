@@ -14,9 +14,10 @@ import { DestroyRef, Directive, effect, ElementRef, inject, input, NgZone, Rende
     },
 })
 export class ImageUrlDirective {
-    private readonly zone = inject(NgZone);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly element = inject(ElementRef);
     private readonly renderer = inject(Renderer2);
+    private readonly zone = inject(NgZone);
 
     /** The URL of the image. The image is hidden until it has been loaded. */
     public readonly imageUrl = input.required<string>({ alias: 'sqxImageUrl' });
@@ -31,7 +32,7 @@ export class ImageUrlDirective {
             }),
         ]);
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             for (const unlisten of unlisteners) {
                 unlisten();
             }

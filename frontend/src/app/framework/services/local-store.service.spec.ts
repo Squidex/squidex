@@ -103,4 +103,36 @@ describe('LocalStore', () => {
 
         expect(localStore.get('key1')).toBeNull();
     });
+
+    it('should provide boolean signal that writes to local store', () => {
+        const localStore = new LocalStoreService();
+
+        const value = localStore.boolean('key1');
+
+        value.set(true);
+
+        expect(value()).toBe(true);
+        expect(localStore.getBoolean('key1')).toBe(true);
+    });
+
+    it('should update signal when value is set', () => {
+        const localStore = new LocalStoreService();
+
+        const value = localStore.int('key1', 13);
+
+        localStore.setInt('key1', 42);
+
+        expect(value()).toBe(42);
+    });
+
+    it('should keep signals of same key in sync', () => {
+        const localStore = new LocalStoreService();
+
+        const value1 = localStore.value('key1');
+        const value2 = localStore.value('key1');
+
+        value1.set('abc');
+
+        expect(value2()).toBe('abc');
+    });
 });

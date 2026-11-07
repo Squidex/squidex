@@ -25,6 +25,7 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     ],
 })
 export class AssetFolderDropdownComponent implements FormValueControl<string | null> {
+    private readonly appsState = inject(AppsState);
     private readonly assetsService = inject(AssetsService);
     private readonly changeDetector = inject(ChangeDetectorRef);
     private selectedId?: string;
@@ -38,7 +39,7 @@ export class AssetFolderDropdownComponent implements FormValueControl<string | n
     /** Indicates whether the control has been touched. */
     public readonly touched = model(false);
 
-    protected readonly appName = inject(AppsState).appName;
+    protected readonly appName = this.appsState.appName;
 
     protected readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
 

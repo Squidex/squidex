@@ -25,7 +25,6 @@ import { ThemeService } from '@app/framework/internal';
 export class ProgressBarComponent {
     private readonly element = inject(ElementRef);
     private readonly themeService = inject(ThemeService);
-    private readonly progressBar = signal<any>(null);
 
     /** Renders a horizontal line or a circle. */
     public readonly mode = input<'Line' | 'Circle' | string>('Line');
@@ -50,6 +49,8 @@ export class ProgressBarComponent {
 
     /** The progress in percent, between 0 and 100. */
     public readonly value = input(0, { transform: numberAttribute });
+
+    protected readonly progressBar = signal<any>(null);
 
     constructor() {
         effect(onCleanup => {

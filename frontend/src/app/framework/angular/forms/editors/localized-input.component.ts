@@ -33,12 +33,6 @@ type LocalizedValue = { [key: string]: any };
     ],
 })
 export class LocalizedInputComponent implements FormValueControl<LocalizedValue | null> {
-    private readonly valueObject = computed(() => {
-        const value = this.value();
-
-        return Types.isObject(value) ? value as LocalizedValue : null;
-    });
-
     /** The values per language. */
     public readonly value = model<LocalizedValue | null>(null);
 
@@ -61,6 +55,12 @@ export class LocalizedInputComponent implements FormValueControl<LocalizedValue 
     public readonly id = input('');
 
     protected readonly language = signal<Language>(DEFAULT_LANGUAGE);
+
+    protected readonly valueObject = computed(() => {
+        const value = this.value();
+
+        return Types.isObject(value) ? value as LocalizedValue : null;
+    });
 
     protected readonly valueCurrent = computed(() => {
         return this.valueObject()?.[this.language().iso2Code] ?? null;

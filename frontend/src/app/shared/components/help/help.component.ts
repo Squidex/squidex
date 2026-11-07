@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '@app/framework';
 import { HelpService } from '@app/shared/internal';
@@ -18,7 +18,6 @@ import { HelpMarkdownPipe } from './help-markdown.pipe';
     templateUrl: './help.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         HelpMarkdownPipe,
         LayoutComponent,
     ],
@@ -27,5 +26,5 @@ export class HelpComponent {
     private readonly helpService = inject(HelpService);
     private readonly route = inject(ActivatedRoute);
 
-    protected helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);
+    protected readonly helpMarkdown = toSignal(this.helpService.getHelp(this.route.snapshot.data.helpPage));
 }

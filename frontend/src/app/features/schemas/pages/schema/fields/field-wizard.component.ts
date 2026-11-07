@@ -38,7 +38,6 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
 export class FieldWizardComponent {
     private readonly injector = inject(Injector);
     private readonly schemasState = inject(SchemasState);
-    private readonly nameInput = viewChild<ElementRef<HTMLElement>>('nameInput');
 
     protected readonly languagesState = inject(LanguagesState);
 
@@ -54,6 +53,10 @@ export class FieldWizardComponent {
     /** Emits when the dialog is closed. */
     public readonly dialogClose = output();
 
+    protected readonly nameInput = viewChild<ElementRef<HTMLElement>>('nameInput');
+
+    protected readonly editing = signal<{ field: FieldDto; form: EditFieldForm } | null>(null);
+
     protected readonly fieldTypes = computed(() => {
         if (this.parent()) {
             return fieldTypes.filter(x => x.type !== 'Array');
@@ -62,15 +65,13 @@ export class FieldWizardComponent {
         return fieldTypes;
     });
 
-    protected readonly addFieldForm = new AddFieldForm();
-
-    protected readonly addFieldModal = new ModalModel();
-
-    protected readonly editing = signal<{ field: FieldDto; form: EditFieldForm } | null>(null);
-
     protected readonly isLocalizable = computed(() => {
         return this.parent()?.isLocalizable || (this.editing()?.field as any)?.['isLocalizable'];
     });
+
+    protected readonly addFieldForm = new AddFieldForm();
+
+    protected readonly addFieldModal = new ModalModel();
 
     protected emitClose() {
         this.dialogClose.emit();

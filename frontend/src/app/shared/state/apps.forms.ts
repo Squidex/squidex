@@ -12,9 +12,9 @@ import { AppDto, AppSettingsDto, CreateAppDto, EditorDto, PatternDto, TransferTo
 export class CreateAppForm extends SignalForm<{ name: string }, CreateAppDto> {
     constructor() {
         super({ name: '' }, path => {
-            required(path.name);
             maxLength(path.name, 40);
             SignalValidators.patternWithMessage(path.name, '[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage');
+            required(path.name);
         });
     }
 
@@ -57,18 +57,18 @@ export class EditAppSettingsForm extends SignalForm<EditAppSettingsFormModel, Up
     constructor() {
         super({ patterns: [], editors: [], hideScheduler: false, hideDateTimeModeButton: false }, path => {
             applyEach(path.patterns, pattern => {
-                required(pattern.name);
                 maxLength(pattern.name, 1000);
-                required(pattern.regex);
                 maxLength(pattern.regex, 1000);
                 maxLength(pattern.message, 1000);
+                required(pattern.name);
+                required(pattern.regex);
             });
 
             applyEach(path.editors, editor => {
-                required(editor.name);
                 maxLength(editor.name, 1000);
-                required(editor.url);
                 maxLength(editor.url, 1000);
+                required(editor.name);
+                required(editor.url);
             });
         });
     }

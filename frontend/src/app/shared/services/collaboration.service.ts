@@ -19,7 +19,8 @@ export type CollaborationProvider = { awareness: Awareness; doc: Y.Doc; destroy:
 @Injectable()
 export class CollaborationService {
     private readonly provider = signal<CollaborationProvider | null>(null);
-    private readonly basePath = inject(UIOptions).value.collaborationService;
+    private readonly uiOptions = inject(UIOptions);
+    private readonly basePath = this.uiOptions.value.collaborationService;
     private readonly profile: Profile;
     private readonly usersState = signal<AwarenessState[]>([], { equal: Types.equals });
     private previousName?: string | null;

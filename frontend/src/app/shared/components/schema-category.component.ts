@@ -51,7 +51,11 @@ export class SchemaCategoryComponent {
             return false;
         }
 
-        return this.localStore.getBoolean(getCollapsedKey(schemaCategory));
+        return this.isCollapsedStore()();
+    });
+
+    protected readonly isCollapsedStore = computed(() => {
+        return this.localStore.boolean(getCollapsedKey(this.schemaCategory()));
     });
 
     protected readonly forContent = computed(() => {
@@ -70,7 +74,7 @@ export class SchemaCategoryComponent {
         const isCollapsed = !this.isCollapsed();
 
         this.isCollapsed.set(isCollapsed);
-        this.localStore.setBoolean(getCollapsedKey(this.schemaCategory()), isCollapsed);
+        this.isCollapsedStore().set(isCollapsed);
     }
 
     protected schemaRoute(schema: SchemaDto) {

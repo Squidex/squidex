@@ -40,11 +40,11 @@ export class WorkflowStepComponent {
     /** Prevents the step from being changed. */
     public readonly disabled = input(false, { transform: booleanAttribute });
 
+    protected readonly openStep = linkedSignal(() => this.openSteps()[0]);
+
     protected readonly openSteps = computed(() => {
         return this.workflow().getOpenSteps(this.step());
     });
-
-    protected readonly openStep = linkedSignal(() => this.openSteps()[0]);
 
     protected readonly transitions = computed(() => {
         return this.workflow().getTransitions(this.step());

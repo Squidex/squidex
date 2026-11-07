@@ -36,10 +36,9 @@ import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective,
 export class SchemaFormComponent {
     private readonly appsState = inject(AppsState);
     private readonly schemasService = inject(SchemasService);
+    private readonly uiOptions = inject(UIOptions);
 
     protected readonly schemasState = inject(SchemasState);
-
-    protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
     /** Emits the created schema. */
     public readonly create = output<SchemaDto>();
@@ -52,10 +51,6 @@ export class SchemaFormComponent {
 
     protected readonly sourceActual = linkedSignal(() => this.source());
 
-    protected readonly createForm = new CreateSchemaForm();
-
-    protected readonly generateForm = new GenerateSchemaForm();
-
     protected readonly generateLog = signal('');
 
     protected readonly selectedTab = linkedSignal<number>(() => {
@@ -65,6 +60,12 @@ export class SchemaFormComponent {
     protected readonly actualForm = computed(() => {
         return this.selectedTab() === 2 ? this.generateForm : this.createForm;
     });
+
+    protected readonly hasChatBot = this.uiOptions.value.canUseChatBot;
+
+    protected readonly createForm = new CreateSchemaForm();
+
+    protected readonly generateForm = new GenerateSchemaForm();
 
     constructor() {
         effect(() => {

@@ -7,9 +7,9 @@
 
 import { LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ALL_TRIGGERS, ConfirmClickDirective, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { ALL_TRIGGERS, ConfirmClickDirective, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, ScriptCompletions, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { RuleConfigured } from '../messages';
 import { BranchComponent } from './branch.component';
@@ -57,15 +57,16 @@ export class RulePageComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly rulesService = inject(RulesService);
-    private readonly error = signal<ErrorDto | undefined>(undefined);
+    private readonly schemasState = inject(SchemasState);
 
     protected readonly rulesState = inject(RulesState);
-    protected readonly availableTriggers = ALL_TRIGGERS;
-    protected readonly availableSteps = toSignal(this.rulesService.getSteps(), { initialValue: {} as { [name: string]: RuleElementDto } });
-    protected readonly stepDialog = new DialogModel();
+
+    protected readonly error = signal<ErrorDto | undefined>(undefined);
+
     protected readonly stepToUpsert = signal<{ step?: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd } | undefined>(undefined);
+
     protected readonly triggerToEdit = signal<RuleTriggerDto | undefined>(undefined);
-    protected readonly triggerDialog = new DialogModel();
+
     protected readonly rule = signal<DynamicRuleDto | null | undefined>(undefined);
 
     protected readonly editableRule = signal<Snapshot>({
@@ -74,15 +75,26 @@ export class RulePageComponent {
         isEnabled: true,
     });
 
-    protected readonly scriptCompletions = rxResource({
+    protected readonly isManual = computed(() => {
+        return this.rule()?.trigger?.triggerType === 'Manual';
+    });
+
+    protected readonly scriptCompletions = rxResource<ScriptCompletions | null, string | undefined>({
         params: () => this.editableRule().trigger?.triggerType || undefined,
         stream: ({ params }) => this.rulesService.getCompletions(this.rulesState.appName, params),
         defaultValue: null,
     });
 
-    protected readonly isManual = computed(() => {
-        return this.rule()?.trigger?.triggerType === 'Manual';
+    protected readonly availableTriggers = ALL_TRIGGERS;
+
+    protected readonly availableSteps = rxResource({
+        stream: () => this.rulesService.getSteps(),
+        defaultValue: {} as { [name: string]: RuleElementDto },
     });
+
+    protected readonly stepDialog = new DialogModel();
+
+    protected readonly triggerDialog = new DialogModel();
 
     constructor() {
         effect(onCleanup => {
@@ -101,7 +113,7 @@ export class RulePageComponent {
             this.initFromRule(this.rulesState.selectedRule());
         });
 
-        inject(SchemasState).loadIfNotLoaded();
+        this.schemasState.loadIfNotLoaded();
     }
 
     private initFromRule(rule?: DynamicRuleDto | null) {

@@ -15,8 +15,8 @@ import { ActivatedRoute, Router } from '@angular/router';
     },
 })
 export class TabRouterlinkDirective {
-    private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     /** The router commands to navigate to; opens a new tab when ctrl or meta is pressed. */
     public readonly commands = input.required<any[]>({ alias: 'sqxTabRouterLink' });

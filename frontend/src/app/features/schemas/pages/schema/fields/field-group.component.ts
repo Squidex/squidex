@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, inject, input, linkedSignal, output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, LocalStoreService, SchemaDto, Settings } from '@app/shared';
 import { FieldComponent } from './field.component';
 
@@ -50,24 +50,21 @@ export class FieldGroupComponent {
     /** The group to render, with the optional separator and its fields. */
     public readonly fieldGroup = input.required<FieldGroup>();
 
-    protected readonly isCollapsed = linkedSignal(() => {
+    protected readonly isCollapsed = computed(() => {
+        return this.isCollapsedStore()?.() === true;
+    });
+
+    protected readonly isCollapsedStore = computed(() => {
         const separator = this.fieldGroup().separator;
         if (!separator) {
-            return false;
+            return null;
         }
 
-        return this.localStore.getBoolean(this.isCollapsedKey(separator));
+        return this.localStore.boolean(this.isCollapsedKey(separator));
     });
 
     protected toggle() {
-        const isCollapsed = !this.isCollapsed();
-
-        this.isCollapsed.set(isCollapsed);
-
-        const separator = this.fieldGroup().separator;
-        if (separator) {
-            this.localStore.setBoolean(this.isCollapsedKey(separator), isCollapsed);
-        }
+        this.isCollapsedStore()?.update(x => !x);
     }
 
     protected trackByField(field: FieldDto) {

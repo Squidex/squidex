@@ -37,11 +37,11 @@ export class SettingsPageComponent {
     private readonly appsState = inject(AppsState);
     private readonly editingSettings = this.appsState.selectedSettings;
 
-    protected readonly editForm = new EditAppSettingsForm();
-
     protected readonly isEditable = computed(() => {
         return this.editingSettings()?.canUpdate === true;
     });
+
+    protected readonly editForm = new EditAppSettingsForm();
 
     constructor() {
         this.appsState.loadSettings();

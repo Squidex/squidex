@@ -15,11 +15,12 @@ export interface ResizeListener {
     providedIn: 'root',
 })
 export class ResizeService {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly listeners = new WeakMap<Element, ResizeListener>();
     private observer?: ResizeObserver;
 
     constructor() {
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.observer?.disconnect();
         });
     }

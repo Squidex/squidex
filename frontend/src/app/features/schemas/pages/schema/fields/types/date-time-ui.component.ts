@@ -20,8 +20,6 @@ import { DateTimeFieldEditorValues, DateTimeFieldFormModel, DateTimeFieldPropert
     ],
 })
 export class DateTimeUIComponent {
-    protected readonly editors = DateTimeFieldEditorValues;
-
     /** The form to edit the field properties. */
     public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
@@ -34,4 +32,6 @@ export class DateTimeUIComponent {
     protected readonly form = computed(() => {
         return this.fieldForm() as FieldTree<DateTimeFieldFormModel>;
     });
+
+    protected readonly editors = DateTimeFieldEditorValues;
 }

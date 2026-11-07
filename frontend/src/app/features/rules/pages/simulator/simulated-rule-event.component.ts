@@ -59,9 +59,6 @@ export class SimulatedRuleEventComponent {
     /** Emits when the user wants to toggle the details. */
     public readonly expandedChange = output();
 
-    protected readonly errorsAfterEvent = ERRORS_AFTER_EVENT;
-    protected readonly errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
-
     protected readonly branchItems = computed(() => {
         const flowState = this.event().flowState;
         if (!flowState) {
@@ -70,4 +67,8 @@ export class SimulatedRuleEventComponent {
 
         return new FlowView(flowState.definition as any).getAllItems();
     });
+
+    protected readonly errorsAfterEvent = ERRORS_AFTER_EVENT;
+
+    protected readonly errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
 }

@@ -43,8 +43,6 @@ export class IndexFormComponent {
     /** The languages of the app, to provide the localized fields. */
     public readonly languages = input.required<AppLanguageDto[]>();
 
-    protected readonly createForm = new CreateIndexForm();
-
     protected readonly fieldNames = computed(() => {
         const languages = this.languages();
 
@@ -73,6 +71,8 @@ export class IndexFormComponent {
 
         return [...metaFields, ...dataFields.sort()];
     });
+
+    protected readonly createForm = new CreateIndexForm();
 
     private emitCreate() {
         this.create.emit();

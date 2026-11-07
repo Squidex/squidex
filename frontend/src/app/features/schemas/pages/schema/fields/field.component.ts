@@ -54,9 +54,6 @@ export class FieldComponent {
     /** The settings of the app. */
     public readonly settings = input.required<AppSettingsDto>();
 
-    protected readonly dropdown = new ModalModel();
-    protected readonly fieldWizard = new DialogModel();
-
     protected readonly isEditing = signal(false);
 
     protected readonly isEditable = computed(() => {
@@ -74,6 +71,10 @@ export class FieldComponent {
     protected readonly isLocalizable = computed(() => {
         return this.parent()?.isLocalizable || (this.field() as any)['isLocalizable'];
     });
+
+    protected readonly dropdown = new ModalModel();
+
+    protected readonly fieldWizard = new DialogModel();
 
     protected toggleEditing() {
         const isEditing = !this.isEditing();

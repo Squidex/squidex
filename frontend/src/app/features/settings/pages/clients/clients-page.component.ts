@@ -34,6 +34,7 @@ import { ClientComponent } from './client.component';
 })
 export class ClientsPageComponent {
     protected readonly clientsState = inject(ClientsState);
+
     protected readonly rolesState = inject(RolesState);
 
     constructor() {

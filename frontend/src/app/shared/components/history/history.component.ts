@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { merge, Observable, timer } from 'rxjs';
+import { merge, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { LayoutComponent } from '@app/framework';
-import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, SchemasState, switchSafe, TeamsState } from '@app/shared/internal';
+import { allParams, AppsState, HistoryChannelUpdated, HistoryService, MessageBus, SchemasState, switchSafe, TeamsState } from '@app/shared/internal';
 import { HistoryListComponent } from './history-list.component';
 
 @Component({
@@ -20,7 +20,6 @@ import { HistoryListComponent } from './history-list.component';
     templateUrl: './history.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         HistoryListComponent,
         LayoutComponent,
     ],
@@ -32,15 +31,15 @@ export class HistoryComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly schemasState = inject(SchemasState);
     private readonly teamsState = inject(TeamsState);
-
     private readonly channel = this.calculateChannel();
 
-    protected events: Observable<ReadonlyArray<HistoryEventDto>> =
+    protected readonly events = toSignal(
         merge(
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000)),
         ).pipe(
-            switchSafe(() => this.getHistory()));
+            switchSafe(() => this.getHistory())),
+        { initialValue: null });
 
     private getHistory() {
         if (this.teamsState.teamId) {

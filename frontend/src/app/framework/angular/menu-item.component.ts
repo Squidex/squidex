@@ -24,6 +24,7 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ],
 })
 export class MenuItemComponent {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly localizerService = inject(LocalizerService);
     private readonly menuItemRegistry = inject(MenuItemRegistry, { optional: true });
 
@@ -60,7 +61,7 @@ export class MenuItemComponent {
     /** Emits when the button is clicked and the action is confirmed. */
     public readonly action = output();
 
-    public readonly template = viewChild.required<TemplateRef<any>>('dropdownTemplate');
+    protected readonly template = viewChild.required<TemplateRef<any>>('dropdownTemplate');
 
     public readonly actualMenuLabel = computed(() => {
         const key = this.menuLabel() || this.label();
@@ -74,7 +75,7 @@ export class MenuItemComponent {
     constructor() {
         this.menuItemRegistry?.registerItem(this);
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.menuItemRegistry?.unregisterItem(this);
         });
     }

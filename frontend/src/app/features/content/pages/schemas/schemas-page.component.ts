@@ -28,6 +28,7 @@ import { AppDto, AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComp
 export class SchemasPageComponent {
     private readonly schemasState = inject(SchemasState);
     private readonly appsState = inject(AppsState);
+    private readonly uiOptions = inject(UIOptions);
 
     private readonly schemas = computed(() => {
         const app = this.appsState.snapshot.selectedApp!;
@@ -37,7 +38,7 @@ export class SchemasPageComponent {
 
     protected readonly schemasFilter = form(signal(''));
 
-    protected readonly isEmbedded = inject(UIOptions).value.embedded;
+    protected readonly isEmbedded = this.uiOptions.value.embedded;
 
     protected readonly categories = computed(() => {
         return getCategoryTree(this.schemas(), this.schemasState.addedCategories(), this.schemasFilter().value());

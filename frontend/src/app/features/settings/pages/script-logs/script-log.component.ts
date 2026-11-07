@@ -22,6 +22,8 @@ export class ScriptLogComponent {
     /** The script log to show, including its log entries. */
     public readonly scriptLog = input.required<ScriptLogDto>();
 
+    protected readonly isExpanded = signal(false);
+
     protected readonly lines = computed(() => {
         return this.scriptLog().entries.map(x => ({
             time: x.timestamp?.toStringFormat('yyyy-MM-dd HH:mm:ss.SSS') ?? '',
@@ -35,8 +37,6 @@ export class ScriptLogComponent {
 
         return Math.max(0, scriptLog.totalEntries - scriptLog.entries.length);
     });
-
-    protected readonly isExpanded = signal(false);
 
     protected toggleExpanded() {
         this.isExpanded.update(x => !x);

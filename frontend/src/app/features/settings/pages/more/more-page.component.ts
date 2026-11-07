@@ -43,9 +43,12 @@ export class MorePageComponent {
     private readonly dialogs = inject(DialogService);
 
     protected readonly router = inject(Router);
+
     protected readonly teamsState = inject(TeamsState);
 
-    protected readonly app = this.appsState.selectedApp;
+    protected readonly uploading = signal(false);
+
+    protected readonly uploadProgress = signal(10);
 
     protected readonly isEditable = computed(() => {
         return this.app()?.canUpdateGeneral === true;
@@ -63,8 +66,7 @@ export class MorePageComponent {
         return this.app()?.canUpdateTeam === true;
     });
 
-    protected readonly uploading = signal(false);
-    protected readonly uploadProgress = signal(10);
+    protected readonly app = this.appsState.selectedApp;
 
     protected readonly transferForm = new TransferAppForm();
 

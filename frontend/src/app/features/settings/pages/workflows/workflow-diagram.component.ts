@@ -20,20 +20,20 @@ declare const vis: any;
     ],
 })
 export class WorkflowDiagramComponent {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly themeService = inject(ThemeService);
-
     private network: any;
-
-    public readonly chartContainer = viewChild<ElementRef<HTMLElement>>('chartContainer');
 
     /** The workflow to visualize as a diagram. */
     public readonly workflow = input.required<WorkflowView>();
 
+    protected readonly chartContainer = viewChild<ElementRef<HTMLElement>>('chartContainer');
+
     protected readonly isLoaded = signal(false);
 
     constructor() {
-        const destroyRef = inject(DestroyRef);
+        const destroyRef = this.destroyRef;
         const themeService = this.themeService;
 
         effect(() => {

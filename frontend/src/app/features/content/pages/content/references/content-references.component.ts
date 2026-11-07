@@ -28,6 +28,7 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
 })
 export class ContentReferencesComponent {
     private readonly contentsRoute = inject(Router2State);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly toolbar = inject(ToolbarService);
 
     protected readonly contentsState = inject(ComponentContentsState);
@@ -53,7 +54,7 @@ export class ContentReferencesComponent {
             this.publishAll();
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.toolbar.remove(this);
         });
 

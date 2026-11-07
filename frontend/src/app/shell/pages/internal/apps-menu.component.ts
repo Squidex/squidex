@@ -26,8 +26,8 @@ import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalD
     ],
 })
 export class AppsMenuComponent {
-    private readonly titleService = inject(TitleService);
     private readonly templatesState = inject(TemplatesState);
+    private readonly titleService = inject(TitleService);
 
     protected readonly appsState = inject(AppsState);
 
@@ -37,15 +37,15 @@ export class AppsMenuComponent {
 
     protected readonly uiState = inject(UIState);
 
+    protected readonly appPath = computed(() => {
+        return this.titleService.path().slice(1);
+    });
+
     protected readonly addAppDialog = new DialogModel();
 
     protected readonly addTeamDialog = new DialogModel();
 
     protected readonly appsMenu = new ModalModel();
-
-    protected readonly appPath = computed(() => {
-        return this.titleService.path().slice(1);
-    });
 
     protected readonly starters = this.templatesState.starters;
 }

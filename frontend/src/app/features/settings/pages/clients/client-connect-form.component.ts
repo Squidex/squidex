@@ -7,7 +7,7 @@
 
 import { KeyValuePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
@@ -28,20 +28,11 @@ import { ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, C
     ],
 })
 export class ClientConnectFormComponent {
+    private readonly appsState = inject(AppsState);
     private readonly clientsService = inject(ClientsService);
     private readonly dialogs = inject(DialogService);
     private readonly helpService = inject(HelpService);
-
-    private readonly mcpServerName = computed(() => {
-        return `squidex-${this.appName}`;
-    });
-
-    private readonly mcpAuthorization = computed(() => {
-        const client = this.client();
-
-        // The client secret does not expire, unlike the access token.
-        return `Basic ${btoa(`${this.appName}:${client.id}:${client.secret}`)}`;
-    });
+    private readonly messageBus = inject(MessageBus);
 
     protected readonly apiUrl = inject(ApiUrlConfig);
 
@@ -51,21 +42,20 @@ export class ClientConnectFormComponent {
     /** The client to show the connection instructions for. */
     public readonly client = input.required<ClientDto>();
 
-    protected readonly sdks = toSignal(this.helpService.getSDKs());
     protected readonly sdk = signal<SDKEntry | undefined>(undefined);
-    protected readonly appName: string;
-
-    protected readonly appToken = rxResource({
-        params: () => this.client(),
-        stream: ({ params }) => this.clientsService.createToken(this.appName, params).pipe(
-            catchError(error => {
-                this.dialogs.notifyError(error);
-
-                return of(undefined);
-            })),
-    });
 
     protected readonly step = signal('Start');
+
+    protected readonly mcpServerName = computed(() => {
+        return `squidex-${this.appName}`;
+    });
+
+    protected readonly mcpAuthorization = computed(() => {
+        const client = this.client();
+
+        // The client secret does not expire, unlike the access token.
+        return `Basic ${btoa(`${this.appName}:${client.id}:${client.secret}`)}`;
+    });
 
     protected readonly mcpUrl = computed(() => {
         return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
@@ -91,13 +81,24 @@ export class ClientConnectFormComponent {
         return JSON.stringify(config, undefined, 4);
     });
 
+    protected readonly appToken = rxResource({
+        params: () => this.client(),
+        stream: ({ params }) => this.clientsService.createToken(this.appName, params).pipe(
+            catchError(error => {
+                this.dialogs.notifyError(error);
+
+                return of(undefined);
+            })),
+    });
+
+    protected readonly sdks = rxResource({
+        stream: () => this.helpService.getSDKs(),
+    });
+
+    protected readonly appName = this.appsState.appName;
+
     constructor() {
-        const appsState = inject(AppsState);
-        const messageBus = inject(MessageBus);
-
-        this.appName = appsState.appName;
-
-        messageBus.emit(new ClientTourStated());
+        this.messageBus.emit(new ClientTourStated());
     }
 
     protected select(sdk: SDKEntry) {

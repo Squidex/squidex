@@ -146,8 +146,12 @@ export class ContentsPageComponent {
         return this.languagesState.isoLanguages();
     });
 
-    protected readonly language = linkedSignal<AppLanguageDto>(() => {
-        const languageKey = this.localStore.get(this.languageKey());
+    protected readonly languageStore = computed(() => {
+        return this.localStore.value(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
+    });
+
+    protected readonly language = computed<AppLanguageDto>(() => {
+        const languageKey = this.languageStore()();
         const languageMaster = this.languagesState.isoMasterLanguage();
 
         return this.languages().find(x => x.iso2Code === languageKey) || languageMaster;
@@ -262,9 +266,7 @@ export class ContentsPageComponent {
     }
 
     protected changeLanguage(language: AppLanguageDto) {
-        this.language.set(language);
-
-        this.localStore.set(this.languageKey(), language.iso2Code);
+        this.languageStore().set(language.iso2Code);
     }
 
     protected search(query: Query) {
@@ -299,9 +301,5 @@ export class ContentsPageComponent {
         const selectedItems = this.selectedItems();
 
         return this.contentsState.snapshot.contents.filter(c => selectedItems[c.id] && (!predicate || predicate(c)));
-    }
-
-    private languageKey(): any {
-        return Settings.Local.CONTENT_LANGUAGE(this.schema().id);
     }
 }

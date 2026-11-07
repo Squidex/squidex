@@ -47,25 +47,10 @@ function getDocHTML(item: AceAjax.Completion) {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeEditorComponent implements FormValueControl<any>, FocusComponent {
-    private readonly themeService = inject(ThemeService);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly resourceLoader = inject(ResourceLoaderService);
-    private readonly editor = viewChild.required<ElementRef<HTMLDivElement>>('editor');
-    private readonly aceEditor = signal<Editor | undefined>(undefined);
+    private readonly themeService = inject(ThemeService);
     private readonly valueChanged = new Subject<boolean>();
-
-    private readonly completions = computed<ReadonlyArray<Completion>>(() => {
-        const completion = this.completion();
-        if (!completion) {
-            return [];
-        }
-
-        return completion.map(source => {
-            const { path, description, type, ...other } = source;
-
-            return { value: path, name: path, description, meta: type?.toLowerCase(), path, ...other };
-        });
-    });
-
     private aceModes?: ModeList;
     private aceTools = false;
     private lastValue: any;
@@ -116,6 +101,23 @@ export class CodeEditorComponent implements FormValueControl<any>, FocusComponen
     /** The suggestions for autocompletion. */
     public readonly completion = input<ScriptCompletions | undefined | null>();
 
+    protected readonly editor = viewChild.required<ElementRef<HTMLDivElement>>('editor');
+
+    protected readonly aceEditor = signal<Editor | undefined>(undefined);
+
+    protected readonly completions = computed<ReadonlyArray<Completion>>(() => {
+        const completion = this.completion();
+        if (!completion) {
+            return [];
+        }
+
+        return completion.map(source => {
+            const { path, description, type, ...other } = source;
+
+            return { value: path, name: path, description, meta: type?.toLowerCase(), path, ...other };
+        });
+    });
+
     constructor() {
         const valueSubscription =
             this.valueChanged.pipe(debounceTime(100))
@@ -125,7 +127,7 @@ export class CodeEditorComponent implements FormValueControl<any>, FocusComponen
 
         let isDestroyed = false;
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             isDestroyed = true;
             valueSubscription.unsubscribe();
         });

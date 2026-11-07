@@ -6,7 +6,7 @@
  */
 
 import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { RuleComponent } from './rule.component';
@@ -32,14 +32,21 @@ import { RuleComponent } from './rule.component';
     ],
 })
 export class RulesPageComponent {
+    private readonly rulesService = inject(RulesService);
+    private readonly schemasState = inject(SchemasState);
+
     protected readonly rulesState = inject(RulesState);
+
     protected readonly availableTriggers = ALL_TRIGGERS;
-    protected readonly availableSteps = toSignal(inject(RulesService).getSteps());
+
+    protected readonly availableSteps = rxResource({
+        stream: () => this.rulesService.getSteps(),
+    });
 
     constructor() {
         this.rulesState.load();
 
-        inject(SchemasState).loadIfNotLoaded();
+        this.schemasState.loadIfNotLoaded();
     }
 
     protected reload() {

@@ -24,9 +24,9 @@ type CreateSchemaFormModel = { name: string; type: SchemaType; initialCategory: 
 export class CreateSchemaForm extends SignalForm<CreateSchemaFormModel, CreateSchemaDto> {
     constructor() {
         super({ name: '', type: 'Default', initialCategory: null, importing: {} }, path => {
-            required(path.name);
             maxLength(path.name, 40);
             SignalValidators.patternWithMessage(path.name, '[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage');
+            required(path.name);
             required(path.type);
         });
     }
@@ -109,8 +109,8 @@ export class ConfigurePreviewUrlsForm extends SignalForm<PreviewUrlFormModel[], 
     constructor() {
         super([], path => {
             applyEach(path, previewUrl => {
-                required(previewUrl.name);
                 maxLength(previewUrl.name, 1000);
+                required(previewUrl.name);
                 required(previewUrl.url);
             });
         });
@@ -214,10 +214,10 @@ export class AddFieldForm extends SignalForm<AddFieldFormModel, AddFieldDto, Par
 
     constructor() {
         super({ type: 'String', name: '', isLocalizable: false }, path => {
-            required(path.type);
-            required(path.name);
             maxLength(path.name, 40);
             SignalValidators.patternWithMessage(path.name, '[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'i18n:schemas.field.nameValidationMessage');
+            required(path.type);
+            required(path.name);
         });
     }
 

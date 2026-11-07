@@ -27,6 +27,7 @@ import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEdi
 })
 export class IFrameEditorComponent {
     private readonly appsState = inject(AppsState);
+    private readonly destroyRef = inject(DestroyRef);
     private readonly dialogs = inject(DialogService);
     private readonly renderer = inject(Renderer2);
     private readonly router = inject(Router);
@@ -134,7 +135,7 @@ export class IFrameEditorComponent {
             untracked(() => this.isDisabledByControl.set(isDisabled));
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.toggleFullscreen(false);
         });
     }

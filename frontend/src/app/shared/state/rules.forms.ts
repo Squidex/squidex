@@ -212,8 +212,8 @@ export class CronJobTriggerForm extends TriggerForm<CronJobTriggerModel, 'CronJo
 export class UsageTriggerForm extends TriggerForm<UsageTriggerModel, 'Usage'> {
     constructor(injector?: Injector) {
         super('Usage', { limit: 20000, numDays: 3 }, path => {
-            required(path.limit);
             SignalValidators.between(path.numDays, 1, 30);
+            required(path.limit);
         }, injector);
     }
 }

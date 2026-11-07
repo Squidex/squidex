@@ -16,10 +16,10 @@ import { LayoutComponent } from './layout.component';
 })
 export class LayoutContainerDirective {
     private readonly element = inject(ElementRef);
-    private readonly renderer = inject(Renderer2);
     private readonly layouts: LayoutComponent[] = [];
-    private isViewInit = false;
+    private readonly renderer = inject(Renderer2);
     private containerWidth = 0;
+    private isViewInit = false;
 
     constructor() {
         afterNextRender(() => {

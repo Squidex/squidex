@@ -19,14 +19,15 @@ declare type Model = DialogModel | ModalModel | any;
 export class ModalDirective<T = unknown> implements OpenModal {
     private static backdrop: any;
 
+    private readonly backdropListener = (event: MouseEvent) => {
+        if (!this.isClickedInside(event)) {
+            this.hideModal(this.model());
+        }
+    };
+
     private readonly changeDetector = inject(ChangeDetectorRef);
-    private readonly modalService = inject(ModalService);
-    private readonly renderer = inject(Renderer2);
-    private readonly rendererFactory = inject(RendererFactory2);
-    private readonly rootView = inject(RootViewComponent);
-    private readonly templateRef = inject<TemplateRef<ModalContext<T>>>(TemplateRef);
-    private readonly viewContainer = inject(ViewContainerRef);
     private readonly currentContext: ModalContext<T> = new ModalContext<T>();
+    private readonly destroyRef = inject(DestroyRef);
 
     private readonly elementListener = (event: MouseEvent) => {
         if (this.isClickedInside(event)) {
@@ -34,16 +35,16 @@ export class ModalDirective<T = unknown> implements OpenModal {
         }
     };
 
-    private readonly backdropListener = (event: MouseEvent) => {
-        if (!this.isClickedInside(event)) {
-            this.hideModal(this.model());
-        }
-    };
-
+    private readonly modalService = inject(ModalService);
+    private readonly renderer = inject(Renderer2);
+    private readonly rendererFactory = inject(RendererFactory2);
+    private readonly rootView = inject(RootViewComponent);
+    private readonly templateRef = inject<TemplateRef<ModalContext<T>>>(TemplateRef);
+    private readonly viewContainer = inject(ViewContainerRef);
+    private isOpen = false;
     private renderedView: EmbeddedViewRef<ModalContext<T>> | null = null;
     private renderRoots: ReadonlyArray<HTMLElement> | null = null;
     private viewListeners: (() => void)[] = [];
-    private isOpen = false;
 
     /** The modal or dialog model that controls the visibility, or any value that renders the template when truthy. */
     public readonly model = input<Model>(undefined, { alias: 'sqxModal' });
@@ -61,7 +62,7 @@ export class ModalDirective<T = unknown> implements OpenModal {
     public readonly isDialog = input(false, { alias: 'sqxModalIsDialog', transform: booleanAttribute });
 
     constructor() {
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.hideModal(this.model());
 
             this.modalService.remove(this);

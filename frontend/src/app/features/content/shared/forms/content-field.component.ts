@@ -36,7 +36,8 @@ export class ContentFieldComponent {
     private readonly localStore = inject(LocalStoreService);
     private readonly messageBus = inject(MessageBus);
     private readonly translations = inject(TranslationsService);
-    private readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
+    private readonly uiOptions = inject(UIOptions);
+    private readonly hasTranslator = this.uiOptions.value.canUseTranslator;
 
     private readonly isHalfWidth = computed(() => {
         return this.formModel().field.properties.isHalfWidth && !this.isCompact() && !this.formCompare();
@@ -80,7 +81,7 @@ export class ContentFieldComponent {
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
     protected readonly commentsState = inject(CommentsState, { optional: true });
-    protected readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+    protected readonly hasChatBot = this.uiOptions.value.canUseChatBot;
 
     protected readonly showAllControls = linkedSignal(() => {
         return this.localStore.getBoolean(this.showAllControlsKey());

@@ -19,11 +19,12 @@ import { DialogService, FloatingPlacement, Tooltip } from '@app/framework/intern
     },
 })
 export class TooltipDirective {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly dialogs = inject(DialogService);
     private readonly element = inject(ElementRef);
     private readonly renderer = inject(Renderer2);
-    private timer: any;
     private shortcutTimer: any;
+    private timer: any;
 
     /** The placement of the shortcut hint relative to the element. */
     public readonly shortcutPosition = input<FloatingPlacement>('bottom-start');
@@ -53,7 +54,7 @@ export class TooltipDirective {
             this.unsetAttribute();
         });
 
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             this.hide();
             this.hideShortcut();
         });

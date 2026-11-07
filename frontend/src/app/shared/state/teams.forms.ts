@@ -14,8 +14,8 @@ export type TeamFormModel = { name: string };
 export class CreateTeamForm extends SignalForm<TeamFormModel, CreateTeamDto> {
     constructor() {
         super({ name: '' }, path => {
-            required(path.name);
             maxLength(path.name, 40);
+            required(path.name);
         });
     }
 
@@ -27,8 +27,8 @@ export class CreateTeamForm extends SignalForm<TeamFormModel, CreateTeamDto> {
 export class UpdateTeamForm extends SignalForm<TeamFormModel, UpdateTeamDto, TeamDto> {
     constructor() {
         super({ name: '' }, path => {
-            required(path.name);
             maxLength(path.name, 40);
+            required(path.name);
         });
     }
 

@@ -61,10 +61,8 @@ function convertTags(obj: any, converter: TagConverter) {
     ],
 })
 export class TagEditorComponent implements FormValueControl<any> {
-    private readonly formElement = viewChild.required<ElementRef<HTMLElement>>('form');
-    private readonly inputElement = viewChild<ElementRef<HTMLInputElement>>('input');
-    private readonly textMeasurer = new TextMeasurer(() => this.inputElement());
     private readonly injector = inject(Injector);
+    private readonly textMeasurer = new TextMeasurer(() => this.inputElement());
     private lastValue: any;
     private latestInput?: string;
 
@@ -137,16 +135,25 @@ export class TagEditorComponent implements FormValueControl<any> {
     /** The suggested tags. */
     public readonly itemsSource = input<ReadonlyArray<string | TagValue> | undefined | null>();
 
+    protected readonly formElement = viewChild.required<ElementRef<HTMLElement>>('form');
+
+    protected readonly inputElement = viewChild<ElementRef<HTMLInputElement>>('input');
+
+    protected readonly hasFocus = signal(false);
+
+    protected readonly suggestedItems = signal<ReadonlyArray<TagValue>>([]);
+
+    protected readonly suggestedIndex = signal(0);
+
+    protected readonly tags = signal<ReadonlyArray<TagValue>>([]);
+
+    protected readonly addText = signal('');
+
     protected readonly itemsSorted = computed(() => {
         return getTagValues(this.itemsSource());
     });
 
     protected readonly itemsModal = new ModalModel();
-    protected readonly hasFocus = signal(false);
-    protected readonly suggestedItems = signal<ReadonlyArray<TagValue>>([]);
-    protected readonly suggestedIndex = signal(0);
-    protected readonly tags = signal<ReadonlyArray<TagValue>>([]);
-    protected readonly addText = signal('');
 
     constructor() {
         afterNextRender(() => {

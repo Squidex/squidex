@@ -22,12 +22,12 @@ export type AnnotateAssetFormModel = {
 export class AnnotateAssetForm extends SignalForm<AnnotateAssetFormModel, AnnotateAssetDto, AssetDto> {
     constructor() {
         super({ isProtected: false, fileName: '', slug: '', tags: [], metadata: [] }, path => {
+            applyEach(path.metadata, item => {
+                maxLength(item.name, 1000);
+                required(item.name);
+            });
             required(path.fileName);
             required(path.slug);
-            applyEach(path.metadata, item => {
-                required(item.name);
-                maxLength(item.name, 1000);
-            });
         });
     }
 

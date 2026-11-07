@@ -8,7 +8,7 @@
 import { LowerCasePipe } from '@angular/common';
 import { booleanAttribute, Component, effect, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { form, FormField } from '@angular/forms/signals';
+import { form, FormField, maxLength } from '@angular/forms/signals';
 import { lastValueFrom } from 'rxjs';
 import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, SignalSelectDirective, StepForm, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
@@ -67,7 +67,9 @@ export class StepDialogComponent {
 
     protected readonly stepName = form(linkedSignal(() => {
         return this.stepDefinition()?.name ?? '';
-    }));
+    }), path => {
+        maxLength(path, 40);
+    });
 
     protected readonly stepIgnoreError = form(linkedSignal(() => {
         return this.stepDefinition()?.ignoreError || false;

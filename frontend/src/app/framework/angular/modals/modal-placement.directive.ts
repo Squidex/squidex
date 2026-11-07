@@ -13,24 +13,9 @@ import { FloatingPlacement, Types } from '@app/framework/internal';
     selector: '[sqxAnchoredTo]',
 })
 export class ModalPlacementDirective {
-    private readonly renderer = inject(Renderer2);
     private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly injector = inject(Injector);
-    private readonly options = computed(() => {
-        return {
-            target: this.target(),
-            scrollX: this.scrollX(),
-            scrollY: this.scrollY(),
-            scrollMargin: this.scrollMargin(),
-            offset: this.offset(),
-            spaceX: this.spaceX(),
-            spaceY: this.spaceY(),
-            position: this.position(),
-            adjustWidth: this.adjustWidth(),
-            adjustHeight: this.adjustHeight(),
-        };
-    });
-
+    private readonly renderer = inject(Renderer2);
     private isViewInit = false;
 
     /** The element the modal is anchored to. */
@@ -62,6 +47,21 @@ export class ModalPlacementDirective {
 
     /** Gives the modal the same height as the anchor element. */
     public readonly adjustHeight = input(false, { transform: booleanAttribute });
+
+    protected readonly options = computed(() => {
+        return {
+            target: this.target(),
+            scrollX: this.scrollX(),
+            scrollY: this.scrollY(),
+            scrollMargin: this.scrollMargin(),
+            offset: this.offset(),
+            spaceX: this.spaceX(),
+            spaceY: this.spaceY(),
+            position: this.position(),
+            adjustWidth: this.adjustWidth(),
+            adjustHeight: this.adjustHeight(),
+        };
+    });
 
     constructor() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'hidden');

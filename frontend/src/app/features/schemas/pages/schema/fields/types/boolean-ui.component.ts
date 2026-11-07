@@ -20,8 +20,6 @@ import { BooleanFieldEditorValues, BooleanFieldFormModel, BooleanFieldProperties
     ],
 })
 export class BooleanUIComponent {
-    protected readonly editors = BooleanFieldEditorValues;
-
     /** The form to edit the field properties. */
     public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
@@ -34,4 +32,6 @@ export class BooleanUIComponent {
     protected readonly form = computed(() => {
         return this.fieldForm() as FieldTree<BooleanFieldFormModel>;
     });
+
+    protected readonly editors = BooleanFieldEditorValues;
 }

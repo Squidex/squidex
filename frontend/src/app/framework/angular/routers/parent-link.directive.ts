@@ -15,10 +15,10 @@ import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@ang
     },
 })
 export class ParentLinkDirective {
-    private readonly router = inject(Router);
-    private readonly route = inject(ActivatedRoute);
     private readonly element = inject(ElementRef);
     private readonly renderer = inject(Renderer2);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private url?: string;
 
     /** Navigates one level further up, because the current route is a lazy loaded module. */

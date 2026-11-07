@@ -36,7 +36,8 @@ import { PlanComponent } from './plan.component';
     ],
 })
 export class PlansPageComponent {
-    private readonly overridePlanId: string | undefined = inject(ActivatedRoute).snapshot.queryParams['planId'];
+    private readonly route = inject(ActivatedRoute);
+    private readonly overridePlanId: string | undefined = this.route.snapshot.queryParams['planId'];
 
     protected readonly plansState = inject(TeamPlansState);
 

@@ -54,12 +54,9 @@ export class MenuItemRegistry {
     }]
 })
 export class MenuComponent implements ResizeListener {
-    private readonly menuItemsRegistry = inject(MenuItemRegistry, { optional: true, skipSelf: true }) ?? new MenuItemRegistry();
+    private readonly menuItemRegistry = inject(MenuItemRegistry, { optional: true, skipSelf: true });
+    private readonly menuItemsRegistry = this.menuItemRegistry ?? new MenuItemRegistry();
     private readonly resizeService = inject(ResizeService);
-    private readonly measuredContainer = signal(-1);
-    private readonly measuredMenu = signal(-1);
-    private readonly container = viewChild<ElementRef<HTMLDivElement>>('container');
-    private readonly menu = viewChild<ElementRef<HTMLDivElement>>('menu');
 
     /** Aligns the menu items and the overflow button to the left or right. */
     public readonly alignment = input<'left' | 'right'>('left');
@@ -67,7 +64,13 @@ export class MenuComponent implements ResizeListener {
     /** Renders small buttons with less space between them. */
     public readonly small = input(false, { transform: booleanAttribute });
 
-    protected readonly overflowDropdown = new ModalModel();
+    protected readonly measuredContainer = signal(-1);
+
+    protected readonly measuredMenu = signal(-1);
+
+    protected readonly container = viewChild<ElementRef<HTMLDivElement>>('container');
+
+    protected readonly menu = viewChild<ElementRef<HTMLDivElement>>('menu');
 
     protected readonly isRightAligned = computed(() => {
         return this.alignment() === 'right';
@@ -85,6 +88,8 @@ export class MenuComponent implements ResizeListener {
         const isOverlapping = measuredMenu > measuredContainer;
         return isOverlapping ? [...items.values()].filter(x => x.actualMenuLabel()).sortedByString(x => x.actualMenuLabel()) : null;
     });
+
+    protected readonly overflowDropdown = new ModalModel();
 
     constructor() {
         effect(onCleanup => {

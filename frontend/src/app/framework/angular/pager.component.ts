@@ -35,9 +35,7 @@ export class PagerComponent {
     /** Hides the pager when there is only one page. */
     public readonly autoHide = input(false, { transform: booleanAttribute });
 
-    protected readonly pageSizes = PAGE_SIZES;
-
-    public readonly itemFirst = computed(() => {
+    protected readonly itemFirst = computed(() => {
         const paging = this.paging();
         if (!paging) {
             return 0;
@@ -46,7 +44,7 @@ export class PagerComponent {
         return paging.page * paging.pageSize + (paging.count > 0 ? 1 : 0);
     });
 
-    public readonly itemLast = computed(() => {
+    protected readonly itemLast = computed(() => {
         const paging = this.paging();
         if (!paging) {
             return 0;
@@ -55,7 +53,7 @@ export class PagerComponent {
         return paging.page * paging.pageSize + paging.count;
     });
 
-    public readonly canGoPrev = computed(() => {
+    protected readonly canGoPrev = computed(() => {
         const paging = this.paging();
         if (!paging) {
             return false;
@@ -64,7 +62,7 @@ export class PagerComponent {
         return paging.page > 0;
     });
 
-    public readonly canGoNext = computed(() => {
+    protected readonly canGoNext = computed(() => {
         const paging = this.paging();
         if (!paging || paging.count <= 0) {
             return false;
@@ -84,6 +82,8 @@ export class PagerComponent {
             numberOfItems: this.paging()?.total,
         };
     });
+
+    protected readonly pageSizes = PAGE_SIZES;
 
     public goPrev() {
         const paging = this.paging();

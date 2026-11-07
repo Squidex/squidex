@@ -39,8 +39,8 @@ export class FormattableInputComponent implements FormValueControl<string | null
     /** The suggestions for autocompletion. */
     public readonly completion = input<ScriptCompletions | undefined | null>();
 
-    protected readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
     protected readonly mode = signal<TemplateMode>('Text');
+
     protected readonly text = signal<string | null>(null);
 
     protected readonly editorMode = computed(() => {
@@ -62,6 +62,8 @@ export class FormattableInputComponent implements FormValueControl<string | null
 
         return completion?.filter(x => x.type !== 'Function');
     });
+
+    protected readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
 
     constructor() {
         effect(() => {

@@ -21,15 +21,11 @@ import { AssetTagsComponent } from './asset-tags.component';
     ],
 })
 export class AssetsFiltersPageComponent {
+    private readonly uIState = inject(UIState);
+
     protected readonly assetsState = inject(AssetsState);
 
-    protected readonly assetsQueries: Queries;
-
-    constructor() {
-        const uiState = inject(UIState);
-
-        this.assetsQueries = new Queries(uiState, 'assets');
-    }
+    protected readonly assetsQueries = new Queries(this.uIState, 'assets');
 
     protected search(query?: Query) {
         this.assetsState.search(query);

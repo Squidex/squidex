@@ -17,8 +17,8 @@ import { StepDefinition, TourService } from './tour.service';
 })
 export class TourStepDirective implements TourAnchorDirective {
     private readonly tourService = inject(TourService);
-    private isNextOnClick = false;
     private isActive = false;
+    private isNextOnClick = false;
     private wasClicked = false;
 
     public readonly element = inject(ElementRef);

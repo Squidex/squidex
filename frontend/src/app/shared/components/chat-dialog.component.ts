@@ -28,6 +28,7 @@ type ChatItem = { content: string | Observable<ChatEventDto>; type: 'User' | 'As
 })
 export class ChatDialogComponent {
     private readonly appsState = inject(AppsState);
+    private readonly authService = inject(AuthService);
     private readonly translator = inject(TranslationsService);
 
     /** Emits the content the user wants to use, or nothing when the dialog is closed. */
@@ -45,7 +46,7 @@ export class ChatDialogComponent {
     /** Defines what is copied when the user uses an answer. */
     public readonly copyMode = input<'Text' | 'Image'>();
 
-    protected readonly user = inject(AuthService).user!;
+    protected readonly user = this.authService.user!;
 
     protected readonly chatQuestion = signal('');
     protected readonly chatItems = signal<ReadonlyArray<ChatItem>>([]);

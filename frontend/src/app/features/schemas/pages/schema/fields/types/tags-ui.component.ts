@@ -21,8 +21,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, TagEditorComponent, TagsFie
     ],
 })
 export class TagsUIComponent {
-    protected readonly editors = TagsFieldEditorValues;
-
     /** The form to edit the field properties. */
     public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
@@ -35,4 +33,6 @@ export class TagsUIComponent {
     protected readonly form = computed(() => {
         return this.fieldForm() as FieldTree<TagsFieldFormModel>;
     });
+
+    protected readonly editors = TagsFieldEditorValues;
 }

@@ -89,10 +89,9 @@ function parseQuery(text: unknown, startCharacter: string, cursor: number): Quer
     ],
 })
 export class AutocompleteComponent implements FormValueControl<any> {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly modalStream = new Subject<Query>();
     private readonly queryStream = new Subject<string>();
-    private readonly anchor = viewChild.required<ElementRef<HTMLDivElement>>('anchor');
-    private readonly inputControl = viewChild.required<ElementRef<HTMLInputElement>>('input');
     private lastCursor = 0;
     private lastQuery?: Query;
     private lastValue: any = null;
@@ -170,17 +169,24 @@ export class AutocompleteComponent implements FormValueControl<any> {
     /** Additional styles for the suggestions dropdown. */
     public readonly dropdownStyles = input<any>({});
 
+    protected readonly anchor = viewChild.required<ElementRef<HTMLDivElement>>('anchor');
+
+    protected readonly inputControl = viewChild.required<ElementRef<HTMLInputElement>>('input');
+
     protected readonly itemTemplate = contentChild(TemplateRef);
 
-    protected readonly suggestionsModal = new ModalModel();
     protected readonly suggestedItems = signal<ReadonlyArray<any>>([]);
+
     protected readonly suggestedIndex = signal(-1);
+
     protected readonly isLoading = signal(false);
 
     protected readonly queryText = signal('');
 
+    protected readonly suggestionsModal = new ModalModel();
+
     constructor() {
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             clearTimeout(this.timer);
         });
 

@@ -44,11 +44,12 @@ export class SearchSource implements AutocompleteSource {
     ],
 })
 export class SearchMenuComponent {
-    private readonly router = inject(Router);
     private readonly apiUrl = inject(ApiUrlConfig);
-    private readonly searchControl = viewChild(AutocompleteComponent);
+    private readonly router = inject(Router);
 
     protected readonly searchSource = inject(SearchSource);
+
+    protected readonly searchControl = viewChild(AutocompleteComponent);
 
     protected readonly searchResult?: SearchResultDto;
 

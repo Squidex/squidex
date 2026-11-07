@@ -29,6 +29,7 @@ export class SchemaMigrateFormComponent {
     public readonly schema = input.required<SchemaDto>();
 
     protected readonly migrateDraft = form(signal(true));
+
     protected readonly migratePublished = form(signal(true));
 
     protected migrateContents() {

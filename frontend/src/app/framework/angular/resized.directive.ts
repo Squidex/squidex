@@ -7,31 +7,17 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { computed, Directive, DestroyRef, ElementRef, inject, input, NgZone, numberAttribute, output } from '@angular/core';
+import { computed, DestroyRef, Directive, ElementRef, inject, input, NgZone, numberAttribute, output } from '@angular/core';
 import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxResized], [sqxResizeCondition]',
 })
 export class ResizedDirective implements ResizeListener {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly element = inject(ElementRef);
     private readonly resizeService = inject(ResizeService);
     private readonly zone = inject(NgZone);
-    private readonly condition = computed(() => {
-        const minWidth = this.minWidth();
-        const maxWidth = this.maxWidth();
-
-        if (minWidth > 0 && maxWidth > 0) {
-            return (rect: DOMRect) => rect.width < minWidth || rect.width > maxWidth;
-        } else if (maxWidth > 0) {
-            return (rect: DOMRect) => rect.width > maxWidth;
-        } else if (minWidth > 0) {
-            return (rect: DOMRect) => rect.width < minWidth;
-        } else {
-            return undefined;
-        }
-    });
-
     private conditionValue = false;
 
     /** The condition is true when the element is smaller than this width. */
@@ -46,10 +32,25 @@ export class ResizedDirective implements ResizeListener {
     /** Emits the new size when the element is resized and no width condition is defined. */
     public readonly resizeChange = output<DOMRect>({ alias: 'sqxResized' });
 
+    protected readonly condition = computed(() => {
+        const minWidth = this.minWidth();
+        const maxWidth = this.maxWidth();
+
+        if (minWidth > 0 && maxWidth > 0) {
+            return (rect: DOMRect) => rect.width < minWidth || rect.width > maxWidth;
+        } else if (maxWidth > 0) {
+            return (rect: DOMRect) => rect.width > maxWidth;
+        } else if (minWidth > 0) {
+            return (rect: DOMRect) => rect.width < minWidth;
+        } else {
+            return undefined;
+        }
+    });
+
     constructor() {
         const unlisten = this.resizeService.listen(this.element.nativeElement, this);
 
-        inject(DestroyRef).onDestroy(unlisten);
+        this.destroyRef.onDestroy(unlisten);
     }
 
     public onResize(rect: DOMRect) {

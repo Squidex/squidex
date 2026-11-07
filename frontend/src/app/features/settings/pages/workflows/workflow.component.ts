@@ -38,14 +38,16 @@ export class WorkflowComponent {
     public readonly schemasSource = input.required<SchemaTagSource>();
 
     protected readonly error = signal<ErrorDto | null | undefined>(undefined);
+
     protected readonly isEditing = signal(false);
+
+    protected readonly workflowView = linkedSignal(() => new WorkflowView(this.workflow()));
+
+    protected readonly selectedTab = signal(0);
 
     protected readonly isEditable = computed(() => {
         return this.workflow().canUpdate;
     });
-
-    protected readonly workflowView = linkedSignal(() => new WorkflowView(this.workflow()));
-    protected readonly selectedTab = signal(0);
 
     protected toggleEditing() {
         this.isEditing.update(x => !x);

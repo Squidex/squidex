@@ -33,7 +33,13 @@ export const SQX_TRANSFORM_INPUT_VALUE_ACCESSOR: any = {
 export class TransformInputDirective implements ControlValueAccessor {
     private readonly element = inject(ElementRef);
     private readonly renderer = inject(Renderer2);
-    private readonly transformer = computed(() => {
+    private callChange = (_: any) => { /* NOOP */ };
+    private callTouched = () => { /* NOOP */ };
+
+    /** The transformation that is applied to the entered text, either a function or LowerCase, Slugify or UpperCase. */
+    public readonly transform = input<Transform | string | undefined | null>(undefined, { alias: 'sqxTransformInput' });
+
+    protected readonly transformer = computed(() => {
         const value = this.transform();
 
         if (!Types.isString(value)) {
@@ -51,12 +57,6 @@ export class TransformInputDirective implements ControlValueAccessor {
                 return TransformNoop;
         }
     });
-
-    private callChange = (_: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
-
-    /** The transformation that is applied to the entered text, either a function or LowerCase, Slugify or UpperCase. */
-    public readonly transform = input<Transform | string | undefined | null>(undefined, { alias: 'sqxTransformInput' });
 
     protected onChange(event: Event): void {
         const target = event.target as HTMLInputElement;

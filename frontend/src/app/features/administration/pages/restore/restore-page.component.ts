@@ -6,7 +6,7 @@
  */
 
 import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -40,8 +40,9 @@ export class RestorePageComponent {
 
     protected readonly restoreForm = new RestoreForm();
 
-    protected readonly restoreJob = toSignal(
-        timer(0, 2000).pipe(switchSafe(() => this.jobsService.getRestore())));
+    protected readonly restoreJob = rxResource({
+        stream: () => timer(0, 2000).pipe(switchSafe(() => this.jobsService.getRestore())),
+    });
 
     protected restore() {
         this.restoreForm.submit(value => {

@@ -14,6 +14,7 @@ import { Types } from '../utils/types';
     providedIn: 'root',
 })
 export class LoadingService {
+    private readonly router = inject(Router);
     private readonly loadingCount = signal(0);
     private readonly loadingOperations: { [key: string]: boolean } = {};
 
@@ -26,7 +27,7 @@ export class LoadingService {
     };
 
     constructor() {
-        inject(Router).events.pipe(takeUntilDestroyed())
+        this.router.events.pipe(takeUntilDestroyed())
             .subscribe(event => {
                 this.handleRouterEvent(event);
             });

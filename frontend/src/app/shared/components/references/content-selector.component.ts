@@ -113,7 +113,6 @@ export class ContentSelectorComponent {
     protected readonly queryModel = rxResource({
         params: () => this.schema()?.name,
         stream: ({ params }) => this.schemasService.getFilters(this.appsState.appName, params),
-        defaultValue: null,
     });
 
     constructor() {

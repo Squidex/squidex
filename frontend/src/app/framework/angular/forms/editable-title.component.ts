@@ -26,8 +26,6 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
     ],
 })
 export class EditableTitleComponent {
-    private readonly renameValue = signal('');
-
     /** Emits the new title when renamed. */
     public readonly inputTitleChange = output<string>();
 
@@ -52,9 +50,12 @@ export class EditableTitleComponent {
     /** The text to show when the title is empty. */
     public readonly displayFallback = input('');
 
+    protected readonly renameValue = signal('');
+
     protected readonly inputTitleDisplayed = linkedSignal(() => this.inputTitle());
 
     protected readonly renaming = signal(false);
+
     protected readonly renameForm = form(this.renameValue, path => {
         maxLength(path, () => this.inputTitleLength() || undefined);
         required(path, { when: () => this.inputTitleRequired() });

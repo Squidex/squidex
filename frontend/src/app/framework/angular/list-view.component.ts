@@ -27,8 +27,6 @@ import { SyncScollingDirective } from './sync-scrolling.directive';
     ],
 })
 export class ListViewComponent {
-    private readonly headerElement = viewChild<ElementRef<ParentNode>>('headerElement');
-    private readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
     private readonly renderer = inject(Renderer2);
 
     /** Lets the content overflow the list instead of scrolling inside. */
@@ -54,6 +52,10 @@ export class ListViewComponent {
 
     /** Shows the loading indicator. It is hidden with a short delay to avoid flickering. */
     public readonly isLoading = input(false, { transform: booleanAttribute });
+
+    protected readonly headerElement = viewChild<ElementRef<ParentNode>>('headerElement');
+
+    protected readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
 
     protected readonly isLoadingVisible = signal(false);
 

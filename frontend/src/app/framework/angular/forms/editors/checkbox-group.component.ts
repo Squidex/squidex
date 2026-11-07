@@ -20,29 +20,7 @@ import { ResizedDirective } from '../../resized.directive';
     ],
 })
 export class CheckboxGroupComponent implements FormValueControl<ReadonlyArray<string> | null> {
-    private readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
-    private readonly containerWidth = signal(0);
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
-
-    private readonly tagValuesUnsorted = computed(() => {
-        return getTagValues(this.values(), false);
-    });
-
-    private readonly tagValuesSorted = computed(() => {
-        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
-    });
-
-    private readonly tagValuesWidth = computed(() => {
-        let width = 0;
-        for (const value of this.tagValuesUnsorted()) {
-            width += 40;
-            width += this.textMeasurer.getTextSize(value.name);
-        }
-
-        return width;
-    });
-
-    protected readonly controlId = MathHelper.guid();
 
     /** The values of the checked options. */
     public readonly value = model<ReadonlyArray<string> | null>(null);
@@ -62,6 +40,44 @@ export class CheckboxGroupComponent implements FormValueControl<ReadonlyArray<st
     /** The values to choose from. */
     public readonly values = input<ReadonlyArray<string | TagValue>>([]);
 
+    protected readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
+
+    protected readonly containerWidth = signal(0);
+
+    protected readonly checkedValues = linkedSignal<{ raw: unknown; tags: ReadonlyArray<TagValue> }, ReadonlyArray<TagValue>>({
+        source: () => ({ raw: this.value(), tags: this.tagValuesUnsorted() }),
+        computation: ({ raw, tags }, previous) => {
+            // Keep the order of the user's selection, when the value was set by this control.
+            if (previous && previous.source.tags === tags && Types.equals(previous.value.map(x => x.id), raw)) {
+                return previous.value;
+            }
+
+            if (!Types.isArray(raw) || raw.length === 0) {
+                return [];
+            }
+
+            return tags.filter(x => raw.includes(x.value));
+        },
+    });
+
+    protected readonly tagValuesUnsorted = computed(() => {
+        return getTagValues(this.values(), false);
+    });
+
+    protected readonly tagValuesSorted = computed(() => {
+        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
+    });
+
+    protected readonly tagValuesWidth = computed(() => {
+        let width = 0;
+        for (const value of this.tagValuesUnsorted()) {
+            width += 40;
+            width += this.textMeasurer.getTextSize(value.name);
+        }
+
+        return width;
+    });
+
     protected readonly tagValues = computed(() => {
         return this.unsorted() ? this.tagValuesUnsorted() : this.tagValuesSorted();
     });
@@ -80,21 +96,7 @@ export class CheckboxGroupComponent implements FormValueControl<ReadonlyArray<st
         return width < this.containerWidth();
     });
 
-    protected readonly checkedValues = linkedSignal<{ raw: unknown; tags: ReadonlyArray<TagValue> }, ReadonlyArray<TagValue>>({
-        source: () => ({ raw: this.value(), tags: this.tagValuesUnsorted() }),
-        computation: ({ raw, tags }, previous) => {
-            // Keep the order of the user's selection, when the value was set by this control.
-            if (previous && previous.source.tags === tags && Types.equals(previous.value.map(x => x.id), raw)) {
-                return previous.value;
-            }
-
-            if (!Types.isArray(raw) || raw.length === 0) {
-                return [];
-            }
-
-            return tags.filter(x => raw.includes(x.value));
-        },
-    });
+    protected readonly controlId = MathHelper.guid();
 
     protected updateContainerWidth(width: number) {
         this.containerWidth.set(width);

@@ -20,29 +20,7 @@ import { ResizedDirective } from '../../resized.directive';
     ],
 })
 export class RadioGroupComponent implements FormValueControl<any> {
-    private readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
-    private readonly containerWidth = signal(0);
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
-
-    private readonly tagValuesUnsorted = computed(() => {
-        return getTagValues(this.values(), false);
-    });
-
-    private readonly tagValuesSorted = computed(() => {
-        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
-    });
-
-    private readonly tagValuesWidth = computed(() => {
-        let width = 0;
-        for (const value of this.tagValuesUnsorted()) {
-            width += 40;
-            width += this.textMeasurer.getTextSize(value.name);
-        }
-
-        return width;
-    });
-
-    protected readonly controlId = MathHelper.guid();
 
     /** The value of the selected option. */
     public readonly value = model<any>(null);
@@ -62,6 +40,28 @@ export class RadioGroupComponent implements FormValueControl<any> {
     /** The values to choose from. */
     public readonly values = input<ReadonlyArray<string | TagValue>>([]);
 
+    protected readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
+
+    protected readonly containerWidth = signal(0);
+
+    protected readonly tagValuesUnsorted = computed(() => {
+        return getTagValues(this.values(), false);
+    });
+
+    protected readonly tagValuesSorted = computed(() => {
+        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
+    });
+
+    protected readonly tagValuesWidth = computed(() => {
+        let width = 0;
+        for (const value of this.tagValuesUnsorted()) {
+            width += 40;
+            width += this.textMeasurer.getTextSize(value.name);
+        }
+
+        return width;
+    });
+
     protected readonly tagValues = computed(() => {
         return this.unsorted() ? this.tagValuesUnsorted() : this.tagValuesSorted();
     });
@@ -79,6 +79,8 @@ export class RadioGroupComponent implements FormValueControl<any> {
 
         return width < this.containerWidth();
     });
+
+    protected readonly controlId = MathHelper.guid();
 
     protected updateContainerWidth(width: number) {
         this.containerWidth.set(width);

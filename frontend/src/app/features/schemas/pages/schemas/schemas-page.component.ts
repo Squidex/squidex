@@ -36,23 +36,27 @@ import { SchemaFormComponent } from './schema-form.component';
     ],
 })
 export class SchemasPageComponent {
+    private readonly messageBus = inject(MessageBus);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly showDialog = routeParam('showDialog');
 
     protected readonly schemasState = inject(SchemasState);
-    protected readonly addSchemaDialog = new DialogModel();
-    protected readonly addCategoryForm = new CreateCategoryForm();
-    protected readonly schemasFilter = form(signal(''));
+
+    protected readonly source = signal<any>(null);
 
     protected readonly categories = computed(() => {
         return getCategoryTree(this.schemasState.schemas(), this.schemasState.addedCategories(), this.schemasFilter().value());
     });
 
-    protected readonly source = signal<any>(null);
+    protected readonly addSchemaDialog = new DialogModel();
+
+    protected readonly addCategoryForm = new CreateCategoryForm();
+
+    protected readonly schemasFilter = form(signal(''));
 
     constructor() {
-        inject(MessageBus).on(SchemaCloning, event => {
+        this.messageBus.on(SchemaCloning, event => {
             this.source.set(event.schema);
 
             this.addSchemaDialog.show();

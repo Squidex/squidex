@@ -17,9 +17,10 @@ import { DestroyRef, Directive, inject, input, numberAttribute, output, Renderer
     },
 })
 export class LongHoverDirective {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly renderer = inject(Renderer2);
-    private timerOut: Function | null = null;
     private timer?: any;
+    private timerOut: Function | null = null;
     private wasHovering = false;
 
     /** Emits when the mouse stays over the element for the given duration. */
@@ -35,7 +36,7 @@ export class LongHoverDirective {
     public readonly duration = input(2000, { alias: 'longHoverDuration', transform: numberAttribute });
 
     constructor() {
-        inject(DestroyRef).onDestroy(() => {
+        this.destroyRef.onDestroy(() => {
             clearTimeout(this.timer);
             this.timerOut?.();
         });

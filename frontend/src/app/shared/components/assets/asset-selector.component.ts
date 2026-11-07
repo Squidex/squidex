@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
 import { ListViewComponent, ModalDialogComponent, PagerComponent, TagEditorComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings } from '@app/shared/internal';
 import { SearchFormComponent } from '../search/search-form.component';
@@ -44,13 +44,9 @@ export class AssetSelectorComponent {
         return Object.keys(this.selectedAssets()).length;
     });
 
-    protected readonly isListView = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
+    protected readonly isListView = this.localStore.boolean(Settings.Local.ASSETS_MODE);
 
     constructor() {
-        effect(() => {
-            this.localStore.setBoolean(Settings.Local.ASSETS_MODE, this.isListView());
-        });
-
         this.assetsState.load();
     }
 

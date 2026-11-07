@@ -6,7 +6,7 @@
  */
 
 import { Component, inject, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent, ListViewComponent, MessageBus, RuleElementDto, RuleSimulatorState, RulesService, SimulatedRuleEventDto, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleConfigured } from '../messages';
@@ -26,16 +26,25 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
     ],
 })
 export class RuleSimulatorPageComponent {
+    private readonly messageBus = inject(MessageBus);
+    private readonly route = inject(ActivatedRoute);
+    private readonly rulesService = inject(RulesService);
+
     protected readonly ruleSimulatorState = inject(RuleSimulatorState);
-    protected readonly availableSteps = toSignal(inject(RulesService).getSteps(), { initialValue: {} as Record<string, RuleElementDto> });
+
     protected readonly selectedRuleEvent = signal<string | null | undefined>(undefined);
 
+    protected readonly availableSteps = rxResource({
+        stream: () => this.rulesService.getSteps(),
+        defaultValue: {} as Record<string, RuleElementDto>,
+    });
+
     constructor() {
-        inject(MessageBus).on(RuleConfigured, message => {
+        this.messageBus.on(RuleConfigured, message => {
             this.ruleSimulatorState.setRule(message.trigger, message.flow);
         });
 
-        inject(ActivatedRoute).queryParams
+        this.route.queryParams
             .pipe(takeUntilDestroyed())
             .subscribe(query => {
                 this.ruleSimulatorState.selectRule(query['ruleId']);

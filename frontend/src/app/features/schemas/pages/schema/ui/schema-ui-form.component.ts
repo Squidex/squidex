@@ -29,16 +29,16 @@ export class SchemaUIFormComponent {
 
     protected readonly selectedTab = signal(0);
 
-    protected readonly isEditable = computed(() => {
-        return this.schema().canUpdate;
-    });
-
     protected readonly fieldsInLists = linkedSignal<string[]>(() => {
         return this.schema().fieldsInLists;
     });
 
     protected readonly fieldsInReferences = linkedSignal<string[]>(() => {
         return this.schema().fieldsInReferences;
+    });
+
+    protected readonly isEditable = computed(() => {
+        return this.schema().canUpdate;
     });
 
     protected setFieldsInLists(names: string[]) {

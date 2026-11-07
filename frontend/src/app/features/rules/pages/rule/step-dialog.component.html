@@ -14,7 +14,7 @@
             @if (currentStep) {
                 <div class="form-horizontal">
                     <sqx-form-row for="stepName" hint="rules.stepNameHint" label="common.name">
-                        <input class="form-control" id="stepName" maxlength="40" [formField]="stepName" />
+                        <input class="form-control" id="stepName" [formField]="stepName" />
                     </sqx-form-row>
 
                     <sqx-form-row check for="stepIgnore" hint="rules.stepIgnoreErrorHint" label="rules.stepIgnoreError">

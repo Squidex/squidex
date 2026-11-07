@@ -30,6 +30,8 @@ export class JobComponent {
     /** The job to show. */
     public readonly job = input.required<JobDto>();
 
+    protected readonly isExpanded = signal(false);
+
     protected readonly duration = computed(() => {
         const job = this.job();
 
@@ -53,8 +55,6 @@ export class JobComponent {
 
         return details;
     });
-
-    protected readonly isExpanded = signal(false);
 
     protected delete() {
         this.jobsState.delete(this.job());

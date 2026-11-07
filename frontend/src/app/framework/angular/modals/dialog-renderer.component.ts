@@ -53,10 +53,13 @@ export class DialogRendererComponent {
     private readonly destroyRef = inject(DestroyRef);
     private readonly dialogs = inject(DialogService);
 
-    protected readonly dialogView = new DialogModel();
     protected readonly dialogRequest = signal<DialogRequest | null | undefined>(undefined);
+
     protected readonly notifications = signal<ReadonlyArray<Notification>>([]);
+
     protected readonly tooltips = signal<ReadonlyArray<Tooltip>>([]);
+
+    protected readonly dialogView = new DialogModel();
 
     constructor() {
         this.dialogView.isOpenChanges.pipe(takeUntilDestroyed())

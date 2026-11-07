@@ -32,6 +32,8 @@ export class StarsComponent implements FormValueControl<number | null> {
     /** The number of stars to render. Shows a hint instead of stars when greater than 15. */
     public readonly maximumStars = input(5, { transform: (value: unknown) => numberAttribute(value, 5) });
 
+    protected readonly valuePreview = linkedSignal(() => this.valueNumber() || 0);
+
     protected readonly starsArray = computed(() => {
         const result: number[] = [];
 
@@ -47,8 +49,6 @@ export class StarsComponent implements FormValueControl<number | null> {
 
         return Types.isNumber(value) ? value : null;
     });
-
-    protected readonly valuePreview = linkedSignal(() => this.valueNumber() || 0);
 
     protected setPreview(stars: number) {
         if (this.disabled()) {

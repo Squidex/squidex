@@ -55,6 +55,7 @@ export class RolesPageComponent {
     private readonly rolesService = inject(RolesService);
 
     protected readonly rolesState = inject(RolesState);
+
     protected readonly schemasState = inject(SchemasState);
 
     protected readonly allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);

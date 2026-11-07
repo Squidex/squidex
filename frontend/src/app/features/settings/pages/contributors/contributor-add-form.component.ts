@@ -63,14 +63,14 @@ export class ContributorAddFormComponent {
     private readonly contributorsState = inject(ContributorsState);
     private readonly dialogs = inject(DialogService);
 
-    private readonly defaultValue = computed<Partial<AssignContributorFormModel>>(() => {
-        return { role: this.roles()[0]?.name, user: '' };
-    });
-
     protected readonly usersDataSource = inject(UsersDataSource);
 
     /** The roles that can be assigned to new contributors. */
     public readonly roles = input.required<ReadonlyArray<RoleDto>>();
+
+    protected readonly defaultValue = computed<Partial<AssignContributorFormModel>>(() => {
+        return { role: this.roles()[0]?.name, user: '' };
+    });
 
     protected readonly assignContributorForm = new AssignContributorForm();
 
