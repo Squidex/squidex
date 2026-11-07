@@ -6,9 +6,10 @@
  */
 
 import { LowerCasePipe } from '@angular/common';
-import { booleanAttribute, Component, effect, inject, input, linkedSignal, output, signal, untracked } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe } from '@app/shared';
+import { booleanAttribute, Component, effect, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, SignalSelectDirective, StepForm, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -23,19 +24,21 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         EntriesPipe,
         FormattableInputComponent,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LowerCasePipe,
         MarkdownDirective,
         ModalDialogComponent,
-        ReactiveFormsModule,
         RuleElementComponent,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class StepDialogComponent {
     private readonly appsState = inject(AppsState);
+    private readonly injector = inject(Injector);
     private readonly rulesService = inject(RulesService);
 
     /** The step to edit, or undefined to add a new step. */
@@ -86,7 +89,7 @@ export class StepDialogComponent {
         if (this.currentStep()?.stepType !== type) {
             const element = this.availableSteps()[type];
 
-            const currentStep = new StepForm(element, type);
+            const currentStep = new StepForm(element, type, this.injector);
             currentStep.setEnabled(this.isEditable());
 
             this.currentStep.set(currentStep);

@@ -1,12 +1,12 @@
-<form [formGroup]="importForm.form" (ngSubmit)="detect()">
+<form (ngSubmit)="detect()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()">
         <ng-container title> {{ "contributors.importTitle" | sqxTranslate }}</ng-container>
         <ng-container content>
             @switch (importStage()) {
                 @case ("Start") {
-                    <textarea class="form-control content" formControlName="import" placeholder="user1@squidex.io;user2@squidex.io"></textarea>
+                    <textarea class="form-control content" [formField]="importForm.form.import" placeholder="user1@squidex.io;user2@squidex.io"></textarea>
                     <sqx-form-hint>
-                        @if (importForm.numberOfEmails | async; as count) {
+                        @if (importForm.numberOfEmails(); as count) {
                             {{ "contributors.import.emailsDetected" | sqxTranslate: { count: count } }}
                         }
                         &nbsp;
@@ -48,7 +48,7 @@
             </button>
             @switch (importStage()) {
                 @case ("Start") {
-                    <button class="btn btn-success" [disabled]="importForm.hasNoUser | async" type="submit">
+                    <button class="btn btn-success" [disabled]="importForm.hasNoUser()" type="submit">
                         {{ "contributors.import.run" | sqxTranslate }}
                     </button>
                 }

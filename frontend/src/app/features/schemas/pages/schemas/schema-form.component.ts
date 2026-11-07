@@ -6,9 +6,10 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { switchMap } from 'rxjs';
-import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, SignalSelectDirective, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
@@ -20,12 +21,13 @@ import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LoaderComponent,
         ModalDialogComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,
@@ -74,7 +76,7 @@ export class SchemaFormComponent {
         this.selectedTab.set(tab);
         this.sourceActual.set(null);
 
-        const { type, name } = this.createForm.form.value;
+        const { type, name } = this.createForm.model();
         this.createForm.load({ type, name });
     }
 

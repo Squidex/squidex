@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, RolesState, SignalSelectDirective, UserInfoFieldFormModel, UserInfoFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-user-info-validation',
@@ -15,22 +16,27 @@ import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } fr
     templateUrl: 'user-info-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
     ],
 })
 export class UserInfoValidationComponent {
     protected readonly rolesState = inject(RolesState);
 
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
 
     /** The type specific properties of the field. */
     public readonly properties = input.required<UserInfoFieldPropertiesDto>();
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<UserInfoFieldFormModel>;
+    });
 
     constructor() {
         this.rolesState.loadIfNotLoaded();

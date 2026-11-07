@@ -10,7 +10,7 @@
         </div>
     }
 
-    <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
+    <form (ngSubmit)="comment()">
         <sqx-autocomplete
             #input
             autoFocus="true"
@@ -18,7 +18,7 @@
             displayProperty="contributorEmail"
             (editorBlur)="onBlur()"
             (editorKeyPress)="onKeyPress($event)"
-            formControlName="text"
+            [formField]="commentForm.form.text"
             [itemsSource]="contributorsDataSource"
             placeholder="{{ 'comments.create' | sqxTranslate }}"
             startCharacter="@"

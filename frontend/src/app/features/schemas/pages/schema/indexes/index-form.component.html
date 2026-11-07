@@ -5,11 +5,11 @@
             <sqx-form-hint>
                 <span [sqxMarkdown]="'schemas.indexes.hint' | sqxTranslate" trusted="true"></span>
             </sqx-form-hint>
-            @for (form of createForm.controls; track form; let i = $index) {
-                <div class="form-group row gx-2" [formGroup]="form">
+            @for (field of createForm.form; track $index; let i = $index) {
+                <div class="form-group row gx-2">
                     <div class="col">
-                        <sqx-control-errors for="name" />
-                        <select class="form-select" formControlName="name">
+                        <sqx-control-errors [for]="field.name" />
+                        <select class="form-select" [formField]="field.name">
                             @for (fieldName of fieldNames(); track fieldName) {
                                 <option [ngValue]="fieldName">{{ fieldName }}</option>
                             }
@@ -17,8 +17,8 @@
                     </div>
 
                     <div class="col-4">
-                        <sqx-control-errors for="order" />
-                        <select class="form-select" formControlName="order">
+                        <sqx-control-errors [for]="field.order" />
+                        <select class="form-select" [formField]="field.order">
                             <option [ngValue]="'Ascending'">Ascending</option>
 
                             <option [ngValue]="'Descending'">Descending</option>
@@ -32,7 +32,7 @@
                             confirmRememberKey="deleteIndexField"
                             confirmText="i18n:schemas.indexes.deleteFieldConfirmText"
                             confirmTitle="i18n:schemas.indexes.deleteFieldConfirmTitle"
-                            (sqxConfirmClick)="createForm.form.removeAt(i)"
+                            (sqxConfirmClick)="createForm.remove(i)"
                             type="button">
                             <i class="icon-bin3"></i>
                         </button>
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="col-auto">
-                    <button class="btn btn-success" attr.aria-label="{{ 'common.add' | sqxTranslate }}" (click)="createForm.form.add()" type="button">
+                    <button class="btn btn-success" attr.aria-label="{{ 'common.add' | sqxTranslate }}" (click)="createForm.add()" type="button">
                         <i class="icon-add"></i>
                     </button>
                 </div>

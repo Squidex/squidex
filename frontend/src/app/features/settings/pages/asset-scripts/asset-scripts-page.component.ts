@@ -7,10 +7,11 @@
 
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, shareReplay } from 'rxjs';
-import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditAssetScriptsForm, KeysPipe, LayoutComponent, ScriptCompletions, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditAssetScriptsForm, LayoutComponent, ScriptCompletions, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ScriptNamePipe } from '@app/shared/components/pipes';
 
 @Component({
@@ -21,10 +22,9 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     imports: [
         AsyncPipe,
         CodeEditorComponent,
+        FormField,
         FormsModule,
-        KeysPipe,
         LayoutComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

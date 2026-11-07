@@ -106,11 +106,11 @@
 
     @if (isEditing()) {
         <div class="table-items-row-details">
-            <form [formGroup]="editForm().form" (ngSubmit)="save()">
+            <form (ngSubmit)="save()">
                 <sqx-field-form
                     (dialogClose)="toggleEditing()"
                     [field]="field"
-                    [fieldForm]="editForm().form"
+                    [fieldForm]="editForm()"
                     [isEditable]="isEditable()"
                     [isLocalizable]="isLocalizable()"
                     [languages]="languages()"

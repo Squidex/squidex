@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
@@ -18,12 +19,12 @@ import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowCo
     imports: [
         ConfirmClickDirective,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

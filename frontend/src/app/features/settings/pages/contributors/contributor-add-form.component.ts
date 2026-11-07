@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Injectable, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AssignContributorForm, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
+import { AssignContributorForm, AssignContributorFormModel, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, SignalSelectDirective, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
 @Injectable()
@@ -48,13 +48,13 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource,
     ],
     imports: [
-        AsyncPipe,
         AutocompleteComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
         ImportContributorsDialogComponent,
         ModalDirective,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
         UserDtoPicture,
     ],
@@ -63,7 +63,7 @@ export class ContributorAddFormComponent {
     private readonly contributorsState = inject(ContributorsState);
     private readonly dialogs = inject(DialogService);
 
-    private readonly defaultValue = computed<any>(() => {
+    private readonly defaultValue = computed<Partial<AssignContributorFormModel>>(() => {
         return { role: this.roles()[0]?.name, user: '' };
     });
 

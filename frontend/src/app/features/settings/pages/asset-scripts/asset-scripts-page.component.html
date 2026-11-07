@@ -6,10 +6,10 @@
         </button>
     </ng-container>
     <ng-container>
-        <form class="inner-form" [formGroup]="editForm.form" (ngSubmit)="saveScripts()">
+        <form class="inner-form" (ngSubmit)="saveScripts()">
             <div class="inner-header">
                 <ul class="nav nav-tabs2">
-                    @for (script of editForm.form.controls | sqxKeys; track script) {
+                    @for (script of editForm.scriptNames; track script) {
                         <li class="nav-item">
                             <button class="nav-link" [class.active]="assetScript() === script" (click)="selectField(script)" type="button">
                                 {{ script | sqxScriptName }}
@@ -23,9 +23,9 @@
             </div>
 
             <div class="inner-main">
-                @for (script of editForm.form.controls | sqxKeys; track script) {
+                @for (script of editForm.scriptNames; track script) {
                     @if (assetScript() === script) {
-                        <sqx-code-editor borderless="true" [completion]="assetCompletions | async" [formControlName]="script" />
+                        <sqx-code-editor borderless="true" [completion]="assetCompletions | async" [formField]="editForm.form[script]" />
                     }
                 }
             </div>

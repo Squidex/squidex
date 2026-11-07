@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AddFieldForm, AppSettingsDto, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
 
@@ -19,23 +19,23 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
     imports: [
-        AsyncPipe,
         DropdownMenuComponent,
         FieldFormComponent,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         ModalDialogComponent,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
     ],
 })
 export class FieldWizardComponent {
+    private readonly injector = inject(Injector);
     private readonly schemasState = inject(SchemasState);
     private readonly nameInput = viewChild<ElementRef<HTMLElement>>('nameInput');
 
@@ -136,7 +136,7 @@ export class FieldWizardComponent {
     }
 
     private startEditing(field: FieldDto) {
-        const form = new EditFieldForm(field.properties);
+        const form = new EditFieldForm(field.properties, this.injector);
         form.load(field.properties);
 
         this.editing.set({ field, form });

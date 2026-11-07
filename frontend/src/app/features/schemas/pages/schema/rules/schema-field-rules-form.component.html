@@ -4,15 +4,15 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="content">
-                @if (!isEditable() && editForm.rulesControls.length === 0) {
+                @if (!isEditable() && editForm.model().length === 0) {
                     <div class="mt-4">{{ "schemas.rules.empty" | sqxTranslate }}</div>
                 }
 
-                @for (form of editForm.rulesControls; track form; let i = $index) {
-                    <div class="mb-2 row gx-2" [formGroup]="form">
+                @for (rule of editForm.form; track $index; let i = $index) {
+                    <div class="mb-2 row gx-2">
                         <div class="col col-action">
-                            <sqx-control-errors for="action" />
-                            <select class="form-select" formControlName="action">
+                            <sqx-control-errors [for]="rule.action" />
+                            <select class="form-select" [formField]="rule.action">
                                 @for (fieldAction of fieldActions; track fieldAction) {
                                     <option [ngValue]="fieldAction">{{ fieldAction }}</option>
                                 }
@@ -20,8 +20,8 @@
                         </div>
 
                         <div class="col-3">
-                            <sqx-control-errors for="field" />
-                            <select class="form-select" formControlName="field">
+                            <sqx-control-errors [for]="rule.field" />
+                            <select class="form-select" [formField]="rule.field">
                                 @for (option of fieldOptions(); track option.value) {
                                     <option [ngValue]="option.value">{{ option.label }}</option>
                                 }
@@ -33,8 +33,8 @@
                         </div>
 
                         <div class="col">
-                            <sqx-control-errors for="condition" />
-                            <sqx-code-editor [completion]="fieldCompletions()" formControlName="condition" singleLine="true" />
+                            <sqx-control-errors [for]="rule.condition" />
+                            <sqx-code-editor [completion]="fieldCompletions()" [formField]="rule.condition" singleLine="true" />
                         </div>
 
                         <div class="col-auto">

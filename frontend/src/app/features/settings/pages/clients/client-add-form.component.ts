@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -16,11 +16,10 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
     templateUrl: './client-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         TransformInputDirective,
         TranslatePipe,
     ],
@@ -28,7 +27,7 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
 export class ClientAddFormComponent {
     private readonly clientsState = inject(ClientsState);
 
-    protected addClientForm = new AddClientForm();
+    protected readonly addClientForm = new AddClientForm();
 
     protected addClient() {
         const value = this.addClientForm.submit();

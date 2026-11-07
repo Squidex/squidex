@@ -39,7 +39,7 @@
 
     @if (isEditing()) {
         <div class="table-items-row-details">
-            <form [formGroup]="editForm.form" (ngSubmit)="save()">
+            <form (ngSubmit)="save()">
                 <div class="table-items-row-details-tabs clearfix">
                     <div class="float-end">
                         <button class="btn btn-text-secondary" (click)="toggleEditing()" type="button">
@@ -118,14 +118,14 @@
                     }
 
                     @if (!languageValue.isMaster) {
-                        <sqx-form-row check for="isMaster" hint="languages.masterHint" label="languages.master" [prefix]="languageValue.iso2Code">
-                            <input class="form-check-input" id="{{ languageValue.iso2Code }}_isMaster" formControlName="isMaster" type="checkbox" />
+                        <sqx-form-row check [for]="editForm.form.isMaster" hint="languages.masterHint" label="languages.master" [prefix]="languageValue.iso2Code">
+                            <input class="form-check-input" id="{{ languageValue.iso2Code }}_isMaster" [formField]="editForm.form.isMaster" type="checkbox" />
                         </sqx-form-row>
                     }
 
                     @if (!languageValue.isMaster) {
-                        <sqx-form-row check for="isOptional" hint="languages.optionalHint" label="languages.optional" [prefix]="languageValue.iso2Code">
-                            <input class="form-check-input" id="{{ languageValue.iso2Code }}_isOptional" formControlName="isOptional" type="checkbox" />
+                        <sqx-form-row check [for]="editForm.form.isOptional" hint="languages.optionalHint" label="languages.optional" [prefix]="languageValue.iso2Code">
+                            <input class="form-check-input" id="{{ languageValue.iso2Code }}_isOptional" [formField]="editForm.form.isOptional" type="checkbox" />
                         </sqx-form-row>
                     }
                 </div>

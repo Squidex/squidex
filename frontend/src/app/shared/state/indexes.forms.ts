@@ -6,35 +6,35 @@
  */
 
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, TemplatedFormArray } from '@app/framework';
-import { CreateIndexDto, IndexFieldDto } from '@app/shared/internal';
+import { applyEach, required } from '@angular/forms/signals';
+import { SignalForm } from '@app/framework';
+import { CreateIndexDto, IndexFieldDto, SortOrder } from '@app/shared/internal';
 
-export class CreateIndexForm extends Form<TemplatedFormArray, CreateIndexDto> {
-    public get controls(): ReadonlyArray<ExtendedFormGroup> {
-        return this.form.controls as any;
-    }
+type IndexFieldFormModel = { name: string; order: SortOrder | '' };
 
+export class CreateIndexForm extends SignalForm<IndexFieldFormModel[], CreateIndexDto> {
     constructor() {
-        super(new TemplatedFormArray(FieldTemplate.INSTANCE));
-    }
-
-    protected transformSubmit(value: any[]) {
-        return new CreateIndexDto({ fields: value.map(x => new IndexFieldDto(x)) });
-    }
-}
-
-class FieldTemplate {
-    public static readonly INSTANCE = new FieldTemplate();
-
-    public createControl() {
-        return new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-            order: new UntypedFormControl('',
-                Validators.required,
-            ),
+        super([], path => {
+            applyEach(path, field => {
+                required(field.name);
+                required(field.order);
+            });
         });
+    }
+
+    public add() {
+        this.model.update(fields => [...fields, { name: '', order: '' }]);
+    }
+
+    public remove(index: number) {
+        this.model.update(fields => fields.filter((_, i) => i !== index));
+    }
+
+    protected transformLoad(value: Partial<CreateIndexDto>): IndexFieldFormModel[] {
+        return (value.fields || []).map(({ name, order }) => ({ name, order }));
+    }
+
+    protected transformSubmit(value: IndexFieldFormModel[]) {
+        return new CreateIndexDto({ fields: value.map(x => new IndexFieldDto({ name: x.name, order: x.order as SortOrder })) });
     }
 }

@@ -7,7 +7,8 @@
 
 import { Component, computed, effect, inject, input, linkedSignal, output, signal, viewChild } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { map } from 'rxjs/operators';
@@ -36,6 +37,7 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
         ControlErrorsComponent,
         CopyDirective,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         ImageCropperComponent,
@@ -44,7 +46,6 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
         NgxDocViewerModule,
         PreviewableType,
         ProgressBarComponent,
-        ReactiveFormsModule,
         RouterLink,
         TagEditorComponent,
         TooltipDirective,
@@ -267,11 +268,14 @@ export class AssetDialogComponent {
                     this.assetUpdated.emit(dto);
                     this.assetActual.set(dto);
 
-                    this.annotateForm.submitCompleted({ noReset: true });
-
                     this.dialogs.notifyInfo('i18n:assets.moved');
                 },
+                error: error => {
+                    this.moveForm.submitFailed(error);
+                },
                 complete: () => {
+                    this.moveForm.submitCompleted({ noReset: true });
+
                     this.isMoving.set(false);
                 },
             });

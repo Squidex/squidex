@@ -5,11 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
 import { switchMap } from 'rxjs';
-import { CodeEditorComponent, ConfirmClickDirective, ControlErrorsComponent, SchemaDto, TranslatePipe, value$ } from '@app/shared';
+import { CodeEditorComponent, ConfirmClickDirective, ContentChangedSchemaModel, ControlErrorsComponent, SchemaDto, SignalSelectDirective, TranslatePipe } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 
 @Component({
@@ -20,8 +21,9 @@ import { CompletionsCache } from './completions-cache';
         CodeEditorComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
@@ -29,8 +31,8 @@ export class ContentChangedSchemaComponent {
     /** The schemas the user can choose from. */
     public readonly schemas = input.required<ReadonlyArray<SchemaDto> | null | undefined>();
 
-    /** The form group with the schema and the condition. */
-    public readonly form = input.required<FormGroup>();
+    /** The field with the schema and the condition. */
+    public readonly field = input.required<FieldTree<ContentChangedSchemaModel>>();
 
     /** Emits when the user confirms to remove the schema. */
     public readonly remove = output();
@@ -40,10 +42,13 @@ export class ContentChangedSchemaComponent {
     constructor() {
         const completionsCache = inject(CompletionsCache);
 
+        const schemaId = computed(() => {
+            return this.field().schemaId().value();
+        });
+
         this.completions = toSignal(
-            toObservable(this.form).pipe(
-                switchMap(form => value$(form.controls['schemaId'])),
-                switchMap(schemaId => completionsCache.getCompletions(schemaId, true))),
+            toObservable(schemaId).pipe(
+                switchMap(id => completionsCache.getCompletions(id, true))),
             { initialValue: null });
     }
 }

@@ -7,7 +7,8 @@
 
 import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { ControlErrorsComponent, DialogService, ISODatePipe, JobsService, LayoutComponent, ListViewComponent, RestoreForm, SidebarMenuDirective, switchSafe, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -19,11 +20,11 @@ import { ControlErrorsComponent, DialogService, ISODatePipe, JobsService, Layout
     imports: [
         AsyncPipe,
         ControlErrorsComponent,
+        FormField,
         FormsModule,
         ISODatePipe,
         LayoutComponent,
         ListViewComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

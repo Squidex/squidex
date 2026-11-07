@@ -1,21 +1,21 @@
-<div [formGroup]="fieldForm()">
+<div>
     <sqx-form-row
         #classNamesRow
-        for="classNames"
+        [for]="form().classNames"
         hint="schemas.fieldTypes.string.classNamesHint"
         label="schemas.fieldTypes.string.classNames"
         [prefix]="field().fieldId">
-        <sqx-tag-editor [id]="classNamesRow.fieldName()" formControlName="classNames" />
+        <sqx-tag-editor [id]="classNamesRow.fieldName()" [formField]="form().classNames" />
     </sqx-form-row>
 
-    <sqx-form-row for="folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field().fieldId">
-        <sqx-asset-folder-dropdown formControlName="folderId" />
+    <sqx-form-row [for]="form().folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field().fieldId">
+        <sqx-asset-folder-dropdown [formField]="form().folderId" />
     </sqx-form-row>
 
-    <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field().fieldId">
+    <sqx-form-row #schemaIdsRow [for]="form().schemaIds" label="common.schemas" [prefix]="field().fieldId">
         <sqx-tag-editor
             [id]="schemaIdsRow.fieldName()"
-            formControlName="schemaIds"
+            [formField]="form().schemaIds"
             [itemConverter]="schemasSource.normalConverter()"
             [itemsSource]="schemasSource.normalConverter().suggestions"
             placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />

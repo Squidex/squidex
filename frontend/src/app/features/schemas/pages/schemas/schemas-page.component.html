@@ -21,7 +21,7 @@
             <div class="col search-form">
                 <input
                     class="form-control"
-                    [formControl]="schemasFilter"
+                    [formField]="schemasFilter"
                     placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}"
                     shortcut="CTRL + I"
                     shortcutAction="focus" />
@@ -36,8 +36,8 @@
             }
         </div>
 
-        <form class="mt-4" [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
-            <input class="form-control" formControlName="name" placeholder="{{ 'schemas.createCategory' | sqxTranslate }}" />
+        <form class="mt-4" (ngSubmit)="addCategory()">
+            <input class="form-control" [formField]="addCategoryForm.form.name" placeholder="{{ 'schemas.createCategory' | sqxTranslate }}" />
         </form>
     </ng-container>
 </sqx-layout>

@@ -7,9 +7,10 @@
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { switchMap } from 'rxjs';
-import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, SchemaDto, SchemasService, SchemasState, ScriptNamePipe, TranslatePipe } from '@app/shared';
+import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, SchemaDto, SchemasService, SchemasState, ScriptNamePipe, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-scripts-form',
@@ -18,9 +19,8 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, Schema
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
+        FormField,
         FormsModule,
-        KeysPipe,
-        ReactiveFormsModule,
         ScriptNamePipe,
         TranslatePipe,
     ],

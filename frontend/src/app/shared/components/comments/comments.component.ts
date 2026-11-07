@@ -6,7 +6,8 @@
  */
 
 import { booleanAttribute, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { AutocompleteComponent, Keys, MessageBus, TranslatePipe } from '@app/framework';
 import { AnnotationCreateAfterNavigate, AnnotationsSelectedAfterNavigate, AuthService, CommentsState, ContentDto, FieldSelected, UpsertCommentForm } from '@app/shared/internal';
@@ -24,8 +25,8 @@ import { ContributorsDataSource } from './data-source';
     imports: [
         AutocompleteComponent,
         CommentComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
         UserPicturePipe,
     ],

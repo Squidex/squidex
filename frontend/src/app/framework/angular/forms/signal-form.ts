@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { signal, WritableSignal } from '@angular/core';
+import { Injector, signal, WritableSignal } from '@angular/core';
 import { disabled, FieldTree, form, SchemaPathTree, validateTree } from '@angular/forms/signals';
 import { ErrorDto, Types } from '@app/framework/internal';
 import { State } from '../../state';
@@ -36,17 +36,20 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     constructor(
         private readonly initialModel: TModel,
         schema?: (path: SchemaPathTree<TModel>) => void,
+        injector?: Injector,
     ) {
         this.model = signal(initialModel);
         this.form = form(this.model, path => {
-            disabled(path, () => this.isDisabled());
+            const root = path as SchemaPathTree<unknown>;
 
-            validateTree(path, ctx => {
+            disabled(root, () => this.isDisabled());
+
+            validateTree(root, ctx => {
                 return serverErrors(ctx.fieldTree, this.model(), this.serverError());
             });
 
-            schema?.(path);
-        });
+            schema?.(path as SchemaPathTree<TModel>);
+        }, { injector }) as FieldTree<TModel>;
     }
 
     public setEnabled(isEnabled: boolean) {
@@ -54,7 +57,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     }
 
     protected transformLoad(value: Partial<TIn>): TModel {
-        const result: Record<string, any> = { ...this.initialModel };
+        const result: Record<string, any> = { ...this.initialModel as Record<string, any> };
 
         for (const key of Object.keys(result)) {
             const loaded = (value as Record<string, any>)[key];
@@ -81,9 +84,9 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     }
 
     public submit(): TOut | null {
-        markAllAsTouched(this.form, this.model());
+        markAllAsTouched(this.form as FieldTree<unknown>, this.model());
 
-        const hasErrors = this.form().errorSummary().some(x => x.kind !== SERVER_ERROR_KIND);
+        const hasErrors = (this.form as FieldTree<unknown>)().errorSummary().some(x => x.kind !== SERVER_ERROR_KIND);
         if (hasErrors) {
             return null;
         }
@@ -102,7 +105,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
         this.isDisabled.set(false);
 
         if (options?.noReset) {
-            this.form().reset();
+            (this.form as FieldTree<unknown>)().reset();
         } else {
             this.setValue(options?.newValue);
         }
@@ -115,7 +118,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
 
     private setValue(value?: Partial<TIn>) {
         this.model.set(value ? this.transformLoad(value) : this.initialModel);
-        this.form().reset();
+        (this.form as FieldTree<unknown>)().reset();
     }
 
     private updateSubmitState(errorOrMessage: string | ErrorDto | undefined | null, submitting: boolean, replaceDetails = true) {
@@ -133,7 +136,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     }
 }
 
-export function markAllAsTouched(field: FieldTree<any> | undefined, value: any) {
+export function markAllAsTouched(field: FieldTree<unknown> | undefined, value: any) {
     if (!field) {
         return;
     }

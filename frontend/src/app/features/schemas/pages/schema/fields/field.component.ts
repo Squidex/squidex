@@ -6,8 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, inject, Injector, input, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateFieldDto } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { FieldFormComponent } from './forms/field-form.component';
@@ -26,7 +26,6 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
@@ -34,6 +33,7 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     ],
 })
 export class FieldComponent {
+    private readonly injector = inject(Injector);
     private readonly schemasState = inject(SchemasState);
 
     /** The field to render. */
@@ -66,7 +66,7 @@ export class FieldComponent {
     protected readonly editForm = computed(() => {
         const properties = this.field().properties;
 
-        const editForm = new EditFieldForm(properties);
+        const editForm = new EditFieldForm(properties, this.injector);
         editForm.load(properties);
         return editForm;
     });

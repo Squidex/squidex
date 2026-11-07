@@ -8,7 +8,8 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
 
 @Component({
@@ -21,9 +22,9 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowCompone
         CdkDragHandle,
         CdkDropList,
         ConfirmClickDirective,
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

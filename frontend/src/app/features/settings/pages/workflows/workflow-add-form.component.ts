@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePipe, WorkflowsState } from '@app/shared';
 
 @Component({
@@ -16,18 +16,17 @@ import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePi
     templateUrl: './workflow-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class WorkflowAddFormComponent {
     private readonly workflowsState = inject(WorkflowsState);
 
-    protected addWorkflowForm = new AddWorkflowForm();
+    protected readonly addWorkflowForm = new AddWorkflowForm();
 
     protected addWorkflow() {
         const value = this.addWorkflowForm.submit();

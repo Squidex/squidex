@@ -6,9 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output, signal, untracked } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, AppSettingsDto, FieldDto, SchemaDto, TranslatePipe } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import { AppLanguageDto, AppSettingsDto, EditFieldForm, FieldDto, SchemaDto, TranslatePipe } from '@app/shared';
 import { JsonMoreComponent } from '../types/json-more.component';
 import { FieldFormCommonComponent } from './field-form-common.component';
 import { FieldFormUIComponent } from './field-form-ui.component';
@@ -37,8 +36,8 @@ export class FieldFormComponent {
     /** Enables the form and the save button, otherwise the form is disabled. */
     public readonly isEditable = input(false, { transform: booleanAttribute });
 
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<EditFieldForm>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -59,16 +58,7 @@ export class FieldFormComponent {
 
     constructor() {
         effect(() => {
-            const fieldForm = this.fieldForm();
-            const isEditable = this.isEditable();
-
-            untracked(() => {
-                if (!isEditable) {
-                    fieldForm.disable();
-                } else {
-                    fieldForm.enable();
-                }
-            });
+            this.fieldForm().setEnabled(this.isEditable());
         });
     }
 

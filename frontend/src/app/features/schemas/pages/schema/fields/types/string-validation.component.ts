@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, untracked } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { switchMap } from 'rxjs/operators';
-import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormRowComponent, hasNoValue$, hasValue$, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, StringContentTypeValues, StringFieldPropertiesDto, TranslatePipe, Types, value$ } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, SignalSelectDirective, StringContentTypeValues, StringFieldFormModel, StringFieldPropertiesDto, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',
@@ -18,28 +17,21 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormRo
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class StringValidationComponent {
-    private readonly patternControl = computed(() => {
-        return this.fieldForm().controls['pattern'];
-    });
-
-    private readonly patternValue = toSignal(
-        toObservable(this.patternControl).pipe(
-            switchMap(control => value$<string>(control))));
-
     protected readonly contentTypes = StringContentTypeValues;
 
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -59,20 +51,22 @@ export class StringValidationComponent {
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<StringFieldFormModel>;
+    });
+
     protected readonly patternsModal = new ModalModel();
 
-    protected readonly showPatternMessage = toSignal(
-        toObservable(this.patternControl).pipe(
-            switchMap(control => hasValue$(control))),
-        { initialValue: false });
+    protected readonly showPatternMessage = computed(() => {
+        return !!this.form().pattern().value();
+    });
 
-    protected readonly showPatternSuggestions = toSignal(
-        toObservable(this.patternControl).pipe(
-            switchMap(control => hasNoValue$(control))),
-        { initialValue: false });
+    protected readonly showPatternSuggestions = computed(() => {
+        return !this.form().pattern().value();
+    });
 
     protected readonly patternName = computed(() => {
-        const regex = this.patternValue();
+        const regex = this.form().pattern().value();
         if (!regex) {
             return '';
         }
@@ -92,25 +86,18 @@ export class StringValidationComponent {
     });
 
     constructor() {
-        effect(onCleanup => {
-            const fieldForm = this.fieldForm();
-
-            const subscription = untracked(() =>
-                value$<string>(fieldForm.controls['pattern'])
-                    .subscribe(value => {
-                        if (!value) {
-                            fieldForm.controls['patternMessage'].setValue(undefined);
-                        }
-                    }));
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            const form = this.form();
+            if (!form.pattern().value()) {
+                form.patternMessage().value.set('');
+            }
         });
     }
 
     protected setPattern(pattern: PatternDto) {
-        const fieldForm = this.fieldForm();
+        const form = this.form();
 
-        fieldForm.controls['pattern'].setValue(pattern.regex);
-        fieldForm.controls['patternMessage'].setValue(pattern.message);
+        form.pattern().value.set(pattern.regex);
+        form.patternMessage().value.set(pattern.message ?? '');
     }
 }

@@ -7,8 +7,9 @@
 
 import { Component, inject, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AppsState, CodeComponent, CronJobTriggerForm, FormHintComponent, FormRowComponent, RulesService, SignalSelectDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-cron-job-trigger',
@@ -16,16 +17,17 @@ import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesSer
     templateUrl: './cron-job-trigger.component.html',
     imports: [
         CodeComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class CronJobTriggerComponent {
     /** The form to edit the trigger settings. */
-    public readonly triggerForm = input.required<TriggerForm>();
+    public readonly triggerForm = input.required<CronJobTriggerForm>();
 
     protected readonly timezones;
 

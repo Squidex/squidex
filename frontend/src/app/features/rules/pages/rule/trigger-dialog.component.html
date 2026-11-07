@@ -1,6 +1,6 @@
 @let currentTrigger = this.currentTrigger();
 @let trigger = this.trigger();
-<form [formGroup]="currentTrigger?.form!" (ngSubmit)="save()">
+<form (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
         <ng-container title>
             @if (!trigger) {
@@ -23,10 +23,7 @@
                     }
 
                     @case ("ContentChanged") {
-                        <sqx-content-changed-trigger
-                            [schemas]="schemasState.schemas()"
-                            [triggerDto]="currentTrigger.form.value"
-                            [triggerForm]="currentTrigger" />
+                        <sqx-content-changed-trigger [schemas]="schemasState.schemas()" [triggerForm]="currentTrigger" />
                     }
 
                     @case ("CronJob") {

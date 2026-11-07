@@ -6,9 +6,10 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, BooleanFieldPropertiesDto, FieldDto, FormRowComponent, IndeterminateValueDirective, LocalizedInputComponent } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, BooleanFieldFormModel, BooleanFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, IndeterminateValueDirective, LocalizedInputComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation',
@@ -16,16 +17,16 @@ import { AppLanguageDto, BooleanFieldPropertiesDto, FieldDto, FormRowComponent, 
     templateUrl: 'boolean-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
         IndeterminateValueDirective,
         LocalizedInputComponent,
-        ReactiveFormsModule,
     ],
 })
 export class BooleanValidationComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -38,4 +39,8 @@ export class BooleanValidationComponent {
 
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<BooleanFieldFormModel>;
+    });
 }

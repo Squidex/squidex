@@ -7,8 +7,9 @@
 
 
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, SchemaDto, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, SchemaDto, SignalSelectDirective, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form-common',
@@ -16,16 +17,17 @@ import { FieldDto, FormRowComponent, SchemaDto, TagEditorComponent, TranslatePip
     templateUrl: './field-form-common.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class FieldFormCommonComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();

@@ -8,7 +8,7 @@
             <form class="form-inline ms-2" (ngSubmit)="search()">
                 <input
                     class="form-control"
-                    [formControl]="usersFilter"
+                    [formField]="usersFilter"
                     placeholder="{{ 'users.search' | sqxTranslate }}"
                     shortcut="CTRL + SHIFT + S"
                     shortcutAction="focus" />

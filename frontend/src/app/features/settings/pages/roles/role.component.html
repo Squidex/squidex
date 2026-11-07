@@ -55,11 +55,11 @@
                     <h3>{{ "roles.permissions" | sqxTranslate }}</h3>
                     <sqx-form-hint marginBottom="3"> {{ "roles.permissionsDescription" | sqxTranslate }}</sqx-form-hint>
                     @if (!roleValue.isDefaultRole) {
-                        @for (control of editForm.controls; track control; let i = $index) {
+                        @for (permission of editForm.form.permissions; track $index; let i = $index) {
                             <div class="row gx-2 mb-1">
                                 <div class="col">
-                                    <sqx-control-errors [fieldName]="'Permission'" [for]="control" />
-                                    <sqx-autocomplete [formControl]="control" [itemsSource]="allPermissions()" />
+                                    <sqx-control-errors [fieldName]="'Permission'" [for]="permission" />
+                                    <sqx-autocomplete [formField]="permission" [itemsSource]="allPermissions()" />
                                 </div>
 
                                 @if (isEditable()) {
@@ -67,7 +67,7 @@
                                         <button
                                             class="btn btn-text-danger"
                                             attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
-                                            (click)="editForm.form.removeAt(i)"
+                                            (click)="editForm.removePermission(i)"
                                             type="button">
                                             <i class="icon-bin3"></i>
                                         </button>
@@ -79,9 +79,9 @@
                         <sqx-form-alert> {{ descriptions[roleValue.name] | sqxTranslate }}</sqx-form-alert>
                         <table class="table table-bordered table-fixed">
                             <tbody>
-                                @for (control of editForm.controls; track control; let i = $index) {
+                                @for (permission of editForm.form.permissions; track $index) {
                                     <tr>
-                                        <td>{{ control.value }}</td>
+                                        <td>{{ permission().value() }}</td>
                                     </tr>
                                 }
                             </tbody>

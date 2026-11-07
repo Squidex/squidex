@@ -1,4 +1,4 @@
-<form [formGroup]="createForm.form" (ngSubmit)="createApp()">
+<form (ngSubmit)="createApp()">
     <sqx-modal-dialog (dialogClose)="emitClose()" flexBody="true" [size]="templates().length > 0 ? 'lg' : 'md'" tourId="appForm">
         <ng-container title>
             @if (templateSelected(); as selected) {
@@ -13,8 +13,8 @@
                     <div class="card-body">
                         <sqx-form-error [error]="createForm.error()" />
 
-                        <sqx-form-row class="mt-2" for="name" hint="apps.appNameHint" label="common.name" required vertical>
-                            <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                        <sqx-form-row class="mt-2" [for]="createForm.form.name" hint="apps.appNameHint" label="common.name" required vertical>
+                            <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                         </sqx-form-row>
 
                         <sqx-form-alert marginBottom="4" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }}</sqx-form-alert>

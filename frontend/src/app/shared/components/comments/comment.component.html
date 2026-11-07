@@ -107,12 +107,12 @@
     }
 
     @if (mode === "Edit") {
-        <form [formGroup]="updateForm.form" (ngSubmit)="update()">
+        <form (ngSubmit)="update()">
             <sqx-autocomplete
                 autoFocus="true"
                 autoSelectFirst="false"
                 (editorKeyPress)="onKeyPressUpdate($event)"
-                formControlName="text"
+                [formField]="updateForm.form.text"
                 [itemsSource]="contributors()"
                 startCharacter="@"
                 textArea="true">
@@ -133,12 +133,12 @@
             }
 
             @if (mode === "Reply") {
-                <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
+                <form (ngSubmit)="reply()">
                     <sqx-autocomplete
                         autoFocus="true"
                         autoSelectFirst="false"
                         (editorKeyPress)="onKeyPressReply($event)"
-                        formControlName="text"
+                        [formField]="replyForm.form.text"
                         [itemsSource]="contributors()"
                         sqxFocusOnInit
                         startCharacter="@"

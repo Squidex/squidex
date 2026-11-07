@@ -7,8 +7,9 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, AppSettingsDto, FieldDto, FormRowComponent, SchemaDto } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, AppSettingsDto, FieldDto, FieldFormModel, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayValidationComponent } from '../types/array-validation.component';
 import { AssetsValidationComponent } from '../types/assets-validation.component';
 import { BooleanValidationComponent } from '../types/boolean-validation.component';
@@ -33,15 +34,15 @@ import { UserInfoValidationComponent } from '../types/user-info-validation.compo
         ArrayValidationComponent,
         AssetsValidationComponent,
         BooleanValidationComponent,
-        ComponentValidationComponent,
         ComponentsValidationComponent,
+        ComponentValidationComponent,
         DateTimeValidationComponent,
+        FormField,
+        FormRowComponent,
         FormsModule,
         GeolocationValidationComponent,
         JsonValidationComponent,
         NumberValidationComponent,
-        FormRowComponent,
-        ReactiveFormsModule,
         ReferencesValidationComponent,
         RichTextValidationComponent,
         StringValidationComponent,
@@ -50,8 +51,8 @@ import { UserInfoValidationComponent } from '../types/user-info-validation.compo
     ],
 })
 export class FieldFormValidationComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();

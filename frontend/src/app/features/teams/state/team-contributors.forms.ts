@@ -5,26 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { debounceTime, map, shareReplay } from 'rxjs/operators';
-import { AssignContributorDto, ExtendedFormGroup, Form, hasNoValue$, Types, UserDto, value$ } from '@app/shared';
+import { computed } from '@angular/core';
+import { required } from '@angular/forms/signals';
+import { AssignContributorDto, SignalForm, Types, UserDto } from '@app/shared';
 
-export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignContributorDto, { user: string }> {
-    public get user() {
-        return this.form.controls['user'];
-    }
+type AssignTeamContributorFormModel = { user: string | UserDto };
 
-    public hasNoUser = hasNoValue$(this.user);
+export class AssignTeamContributorForm extends SignalForm<AssignTeamContributorFormModel, AssignContributorDto, { user: string }> {
+    public readonly hasNoUser = computed(() => {
+        return !this.model().user;
+    });
 
     constructor() {
-        super(new ExtendedFormGroup({
-            user: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ user: '' }, path => {
+            required(path.user);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: AssignTeamContributorFormModel) {
         let contributorId = value.user;
 
         if (Types.is(contributorId, UserDto)) {
@@ -35,24 +33,22 @@ export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignCon
     }
 }
 
-export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArray<AssignContributorDto>> {
-    public get import() {
-        return this.form.controls['import'];
-    }
+export class ImportContributorsForm extends SignalForm<{ import: string }, ReadonlyArray<AssignContributorDto>> {
+    public readonly numberOfEmails = computed(() => {
+        return extractEmails(this.model().import).length;
+    });
 
-    public numberOfEmails = value$(this.import).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
-
-    public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
+    public readonly hasNoUser = computed(() => {
+        return this.numberOfEmails() === 0;
+    });
 
     constructor() {
-        super(new ExtendedFormGroup({
-            import: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ import: '' }, path => {
+            required(path.import);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { import: string }) {
         return extractEmails(value.import);
     }
 }

@@ -1,12 +1,12 @@
 <div class="card card-body card-create mb-4">
     <h5 class="card-title">{{ "languages.add.title" | sqxTranslate }}</h5>
 
-    <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
+    <form (ngSubmit)="addLanguage()">
         <div class="row gx-2">
             <div class="col">
                 <sqx-autocomplete
                     displayProperty="iso2Code"
-                    formControlName="language"
+                    [formField]="addLanguageForm.form.language"
                     formId="language"
                     formName="{{ 'common.language' | sqxTranslate }}"
                     [itemsSource]="addLanguagesSource()"

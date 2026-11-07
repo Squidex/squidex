@@ -6,9 +6,10 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, ReferencesFieldPropertiesDto } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { ComponentsFieldFormModel, FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldPropertiesDto, SignalSelectDirective } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
@@ -18,20 +19,25 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     templateUrl: 'components-ui.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
     ],
 })
 export class ComponentsUIComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
 
     /** The type specific properties of the field. */
     public readonly properties = input.required<ReferencesFieldPropertiesDto>();
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<ComponentsFieldFormModel>;
+    });
 
     protected readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

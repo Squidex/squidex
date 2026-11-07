@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { Component, inject, linkedSignal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { UsersState } from '../../internal';
@@ -20,11 +21,11 @@ import { UserComponent } from './user.component';
         Router2State,
     ],
     imports: [
+        FormField,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
         PagerComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -41,17 +42,15 @@ import { UserComponent } from './user.component';
 export class UsersPageComponent {
     private readonly usersRoute = inject(Router2State);
 
+    private readonly usersQuery = linkedSignal(() => {
+        return this.usersState.query() || '';
+    });
+
     protected readonly usersState = inject(UsersState);
 
-    protected readonly usersFilter = new UntypedFormControl();
+    protected readonly usersFilter = form(this.usersQuery);
 
     constructor() {
-        effect(() => {
-            const query = this.usersState.query();
-
-            this.usersFilter.setValue(query || '');
-        });
-
         const initial =
             this.usersRoute.mapTo(this.usersState)
                 .withPaging('users', 10)
@@ -67,6 +66,6 @@ export class UsersPageComponent {
     }
 
     protected search() {
-        this.usersState.search(this.usersFilter.value);
+        this.usersState.search(this.usersQuery());
     }
 }

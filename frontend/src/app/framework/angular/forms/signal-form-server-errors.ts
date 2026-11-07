@@ -14,7 +14,7 @@ export interface ServerValidationError extends ValidationError.WithOptionalField
     readonly errors: ReadonlyArray<string>;
 }
 
-export function serverErrors(root: FieldTree<any>, model: any, source: { error: ErrorDto; model: any } | null): ServerValidationError[] {
+export function serverErrors(root: FieldTree<unknown>, model: any, source: { error: ErrorDto; model: any } | null): ServerValidationError[] {
     const details = source?.error.details;
     if (!details || details.length === 0) {
         return [];
@@ -22,7 +22,7 @@ export function serverErrors(root: FieldTree<any>, model: any, source: { error: 
 
     const result: ServerValidationError[] = [];
 
-    const visit = (field: FieldTree<any> | undefined, value: any, valueAtError: any, path: string) => {
+    const visit = (field: FieldTree<unknown> | undefined, value: any, valueAtError: any, path: string) => {
         if (!field) {
             return;
         }

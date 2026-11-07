@@ -6,9 +6,10 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormRowComponent, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, AssetsFieldFormModel, AssetsFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, SignalSelectDirective, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-validation',
@@ -16,17 +17,18 @@ import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormRowComponent, L
     templateUrl: 'assets-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
+        FormField,
         FormRowComponent,
+        FormsModule,
         LocalizedInputComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class AssetsValidationComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -39,4 +41,8 @@ export class AssetsValidationComponent {
 
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<AssetsFieldFormModel>;
+    });
 }

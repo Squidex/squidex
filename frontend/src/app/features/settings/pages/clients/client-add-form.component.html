@@ -1,21 +1,20 @@
 <div class="card card-body card-create mb-4">
     <h5 class="card-title">{{ "clients.add.title" | sqxTranslate }}</h5>
 
-    <form [formGroup]="addClientForm.form" (ngSubmit)="addClient()">
+    <form (ngSubmit)="addClient()">
         <div class="row gx-2">
             <div class="col">
-                <sqx-control-errors for="id" />
+                <sqx-control-errors [for]="addClientForm.form.id" />
                 <input
                     class="form-control"
                     autocomplete="off"
-                    formControlName="id"
-                    maxlength="40"
+                    [formField]="addClientForm.form.id"
                     placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}"
                     sqxTransformInput="LowerCase" />
             </div>
 
             <div class="col-auto">
-                <button class="btn btn-success" [disabled]="addClientForm.hasNoId | async" type="submit">
+                <button class="btn btn-success" [disabled]="addClientForm.hasNoId()" type="submit">
                     {{ "clients.add" | sqxTranslate }}
                 </button>
             </div>

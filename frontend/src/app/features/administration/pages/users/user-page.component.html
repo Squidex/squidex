@@ -1,4 +1,4 @@
-<form [formGroup]="userForm.form" (ngSubmit)="save()">
+<form (ngSubmit)="save()">
     <input name="foilautofill" style="display: none" type="password" />
     <sqx-layout layout="right" overflow="true" padding="true" white="true" width="30">
         <ng-container title>
@@ -21,31 +21,31 @@
         </ng-container>
         <ng-container>
             <sqx-form-error [error]="userForm.error()" />
-            <sqx-form-row for="email" label="common.email" required vertical>
-                <input class="form-control" id="email" autocomplete="off" formControlName="email" maxlength="100" type="email" />
+            <sqx-form-row [for]="userForm.form.email" label="common.email" required vertical>
+                <input class="form-control" id="email" autocomplete="off" [formField]="userForm.form.email" type="email" />
             </sqx-form-row>
 
-            <sqx-form-row for="displayName" label="common.displayName" required vertical>
-                <input class="form-control" id="displayName" autocomplete="off" formControlName="displayName" maxlength="100" spellcheck="false" />
+            <sqx-form-row [for]="userForm.form.displayName" label="common.displayName" required vertical>
+                <input class="form-control" id="displayName" autocomplete="off" [formField]="userForm.form.displayName" spellcheck="false" />
             </sqx-form-row>
 
             <div class="form-section">
-                <sqx-form-row for="password" label="common.password" vertical>
-                    <input class="form-control" id="password" autocomplete="off" formControlName="password" maxlength="100" type="password" />
+                <sqx-form-row [for]="userForm.form.password" label="common.password" vertical>
+                    <input class="form-control" id="password" autocomplete="off" [formField]="userForm.form.password" type="password" />
                 </sqx-form-row>
 
-                <sqx-form-row for="passwordConfirm" label="common.passwordConfirm" vertical>
-                    <input class="form-control" id="passwordConfirm" autocomplete="off" formControlName="passwordConfirm" maxlength="100" type="password" />
+                <sqx-form-row [for]="userForm.form.passwordConfirm" label="common.passwordConfirm" vertical>
+                    <input class="form-control" id="passwordConfirm" autocomplete="off" [formField]="userForm.form.passwordConfirm" type="password" />
                 </sqx-form-row>
             </div>
 
             <div class="form-section">
-                <sqx-form-row for="permissions" label="common.permissions" vertical>
+                <sqx-form-row [for]="userForm.form.permissions" label="common.permissions" vertical>
                     <textarea
                         class="form-control"
                         id="permissions"
                         autocomplete="off"
-                        formControlName="permissions"
+                        [formField]="userForm.form.permissions"
                         placeholder="{{ 'common.separateByLine' | sqxTranslate }}"
                         spellcheck="false"></textarea>
                 </sqx-form-row>

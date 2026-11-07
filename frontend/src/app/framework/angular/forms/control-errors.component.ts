@@ -13,7 +13,7 @@ import { LocalizerService, Types } from '@app/framework/internal';
 import { ControlErrorsMessagesComponent } from './control-errors-messages.component';
 import { formatError } from './error-formatting';
 import { touchedChange$ } from './forms-helper';
-import { formatSignalErrors } from './signal-validators';
+import { formatSignalErrors, getFieldKey } from './signal-validators';
 
 @Component({
     selector: 'sqx-control-errors',
@@ -34,7 +34,7 @@ export class ControlErrorsComponent {
             return null;
         }
 
-        return control as FieldTree<any>;
+        return control as FieldTree<unknown>;
     });
 
     private readonly control = computed(() => {
@@ -58,10 +58,10 @@ export class ControlErrorsComponent {
 
         let control = this.for();
         if (Types.isFunction(control)) {
-            control = `${(control as FieldTree<any>)().keyInParent()}`;
+            control = getFieldKey(control as FieldTree<unknown>);
         }
 
-        if (!Types.isString(control)) {
+        if (!Types.isString(control) || !control) {
             return this.localizer.get('common.field')!;
         }
 
@@ -90,7 +90,7 @@ export class ControlErrorsComponent {
     }, { equal: Types.equals });
 
     /** The control or the name of the control in the parent form group. */
-    public readonly for = input.required<string | AbstractControl | FieldTree<any>>();
+    public readonly for = input.required<string | AbstractControl | FieldTree<unknown>>();
 
     /** Shows the errors only when the form has been submitted, if set. */
     public readonly submitCount = input<number | null>();

@@ -1,7 +1,7 @@
 @let currentStep = this.currentStep();
 @let stepDefinition = this.stepDefinition();
 @let scriptCompletions = this.scriptCompletions();
-<form [formGroup]="currentStep?.form!" (ngSubmit)="save()">
+<form (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
         <ng-container title>
             @if (!stepDefinition) {
@@ -12,7 +12,7 @@
         </ng-container>
         <ng-container content>
             @if (currentStep) {
-                <div class="form-horizontal" [formGroup]="currentStep.form">
+                <div class="form-horizontal">
                     <sqx-form-row for="stepName" hint="rules.stepNameHint" label="common.name">
                         <input class="form-control" id="stepName" maxlength="40" [(ngModel)]="stepName" [ngModelOptions]="{ standalone: true }" />
                     </sqx-form-row>
@@ -28,15 +28,15 @@
                     @for (property of currentStep.editableProperties; track property.name) {
                         <sqx-form-row
                             [check]="property.editor === 'Checkbox'"
-                            [for]="property.name"
+                            [for]="currentStep.field(property.name)"
                             [label]="property.display"
                             [required]="property.isRequired">
                             @switch (property.editor) {
                                 @case ("Text") {
                                     @if (property.isFormattable) {
-                                        <sqx-formattable-input [id]="property.name" [formControlName]="property.name" type="Text" />
+                                        <sqx-formattable-input [id]="property.name" [formField]="currentStep.field(property.name)" type="Text" />
                                     } @else {
-                                        <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
+                                        <input class="form-control" id="{{ property.name }}" [formField]="currentStep.field(property.name)" />
                                     }
                                 }
 
@@ -45,26 +45,26 @@
                                         <sqx-formattable-input
                                             [id]="property.name"
                                             [completion]="scriptCompletions"
-                                            [formControlName]="property.name"
+                                            [formField]="currentStep.field(property.name)"
                                             type="Code" />
                                     } @else {
-                                        <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
+                                        <textarea class="form-control" id="{{ property.name }}" [formField]="currentStep.field(property.name)"></textarea>
                                     }
                                 }
 
                                 @case ("Javascript") {
-                                    <sqx-code-editor [completion]="scriptCompletions" [formControlName]="property.name" [height]="350" />
+                                    <sqx-code-editor [completion]="scriptCompletions" [formField]="currentStep.field(property.name)" [height]="350" />
                                 }
 
                                 @case ("Checkbox") {
                                     <div class="form-check">
-                                        <input class="form-check-input" id="{{ property.name }}" [formControlName]="property.name" type="checkbox" />
+                                        <input class="form-check-input" id="{{ property.name }}" [formField]="currentStep.checkboxField(property.name)" type="checkbox" />
                                         <label class="form-check-label" for="{{ property.name }}"> {{ property.display }} </label>
                                     </div>
                                 }
 
                                 @case ("Dropdown") {
-                                    <select class="form-select" [id]="property.name" [formControlName]="property.name">
+                                    <select class="form-select" [id]="property.name" [formField]="currentStep.field(property.name)">
                                         @if (!property.isRequired) {
                                             <option></option>
                                         }
@@ -76,14 +76,14 @@
                                 }
 
                                 @case ("Branches") {
-                                    <sqx-branches-input [control]="currentStep.branch(property.name)" [isEditable]="isEditable()" />
+                                    <sqx-branches-input [isEditable]="isEditable()" [property]="property.name" [stepForm]="currentStep" />
                                 }
 
                                 @default {
                                     <input
                                         class="form-control"
                                         id="{{ property.name }}"
-                                        [formControlName]="property.name"
+                                        [formField]="currentStep.field(property.name)"
                                         type="{{ property.editor | lowercase }}" />
                                 }
                             }

@@ -7,7 +7,8 @@
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, SchemaDto, SchemasService, SchemasState, TranslatePipe } from '@app/shared';
 
@@ -21,8 +22,8 @@ import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, C
         ConfirmClickDirective,
         ControlErrorsComponent,
         FormAlertComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

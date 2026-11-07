@@ -6,7 +6,8 @@
  */
 
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { AllAppsState, AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, ModalDirective, NewsService, PagerComponent, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
 import { AppComponent } from './app.component';
 import { NewsDialogComponent } from './news-dialog.component';
@@ -22,12 +23,12 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
     imports: [
         AppComponent,
         AppFormComponent,
+        FormField,
         FormsModule,
         ModalDirective,
         NewsDialogComponent,
         OnboardingDialogComponent,
         PagerComponent,
-        ReactiveFormsModule,
         TeamComponent,
         TitleComponent,
         TourStepDirective,
@@ -63,7 +64,7 @@ export class AppsPageComponent {
 
     protected readonly starters = this.templatesState.starters;
 
-    protected readonly allAppsFilter = new UntypedFormControl();
+    protected readonly allAppsFilter = form(signal(''));
 
     protected readonly showAllApps = computed(() => {
         const query = this.allAppsState.query();
@@ -126,7 +127,7 @@ export class AppsPageComponent {
     }
 
     protected searchAllApps() {
-        this.allAppsState.search(this.allAppsFilter.value);
+        this.allAppsState.search(this.allAppsFilter().value());
     }
 
     public createNewApp(template?: TemplateDto) {

@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
+import { booleanAttribute, Component, effect, inject, Injector, input, output, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AnyTriggerForm, createTriggerForm, EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
 import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
@@ -27,8 +27,8 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
         CronJobTriggerComponent,
         EntriesPipe,
         FormErrorComponent,
+        FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         RuleElementComponent,
         SchemaChangedTriggerComponent,
         TranslatePipe,
@@ -36,6 +36,7 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
     ],
 })
 export class TriggerDialogComponent {
+    private readonly injector = inject(Injector);
     private readonly rulesService = inject(RulesService);
 
     protected readonly schemasState = inject(SchemasState);
@@ -55,7 +56,7 @@ export class TriggerDialogComponent {
     /** Emits the validated trigger when the user saves it or selects a trigger without properties. */
     public readonly dialogSave = output<RuleTriggerDto>();
 
-    protected readonly currentTrigger = signal<TriggerForm | undefined>(undefined);
+    protected readonly currentTrigger = signal<AnyTriggerForm | undefined>(undefined);
 
     constructor() {
         effect(() => {
@@ -83,7 +84,11 @@ export class TriggerDialogComponent {
         }
 
         if (this.currentTrigger()?.triggerType !== type) {
-            const currentTrigger = new TriggerForm(type);
+            const currentTrigger = createTriggerForm(type, this.injector);
+            if (!currentTrigger) {
+                return;
+            }
+
             currentTrigger.setEnabled(this.isEditable());
 
             this.currentTrigger.set(currentTrigger);

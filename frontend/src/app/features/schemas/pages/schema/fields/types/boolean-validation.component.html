@@ -1,11 +1,11 @@
-<div [formGroup]="fieldForm()">
-    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
-        <input class="form-check-input" [id]="defaultValueRow.fieldName()" formControlName="defaultValue" sqxIndeterminateValue type="checkbox" />
+<div>
+    <sqx-form-row #defaultValueRow [for]="form().defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
+        <input class="form-check-input" [id]="defaultValueRow.fieldName()" [formField]="form().defaultValue" sqxIndeterminateValue type="checkbox" />
     </sqx-form-row>
 
     @if (isLocalizable()) {
-        <sqx-form-row #defaultValueRows for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field().fieldId">
-            <sqx-localized-input [id]="defaultValueRows.fieldName()" formControlName="defaultValues" [languages]="languages()" type="boolean" />
+        <sqx-form-row #defaultValueRows [for]="form().defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field().fieldId">
+            <sqx-localized-input [id]="defaultValueRows.fieldName()" [formField]="form().defaultValues" [languages]="languages()" type="boolean" />
         </sqx-form-row>
     }
 </div>

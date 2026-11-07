@@ -7,41 +7,37 @@
 
 
 import { Component, inject, output, signal } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormRowComponent, MarkdownDirective, ModalDialogComponent, TourState, TranslatePipe, UsersService } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
+import { FormRowComponent, MarkdownDirective, ModalDialogComponent, SignalSelectDirective, TourState, TranslatePipe, UsersService } from '@app/shared';
 
 @Component({
     selector: 'sqx-onboarding-dialog',
     styleUrls: ['./onboarding-dialog.component.scss'],
     templateUrl: './onboarding-dialog.component.html',
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
         MarkdownDirective,
         ModalDialogComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class OnboardingDialogComponent {
-    private readonly formBuilder = inject(FormBuilder);
     private readonly tourState = inject(TourState);
     private readonly usersService = inject(UsersService);
 
     /** Emits when the user closes the dialog, by skipping or starting the tour. */
     public readonly dialogClose = output();
 
-    protected readonly answersForm =
-        this.formBuilder.group({
-            companySize: '',
-            companyRole: '',
-            project: '',
-        });
+    protected readonly answersForm = form(signal({ companySize: '', companyRole: '', project: '' }));
 
     protected readonly step = signal(0);
 
     protected submitAnswers() {
-        this.usersService.postUser({ answers: this.answersForm.value as any }).subscribe();
+        this.usersService.postUser({ answers: this.answersForm().value() }).subscribe();
         this.next();
     }
 

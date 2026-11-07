@@ -7,7 +7,8 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, FromNowPipe, MarkdownDirective, MessageBus, NOOP_DATASOURCE, ScrollActiveDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { CommentItem, CommentSelected, CommentsState, DialogService, Keys, UpsertCommentForm } from '@app/shared/internal';
@@ -21,9 +22,10 @@ import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
     imports: [
         AutocompleteComponent,
         ConfirmClickDirective,
+        FormField,
+        FormsModule,
         FromNowPipe,
         MarkdownDirective,
-        ReactiveFormsModule,
         RouterLink,
         ScrollActiveDirective,
         TooltipDirective,

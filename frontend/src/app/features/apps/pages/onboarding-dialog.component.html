@@ -25,13 +25,13 @@
             <div>
                 <img class="header-left" animate.enter="fade-in" animate.leave="fade-out" src="./images/logo-white-small.png" />
                 <div class="onboarding-enter-leave" animate.enter="slide-left-in" animate.leave="slide-left-out">
-                    <form [formGroup]="answersForm" (ngSubmit)="submitAnswers()">
+                    <form (ngSubmit)="submitAnswers()">
                         <h2>{{ "tour.stepDataTitle" | sqxTranslate }}</h2>
 
                         <div [sqxMarkdown]="'tour.stepDataText' | sqxTranslate"></div>
 
-                        <sqx-form-row class="mt-4" for="companyRole" label="tour.stepDataCompanyRole" vertical="true">
-                            <select class="form-select" id="companyRole" formControlName="companyRole">
+                        <sqx-form-row class="mt-4" [for]="answersForm.companyRole" label="tour.stepDataCompanyRole" vertical="true">
+                            <select class="form-select" id="companyRole" [formField]="answersForm.companyRole">
                                 <option [ngValue]="'RoleEmployee'">{{ "tour.roleEmployee" | sqxTranslate }}</option>
                                 <option [ngValue]="'RoleBusinessOwner'">{{ "tour.roleBusinessOwner" | sqxTranslate }}</option>
                                 <option [ngValue]="'RoleProductManager'">{{ "tour.roleProductManager" | sqxTranslate }}</option>
@@ -41,8 +41,8 @@
                             </select>
                         </sqx-form-row>
 
-                        <sqx-form-row for="companySize" label="tour.stepDataCompanySize" vertical="true">
-                            <select class="form-select" id="companySize" formControlName="companySize">
+                        <sqx-form-row [for]="answersForm.companySize" label="tour.stepDataCompanySize" vertical="true">
+                            <select class="form-select" id="companySize" [formField]="answersForm.companySize">
                                 <option [ngValue]="'SizeSingle'">{{ "tour.sizeSingle" | sqxTranslate }}</option>
                                 <option [ngValue]="'SizeSmall'">{{ "tour.sizeSmall" | sqxTranslate }}</option>
                                 <option [ngValue]="'SizeMedium'">{{ "tour.sizeMedium" | sqxTranslate }}</option>
@@ -51,8 +51,8 @@
                             </select>
                         </sqx-form-row>
 
-                        <sqx-form-row for="project" label="tour.stepDataProject" vertical="true">
-                            <select class="form-select" id="project" formControlName="project">
+                        <sqx-form-row [for]="answersForm.project" label="tour.stepDataProject" vertical="true">
+                            <select class="form-select" id="project" [formField]="answersForm.project">
                                 <option [ngValue]="'ProjectNewsMagazine'">{{ "tour.projectNewsMagazine" | sqxTranslate }}</option>
                                 <option [ngValue]="'ProjectPersonalBlog'">{{ "tour.projectPersonalBlog" | sqxTranslate }}</option>
                                 <option [ngValue]="'ProjectSmallBusiness'">{{ "tour.projectSmallBusiness" | sqxTranslate }}</option>

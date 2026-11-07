@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -16,18 +16,17 @@ import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, Tra
     templateUrl: './role-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class RoleAddFormComponent {
     private readonly rolesState = inject(RolesState);
 
-    protected addRoleForm = new AddRoleForm();
+    protected readonly addRoleForm = new AddRoleForm();
 
     protected addRole() {
         const value = this.addRoleForm.submit();

@@ -6,7 +6,8 @@
  */
 
 import { booleanAttribute, Component, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { form, FormField, maxLength, required } from '@angular/forms/signals';
 import { Keys } from '@app/framework/internal';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ControlErrorsComponent } from './control-errors.component';
@@ -19,12 +20,14 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
     imports: [
         ControlErrorsComponent,
         FocusOnInitDirective,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class EditableTitleComponent {
+    private readonly renameValue = signal('');
+
     /** Emits the new title when renamed. */
     public readonly inputTitleChange = output<string>();
 
@@ -52,7 +55,10 @@ export class EditableTitleComponent {
     protected readonly inputTitleDisplayed = linkedSignal(() => this.inputTitle());
 
     protected readonly renaming = signal(false);
-    protected readonly renameForm = new FormControl<string>('');
+    protected readonly renameForm = form(this.renameValue, path => {
+        maxLength(path, () => this.inputTitleLength() || undefined);
+        required(path, { when: () => this.inputTitleRequired() });
+    });
 
     protected onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {
@@ -65,22 +71,8 @@ export class EditableTitleComponent {
             return;
         }
 
-        if (!this.renaming()) {
-            const validators: ValidatorFn[] = [];
-
-            const maxLength = this.inputTitleLength();
-            if (maxLength) {
-                validators.push(Validators.maxLength(maxLength));
-            }
-
-            if (this.inputTitleRequired()) {
-                validators.push(Validators.required);
-            }
-
-            this.renameForm.setValidators(validators);
-        }
-
-        this.renameForm.setValue(this.inputTitleDisplayed() || '');
+        this.renameValue.set(this.inputTitleDisplayed() || '');
+        this.renameForm().reset();
         this.renaming.update(x => !x);
     }
 
@@ -89,8 +81,8 @@ export class EditableTitleComponent {
             return;
         }
 
-        if (this.renameForm.valid) {
-            const text = this.renameForm.value || '';
+        if (this.renameForm().valid()) {
+            const text = this.renameValue();
 
             this.inputTitleChange.emit(text);
             this.inputTitleDisplayed.set(text);

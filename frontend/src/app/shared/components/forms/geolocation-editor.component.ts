@@ -7,9 +7,10 @@
 
 
 import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, forwardRef, inject, signal, viewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { ControlErrorsComponent, ResizedDirective, SignalControlComponent, StringHelper, TooltipDirective, TranslatePipe } from '@app/framework';
-import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
+import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { disabled, form, FormField } from '@angular/forms/signals';
+import { ControlErrorsComponent, ResizedDirective, SignalControlComponent, SignalValidators, StringHelper, TooltipDirective, TranslatePipe } from '@app/framework';
+import { LocalStoreService, ResourceLoaderService, Settings, Types, UIOptions } from '@app/shared/internal';
 
 declare const L: any;
 declare const google: any;
@@ -18,7 +19,7 @@ export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => GeolocationEditorComponent), multi: true,
 };
 
-type Geolocation = { latitude: number; longitude: number };
+type Geolocation = { latitude: number | null; longitude: number | null };
 
 type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
 
@@ -32,8 +33,8 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         ResizedDirective,
         TooltipDirective,
         TranslatePipe,
@@ -46,6 +47,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
     private readonly localStore = inject(LocalStoreService);
     private readonly editor = viewChild.required<ElementRef<HTMLElement>>('editor');
     private readonly searchBoxInput = viewChild.required<ElementRef<HTMLInputElement>>('searchBox');
+    private readonly geolocationModel = signal({ latitude: NaN, longitude: NaN });
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
@@ -56,15 +58,11 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
 
     protected readonly isCompact = signal(false);
 
-    protected readonly geolocationForm =
-        new ExtendedFormGroup({
-            latitude: new UntypedFormControl('',
-                ValidatorsEx.between(-90, 90),
-            ),
-            longitude: new UntypedFormControl('',
-                ValidatorsEx.between(-180, 180),
-            ),
-        });
+    protected readonly geolocationForm = form(this.geolocationModel, path => {
+        disabled(path, () => this.isDisabled());
+        SignalValidators.between(path.latitude, -90, 90);
+        SignalValidators.between(path.longitude, -180, 180);
+    });
 
     constructor() {
         const destroyRef = inject(DestroyRef);
@@ -82,12 +80,6 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
                 this.updateOSMDisabled(isDisabled);
             } else {
                 this.updateGoogleDisabled(isDisabled);
-            }
-
-            if (isDisabled) {
-                this.geolocationForm.disable();
-            } else {
-                this.geolocationForm.enable();
             }
         });
 
@@ -157,8 +149,10 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
     }
 
     protected updateValueByInput() {
-        const lat = this.geolocationForm.controls['latitude'].value;
-        const lng = this.geolocationForm.controls['longitude'].value;
+        const { latitude, longitude } = this.geolocationModel();
+
+        const lat = Number.isNaN(latitude) ? null : latitude;
+        const lng = Number.isNaN(longitude) ? null : longitude;
 
         this.updateValue(lat, lng);
 
@@ -281,7 +275,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         this.updateMarker({ fire: true });
     }
 
-    private updateValue(latitude: number, longitude: number) {
+    private updateValue(latitude: number | null, longitude: number | null) {
         this.value = { latitude, longitude };
     }
 
@@ -293,9 +287,10 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         }
 
         if (this.value) {
-            this.geolocationForm.setValue(this.value, { emitEvent: true, onlySelf: false });
+            this.geolocationModel.set({ latitude: this.value.latitude ?? NaN, longitude: this.value.longitude ?? NaN });
         } else {
-            this.geolocationForm.reset(undefined, { emitEvent: true, onlySelf: false });
+            this.geolocationModel.set({ latitude: NaN, longitude: NaN });
+            this.geolocationForm().reset();
         }
 
         if (opts && opts.fire) {

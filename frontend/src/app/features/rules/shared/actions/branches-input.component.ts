@@ -7,8 +7,8 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ControlErrorsComponent, ExtendedFormGroup, TemplatedFormArray, TranslatePipe } from '@app/shared';
+import { FormField } from '@angular/forms/signals';
+import { ControlErrorsComponent, StepForm, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-branches-input',
@@ -17,19 +17,29 @@ import { ControlErrorsComponent, ExtendedFormGroup, TemplatedFormArray, Translat
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
-        FormsModule,
-        ReactiveFormsModule,
+        FormField,
         TranslatePipe,
     ],
 })
 export class BranchesInputComponent {
-    /** The form array with one form group per branch condition. */
-    public readonly control = input.required<TemplatedFormArray>();
+    /** The form of the step that contains the branches. */
+    public readonly stepForm = input.required<StepForm>();
+
+    /** The name of the step property with the branches. */
+    public readonly property = input.required<string>();
 
     /** Allows the user to add and remove branches. */
     public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    protected readonly branchesControls = computed<ReadonlyArray<ExtendedFormGroup>>(() => {
-        return this.control().controls as any;
+    protected readonly branches = computed(() => {
+        return this.stepForm().branches(this.property());
     });
+
+    protected add() {
+        this.stepForm().addBranch(this.property());
+    }
+
+    protected remove(index: number) {
+        this.stepForm().removeBranch(this.property(), index);
+    }
 }

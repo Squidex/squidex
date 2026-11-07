@@ -5,92 +5,100 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
+import { applyEach, maxLength, required } from '@angular/forms/signals';
+import { SignalForm, SignalValidators } from '@app/framework';
 import { AppDto, AppSettingsDto, CreateAppDto, EditorDto, PatternDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from '../model';
 
-export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
+export class CreateAppForm extends SignalForm<{ name: string }, CreateAppDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            name: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(40),
-                ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage'),
-            ]),
-        }));
+        super({ name: '' }, path => {
+            required(path.name);
+            maxLength(path.name, 40);
+            SignalValidators.patternWithMessage(path.name, '[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage');
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { name: string }) {
         return new CreateAppDto(value);
     }
 }
 
-export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, AppDto> {
+export class TransferAppForm extends SignalForm<{ teamId: string | null }, TransferToTeamDto, AppDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            teamId: new UntypedFormControl(''),
-        }));
+        super({ teamId: null });
     }
 
-    protected transformSubmit(value: any) {
-        return new TransferToTeamDto(value);
+    protected transformSubmit(value: { teamId: string | null }) {
+        return new TransferToTeamDto({ teamId: value.teamId ?? undefined });
     }
 }
 
-export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto> {
+export class UpdateAppForm extends SignalForm<{ label: string; description: string }, UpdateAppDto, AppDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            label: new UntypedFormControl('',
-                Validators.maxLength(40),
-            ),
-            description: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-        }));
+        super({ label: '', description: '' }, path => {
+            maxLength(path.label, 40);
+            maxLength(path.description, 100);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { label: string; description: string }) {
         return new UpdateAppDto(value);
     }
 }
 
-export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettingsDto, AppSettingsDto> {
-    public get patterns() {
-        return this.form.controls['patterns'] as TemplatedFormArray;
-    }
+export type EditAppSettingsFormModel = {
+    patterns: { name: string; regex: string; message: string }[];
+    editors: { name: string; url: string }[];
+    hideScheduler: boolean;
+    hideDateTimeModeButton: boolean;
+};
 
-    public get patternsControls(): ReadonlyArray<ExtendedFormGroup> {
-        return this.patterns.controls as any;
-    }
-
-    public get editors() {
-        return this.form.controls['editors'] as TemplatedFormArray;
-    }
-
-    public get editorsControls(): ReadonlyArray<ExtendedFormGroup> {
-        return this.editors.controls as any;
-    }
-
+export class EditAppSettingsForm extends SignalForm<EditAppSettingsFormModel, UpdateAppSettingsDto, AppSettingsDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            patterns: new TemplatedFormArray(
-                PatternTemplate.INSTANCE,
-            ),
-            hideScheduler: new UntypedFormControl(false,
-                Validators.nullValidator,
-            ),
-            hideDateTimeButtons: new UntypedFormControl(false,
-                Validators.nullValidator,
-            ),
-            editors: new TemplatedFormArray(
-                EditorTemplate.INSTANCE,
-            ),
-        }));
+        super({ patterns: [], editors: [], hideScheduler: false, hideDateTimeModeButton: false }, path => {
+            applyEach(path.patterns, pattern => {
+                required(pattern.name);
+                maxLength(pattern.name, 1000);
+                required(pattern.regex);
+                maxLength(pattern.regex, 1000);
+                maxLength(pattern.message, 1000);
+            });
+
+            applyEach(path.editors, editor => {
+                required(editor.name);
+                maxLength(editor.name, 1000);
+                required(editor.url);
+                maxLength(editor.url, 1000);
+            });
+        });
     }
 
-    protected transformSubmit(value: Record<string, any> & { editors: any[]; patterns: any[] }) {
+    public addPattern() {
+        this.model.update(x => ({ ...x, patterns: [...x.patterns, { name: '', regex: '', message: '' }] }));
+    }
+
+    public removePattern(index: number) {
+        this.model.update(x => ({ ...x, patterns: x.patterns.filter((_, i) => i !== index) }));
+    }
+
+    public addEditor() {
+        this.model.update(x => ({ ...x, editors: [...x.editors, { name: '', url: '' }] }));
+    }
+
+    public removeEditor(index: number) {
+        this.model.update(x => ({ ...x, editors: x.editors.filter((_, i) => i !== index) }));
+    }
+
+    protected transformLoad(value: Partial<AppSettingsDto>): EditAppSettingsFormModel {
+        return {
+            patterns: (value.patterns || []).map(x => ({ name: x.name, regex: x.regex, message: x.message || '' })),
+            editors: (value.editors || []).map(x => ({ name: x.name, url: x.url })),
+            hideScheduler: value.hideScheduler || false,
+            hideDateTimeModeButton: value.hideDateTimeModeButton || false,
+        };
+    }
+
+    protected transformSubmit(value: EditAppSettingsFormModel) {
         const { editors, patterns, ...other } = value;
 
         return new UpdateAppSettingsDto({
@@ -99,39 +107,6 @@ export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettin
                 new EditorDto(x)),
             patterns: patterns.map(x =>
                 new PatternDto(x)),
-        });
-    }
-}
-
-class PatternTemplate {
-    public static readonly INSTANCE = new PatternTemplate();
-
-    public createControl() {
-        return new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-            regex: new UntypedFormControl('',
-                Validators.required,
-            ),
-            message: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-        });
-    }
-}
-
-class EditorTemplate {
-    public static readonly INSTANCE = new EditorTemplate();
-
-    public createControl() {
-        return new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-            url: new UntypedFormControl('',
-                Validators.required,
-            ),
         });
     }
 }

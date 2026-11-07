@@ -7,10 +7,11 @@
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { distinctUntilChanged, map, switchMap } from 'rxjs';
 import { TranslatePipe } from '@app/framework';
-import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState } from '@app/shared';
+import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState, SignalSelectDirective } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',
@@ -21,8 +22,9 @@ import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, Co
         CodeEditorComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })

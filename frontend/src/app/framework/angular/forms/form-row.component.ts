@@ -14,6 +14,7 @@ import { TranslatePipe } from '../pipes/translate.pipe';
 import { ControlErrorsComponent } from './control-errors.component';
 import { FormAlertComponent } from './form-alert.component';
 import { FormHintComponent } from './form-hint.component';
+import { getFieldKey } from './signal-validators';
 
 @Component({
     selector: 'sqx-form-row',
@@ -44,7 +45,7 @@ import { FormHintComponent } from './form-hint.component';
 })
 export class FormRowComponent {
     /** The control or the name of the control in the parent form group. */
-    public readonly for = input.required<string | AbstractControl | FieldTree<any>>();
+    public readonly for = input.required<string | AbstractControl | FieldTree<unknown>>();
 
     /** The label of the field. */
     public readonly label = input<string>();
@@ -145,7 +146,7 @@ export class FormRowComponent {
         }
 
         if (Types.isFunction(control)) {
-            return `${control().keyInParent()}`;
+            return getFieldKey(control);
         }
 
         throw new Error('Form id is required.');

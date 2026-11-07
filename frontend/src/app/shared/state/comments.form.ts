@@ -5,16 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form } from '@app/framework';
-import { Comment } from './comments.state';
+import { SignalForm } from '@app/framework';
 
-export class UpsertCommentForm extends Form<ExtendedFormGroup, Comment> {
+export type UpsertCommentFormModel = { text: string };
+
+export class UpsertCommentForm extends SignalForm<UpsertCommentFormModel, UpsertCommentFormModel> {
     constructor() {
-        super(new ExtendedFormGroup({
-            text: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-        }));
+        super({ text: '' });
     }
 }

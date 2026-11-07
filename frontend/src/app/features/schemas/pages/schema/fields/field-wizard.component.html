@@ -8,10 +8,10 @@
     </ng-container>
     <ng-container content>
         @if (editing(); as edit) {
-            <form class="edit-form" [formGroup]="edit.form.form" (ngSubmit)="save('Close')">
+            <form class="edit-form" (ngSubmit)="save('Close')">
                 <sqx-field-form
                     [field]="edit.field"
-                    [fieldForm]="edit.form.form"
+                    [fieldForm]="edit.form"
                     isEditable="true"
                     [isLocalizable]="isLocalizable()"
                     [languages]="languagesState.isoLanguages()"
@@ -19,18 +19,18 @@
                     [settings]="settings()" />
             </form>
         } @else {
-            <form [formGroup]="addFieldForm.form" (ngSubmit)="addField('Close')">
+            <form (ngSubmit)="addField('Close')">
                 <sqx-form-error [error]="addFieldForm.error()" />
 
-                <sqx-form-row for="type" hideError vertical>
+                <sqx-form-row [for]="addFieldForm.form.type" hideError vertical>
                     <div class="row">
                         @for (fieldType of fieldTypes(); track fieldType) {
                             <div class="col-4 type">
                                 <label>
-                                    <input class="radio-input" formControlName="type" name="type" type="radio" value="{{ fieldType.type }}" />
+                                    <input class="radio-input" [formField]="addFieldForm.form.type" type="radio" [value]="fieldType.type" />
                                     <div class="row g-0">
                                         <div class="col-auto">
-                                            <div class="btn-radio" [class.active]="addFieldForm.form.controls['type'].value === fieldType.type">
+                                            <div class="btn-radio" [class.active]="addFieldForm.model().type === fieldType.type">
                                                 <i class="icon-type-{{ fieldType.type }}"></i>
                                             </div>
                                         </div>
@@ -47,19 +47,18 @@
                     </div>
                 </sqx-form-row>
 
-                <sqx-form-row for="name" [submitCount]="addFieldForm.submitCount()" vertical>
+                <sqx-form-row [for]="addFieldForm.form.name" [submitCount]="addFieldForm.submitCount()" vertical>
                     <input
                         class="form-control"
                         #nameInput
-                        formControlName="name"
-                        maxlength="40"
+                        [formField]="addFieldForm.form.name"
                         placeholder="{{ 'schemas.field.namePlaceholder' | sqxTranslate }}"
                         sqxFocusOnInit />
                 </sqx-form-row>
 
-                @if (schema().type !== "Component" && !parent() && (addFieldForm.isContentField | async)) {
-                    <sqx-form-row check for="isLocalizable" hint="schemas.field.localizableHint" label="schemas.field.localizable" vertical>
-                        <input class="form-check-input" id="isLocalizable" formControlName="isLocalizable" type="checkbox" />
+                @if (schema().type !== "Component" && !parent() && addFieldForm.isContentField()) {
+                    <sqx-form-row check [for]="addFieldForm.form.isLocalizable" hint="schemas.field.localizableHint" label="schemas.field.localizable" vertical>
+                        <input class="form-check-input" id="isLocalizable" [formField]="addFieldForm.form.isLocalizable" type="checkbox" />
                     </sqx-form-row>
                 }
 

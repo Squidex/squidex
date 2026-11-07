@@ -6,8 +6,8 @@
  */
 
 import { Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CodeComponent, FormHintComponent, FormRowComponent, TranslatePipe, TriggerForm } from '@app/shared';
+import { FormField } from '@angular/forms/signals';
+import { CodeComponent, ConditionTriggerForm, FormHintComponent, FormRowComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-changed-trigger',
@@ -15,14 +15,13 @@ import { CodeComponent, FormHintComponent, FormRowComponent, TranslatePipe, Trig
     templateUrl: './asset-changed-trigger.component.html',
     imports: [
         CodeComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class AssetChangedTriggerComponent {
     /** The form to edit the trigger settings. */
-    public readonly triggerForm = input.required<TriggerForm>();
+    public readonly triggerForm = input.required<ConditionTriggerForm>();
 }

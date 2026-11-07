@@ -1,17 +1,16 @@
-@let control = this.control();
 @let isEditable = this.isEditable();
-@for (form of branchesControls(); track form; let i = $index) {
-    <div class="form-group row gx-2" [formGroup]="form">
+@for (branch of branches(); track $index; let i = $index) {
+    <div class="form-group row gx-2">
         <div class="col">
-            <sqx-control-errors for="condition" />
-            <input class="form-control" formControlName="condition" maxlength="1000" placeholder="{{ 'common.condition' | sqxTranslate }}" />
+            <sqx-control-errors [for]="branch.condition" />
+            <input class="form-control" [formField]="branch.condition" placeholder="{{ 'common.condition' | sqxTranslate }}" />
         </div>
 
         <div class="col-auto">
             <button
                 class="btn btn-text-danger"
                 attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
-                (click)="control.removeAt(i)"
+                (click)="remove(i)"
                 [disabled]="!isEditable"
                 type="button">
                 <i class="icon-bin3"></i>
@@ -27,7 +26,7 @@
         </div>
 
         <div class="col-auto">
-            <button class="btn btn-success" attr.aria-label="{{ 'common.add' | sqxTranslate }}" (click)="control.add()" type="button">
+            <button class="btn btn-success" attr.aria-label="{{ 'common.add' | sqxTranslate }}" (click)="add()" type="button">
                 <i class="icon-add"></i>
             </button>
         </div>

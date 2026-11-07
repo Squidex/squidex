@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ApiUrlConfig, CopyDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
@@ -18,15 +18,14 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     templateUrl: './auth-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CopyDirective,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

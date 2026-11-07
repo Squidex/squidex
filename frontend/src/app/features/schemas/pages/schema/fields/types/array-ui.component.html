@@ -1,6 +1,6 @@
-<div [formGroup]="fieldForm()">
-    <sqx-form-row for="calculatedDefaultValue" label="schemas.field.defaultValue">
-        <select class="form-select" formControlName="calculatedDefaultValue">
+<div>
+    <sqx-form-row [for]="form().calculatedDefaultValue" label="schemas.field.defaultValue">
+        <select class="form-select" [formField]="form().calculatedDefaultValue">
             @for (value of calculatedDefaultValues; track value) {
                 <option [ngValue]="value">{{ value }}</option>
             }

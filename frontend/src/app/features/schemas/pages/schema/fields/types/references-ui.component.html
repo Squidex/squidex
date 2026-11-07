@@ -1,8 +1,8 @@
-<div [formGroup]="fieldForm()">
-    <sqx-form-row for="editor" label="schemas.field.editor" [prefix]="field().fieldId">
+<div>
+    <sqx-form-row [for]="form().editor" label="schemas.field.editor" [prefix]="field().fieldId">
         @for (editor of editors; track editor) {
-            <label class="btn btn-radio" [class.active]="fieldForm().controls['editor'].value === editor">
-                <input class="radio-input" formControlName="editor" name="editor" type="radio" [value]="editor" />
+            <label class="btn btn-radio" [class.active]="form().editor().value() === editor">
+                <input class="radio-input" [formField]="form().editor" type="radio" [value]="editor" />
                 <i class="icon-control-{{ editor }}"></i> <span class="radio-label">{{ editor }}</span>
             </label>
         }
@@ -12,15 +12,15 @@
         <sqx-form-row
             #isContentFieldRow
             check
-            for="resolveReference"
+            [for]="form().resolveReference"
             hint="schemas.fieldTypes.references.resolveHint"
             label="schemas.fieldTypes.references.resolve"
             [prefix]="field().fieldId">
-            <input class="form-check-input" [id]="isContentFieldRow.fieldName()" formControlName="resolveReference" type="checkbox" />
+            <input class="form-check-input" [id]="isContentFieldRow.fieldName()" [formField]="form().resolveReference" type="checkbox" />
         </sqx-form-row>
     }
 
-    <sqx-form-row #queryRow for="query" hint="schemas.fieldTypes.references.queryHint" label="schemas.fieldTypes.references.query" [prefix]="field().fieldId">
-        <input class="form-control" [id]="queryRow.fieldName()" formControlName="query" type="text" />
+    <sqx-form-row #queryRow [for]="form().query" hint="schemas.fieldTypes.references.queryHint" label="schemas.fieldTypes.references.query" [prefix]="field().fieldId">
+        <input class="form-control" [id]="queryRow.fieldName()" [formField]="form().query" type="text" />
     </sqx-form-row>
 </div>

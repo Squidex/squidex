@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, ReferencesFieldFormModel, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',
@@ -15,10 +16,10 @@ import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, Re
     templateUrl: 'references-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
-        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
@@ -26,8 +27,8 @@ import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, Re
 export class ReferencesValidationComponent {
     protected readonly schemasSource = inject(SchemaTagSource);
 
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -40,4 +41,8 @@ export class ReferencesValidationComponent {
 
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<ReferencesFieldFormModel>;
+    });
 }

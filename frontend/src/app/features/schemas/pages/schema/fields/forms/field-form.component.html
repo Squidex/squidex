@@ -38,13 +38,13 @@
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab() !== 0">
-    <sqx-field-form-common [field]="field()" [fieldForm]="fieldForm()" [schema]="schema()" />
+    <sqx-field-form-common [field]="field()" [fieldForm]="fieldForm().form" [schema]="schema()" />
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab() !== 1">
     <sqx-field-form-validation
         [field]="field()"
-        [fieldForm]="fieldForm()"
+        [fieldForm]="fieldForm().form"
         [isLocalizable]="isLocalizable()"
         [languages]="languages()"
         [schema]="schema()"
@@ -52,11 +52,11 @@
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab() !== 2">
-    <sqx-field-form-ui [field]="field()" [fieldForm]="fieldForm()" [schema]="schema()" />
+    <sqx-field-form-ui [field]="field()" [fieldForm]="fieldForm().form" [schema]="schema()" />
 </div>
 
 @if (selectedTab() === 3) {
     <div class="table-items-row-details-tab">
-        <sqx-json-more [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
+        <sqx-json-more [field]="field()" [fieldForm]="fieldForm().form" [properties]="field().rawProperties" />
     </div>
 }

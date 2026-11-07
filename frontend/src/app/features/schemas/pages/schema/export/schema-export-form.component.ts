@@ -7,7 +7,8 @@
 
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -17,8 +18,8 @@ import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, Tr
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

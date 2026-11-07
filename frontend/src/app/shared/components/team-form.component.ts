@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { CreateTeamForm, TeamsState } from '@app/shared/internal';
 
@@ -19,10 +20,10 @@ import { CreateTeamForm, TeamsState } from '@app/shared/internal';
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,

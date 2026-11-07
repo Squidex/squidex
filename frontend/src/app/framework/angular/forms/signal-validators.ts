@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FieldTree, pattern, PathKind, SchemaPath, validate, ValidationError } from '@angular/forms/signals';
+import { FieldTree, PathKind, pattern, SchemaPath, validate, ValidationError } from '@angular/forms/signals';
 import { DateTime, LocalizerService, Types } from '@app/framework/internal';
 import { formatError } from './error-formatting';
 
@@ -18,6 +18,10 @@ export module SignalValidators {
         validate(path, ({ value }) => {
             const raw = value();
             if (raw === null || raw === undefined || raw === '') {
+                return undefined;
+            }
+
+            if (Number.isNaN(raw)) {
                 return undefined;
             }
 
@@ -92,5 +96,13 @@ function getLegacyError(error: ValidationError & Record<string, any>): [string, 
             return ['minlength', { requiredLength: error['minLength'], message: error.message }];
         default:
             return [error.kind, error];
+    }
+}
+
+export function getFieldKey(field: FieldTree<unknown>): string {
+    try {
+        return `${field().keyInParent()}`;
+    } catch {
+        return '';
     }
 }

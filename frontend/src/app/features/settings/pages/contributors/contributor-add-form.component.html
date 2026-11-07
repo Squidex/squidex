@@ -1,12 +1,12 @@
 <div class="card card-body card-create mb-4">
     <h5 class="card-title">{{ "contributors.add.title" | sqxTranslate }}</h5>
 
-    <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
+    <form (ngSubmit)="assignContributor()">
         <div class="row gx-2">
             <div class="col">
                 <sqx-autocomplete
                     displayProperty="displayName"
-                    formControlName="user"
+                    [formField]="assignContributorForm.form.user"
                     icon="search"
                     [itemsSource]="usersDataSource"
                     placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}">
@@ -20,7 +20,7 @@
             </div>
 
             <div class="col-3">
-                <select class="form-select" formControlName="role">
+                <select class="form-select" [formField]="assignContributorForm.form.role">
                     @for (role of roles(); track role) {
                         <option [ngValue]="role.name">{{ role.name }}</option>
                     }
@@ -28,7 +28,7 @@
             </div>
 
             <div class="col-auto">
-                <button class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async" type="submit">
+                <button class="btn btn-success" [disabled]="assignContributorForm.hasNoUser()" type="submit">
                     {{ "contributors.add" | sqxTranslate }}
                 </button>
             </div>

@@ -6,20 +6,19 @@
  */
 
 import { Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormRowComponent, TriggerForm } from '@app/shared';
+import { FormField } from '@angular/forms/signals';
+import { FormRowComponent, UsageTriggerForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-usage-trigger',
     styleUrls: ['./usage-trigger.component.scss'],
     templateUrl: './usage-trigger.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
     ],
 })
 export class UsageTriggerComponent {
     /** The form to edit the trigger settings. */
-    public readonly triggerForm = input.required<TriggerForm>();
+    public readonly triggerForm = input.required<UsageTriggerForm>();
 }

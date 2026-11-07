@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { AssignContributorDto, ErrorDto, FormHintComponent, ImportContributorsForm, ModalDialogComponent, StatusIconComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -26,11 +26,10 @@ type ImportStatus = {
     templateUrl: './import-contributors-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
+        FormField,
         FormHintComponent,
         FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         StatusIconComponent,
         TooltipDirective,
         TranslatePipe,

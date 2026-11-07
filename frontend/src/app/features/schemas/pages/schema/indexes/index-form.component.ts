@@ -6,8 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIndexForm, FormHintComponent, IndexesState, MarkdownDirective, ModalDialogComponent, SchemaDto, TranslatePipe } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIndexForm, FormHintComponent, IndexesState, MarkdownDirective, ModalDialogComponent, SchemaDto, SignalSelectDirective, TranslatePipe } from '@app/shared';
 
 
 @Component({
@@ -18,11 +19,12 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
     imports: [
         ConfirmClickDirective,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
         MarkdownDirective,
         ModalDialogComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })

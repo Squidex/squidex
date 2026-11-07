@@ -5,20 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, input, untracked } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { switchMap } from 'rxjs/operators';
-import { FieldDto, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, TagEditorComponent, valueProjection$ } from '@app/shared';
+import { Component, computed, effect, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldFormModel, NumberFieldPropertiesDto, TagEditorComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
         TagEditorComponent,
     ],
 })
@@ -26,8 +25,8 @@ export class NumberUIComponent {
     protected readonly converter = FloatConverter.INSTANCE;
     protected readonly editors = NumberFieldEditorValues;
 
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -35,38 +34,27 @@ export class NumberUIComponent {
     /** The type specific properties of the field. */
     public readonly properties = input.required<NumberFieldPropertiesDto>();
 
-    protected readonly hideAllowedValues = toSignal(
-        toObservable(this.fieldForm).pipe(
-            switchMap(form => valueProjection$(form.controls['editor'], hidesAllowedValues))),
-        { initialValue: false });
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<NumberFieldFormModel>;
+    });
+
+    protected readonly hideAllowedValues = computed(() => {
+        return hidesAllowedValues(this.form().editor().value());
+    });
 
     constructor() {
-        effect(onCleanup => {
-            const fieldForm = this.fieldForm();
-
-            const subscription = untracked(() =>
-                valueProjection$(fieldForm.controls['editor'], hidesAllowedValues)
-                    .subscribe(isHidden => {
-                        if (isHidden) {
-                            fieldForm.controls['allowedValues'].setValue(undefined);
-                        }
-                    }));
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            const form = this.form();
+            if (hidesAllowedValues(form.editor().value())) {
+                form.allowedValues().value.set(null);
+            }
         });
 
-        effect(onCleanup => {
-            const fieldForm = this.fieldForm();
-
-            const subscription = untracked(() =>
-                valueProjection$(fieldForm.controls['editor'], hidesInlineEditable)
-                    .subscribe(isHidden => {
-                        if (isHidden) {
-                            fieldForm.controls['inlineEditable'].setValue(false);
-                        }
-                    }));
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            const form = this.form();
+            if (hidesInlineEditable(form.editor().value())) {
+                form.inlineEditable().value.set(false);
+            }
         });
     }
 }

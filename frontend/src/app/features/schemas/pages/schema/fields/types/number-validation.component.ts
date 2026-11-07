@@ -7,8 +7,9 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, NumberFieldFormModel, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-validation',
@@ -16,16 +17,16 @@ import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, Nu
     templateUrl: 'number-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class NumberValidationComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -41,6 +42,10 @@ export class NumberValidationComponent {
 
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<NumberFieldFormModel>;
+    });
 
     protected readonly showUnique = computed(() => {
         const field = this.field();

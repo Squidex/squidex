@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
+import { FieldTree } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-geolocation-validation',
@@ -16,8 +16,8 @@ import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GeolocationValidationComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();

@@ -6,7 +6,8 @@
  */
 
 import { Component, effect, inject, input, output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/internal';
 
@@ -17,10 +18,10 @@ import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/i
     imports: [
         FocusOnInitDirective,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
     ],

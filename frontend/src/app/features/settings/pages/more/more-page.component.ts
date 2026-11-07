@@ -6,9 +6,10 @@
  */
 
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
+import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, SignalSelectDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
@@ -19,17 +20,18 @@ import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileD
         ConfirmClickDirective,
         FileDropDirective,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
         ProgressBarComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
         SidebarMenuDirective,
+        SignalSelectDirective,
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,

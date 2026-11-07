@@ -1,5 +1,5 @@
-<div [formGroup]="fieldForm()">
-    <sqx-form-row for="graphQLSchema" hint="schemas.field.graphQLSchemaHint" label="schemas.field.graphQLSchema" [prefix]="field().fieldId" vertical>
-        <sqx-code-editor formControlName="graphQLSchema" [height]="350" mode="ace/mode/graphqlschema" />
+<div>
+    <sqx-form-row [for]="form().graphQLSchema" hint="schemas.field.graphQLSchemaHint" label="schemas.field.graphQLSchema" [prefix]="field().fieldId" vertical>
+        <sqx-code-editor [formField]="form().graphQLSchema" [height]="350" mode="ace/mode/graphqlschema" />
     </sqx-form-row>
 </div>

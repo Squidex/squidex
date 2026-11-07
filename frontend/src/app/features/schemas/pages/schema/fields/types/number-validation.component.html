@@ -1,31 +1,31 @@
-<div [formGroup]="fieldForm()">
+<div>
     @if (showUnique()) {
-        <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field().fieldId">
-            <input class="form-check-input" [id]="isUniqueRow.fieldName()" formControlName="isUnique" type="checkbox" />
+        <sqx-form-row #isUniqueRow check [for]="form().isUnique" label="schemas.field.unique" [prefix]="field().fieldId">
+            <input class="form-check-input" [id]="isUniqueRow.fieldName()" [formField]="form().isUnique" type="checkbox" />
         </sqx-form-row>
     }
 
-    <sqx-form-row for="minValue" hideError label="schemas.fieldTypes.number.range" [prefix]="field().fieldId">
+    <sqx-form-row [for]="form().minValue" hideError label="schemas.fieldTypes.number.range" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
-                <input class="form-control" formControlName="minValue" placeholder="{{ 'schemas.fieldTypes.number.rangeMin' | sqxTranslate }}" type="number" />
+                <input class="form-control" [formField]="form().minValue" placeholder="{{ 'schemas.fieldTypes.number.rangeMin' | sqxTranslate }}" type="number" />
             </div>
 
             <div class="col-auto"><label class="col-form-label minmax">-</label></div>
 
             <div class="col">
-                <input class="form-control" formControlName="maxValue" placeholder="{{ 'schemas.fieldTypes.number.rangeMax' | sqxTranslate }}" type="number" />
+                <input class="form-control" [formField]="form().maxValue" placeholder="{{ 'schemas.fieldTypes.number.rangeMax' | sqxTranslate }}" type="number" />
             </div>
         </div>
     </sqx-form-row>
 
-    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
-        <input class="form-control" [id]="defaultValueRow.fieldName()" formControlName="defaultValue" type="number" />
+    <sqx-form-row #defaultValueRow [for]="form().defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
+        <input class="form-control" [id]="defaultValueRow.fieldName()" [formField]="form().defaultValue" type="number" />
     </sqx-form-row>
 
     @if (isLocalizable()) {
-        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field().fieldId">
-            <sqx-localized-input [id]="defaultValuesRow.fieldName()" formControlName="defaultValues" [languages]="languages()" type="number" />
+        <sqx-form-row #defaultValuesRow [for]="form().defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field().fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName()" [formField]="form().defaultValues" [languages]="languages()" type="number" />
         </sqx-form-row>
     }
 </div>

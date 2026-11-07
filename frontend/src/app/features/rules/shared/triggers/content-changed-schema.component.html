@@ -1,8 +1,8 @@
-@let form = this.form();
-<div class="row gx-2" [formGroup]="form">
+@let field = this.field();
+<div class="row gx-2">
     <div class="col col-3">
-        <sqx-control-errors for="action" />
-        <select class="form-select schemas-control" formControlName="schemaId">
+        <sqx-control-errors [for]="field.schemaId" />
+        <select class="form-select schemas-control" [formField]="field.schemaId">
             @for (schema of schemas(); track schema.id) {
                 <option [ngValue]="schema.id">{{ schema.displayName }}</option>
             }
@@ -14,8 +14,8 @@
     </div>
 
     <div class="col">
-        <sqx-control-errors for="condition" />
-        <sqx-code-editor [completion]="completions()" formControlName="condition" singleLine="true" />
+        <sqx-control-errors [for]="field.condition" />
+        <sqx-code-editor [completion]="completions()" [formField]="field.condition" singleLine="true" />
     </div>
 
     <div class="col-auto">
@@ -25,7 +25,7 @@
             confirmRememberKey="deleteContentChangedSchema"
             confirmText="i18n:rules.deleteContentChangedSchemaText"
             confirmTitle="i18n:rules.deleteContentChangedSchemaTitle"
-            [disabled]="form.disabled"
+            [disabled]="field().disabled()"
             (sqxConfirmClick)="remove.emit()"
             type="button">
             <i class="icon-bin3"></i>

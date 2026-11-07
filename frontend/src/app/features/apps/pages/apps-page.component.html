@@ -58,7 +58,7 @@
 
                         <div class="col-auto">
                             <form (ngSubmit)="searchAllApps()">
-                                <input class="form-control search" [formControl]="allAppsFilter" placeholder="{{ 'apps.search' | sqxTranslate }}" />
+                                <input class="form-control search" [formField]="allAppsFilter" placeholder="{{ 'apps.search' | sqxTranslate }}" />
                             </form>
                         </div>
                     </div>

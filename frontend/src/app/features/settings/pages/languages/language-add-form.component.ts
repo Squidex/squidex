@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
 import { AddLanguageForm, AutocompleteComponent, AutocompleteSource, FormHintComponent, LanguageDto, LanguagesState, StringHelper, TranslatePipe } from '@app/shared';
 
@@ -46,9 +47,9 @@ class LanguageSource implements AutocompleteSource {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutocompleteComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

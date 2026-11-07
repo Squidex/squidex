@@ -7,7 +7,8 @@
 
 import { SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, UpdateRoleDto } from '@app/shared';
 
 const DESCRIPTIONS = {
@@ -43,9 +44,9 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
         ConfirmClickDirective,
         ControlErrorsComponent,
         FormAlertComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         SlicePipe,
         TranslatePipe,
     ],
@@ -104,7 +105,7 @@ export class RoleComponent {
     }
 
     protected addPermission() {
-        this.editForm.form.add('');
+        this.editForm.addPermission();
     }
 
     protected save() {

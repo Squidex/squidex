@@ -6,7 +6,8 @@
  */
 
 import { Component, effect, inject, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormErrorComponent, FormRowComponent, LayoutComponent, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
 import { UserDto, UserForm, UsersState } from '../../internal';
@@ -17,10 +18,10 @@ import { UserDto, UserForm, UsersState } from '../../internal';
     templateUrl: './user-page.component.html',
     imports: [
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
-        ReactiveFormsModule,
         ShortcutDirective,
         TitleComponent,
         TooltipDirective,
@@ -42,11 +43,9 @@ export class UserPageComponent {
     constructor() {
         effect(() => {
             const user = this.usersState.selectedUser();
-
             this.user = user;
 
             const isEditable = !user || user.canUpdate;
-
             this.isEditable.set(isEditable);
 
             const permissions: string[] = [];

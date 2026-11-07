@@ -7,11 +7,11 @@
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, value$ } from '@app/shared';
+import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaFormComponent } from './schema-form.component';
 
@@ -22,10 +22,10 @@ import { SchemaFormComponent } from './schema-form.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDropListGroup,
+        FormField,
         FormsModule,
         LayoutComponent,
         ModalDirective,
-        ReactiveFormsModule,
         RouterOutlet,
         SchemaCategoryComponent,
         SchemaFormComponent,
@@ -46,20 +46,16 @@ export class SchemasPageComponent {
 
     protected readonly addCategoryForm = new CreateCategoryForm();
 
-    protected readonly schemasFilter = new UntypedFormControl();
+    protected readonly schemasFilter = form(signal(''));
 
-    protected readonly categories;
+    protected readonly categories = computed(() => {
+        return getCategoryTree(this.schemasState.schemas(), this.schemasState.addedCategories(), this.schemasFilter().value());
+    });
 
     protected readonly source = signal<any>(null);
 
     constructor() {
         const messageBus = inject(MessageBus);
-
-        const schemasFilterValue = toSignal(value$<string>(this.schemasFilter));
-
-        this.categories = computed(() => {
-            return getCategoryTree(this.schemasState.schemas(), this.schemasState.addedCategories(), schemasFilterValue());
-        });
 
         effect(onCleanup => {
             const subscription =

@@ -118,3 +118,44 @@ Because of this, the build is broken everywhere until all areas are migrated. Ot
 ## Verification for phase 2
 
 While other areas are still in progress the global build has errors outside your area. Filter the output of `npx ng build --configuration development --output-path <your-own-temp-dir>` (or `npx tsc -p tsconfig.app.json --noEmit` and `npx tsc -p tsconfig.spec.json --noEmit`) to your own folders and get them to zero errors and zero NG8109 warnings. Run `npx eslint` on your changed files and `npx ng test --no-watch` filtered to your specs (`npx ng test --no-watch --include <glob>`), if possible.
+
+---
+
+# Phase 3: signal forms
+
+Migrate form models and their templates from reactive forms to Angular signal forms (`@angular/forms/signals`, Angular 21.1). **The content forms (`shared/state/contents.forms*.ts`, `features/content/**`) stay on reactive forms** – do not touch them, and do not remove anything from the framework that they still use (`Form`, `ExtendedFormGroup`, `TemplatedFormArray`, `ValidatorsEx`, `forms-helper`, ...).
+
+## Already available (do not change the API without reporting it)
+
+- `framework/angular/forms/signal-form.ts`: `SignalForm<TModel, TOut, TIn = TOut>`, the replacement for `Form<...>`.
+  - `super(initialModel, path => { required(path.name); maxLength(path.name, 40); ... }, injector?)`.
+  - `model` (WritableSignal of the plain model), `form` (the `FieldTree`), `submitCount`, `submitted`, `submitting`, `error` signals.
+  - `load(value)`, `submit()`, `submitCompleted({ newValue, noReset })`, `submitFailed(error)`, `setEnabled(bool)`, `getValue()` – same semantics as the old `Form`, so component code calling them stays the same.
+  - `transformLoad(value: Partial<TIn>): TModel` – default copies only the keys of the initial model. `transformSubmit(model: TModel): TOut`.
+  - Server errors (`ErrorDto.details`) are mapped onto fields automatically (kind `custom`), and disappear when the field value changes. Submitting is blocked only by non-server errors.
+  - `form()` needs an injection context. Forms created as component field initializers are fine. Forms created elsewhere (inside `computed`, methods, specs) must pass an `Injector` (`inject(Injector)` in the component) or use `TestBed.runInInjectionContext` in specs.
+- `signal-validators.ts`: `SignalValidators.patternWithMessage(path, 'regex-string', 'i18n:message')` (anchored like `Validators.pattern`), `between`, `validDateTime`, `match`. Use the built-in `required`, `maxLength`, `minLength`, `min`, `max`, `email`, `pattern`, `validate`, `applyEach`, `disabled`, `hidden` from `@angular/forms/signals` for everything else. Add new shared validators to `signal-validators.ts` if several forms need them (error kinds must match an existing `validation.<kind>` i18n key in lower case, see `backend/i18n/frontend_en.json`; `formatSignalErrors` maps `maxLength`/`minLength` to the old keys).
+- `sqx-form-row` and `sqx-control-errors` accept a `FieldTree` in `[for]` (the label `for`/field name comes from the key in the parent).
+- `SignalSelectDirective` (`select[formField]`): keeps `<option [ngValue]="...">` working with `[formField]`. Import it in components that have `<select [formField]>`.
+- Custom form controls (`SignalControlComponent` subclasses, ControlValueAccessors such as `sqx-dropdown`, `sqx-tag-editor`, `sqxTransformInput`) work with `[formField]` through Angular's ControlValueAccessor interop. Do not rewrite them.
+- Pilot to copy: `shared/state/apps.forms.ts` (`CreateAppForm`, `UpdateAppForm`, `TransferAppForm`), `shared/components/app-form.component.*`, `features/settings/pages/more/more-page.component.*`. Specs: `framework/angular/forms/signal-form.spec.ts`, `signal-form-controls.spec.ts`.
+
+## Rules
+
+1. Every `Form<...>` subclass in your area becomes a `SignalForm<...>` with a typed model (an interface/type next to the form, no `any`). `TemplatedFormArray`/`ExtendedFormGroup` become arrays/objects in the model; adding/removing items updates `model` (`this.model.update(...)`), with methods on the form class (e.g. `addPattern()`, `removePattern(index)`) instead of `form.controls[...]` access in components.
+2. Validators move into the schema function. `Validators.nullValidator` disappears. Keep the same limits and messages.
+3. Templates:
+   - `<form [formGroup]="x.form" (ngSubmit)="save()">` -> `<form (ngSubmit)="save()">` (keep `FormsModule` imported for `ngSubmit`).
+   - `formControlName="name"` / `[formControl]="..."` -> `[formField]="x.form.name"`; `formGroupName`/`formArrayName` -> navigate the field tree (`x.form.items[i].name`), loop with `@for (item of x.form.items; track $index)`.
+   - `<sqx-form-row for="name">` -> `<sqx-form-row [for]="x.form.name">`; `<sqx-control-errors for="name">` -> `[for]="x.form.name"`.
+   - `[formField]` forbids `maxlength`, `minlength`, `required`, `disabled`, `readonly`, `min`, `max`, `pattern`, `value` attributes/bindings on the same element (NG8022). Move them into the schema (`maxLength(path.x, 100)`, `disabled(path.x, () => ...)`, ...). Signal forms then sets the native attributes.
+   - Native checkboxes work with `[formField]` on a `boolean` model value.
+   - Import `FormField` from `@angular/forms/signals` (and `SignalSelectDirective` for selects); remove `ReactiveFormsModule` when unused.
+4. Component code: `x.form.controls['a'].value` -> `x.model().a` or `x.form.a().value()`; `value$(...)`, `hasNoValue$(...)`, `valueChanges` -> `computed` over `x.model()`. `x.form.controls['a'].setValue(v)` -> `x.form.a().value.set(v)`. `.disable()/.enable()` on a control -> a `disabled(path, () => ...)` rule driven by a signal, or `setEnabled` for the whole form.
+5. Standalone reactive controls in your components (`new UntypedFormControl()` used for a search box/filter) become signal forms too: `protected readonly filter = form(signal(''))` + `[formField]="filter"`. Leave `[(ngModel)]` bindings alone. Leave the internal controls of framework editors (`framework/angular/forms/editors/**`) alone.
+6. Specs: create forms via `TestBed.runInInjectionContext(() => new XForm())`; assert on `model()`/`form.x().errors()`.
+7. Everything from phases 1 and 2 still applies (readonly, member order: private readonly / private / rest, `inject()`, protected template members, block-body computeds, no new comments).
+
+## Verification
+
+Same as phase 2: `npx ng build --configuration development --output-path <own dir>` (zero errors/warnings in your files, NG8022 included), `npx eslint` on changed files, `npx ng test --no-watch` (or `--include` for your specs). Since nothing runs against a backend here, check behaviour you cannot test by reading carefully (loading values, array add/remove, disabled states) and report it.

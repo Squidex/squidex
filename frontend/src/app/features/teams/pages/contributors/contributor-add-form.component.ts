@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { Component, inject, Injectable } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AutocompleteComponent, AutocompleteSource, DialogModel, DialogService, FormHintComponent, ModalDirective, TranslatePipe, UsersService } from '@app/shared';
@@ -52,13 +52,12 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource,
     ],
     imports: [
-        AsyncPipe,
         AutocompleteComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
         ImportContributorsDialogComponent,
         ModalDirective,
-        ReactiveFormsModule,
         TranslatePipe,
         UserDtoPicture,
     ],

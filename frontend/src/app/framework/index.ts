@@ -44,6 +44,7 @@ export * from './angular/forms/model';
 export * from './angular/forms/progress-bar.component';
 export * from './angular/forms/signal-form';
 export * from './angular/forms/signal-form-server-errors';
+export * from './angular/forms/signal-select.directive';
 export * from './angular/forms/signal-validators';
 export * from './angular/forms/templated-form-array';
 export * from './angular/forms/templated-form-array';

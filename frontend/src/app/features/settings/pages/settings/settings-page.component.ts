@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -19,11 +18,10 @@ import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettin
     imports: [
         ConfirmClickDirective,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

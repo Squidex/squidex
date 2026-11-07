@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { switchMap } from 'rxjs/operators';
-import { AppLanguageDto, DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormRowComponent, hasNoValue$, LocalizedInputComponent, valueProjection$ } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, DateTimeEditorComponent, DateTimeFieldFormModel, DateTimeFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, SignalSelectDirective } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
@@ -20,15 +19,16 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DateTimeEditorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
     ],
 })
 export class DateTimeValidationComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
@@ -42,15 +42,17 @@ export class DateTimeValidationComponent {
     /** Shows the localized default values, if the field is localizable. */
     public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    protected readonly showDefaultValues = toSignal(
-        toObservable(this.fieldForm).pipe(
-            switchMap(form => valueProjection$(form.controls['isRequired'], x => x !== true))),
-        { initialValue: false });
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<DateTimeFieldFormModel>;
+    });
 
-    protected readonly showDefaultValue = toSignal(
-        toObservable(this.fieldForm).pipe(
-            switchMap(form => hasNoValue$(form.controls['calculatedDefaultValue']))),
-        { initialValue: false });
+    protected readonly showDefaultValues = computed(() => {
+        return !this.form().isRequired().value();
+    });
+
+    protected readonly showDefaultValue = computed(() => {
+        return !this.form().calculatedDefaultValue().value();
+    });
 
     protected readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

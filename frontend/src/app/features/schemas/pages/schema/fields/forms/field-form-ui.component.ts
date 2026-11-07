@@ -7,8 +7,9 @@
 
 
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, SchemaDto } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayUIComponent } from '../types/array-ui.component';
 import { AssetsUIComponent } from '../types/assets-ui.component';
 import { BooleanUIComponent } from '../types/boolean-ui.component';
@@ -33,25 +34,25 @@ import { UserInfoUIComponent } from '../types/user-info-ui.component';
         ArrayUIComponent,
         AssetsUIComponent,
         BooleanUIComponent,
-        ComponentUIComponent,
         ComponentsUIComponent,
+        ComponentUIComponent,
         DateTimeUIComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         GeolocationUIComponent,
         JsonUIComponent,
         NumberUIComponent,
-        ReactiveFormsModule,
-        RichTextUIComponent,
         ReferencesUIComponent,
+        RichTextUIComponent,
         StringUIComponent,
         TagsUIComponent,
         UserInfoUIComponent,
     ],
 })
 export class FieldFormUIComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();

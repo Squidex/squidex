@@ -47,20 +47,20 @@
             }
 
             <div class="table-items-row table-items-row-summary">
-                <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
+                <form (ngSubmit)="restore()">
                     <div class="row gx-2">
                         <div class="col">
-                            <sqx-control-errors for="url" />
-                            <input class="form-control" formControlName="url" placeholder="{{ 'jobs.restoreLastUrl' | sqxTranslate }}" />
+                            <sqx-control-errors [for]="restoreForm.form.url" />
+                            <input class="form-control" [formField]="restoreForm.form.url" placeholder="{{ 'jobs.restoreLastUrl' | sqxTranslate }}" />
                         </div>
 
                         <div class="col">
-                            <sqx-control-errors for="name" />
-                            <input class="form-control" formControlName="name" placeholder="{{ 'jobs.restoreNewAppName' | sqxTranslate }}" />
+                            <sqx-control-errors [for]="restoreForm.form.name" />
+                            <input class="form-control" [formField]="restoreForm.form.name" placeholder="{{ 'jobs.restoreNewAppName' | sqxTranslate }}" />
                         </div>
 
                         <div class="col-auto">
-                            <button class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async" type="submit">
+                            <button class="btn btn-success" [disabled]="restoreForm.hasNoUrl()" type="submit">
                                 {{ "jobs.restore" | sqxTranslate }}
                             </button>
                         </div>

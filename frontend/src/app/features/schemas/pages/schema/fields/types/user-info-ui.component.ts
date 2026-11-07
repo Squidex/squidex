@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, UserInfoFieldPropertiesDto } from '@app/shared';
+import { FieldTree } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, UserInfoFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-user-info-ui',
@@ -16,8 +16,8 @@ import { FieldDto, UserInfoFieldPropertiesDto } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserInfoUIComponent {
-    /** The form group to edit the field properties. */
-    public readonly fieldForm = input.required<UntypedFormGroup>();
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
     /** The field to edit. */
     public readonly field = input.required<FieldDto>();
