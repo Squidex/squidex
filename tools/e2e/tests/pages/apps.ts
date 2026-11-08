@@ -11,15 +11,19 @@ export class AppsPage {
     constructor(private readonly page: Page) {}
 
     public async goto() {
+        // The onboarding dialog is only shown when the user has no apps yet, so skip it whenever it blocks an action.
+        const onboarding = this.page.locator('sqx-onboarding-dialog');
+
+        // goto() can be called multiple times for the same page.
+        await this.page.removeLocatorHandler(onboarding);
+        await this.page.addLocatorHandler(onboarding, async () => {
+            await onboarding.getByRole('button', { name: /Skip/ }).click();
+        });
+
         await this.page.goto('/app');
-        await this.page.waitForLoadState('networkidle');
 
-        // The onboarding dialog is only shown when the user has no apps yet.
-        const onboardingSkip = this.page.locator('sqx-onboarding-dialog').getByRole('button', { name: /Skip/ });
-
-        if (await onboardingSkip.waitFor({ timeout: 2000 }).then(() => true, () => false)) {
-            await onboardingSkip.click();
-        }
+        // The app keeps polling, therefore the network is never idle. Wait for the page content instead.
+        await expect(this.page.getByTestId('new-app').first()).toBeVisible();
     }
 
     public async gotoApp(name: string) {

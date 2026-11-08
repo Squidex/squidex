@@ -179,6 +179,9 @@ export class CodeEditorComponent extends FormValueControlBase<any> implements Fo
         this.aceModes = ace.require('ace/ext/modelist');
         this.aceTools = !!ace.require('ace/ext/language_tools');
 
+        // Enabling autocompletion in the options creates the completer, which is patched afterwards.
+        this.setOptions(aceEditor);
+
         if (this.aceTools && !this.disableTools()) {
             this.setupCompleter(aceEditor);
         }
