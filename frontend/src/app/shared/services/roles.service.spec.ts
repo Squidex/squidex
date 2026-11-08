@@ -5,23 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    Resource,
-    RoleDto,
-    RolesDto,
-    RolesService,
-    Versioned,
-    VersionTag,} from "@app/shared/internal";
-import { AddRoleDto, ResourceLinkDto, UpdateRoleDto } from "./../model";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, Resource, RoleDto, RolesDto, RolesService, Versioned, VersionTag } from '@app/shared/internal';
+import { AddRoleDto, ResourceLinkDto, UpdateRoleDto } from './../model';
 
-describe("RolesService", () => {
-    const version = new VersionTag("1");
+describe('RolesService', () => {
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -30,7 +21,7 @@ describe("RolesService", () => {
                 RolesService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
                 provideHttpClient(withXhr(), withInterceptorsFromDi()),
                 provideHttpClientTesting(),
@@ -45,86 +36,86 @@ describe("RolesService", () => {
         },
     ));
 
-    it("should make get request to get all permissions", inject(
+    it('should make get request to get all permissions', inject(
         [RolesService, HttpTestingController],
         (roleService: RolesService, httpMock: HttpTestingController) => {
             let permissions: ReadonlyArray<string>;
-            roleService.getPermissions("my-app").subscribe((result) => {
+            roleService.getPermissions('my-app').subscribe((result) => {
                 permissions = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/roles/permissions",
+                'http://service/p/api/apps/my-app/roles/permissions',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(["P1", "P2"]);
+            req.flush(['P1', 'P2']);
 
-            expect(permissions!).toEqual(["P1", "P2"]);
+            expect(permissions!).toEqual(['P1', 'P2']);
         },
     ));
 
-    it("should make get request to get roles", inject(
+    it('should make get request to get roles', inject(
         [RolesService, HttpTestingController],
         (roleService: RolesService, httpMock: HttpTestingController) => {
             let roles: Versioned<RolesDto>;
-            roleService.getRoles("my-app").subscribe((result) => {
+            roleService.getRoles('my-app').subscribe((result) => {
                 roles = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/roles",
+                'http://service/p/api/apps/my-app/roles',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(rolesResponse(2, 4), {
                 headers: {
-                    etag: "2",
+                    etag: '2',
                 },
             });
 
             expect(roles!).toEqual({
                 payload: createRoles(2, 4),
-                version: new VersionTag("2"),
+                version: new VersionTag('2'),
             });
         },
     ));
 
-    it("should make post request to add role", inject(
+    it('should make post request to add role', inject(
         [RolesService, HttpTestingController],
         (roleService: RolesService, httpMock: HttpTestingController) => {
-            const dto = new AddRoleDto({ name: "Role3" });
+            const dto = new AddRoleDto({ name: 'Role3' });
 
             let roles: Versioned<RolesDto>;
-            roleService.postRole("my-app", dto, version).subscribe((result) => {
+            roleService.postRole('my-app', dto, version).subscribe((result) => {
                 roles = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/roles",
+                'http://service/p/api/apps/my-app/roles',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(rolesResponse(2, 4), {
                 headers: {
-                    etag: "2",
+                    etag: '2',
                 },
             });
 
             expect(roles!).toEqual({
                 payload: createRoles(2, 4),
-                version: new VersionTag("2"),
+                version: new VersionTag('2'),
             });
         },
     ));
 
-    it("should make put request to update role", inject(
+    it('should make put request to update role', inject(
         [RolesService, HttpTestingController],
         (roleService: RolesService, httpMock: HttpTestingController) => {
             const dto = new UpdateRoleDto({
@@ -135,74 +126,74 @@ describe("RolesService", () => {
             const resource: Resource = {
                 _links: {
                     update: {
-                        method: "PUT",
-                        href: "/api/apps/my-app/roles/role1",
+                        method: 'PUT',
+                        href: '/api/apps/my-app/roles/role1',
                     },
                 },
             };
 
             let roles: Versioned<RolesDto>;
             roleService
-                .putRole("my-app", resource, dto, version)
+                .putRole('my-app', resource, dto, version)
                 .subscribe((result) => {
                     roles = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/roles/role1",
+                'http://service/p/api/apps/my-app/roles/role1',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(rolesResponse(2, 4), {
                 headers: {
-                    etag: "2",
+                    etag: '2',
                 },
             });
 
             expect(roles!).toEqual({
                 payload: createRoles(2, 4),
-                version: new VersionTag("2"),
+                version: new VersionTag('2'),
             });
         },
     ));
 
-    it("should make delete request to remove role", inject(
+    it('should make delete request to remove role', inject(
         [RolesService, HttpTestingController],
         (roleService: RolesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     delete: {
-                        method: "DELETE",
-                        href: "/api/apps/my-app/roles/role1",
+                        method: 'DELETE',
+                        href: '/api/apps/my-app/roles/role1',
                     },
                 },
             };
 
             let roles: Versioned<RolesDto>;
             roleService
-                .deleteRole("my-app", resource, version)
+                .deleteRole('my-app', resource, version)
                 .subscribe((result) => {
                     roles = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/roles/role1",
+                'http://service/p/api/apps/my-app/roles/role1',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(rolesResponse(2, 4), {
                 headers: {
-                    etag: "2",
+                    etag: '2',
                 },
             });
 
             expect(roles!).toEqual({
                 payload: createRoles(2, 4),
-                version: new VersionTag("2"),
+                version: new VersionTag('2'),
             });
         },
     ));
@@ -217,11 +208,11 @@ describe("RolesService", () => {
                 properties: createProperties(id),
                 isDefaultRole: id % 2 === 0,
                 _links: {
-                    update: { method: "PUT", href: `/roles/id${id}` },
+                    update: { method: 'PUT', href: `/roles/id${id}` },
                 },
             })),
             _links: {
-                create: { method: "POST", href: "/roles" },
+                create: { method: 'POST', href: '/roles' },
             },
         };
     }
@@ -231,7 +222,7 @@ export function createRoles(...ids: ReadonlyArray<number>) {
     return new RolesDto({
         items: ids.map(createRole),
         _links: {
-            create: new ResourceLinkDto({ method: "POST", href: "/roles" }),
+            create: new ResourceLinkDto({ method: 'POST', href: '/roles' }),
         },
     });
 }
@@ -246,7 +237,7 @@ export function createRole(id: number) {
         isDefaultRole: id % 2 === 0,
         _links: {
             update: new ResourceLinkDto({
-                method: "PUT",
+                method: 'PUT',
                 href: `/roles/id${id}`,
             }),
         },

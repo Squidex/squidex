@@ -5,19 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from "@angular/core";
-import { Meta, moduleMetadata, StoryObj } from "@storybook/angular";
-import {LocalizerService,
-    RootViewComponent,
-    TagEditorComponent,} from "@app/framework";
+import { Component } from '@angular/core';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
+import { LocalizerService, RootViewComponent, TagEditorComponent } from '@app/framework';
 
 const TRANSLATIONS = {
-    "common.tagAdd": ", to add tag",
-    "common.empty": "Nothing available.",
+    'common.tagAdd': ', to add tag',
+    'common.empty': 'Nothing available.',
 };
 
 @Component({
-    selector: "sqx-tag-editor-test",
+    selector: 'sqx-tag-editor-test',
     imports: [RootViewComponent, TagEditorComponent],
     template: `
         <sqx-root-view>
@@ -41,24 +39,24 @@ class TestComponent {
         this.itemsSourceLoading = true;
 
         setTimeout(() => {
-            this.itemsSource = ["A", "B"];
+            this.itemsSource = ['A', 'B'];
             this.itemsSourceLoading = false;
         }, 1000);
     }
 }
 
 export default {
-    title: "Framework/TagEditor",
+    title: 'Framework/TagEditor',
     component: TagEditorComponent,
     argTypes: {
         dashed: {
-            control: "boolean",
+            control: 'boolean',
         },
         disabled: {
-            control: "boolean",
+            control: 'boolean',
         },
         change: {
-            action: "valueChange",
+            action: 'valueChange',
         },
     },
     render: (args) => ({
@@ -100,7 +98,7 @@ export const Default: Story = {
 
 export const Suggestions: Story = {
     args: {
-        itemsSource: ["A", "B", "C"],
+        itemsSource: ['A', 'B', 'C'],
         allowOpen: true,
     },
 };
@@ -122,7 +120,7 @@ export const SuggestionsLoading: Story = {
 export const Values: Story = {
     args: {
         itemsSource: [],
-        model: ["A", "A", "B"],
+        model: ['A', 'A', 'B'],
     },
 };
 
@@ -136,7 +134,7 @@ export const StyleDashed: Story = {
 export const StyleDashedValues: Story = {
     args: {
         styleDashed: true,
-        model: ["A", "B", "C"],
+        model: ['A', 'B', 'C'],
     },
 };
 
@@ -150,7 +148,7 @@ export const StyleBlank: Story = {
 export const StyleBlankValues: Story = {
     args: {
         styleBlank: true,
-        model: ["A", "B", "C"],
+        model: ['A', 'B', 'C'],
     },
 };
 
@@ -158,25 +156,25 @@ export const Multiline: Story = {
     args: {
         styleScrollable: false,
         model: [
-            "Lorem",
-            "ipsum",
-            "dolor",
-            "sit",
-            "amet",
-            "consectetur",
-            "adipiscing",
-            "elit",
-            "sed",
-            "do",
-            "eiusmod",
-            "tempor",
-            "incididunt",
-            "ut",
-            "labore",
-            "et",
-            "dolore",
-            "magna",
-            "aliqua",
+            'Lorem',
+            'ipsum',
+            'dolor',
+            'sit',
+            'amet',
+            'consectetur',
+            'adipiscing',
+            'elit',
+            'sed',
+            'do',
+            'eiusmod',
+            'tempor',
+            'incididunt',
+            'ut',
+            'labore',
+            'et',
+            'dolore',
+            'magna',
+            'aliqua',
         ],
     },
 };
@@ -185,25 +183,25 @@ export const SingleLine: Story = {
     args: {
         styleScrollable: true,
         model: [
-            "Lorem",
-            "ipsum",
-            "dolor",
-            "sit",
-            "amet",
-            "consectetur",
-            "adipiscing",
-            "elit",
-            "sed",
-            "do",
-            "eiusmod",
-            "tempor",
-            "incididunt",
-            "ut",
-            "labore",
-            "et",
-            "dolore",
-            "magna",
-            "aliqua",
+            'Lorem',
+            'ipsum',
+            'dolor',
+            'sit',
+            'amet',
+            'consectetur',
+            'adipiscing',
+            'elit',
+            'sed',
+            'do',
+            'eiusmod',
+            'tempor',
+            'incididunt',
+            'ut',
+            'labore',
+            'et',
+            'dolore',
+            'magna',
+            'aliqua',
         ],
     },
 };

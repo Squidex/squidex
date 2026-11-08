@@ -5,22 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    DateTime,
-    JobDto,
-    JobLogMessageDto,
-    JobsDto,
-    JobsService,
-    Resource,} from "@app/shared/internal";
-import { ResourceLinkDto, RestoreJobDto, RestoreRequestDto } from "../model";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, DateTime, JobDto, JobLogMessageDto, JobsDto, JobsService, Resource } from '@app/shared/internal';
+import { ResourceLinkDto, RestoreJobDto, RestoreRequestDto } from '../model';
 
-describe("JobsService", () => {
+describe('JobsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -30,7 +21,7 @@ describe("JobsService", () => {
                 JobsService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -43,20 +34,20 @@ describe("JobsService", () => {
         },
     ));
 
-    it("should make get request to get jobs", inject(
+    it('should make get request to get jobs', inject(
         [JobsService, HttpTestingController],
         (jobsService: JobsService, httpMock: HttpTestingController) => {
             let jobs: JobsDto;
-            jobsService.getJobs("my-app").subscribe((result) => {
+            jobsService.getJobs('my-app').subscribe((result) => {
                 jobs = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/jobs",
+                'http://service/p/api/apps/my-app/jobs',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 items: [jobResponse(12), jobResponse(13)],
@@ -72,7 +63,7 @@ describe("JobsService", () => {
         },
     ));
 
-    it("should make get request to get restore", inject(
+    it('should make get request to get restore', inject(
         [JobsService, HttpTestingController],
         (jobsService: JobsService, httpMock: HttpTestingController) => {
             let restore: RestoreJobDto;
@@ -80,32 +71,32 @@ describe("JobsService", () => {
                 restore = result!;
             });
 
-            const req = httpMock.expectOne("http://service/p/api/apps/restore");
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
-                url: "http://url",
-                started: "2017-02-03",
-                stopped: "2017-02-04",
-                status: "Failed",
-                log: ["log1", "log2"],
+                url: 'http://url',
+                started: '2017-02-03',
+                stopped: '2017-02-04',
+                status: 'Failed',
+                log: ['log1', 'log2'],
             });
 
             expect(restore!).toEqual(
                 new RestoreJobDto({
-                    url: "http://url",
-                    started: DateTime.parseISO("2017-02-03"),
-                    stopped: DateTime.parseISO("2017-02-04"),
-                    status: "Failed",
-                    log: ["log1", "log2"],
+                    url: 'http://url',
+                    started: DateTime.parseISO('2017-02-03'),
+                    stopped: DateTime.parseISO('2017-02-04'),
+                    status: 'Failed',
+                    log: ['log1', 'log2'],
                 }),
             );
         },
     ));
 
-    it("should return null if get restore returns 404", inject(
+    it('should return null if get restore returns 404', inject(
         [JobsService, HttpTestingController],
         (jobsService: JobsService, httpMock: HttpTestingController) => {
             let restore: RestoreJobDto | null;
@@ -113,18 +104,18 @@ describe("JobsService", () => {
                 restore = result;
             });
 
-            const req = httpMock.expectOne("http://service/p/api/apps/restore");
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush({}, { status: 404, statusText: "404" });
+            req.flush({}, { status: 404, statusText: '404' });
 
             expect(restore!).toBeNull();
         },
     ));
 
-    it("should throw error if get restore returns non 404", inject(
+    it('should throw error if get restore returns non 404', inject(
         [JobsService, HttpTestingController],
         (jobsService: JobsService, httpMock: HttpTestingController) => {
             let error: any;
@@ -135,69 +126,69 @@ describe("JobsService", () => {
                 },
             });
 
-            const req = httpMock.expectOne("http://service/p/api/apps/restore");
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush({}, { status: 500, statusText: "500" });
+            req.flush({}, { status: 500, statusText: '500' });
 
             expect(error)!.toBeDefined();
         },
     ));
 
-    it("should make post request to start backup", inject(
+    it('should make post request to start backup', inject(
         [JobsService, HttpTestingController],
         (jobsService: JobsService, httpMock: HttpTestingController) => {
-            jobsService.postBackup("my-app").subscribe();
+            jobsService.postBackup('my-app').subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/backups",
+                'http://service/p/api/apps/my-app/backups',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make post request to start restore", inject(
+    it('should make post request to start restore', inject(
         [JobsService, HttpTestingController],
         (jobsService: JobsService, httpMock: HttpTestingController) => {
-            const dto = new RestoreRequestDto({ url: "http://url" });
+            const dto = new RestoreRequestDto({ url: 'http://url' });
 
             jobsService.postRestore(dto).subscribe();
 
-            const req = httpMock.expectOne("http://service/p/api/apps/restore");
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make delete request to remove job", inject(
+    it('should make delete request to remove job', inject(
         [JobsService, HttpTestingController],
         (jobsService: JobsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     delete: {
-                        method: "DELETE",
-                        href: "/api/apps/my-app/jobs/1",
+                        method: 'DELETE',
+                        href: '/api/apps/my-app/jobs/1',
                     },
                 },
             };
 
-            jobsService.deleteJob("my-app", resource).subscribe();
+            jobsService.deleteJob('my-app', resource).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/jobs/1",
+                'http://service/p/api/apps/my-app/jobs/1',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
@@ -218,15 +209,15 @@ describe("JobsService", () => {
                     message: `log2_${id}`,
                 },
             ],
-            status: id % 2 === 0 ? "Success" : "Failed",
+            status: id % 2 === 0 ? 'Success' : 'Failed',
             started: buildDate(id, 10),
             stopped: buildDate(id, 20),
             taskName: `task${id}`,
             taskArguments: {
-                [`arg${id}`]: "42",
+                [`arg${id}`]: '42',
             },
             _links: {
-                download: { method: "GET", href: "/api/jobs/1" },
+                download: { method: 'GET', href: '/api/jobs/1' },
             },
         };
     }
@@ -248,16 +239,16 @@ export function createJob(id: number) {
             }),
         ],
         started: DateTime.parseISO(buildDate(id, 10)),
-        status: id % 2 === 0 ? "Success" : ("Failed" as any),
+        status: id % 2 === 0 ? 'Success' : ('Failed' as any),
         stopped: DateTime.parseISO(buildDate(id, 20)),
         taskName: `task${id}`,
         taskArguments: {
-            [`arg${id}`]: "42",
+            [`arg${id}`]: '42',
         },
         _links: {
             download: new ResourceLinkDto({
-                method: "GET",
-                href: "/api/jobs/1",
+                method: 'GET',
+                href: '/api/jobs/1',
             }),
         },
     });

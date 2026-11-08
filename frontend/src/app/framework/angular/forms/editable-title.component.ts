@@ -58,7 +58,9 @@ export class EditableTitleComponent {
 
     protected readonly renameForm = form(this.renameValue, path => {
         maxLength(path, () => this.inputTitleLength() || undefined);
-        required(path, { when: () => this.inputTitleRequired() });
+        required(path,
+            {when: () => this.inputTitleRequired() }
+        );
     });
 
     protected onKeyDown(event: KeyboardEvent) {

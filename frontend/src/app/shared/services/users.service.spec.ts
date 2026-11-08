@@ -5,18 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    Resource,
-    UserDto,
-    UsersService,} from "@app/shared/internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, Resource, UserDto, UsersService } from '@app/shared/internal';
 
-describe("UsersService", () => {
+describe('UsersService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -26,7 +20,7 @@ describe("UsersService", () => {
                 UsersService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -39,19 +33,19 @@ describe("UsersService", () => {
         },
     ));
 
-    it("should make post request to update profile", inject(
+    it('should make post request to update profile', inject(
         [UsersService, HttpTestingController],
         (usersService: UsersService, httpMock: HttpTestingController) => {
             usersService.postUser({ answers: {} }).subscribe();
 
-            const req = httpMock.expectOne("http://service/p/api/user");
+            const req = httpMock.expectOne('http://service/p/api/user');
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
         },
     ));
 
-    it("should make get request to get many users", inject(
+    it('should make get request to get many users', inject(
         [UsersService, HttpTestingController],
         (usersService: UsersService, httpMock: HttpTestingController) => {
             let users: ReadonlyArray<UserDto>;
@@ -59,104 +53,104 @@ describe("UsersService", () => {
                 users = result;
             });
 
-            const req = httpMock.expectOne("http://service/p/api/users");
+            const req = httpMock.expectOne('http://service/p/api/users');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([
                 {
-                    id: "123",
-                    displayName: "User1",
+                    id: '123',
+                    displayName: 'User1',
                     _links: {},
                 },
                 {
-                    id: "456",
-                    displayName: "User2",
+                    id: '456',
+                    displayName: 'User2',
                     _links: {},
                 },
             ]);
 
             expect(users!).toEqual([
                 new UserDto({
-                    id: "123",
-                    displayName: "User1",
+                    id: '123',
+                    displayName: 'User1',
                     _links: {},
                 } as any),
                 new UserDto({
-                    id: "456",
-                    displayName: "User2",
+                    id: '456',
+                    displayName: 'User2',
                     _links: {},
                 } as any),
             ]);
         },
     ));
 
-    it("should make get request with query to get many users", inject(
+    it('should make get request with query to get many users', inject(
         [UsersService, HttpTestingController],
         (usersService: UsersService, httpMock: HttpTestingController) => {
             let users: ReadonlyArray<UserDto>;
-            usersService.getUsers("my-query").subscribe((result) => {
+            usersService.getUsers('my-query').subscribe((result) => {
                 users = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/users?query=my-query",
+                'http://service/p/api/users?query=my-query',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([
                 {
-                    id: "123",
-                    displayName: "User1",
+                    id: '123',
+                    displayName: 'User1',
                     _links: {},
                 },
                 {
-                    id: "456",
-                    displayName: "User2",
+                    id: '456',
+                    displayName: 'User2',
                     _links: {},
                 },
             ]);
 
             expect(users!).toEqual([
                 new UserDto({
-                    id: "123",
-                    displayName: "User1",
+                    id: '123',
+                    displayName: 'User1',
                     _links: {},
                 } as any),
                 new UserDto({
-                    id: "456",
-                    displayName: "User2",
+                    id: '456',
+                    displayName: 'User2',
                     _links: {},
                 } as any),
             ]);
         },
     ));
 
-    it("should make get request to get single user", inject(
+    it('should make get request to get single user', inject(
         [UsersService, HttpTestingController],
         (usersService: UsersService, httpMock: HttpTestingController) => {
             let user: UserDto;
-            usersService.getUser("123").subscribe((result) => {
+            usersService.getUser('123').subscribe((result) => {
                 user = result;
             });
 
-            const req = httpMock.expectOne("http://service/p/api/users/123");
+            const req = httpMock.expectOne('http://service/p/api/users/123');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush({ id: "123", displayName: "User1" });
+            req.flush({ id: '123', displayName: 'User1' });
 
             expect(user!).toEqual(
-                new UserDto({ id: "123", displayName: "User1" } as any),
+                new UserDto({ id: '123', displayName: 'User1' } as any),
             );
         },
     ));
 
-    it("should make get request to get resources", inject(
+    it('should make get request to get resources', inject(
         [UsersService, HttpTestingController],
         (usersService: UsersService, httpMock: HttpTestingController) => {
             let resources: Resource;
@@ -164,20 +158,20 @@ describe("UsersService", () => {
                 resources = result;
             });
 
-            const req = httpMock.expectOne("http://service/p/api");
+            const req = httpMock.expectOne('http://service/p/api');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 _links: {
-                    schemas: { method: "GET", href: "/api/schemas" },
+                    schemas: { method: 'GET', href: '/api/schemas' },
                 },
             });
 
             expect(resources!).toEqual({
                 _links: {
-                    schemas: { method: "GET", href: "/api/schemas" },
+                    schemas: { method: 'GET', href: '/api/schemas' },
                 },
             });
         },

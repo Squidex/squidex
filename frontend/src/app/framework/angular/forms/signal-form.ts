@@ -39,7 +39,9 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     ) {
         this.model = nullSafeSignal(initialModel);
         this.form = form(this.model, path => {
-            disabled(path as SchemaPathTree<unknown>, { when: () => this.isDisabled() || this.submitting() });
+            disabled(path as SchemaPathTree<unknown>,
+                {when: () => this.isDisabled() || this.submitting() }
+            );
 
             schema?.(path as SchemaPathTree<TModel>);
         }, { injector }) as FieldTree<TModel>;

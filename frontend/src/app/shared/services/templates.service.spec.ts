@@ -5,21 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    Resource,
-    TemplateDetailsDto,
-    TemplateDto,
-    TemplatesDto,
-    TemplatesService,} from "@app/shared/internal";
-import { ResourceLinkDto } from "../model";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, Resource, TemplateDetailsDto, TemplateDto, TemplatesDto, TemplatesService } from '@app/shared/internal';
+import { ResourceLinkDto } from '../model';
 
-describe("TemplatesService", () => {
+describe('TemplatesService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -29,7 +21,7 @@ describe("TemplatesService", () => {
                 TemplatesService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -42,7 +34,7 @@ describe("TemplatesService", () => {
         },
     ));
 
-    it("should make get request to get templates", inject(
+    it('should make get request to get templates', inject(
         [TemplatesService, HttpTestingController],
         (
             templatesService: TemplatesService,
@@ -55,11 +47,11 @@ describe("TemplatesService", () => {
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/templates?includeDetails=true",
+                'http://service/p/api/templates?includeDetails=true',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 items: [templateResponse(1), templateResponse(2)],
@@ -75,7 +67,7 @@ describe("TemplatesService", () => {
         },
     ));
 
-    it("should make get request to get template", inject(
+    it('should make get request to get template', inject(
         [TemplatesService, HttpTestingController],
         (
             templatesService: TemplatesService,
@@ -85,7 +77,7 @@ describe("TemplatesService", () => {
 
             const resource: Resource = {
                 _links: {
-                    self: { method: "GET", href: "/api/templates/my-template" },
+                    self: { method: 'GET', href: '/api/templates/my-template' },
                 },
             };
 
@@ -94,11 +86,11 @@ describe("TemplatesService", () => {
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/templates/my-template",
+                'http://service/p/api/templates/my-template',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(templateDetailsResponse(1));
 
@@ -106,59 +98,59 @@ describe("TemplatesService", () => {
         },
     ));
 
-    function templateResponse(id: number, suffix = "") {
+    function templateResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
         return {
             name: `name${key}`,
             title: `Title ${key}`,
-            details: "",
+            details: '',
             description: `Description ${key}`,
             isStarter: id % 2 === 0,
             _links: {
-                self: { method: "GET", href: `/templates/name${key}` },
+                self: { method: 'GET', href: `/templates/name${key}` },
             },
         };
     }
 
-    function templateDetailsResponse(id: number, suffix = "") {
+    function templateDetailsResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
         return {
             details: `Details ${key}`,
             _links: {
-                self: { method: "GET", href: `/templates/name${id}` },
+                self: { method: 'GET', href: `/templates/name${id}` },
             },
         };
     }
 });
 
-export function createTemplate(id: number, suffix = "") {
+export function createTemplate(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new TemplateDto({
         name: `name${key}`,
         title: `Title ${key}`,
-        details: "",
+        details: '',
         description: `Description ${key}`,
         isStarter: id % 2 === 0,
         _links: {
             self: new ResourceLinkDto({
-                method: "GET",
+                method: 'GET',
                 href: `/templates/name${key}`,
             }),
         },
     });
 }
 
-export function createTemplateDetails(id: number, suffix = "") {
+export function createTemplateDetails(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new TemplateDetailsDto({
         details: `Details ${key}`,
         _links: {
             self: new ResourceLinkDto({
-                method: "GET",
+                method: 'GET',
                 href: `/templates/name${id}`,
             }),
         },

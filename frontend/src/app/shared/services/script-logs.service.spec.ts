@@ -5,20 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    DateTime,
-    ScriptLogDto,
-    ScriptLogEntryDto,
-    ScriptLogsDto,
-    ScriptLogsService,} from "@app/shared/internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, DateTime, ScriptLogDto, ScriptLogEntryDto, ScriptLogsDto, ScriptLogsService } from '@app/shared/internal';
 
-describe("ScriptLogsService", () => {
+describe('ScriptLogsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -28,7 +20,7 @@ describe("ScriptLogsService", () => {
                 ScriptLogsService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -41,23 +33,23 @@ describe("ScriptLogsService", () => {
         },
     ));
 
-    it("should make get request to get script logs", inject(
+    it('should make get request to get script logs', inject(
         [ScriptLogsService, HttpTestingController],
         (
             scriptLogsService: ScriptLogsService,
             httpMock: HttpTestingController,
         ) => {
             let logs: ScriptLogsDto;
-            scriptLogsService.getScriptLogs("my-app").subscribe((result) => {
+            scriptLogsService.getScriptLogs('my-app').subscribe((result) => {
                 logs = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/script-logs?take=100",
+                'http://service/p/api/apps/my-app/script-logs?take=100',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 items: [scriptLogResponse(12), scriptLogResponse(13)],
@@ -71,21 +63,21 @@ describe("ScriptLogsService", () => {
         },
     ));
 
-    it("should make get request to get script logs with name filter", inject(
+    it('should make get request to get script logs with name filter', inject(
         [ScriptLogsService, HttpTestingController],
         (
             scriptLogsService: ScriptLogsService,
             httpMock: HttpTestingController,
         ) => {
             scriptLogsService
-                .getScriptLogs("my-app", "contents/my schema")
+                .getScriptLogs('my-app', 'contents/my schema')
                 .subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/script-logs?take=100&name=contents%2Fmy%20schema",
+                'http://service/p/api/apps/my-app/script-logs?take=100&name=contents%2Fmy%20schema',
             );
 
-            expect(req.request.method).toEqual("GET");
+            expect(req.request.method).toEqual('GET');
 
             req.flush({ items: [] });
         },
@@ -99,7 +91,7 @@ describe("ScriptLogsService", () => {
             entries: [
                 {
                     timestamp: `${2017 + id}-12-12T10:10:01Z`,
-                    level: "log",
+                    level: 'log',
                     message: `Message${id}`,
                 },
             ],
@@ -116,7 +108,7 @@ export function createScriptLog(id: number) {
         entries: [
             new ScriptLogEntryDto({
                 timestamp: DateTime.parseISO(`${2017 + id}-12-12T10:10:01Z`),
-                level: "log",
+                level: 'log',
                 message: `Message${id}`,
             }),
         ],

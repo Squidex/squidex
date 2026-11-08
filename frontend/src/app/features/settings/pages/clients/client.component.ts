@@ -40,7 +40,9 @@ export class ClientComponent {
     public readonly clientRoles = input.required<ReadonlyArray<RoleDto>>();
 
     protected readonly apiCallsLimit = form(linkedSignal(() => this.client().apiCallsLimit), path => {
-        disabled(path, { when: () => !this.client().canUpdate });
+        disabled(path,
+            {when: () => !this.client().canUpdate }
+        );
         min(path, 0);
     });
 

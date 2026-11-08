@@ -5,37 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    ContentChangedRuleTriggerDto,
-    DateTime,
-    DynamicCreateRuleDto,
-    DynamicFlowDefinitionDto,
-    DynamicRuleDto,
-    DynamicRulesDto,
-    DynamicUpdateRuleDto,
-    FlowDefinitionDto,
-    FlowExecutionStateDto,
-    ManualRuleTriggerDto,
-    Resource,
-    ResourceLinkDto,
-    RuleElementDto,
-    RuleElementPropertyDto,
-    RuleEventDto,
-    RuleEventsDto,
-    RulesService,
-    ScriptCompletions,
-    SimulatedRuleEventDto,
-    SimulatedRuleEventsDto,
-    VersionTag,} from "@app/shared/internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, ContentChangedRuleTriggerDto, DateTime, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, FlowDefinitionDto, FlowExecutionStateDto, ManualRuleTriggerDto, Resource, ResourceLinkDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
 
-describe("RulesService", () => {
-    const version = new VersionTag("1");
+describe('RulesService', () => {
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -46,7 +22,7 @@ describe("RulesService", () => {
                 RulesService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -59,7 +35,7 @@ describe("RulesService", () => {
         },
     ));
 
-    it("should make get request to get steps", inject(
+    it('should make get request to get steps', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             let steps: {
@@ -69,144 +45,144 @@ describe("RulesService", () => {
                 steps = result;
             });
 
-            const req = httpMock.expectOne("http://service/p/api/rules/steps");
+            const req = httpMock.expectOne('http://service/p/api/rules/steps');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 action2: {
-                    title: "title2",
-                    display: "display2",
-                    description: "description2",
-                    iconColor: "#222",
+                    title: 'title2',
+                    display: 'display2',
+                    description: 'description2',
+                    iconColor: '#222',
                     iconImage: '<svg path="2" />',
-                    readMore: "link2",
+                    readMore: 'link2',
                     properties: [
                         {
-                            name: "property1",
-                            editor: "Editor1",
-                            display: "Display1",
-                            description: "Description1",
+                            name: 'property1',
+                            editor: 'Editor1',
+                            display: 'Display1',
+                            description: 'Description1',
                             isRequired: true,
                             isFormattable: false,
                         },
                         {
-                            name: "property2",
-                            editor: "Editor2",
-                            display: "Display2",
-                            description: "Description2",
+                            name: 'property2',
+                            editor: 'Editor2',
+                            display: 'Display2',
+                            description: 'Description2',
                             isRequired: false,
                             isFormattable: true,
-                            options: ["Yes", "No"],
+                            options: ['Yes', 'No'],
                         },
                     ],
                 },
                 action1: {
-                    title: "title1",
-                    display: "display1",
-                    description: "description1",
-                    iconColor: "#111",
+                    title: 'title1',
+                    display: 'display1',
+                    description: 'description1',
+                    iconColor: '#111',
                     iconImage: '<svg path="1" />',
-                    readMore: "link1",
+                    readMore: 'link1',
                     properties: [],
                 },
             });
 
             expect(steps!).toEqual({
                 action2: new RuleElementDto({
-                    title: "title2",
-                    display: "display2",
-                    description: "description2",
-                    iconColor: "#222",
+                    title: 'title2',
+                    display: 'display2',
+                    description: 'description2',
+                    iconColor: '#222',
                     iconImage: '<svg path="2" />',
-                    readMore: "link2",
+                    readMore: 'link2',
                     properties: [
                         new RuleElementPropertyDto({
-                            name: "property1",
-                            editor: "Editor1" as any,
-                            display: "Display1",
-                            description: "Description1",
+                            name: 'property1',
+                            editor: 'Editor1' as any,
+                            display: 'Display1',
+                            description: 'Description1',
                             isRequired: true,
                             isFormattable: false,
                         }),
                         new RuleElementPropertyDto({
-                            name: "property2",
-                            editor: "Editor2" as any,
-                            display: "Display2",
-                            description: "Description2",
+                            name: 'property2',
+                            editor: 'Editor2' as any,
+                            display: 'Display2',
+                            description: 'Description2',
                             isRequired: false,
                             isFormattable: true,
-                            options: ["Yes", "No"],
+                            options: ['Yes', 'No'],
                         }),
                     ],
                 }),
                 action1: new RuleElementDto({
-                    title: "title1",
-                    display: "display1",
-                    description: "description1",
-                    iconColor: "#111",
+                    title: 'title1',
+                    display: 'display1',
+                    description: 'description1',
+                    iconColor: '#111',
                     iconImage: '<svg path="1" />',
-                    readMore: "link1",
+                    readMore: 'link1',
                     properties: [],
                 }),
             });
         },
     ));
 
-    it("should make get request to get app rules", inject(
+    it('should make get request to get app rules', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             let rules: DynamicRulesDto;
-            rulesService.getRules("my-app").subscribe((result) => {
+            rulesService.getRules('my-app').subscribe((result) => {
                 rules = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules",
+                'http://service/p/api/apps/my-app/rules',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 items: [ruleResponse(12), ruleResponse(13)],
-                runningRuleId: "12",
+                runningRuleId: '12',
                 _links: {},
             });
 
             expect(rules!).toEqual(
                 new DynamicRulesDto({
                     items: [createRule(12), createRule(13)],
-                    runningRuleId: "12",
+                    runningRuleId: '12',
                     _links: {},
                 }),
             );
         },
     ));
 
-    it("should make post request to create rule", inject(
+    it('should make post request to create rule', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const dto = new DynamicCreateRuleDto({
                 trigger: new ManualRuleTriggerDto(),
                 flow: new DynamicFlowDefinitionDto({
                     steps: {},
-                    initialStepId: "NONE",
+                    initialStepId: 'NONE',
                 }),
             });
 
             let rule: DynamicRuleDto;
-            rulesService.postRule("my-app", dto).subscribe((result) => {
+            rulesService.postRule('my-app', dto).subscribe((result) => {
                 rule = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules",
+                'http://service/p/api/apps/my-app/rules',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(ruleResponse(12));
 
@@ -214,39 +190,39 @@ describe("RulesService", () => {
         },
     ));
 
-    it("should make put request to update rule", inject(
+    it('should make put request to update rule', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const dto = new DynamicUpdateRuleDto({
                 trigger: new ManualRuleTriggerDto(),
                 flow: new DynamicFlowDefinitionDto({
                     steps: {},
-                    initialStepId: "NONE",
+                    initialStepId: 'NONE',
                 }),
             });
 
             const resource: Resource = {
                 _links: {
                     update: {
-                        method: "PUT",
-                        href: "/api/apps/my-app/rules/123",
+                        method: 'PUT',
+                        href: '/api/apps/my-app/rules/123',
                     },
                 },
             };
 
             let rule: DynamicRuleDto;
             rulesService
-                .putRule("my-app", resource, dto, version)
+                .putRule('my-app', resource, dto, version)
                 .subscribe((result) => {
                     rule = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/123",
+                'http://service/p/api/apps/my-app/rules/123',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(ruleResponse(123));
 
@@ -254,143 +230,143 @@ describe("RulesService", () => {
         },
     ));
 
-    it("should make delete request to delete rule", inject(
+    it('should make delete request to delete rule', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     delete: {
-                        method: "DELETE",
-                        href: "/api/apps/my-app/rules/123",
+                        method: 'DELETE',
+                        href: '/api/apps/my-app/rules/123',
                     },
                 },
             };
 
-            rulesService.deleteRule("my-app", resource, version).subscribe();
+            rulesService.deleteRule('my-app', resource, version).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/123",
+                'http://service/p/api/apps/my-app/rules/123',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush({});
         },
     ));
 
-    it("should make put request to trigger rule", inject(
+    it('should make put request to trigger rule', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     trigger: {
-                        method: "PUT",
-                        href: "/api/apps/my-app/rules/123/trigger",
+                        method: 'PUT',
+                        href: '/api/apps/my-app/rules/123/trigger',
                     },
                 },
             };
 
-            rulesService.triggerRule("my-app", resource).subscribe();
+            rulesService.triggerRule('my-app', resource).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/123/trigger",
+                'http://service/p/api/apps/my-app/rules/123/trigger',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make put request to run rule", inject(
+    it('should make put request to run rule', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     run: {
-                        method: "PUT",
-                        href: "/api/apps/my-app/rules/123/run",
+                        method: 'PUT',
+                        href: '/api/apps/my-app/rules/123/run',
                     },
                 },
             };
 
-            rulesService.runRule("my-app", resource).subscribe();
+            rulesService.runRule('my-app', resource).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/123/run",
+                'http://service/p/api/apps/my-app/rules/123/run',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make put request to run rule from snapshots", inject(
+    it('should make put request to run rule from snapshots', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    "run/snapshots": {
-                        method: "PUT",
-                        href: "/api/apps/my-app/rules/123/run?fromSnapshots=true",
+                    'run/snapshots': {
+                        method: 'PUT',
+                        href: '/api/apps/my-app/rules/123/run?fromSnapshots=true',
                     },
                 },
             };
 
-            rulesService.runRuleFromSnapshots("my-app", resource).subscribe();
+            rulesService.runRuleFromSnapshots('my-app', resource).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/123/run?fromSnapshots=true",
+                'http://service/p/api/apps/my-app/rules/123/run?fromSnapshots=true',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make delete request to cancel run rule", inject(
+    it('should make delete request to cancel run rule', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
-            rulesService.runCancel("my-app").subscribe();
+            rulesService.runCancel('my-app').subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/run",
+                'http://service/p/api/apps/my-app/rules/run',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make get request to get rule events", inject(
+    it('should make get request to get rule events', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             let rules: RuleEventsDto;
             rulesService
-                .getEvents("my-app", 10, 20, "12")
+                .getEvents('my-app', 10, 20, '12')
                 .subscribe((result) => {
                     rules = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/events?take=10&skip=20&ruleId=12",
+                'http://service/p/api/apps/my-app/rules/events?take=10&skip=20&ruleId=12',
             );
 
-            expect(req.request.method).toEqual("GET");
+            expect(req.request.method).toEqual('GET');
 
             req.flush({
                 total: 20,
                 items: [ruleEventResponse(1), ruleEventResponse(2)],
                 _links: {
-                    cancel: { method: "DELETE", href: "/rules/events" },
+                    cancel: { method: 'DELETE', href: '/rules/events' },
                 },
             });
 
@@ -400,8 +376,8 @@ describe("RulesService", () => {
                     items: [createRuleEvent(1), createRuleEvent(2)],
                     _links: {
                         cancel: new ResourceLinkDto({
-                            method: "DELETE",
-                            href: "/rules/events",
+                            method: 'DELETE',
+                            href: '/rules/events',
                         }),
                     },
                 }),
@@ -409,21 +385,21 @@ describe("RulesService", () => {
         },
     ));
 
-    it("should make get request to get simulated rule events", inject(
+    it('should make get request to get simulated rule events', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             let rules: SimulatedRuleEventsDto;
             rulesService
-                .getSimulatedEvents("my-app", "12")
+                .getSimulatedEvents('my-app', '12')
                 .subscribe((result) => {
                     rules = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/12/simulate",
+                'http://service/p/api/apps/my-app/rules/12/simulate',
             );
 
-            expect(req.request.method).toEqual("GET");
+            expect(req.request.method).toEqual('GET');
 
             req.flush({
                 total: 20,
@@ -447,29 +423,29 @@ describe("RulesService", () => {
         },
     ));
 
-    it("should make post request to get simulated rule events with action and trigger", inject(
+    it('should make post request to get simulated rule events with action and trigger', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const dto = new DynamicCreateRuleDto({
                 trigger: new ManualRuleTriggerDto(),
                 flow: new DynamicFlowDefinitionDto({
                     steps: {},
-                    initialStepId: "NONE",
+                    initialStepId: 'NONE',
                 }),
             });
 
             let rules: SimulatedRuleEventsDto;
             rulesService
-                .postSimulatedEvents("my-app", dto)
+                .postSimulatedEvents('my-app', dto)
                 .subscribe((result) => {
                     rules = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/simulate",
+                'http://service/p/api/apps/my-app/rules/simulate',
             );
 
-            expect(req.request.method).toEqual("POST");
+            expect(req.request.method).toEqual('POST');
 
             req.flush({
                 total: 20,
@@ -493,108 +469,108 @@ describe("RulesService", () => {
         },
     ));
 
-    it("should make put request to enqueue rule event", inject(
+    it('should make put request to enqueue rule event', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     update: {
-                        method: "PUT",
-                        href: "/api/apps/my-app/rules/events/123",
+                        method: 'PUT',
+                        href: '/api/apps/my-app/rules/events/123',
                     },
                 },
             };
 
-            rulesService.enqueueEvent("my-app", resource).subscribe();
+            rulesService.enqueueEvent('my-app', resource).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/events/123",
+                'http://service/p/api/apps/my-app/rules/events/123',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make delete request to cancel all rule events", inject(
+    it('should make delete request to cancel all rule events', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     cancel: {
-                        method: "DELETE",
-                        href: "/api/apps/my-app/rules/events",
+                        method: 'DELETE',
+                        href: '/api/apps/my-app/rules/events',
                     },
                 },
             };
 
-            rulesService.cancelEvents("my-app", resource).subscribe();
+            rulesService.cancelEvents('my-app', resource).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/events",
+                'http://service/p/api/apps/my-app/rules/events',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make post request to validate trigger", inject(
+    it('should make post request to validate trigger', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const dto = new ManualRuleTriggerDto();
 
-            rulesService.validateTrigger("my-app", dto).subscribe();
+            rulesService.validateTrigger('my-app', dto).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/validate/trigger",
+                'http://service/p/api/apps/my-app/rules/validate/trigger',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make post request to validate step", inject(
+    it('should make post request to validate step', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             const dto = {};
 
-            rulesService.validateStep("my-app", dto).subscribe();
+            rulesService.validateStep('my-app', dto).subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/validate/step",
+                'http://service/p/api/apps/my-app/rules/validate/step',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
         },
     ));
 
-    it("should make get request to get completions", inject(
+    it('should make get request to get completions', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             let completions: ScriptCompletions;
             rulesService
-                .getCompletions("my-app", "TriggerType")
+                .getCompletions('my-app', 'TriggerType')
                 .subscribe((result) => {
                     completions = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/completion/TriggerType",
+                'http://service/p/api/apps/my-app/rules/completion/TriggerType',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([]);
 
@@ -602,28 +578,28 @@ describe("RulesService", () => {
         },
     ));
 
-    it("should make get request to get timezones", inject(
+    it('should make get request to get timezones', inject(
         [RulesService, HttpTestingController],
         (rulesService: RulesService, httpMock: HttpTestingController) => {
             let timezones: ReadonlyArray<string>;
-            rulesService.getTimezones("my-app").subscribe((result) => {
+            rulesService.getTimezones('my-app').subscribe((result) => {
                 timezones = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/rules/timezones",
+                'http://service/p/api/apps/my-app/rules/timezones',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(["Europe/Berlin"]);
+            req.flush(['Europe/Berlin']);
 
-            expect(timezones!).toEqual(["Europe/Berlin"]);
+            expect(timezones!).toEqual(['Europe/Berlin']);
         },
     ));
 
-    function ruleResponse(id: number, suffix = "") {
+    function ruleResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
         return {
@@ -637,7 +613,7 @@ describe("RulesService", () => {
             numFailed: id * 4,
             numSucceeded: id * 3,
             trigger: {
-                triggerType: "ContentChanged",
+                triggerType: 'ContentChanged',
             },
             action: {
                 param3: 3,
@@ -646,12 +622,12 @@ describe("RulesService", () => {
             },
             version: id,
             _links: {
-                update: { method: "PUT", href: `/rules/${id}` },
+                update: { method: 'PUT', href: `/rules/${id}` },
             },
         };
     }
 
-    function ruleEventResponse(id: number, suffix = "") {
+    function ruleEventResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
         return {
@@ -660,38 +636,38 @@ describe("RulesService", () => {
                 completed: buildDate(id, 20),
                 context: {},
                 created: buildDate(id, 10),
-                description: "Description",
+                description: 'Description',
                 definition: {
                     steps: {},
-                    initialStepId: "0",
+                    initialStepId: '0',
                 },
-                nextStepId: "1",
+                nextStepId: '1',
                 status: `Failed${key}` as any,
                 steps: {},
             },
             _links: {
-                update: { method: "PUT", href: `/rules/events/${id}` },
+                update: { method: 'PUT', href: `/rules/events/${id}` },
             },
         };
     }
 
-    function simulatedRuleEventResponse(id: number, suffix = "") {
+    function simulatedRuleEventResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
         return {
             eventId: `id${key}`,
             eventName: `name${key}`,
-            event: { value: "simple" },
+            event: { value: 'simple' },
             flowState: {
                 completed: buildDate(id, 20),
                 context: {},
                 created: buildDate(id, 10),
-                description: "Description",
+                description: 'Description',
                 definition: {
                     steps: {},
-                    initialStepId: "0",
+                    initialStepId: '0',
                 },
-                nextStepId: "1",
+                nextStepId: '1',
                 status: `Failed${key}` as any,
                 steps: {},
             },
@@ -701,7 +677,7 @@ describe("RulesService", () => {
     }
 });
 
-export function createRule(id: number, suffix = "") {
+export function createRule(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new DynamicRuleDto({
@@ -724,14 +700,14 @@ export function createRule(id: number, suffix = "") {
         version: id,
         _links: {
             update: new ResourceLinkDto({
-                method: "PUT",
+                method: 'PUT',
                 href: `/rules/${id}`,
             }),
         },
     });
 }
 
-export function createRuleEvent(id: number, suffix = "") {
+export function createRuleEvent(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new RuleEventDto({
@@ -740,41 +716,41 @@ export function createRuleEvent(id: number, suffix = "") {
             completed: DateTime.parseISO(buildDate(id, 20)),
             context: {},
             created: DateTime.parseISO(buildDate(id, 10)),
-            description: "Description",
+            description: 'Description',
             definition: new FlowDefinitionDto({
                 steps: {},
-                initialStepId: "0",
+                initialStepId: '0',
             }),
-            nextStepId: "1",
+            nextStepId: '1',
             status: `Failed${key}` as any,
             steps: {},
         }),
         _links: {
             update: new ResourceLinkDto({
-                method: "PUT",
+                method: 'PUT',
                 href: `/rules/events/${id}`,
             }),
         },
     });
 }
 
-export function createSimulatedRuleEvent(id: number, suffix = "") {
+export function createSimulatedRuleEvent(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new SimulatedRuleEventDto({
         eventId: `id${key}`,
         eventName: `name${key}`,
-        event: { value: "simple" },
+        event: { value: 'simple' },
         flowState: new FlowExecutionStateDto({
             completed: DateTime.parseISO(buildDate(id, 20)),
             context: {},
             created: DateTime.parseISO(buildDate(id, 10)),
-            description: "Description",
+            description: 'Description',
             definition: new FlowDefinitionDto({
                 steps: {},
-                initialStepId: "0",
+                initialStepId: '0',
             }),
-            nextStepId: "1",
+            nextStepId: '1',
             status: `Failed${key}` as any,
             steps: {},
         }),

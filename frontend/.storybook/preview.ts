@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Preview } from "@storybook/angular";
-import "./../src/styles.scss";
+import { Preview } from '@storybook/angular';
+import './../src/styles.scss';
 
 const preview: Preview = {
     parameters: {
         actions: {
-            argTypesRegex: "^on[A-Z].*",
+            argTypesRegex: '^on[A-Z].*',
         },
         controls: {
             matchers: {

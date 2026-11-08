@@ -6,9 +6,10 @@
  */
 
 import { Injector } from '@angular/core';
-import { maxLength, SchemaPathTree } from '@angular/forms/signals';
-import { SignalForm, SignalValidators } from '@app/framework';
+import { FieldTree, maxLength } from '@angular/forms/signals';
+import { SignalForm } from '@app/framework';
 import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, DateTimeFieldPropertiesDto, FieldPropertiesDto, FieldPropertiesVisitor, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UserInfoFieldPropertiesDto } from '../model';
+import { EditFieldSchemaVisitor } from './schemas-fields.forms-schema';
 import { loadWithDefaults, submitWithoutEmpty } from './schemas.forms-helpers';
 
 type Nullable<T> = Exclude<T, undefined> | null;
@@ -184,13 +185,7 @@ export class EditFieldForm extends SignalForm<FieldFormModel, Record<string, unk
             maxLength(path.hints, 1000);
             maxLength(path.placeholder, 1000);
 
-            if (properties.fieldType === 'DateTime') {
-                const dateTimePath = path as SchemaPathTree<DateTimeFieldFormModel>;
-
-                maxLength(dateTimePath.format, 100);
-                SignalValidators.validDateTime(dateTimePath.maxValue);
-                SignalValidators.validDateTime(dateTimePath.minValue);
-            }
+            properties.accept(new EditFieldSchemaVisitor(path));
         }, injector);
 
         this.defaults = defaults;
@@ -201,9 +196,21 @@ export class EditFieldForm extends SignalForm<FieldFormModel, Record<string, unk
     }
 
     protected transformSubmit(value: FieldFormModel) {
-        return submitWithoutEmpty(value);
+        const result = submitWithoutEmpty(value);
+
+        // Hidden properties do not apply to the selected editor, so the server defaults are used.
+        const fields = this.form as unknown as Record<string, FieldTree<unknown> | undefined>;
+
+        for (const key of Object.keys(result)) {
+            if (fields[key]?.().hidden()) {
+                result[key] = undefined;
+            }
+        }
+
+        return result;
     }
 }
+
 
 const COMMON_DEFAULTS: FieldFormCommonModel = {
     label: '',

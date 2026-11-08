@@ -51,6 +51,16 @@ npm run lint
 - Do not put blank lines between single-line `private readonly` and `private` fields, neither inside a group nor between the two groups. Fields that span multiple lines are separated by blank lines.
 - Pass submit actions to `submit()`/`submitAndUpdate()` as block-body arrows with an explicit `return`.
 - In signal form schemas, sort the rule calls by validator name, then by the field order of the model.
+- Format signal form rules with a `when` option like this, with a blank line between multi-line rules:
+
+```ts
+hidden(path.inlineEditable,
+    {when: ({ valueOf }) => valueOf(path.editor) === 'Radio' }
+);
+```
+
+- Use single quotes in TypeScript whenever possible.
+- Keep each import statement on a single line.
 - Component constructors only contain effects. Initialize everything else (signals, computeds, resources, forms) directly in the field declaration, so fields stay type safe.
 
 ## Backend

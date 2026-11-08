@@ -5,18 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    FeatureDto,
-    FeaturesDto,
-    NewsService,} from "@app/shared/internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, FeatureDto, FeaturesDto, NewsService } from '@app/shared/internal';
 
-describe("NewsService", () => {
+describe('NewsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -26,7 +20,7 @@ describe("NewsService", () => {
                 NewsService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -39,7 +33,7 @@ describe("NewsService", () => {
         },
     ));
 
-    it("should make get request to get features", inject(
+    it('should make get request to get features', inject(
         [NewsService, HttpTestingController],
         (newsService: NewsService, httpMock: HttpTestingController) => {
             let features: FeaturesDto;
@@ -49,21 +43,21 @@ describe("NewsService", () => {
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/news/features?version=13",
+                'http://service/p/api/news/features?version=13',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 features: [
                     {
-                        name: "Feature1",
-                        text: "Feature Text1",
+                        name: 'Feature1',
+                        text: 'Feature Text1',
                     },
                     {
-                        name: "Feature2",
-                        text: "Feature Text2",
+                        name: 'Feature2',
+                        text: 'Feature Text2',
                     },
                 ],
                 version: 13,
@@ -73,12 +67,12 @@ describe("NewsService", () => {
                 new FeaturesDto({
                     features: [
                         new FeatureDto({
-                            name: "Feature1",
-                            text: "Feature Text1",
+                            name: 'Feature1',
+                            text: 'Feature Text1',
                         }),
                         new FeatureDto({
-                            name: "Feature2",
-                            text: "Feature Text2",
+                            name: 'Feature2',
+                            text: 'Feature Text2',
                         }),
                     ],
                     version: 13,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, inject, input, untracked } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldFormModel, StringFieldPropertiesDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -37,30 +37,5 @@ export class StringUIComponent {
         return this.fieldForm() as FieldTree<StringFieldFormModel>;
     });
 
-    protected readonly hideAllowedValues = computed(() => {
-        const editor = this.form().editor().value();
-
-        return editor !== 'Radio' && editor !== 'Dropdown';
-    });
-
-    protected readonly hideClassNames = computed(() => {
-        return this.form().editor().value() !== 'RichText';
-    });
-
     protected readonly editors = StringFieldEditorValues;
-
-    constructor() {
-        effect(() => {
-            if (this.hideAllowedValues()) {
-                untracked(() => this.form().allowedValues().value.set(null));
-            }
-        });
-
-        effect(() => {
-            const editor = this.form().editor().value();
-            if (editor !== 'Input' && editor !== 'Dropdown' && editor !== 'Slug') {
-                untracked(() => this.form().inlineEditable().value.set(false));
-            }
-        });
-    }
 }

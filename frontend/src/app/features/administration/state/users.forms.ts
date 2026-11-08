@@ -32,7 +32,9 @@ export class UserForm extends SignalForm<UserFormModel, CreateUserDto, UserDto> 
             maxLength(path.passwordConfirm, 100);
             required(path.email);
             required(path.displayName);
-            required(path.password, { when: () => isPasswordRequired() });
+            required(path.password,
+                {when: () => isPasswordRequired() }
+            );
         });
 
         this.isPasswordRequired = isPasswordRequired;

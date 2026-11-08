@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, input, untracked } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldFormModel, NumberFieldPropertiesDto, TagEditorComponent } from '@app/shared';
 
@@ -33,28 +33,7 @@ export class NumberUIComponent {
         return this.fieldForm() as FieldTree<NumberFieldFormModel>;
     });
 
-    protected readonly hideAllowedValues = computed(() => {
-        const editor = this.form().editor().value();
-
-        return editor !== 'Radio' && editor !== 'Dropdown';
-    });
-
     protected readonly converter = FloatConverter.INSTANCE;
 
     protected readonly editors = NumberFieldEditorValues;
-
-    constructor() {
-        effect(() => {
-            if (this.hideAllowedValues()) {
-                untracked(() => this.form().allowedValues().value.set(null));
-            }
-        });
-
-        effect(() => {
-            const form = this.form();
-            if (form.editor().value() === 'Radio') {
-                untracked(() => form.inlineEditable().value.set(false));
-            }
-        });
-    }
 }

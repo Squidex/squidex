@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, signal } from "@angular/core";
-import { TestBed } from "@angular/core/testing";
-import { By } from "@angular/platform-browser";
-import { FocusOnInitDirective } from "./focus-on-init.directive";
+import { Component, signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { FocusOnInitDirective } from './focus-on-init.directive';
 
 @Component({
     template: `<input [select]="select()" sqxFocusOnInit />`,
@@ -18,21 +18,21 @@ class TestHostComponent {
     public readonly select = signal(false);
 }
 
-describe("FocusOnInitDirective", () => {
+describe('FocusOnInitDirective', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [TestHostComponent],
         });
     });
 
-    it("should call focus on element if init", () => {
+    it('should call focus on element if init', () => {
         const { focus, select } = render(false);
 
         expect(focus).toHaveBeenCalled();
         expect(select).not.toHaveBeenCalled();
     });
 
-    it("should call select on element if init", () => {
+    it('should call select on element if init', () => {
         const { focus, select } = render(true);
 
         expect(focus).toHaveBeenCalled();
@@ -52,8 +52,8 @@ describe("FocusOnInitDirective", () => {
         directive.scheduler = (action) => action();
 
         const input = element.nativeElement as HTMLInputElement;
-        const focus = vi.spyOn(input, "focus");
-        const select = vi.spyOn(input, "select");
+        const focus = vi.spyOn(input, 'focus');
+        const select = vi.spyOn(input, 'select');
 
         fixture.detectChanges();
         TestBed.tick();

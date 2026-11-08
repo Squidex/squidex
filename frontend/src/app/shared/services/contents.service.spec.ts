@@ -5,31 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    ContentDto,
-    ContentsDto,
-    ContentsService,
-    DateTime,
-    Resource,
-    ScheduleJobDto,
-    Versioned,
-    VersionTag,} from "@app/shared/internal";
-import {BulkResultDto,
-    BulkUpdateContentsDto,
-    BulkUpdateContentsJobDto,
-    ResourceLinkDto,
-    ServerErrorDto,
-    StatusInfoDto,} from "./../model";
-import { sanitize } from "./query";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ScheduleJobDto, Versioned, VersionTag } from '@app/shared/internal';
+import { BulkResultDto, BulkUpdateContentsDto, BulkUpdateContentsJobDto, ResourceLinkDto, ServerErrorDto, StatusInfoDto } from './../model';
+import { sanitize } from './query';
 
-describe("ContentsService", () => {
-    const version = new VersionTag("1");
+describe('ContentsService', () => {
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -40,7 +24,7 @@ describe("ContentsService", () => {
                 ContentsService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -55,42 +39,42 @@ describe("ContentsService", () => {
 
     const tests = [
         {
-            name: "json query",
-            query: { take: 17, skip: 13, query: { fullText: "my-query" } },
+            name: 'json query',
+            query: { take: 17, skip: 13, query: { fullText: 'my-query' } },
             requestBody: {
-                q: sanitize({ fullText: "my-query", take: 17, skip: 13 }),
+                q: sanitize({ fullText: 'my-query', take: 17, skip: 13 }),
             },
-            requestString: `q=${encodeURIComponent(JSON.stringify(sanitize({ fullText: "my-query", take: 17, skip: 13 })))}`,
+            requestString: `q=${encodeURIComponent(JSON.stringify(sanitize({ fullText: 'my-query', take: 17, skip: 13 })))}`,
             noSlowTotal: null,
             noTotal: null,
         },
         {
-            name: "odata filter",
+            name: 'odata filter',
             query: {
                 take: 17,
                 skip: 13,
-                query: { fullText: "$filter=my-filter" },
+                query: { fullText: '$filter=my-filter' },
             },
-            requestBody: { odata: "$filter=my-filter&$top=17&$skip=13" },
-            requestString: "$filter=my-filter&$top=17&$skip=13",
+            requestBody: { odata: '$filter=my-filter&$top=17&$skip=13' },
+            requestString: '$filter=my-filter&$top=17&$skip=13',
             noSlowTotal: null,
             noTotal: null,
         },
         {
-            name: "json query without total",
+            name: 'json query without total',
             query: {
                 take: 17,
                 skip: 13,
-                query: { fullText: "my-query" },
+                query: { fullText: 'my-query' },
                 noTotal: true,
                 noSlowTotal: true,
             },
             requestBody: {
-                q: sanitize({ fullText: "my-query", take: 17, skip: 13 }),
+                q: sanitize({ fullText: 'my-query', take: 17, skip: 13 }),
             },
-            requestString: `q=${encodeURIComponent(JSON.stringify(sanitize({ fullText: "my-query", take: 17, skip: 13 })))}`,
-            noSlowTotal: "1",
-            noTotal: "1",
+            requestString: `q=${encodeURIComponent(JSON.stringify(sanitize({ fullText: 'my-query', take: 17, skip: 13 })))}`,
+            noSlowTotal: '1',
+            noTotal: '1',
         },
     ];
 
@@ -103,21 +87,21 @@ describe("ContentsService", () => {
             ) => {
                 let contents: ContentsDto;
                 contentsService
-                    .getContents("my-app", "my-schema", x.query)
+                    .getContents('my-app', 'my-schema', x.query)
                     .subscribe((result) => {
                         contents = result;
                     });
 
                 const req = httpMock.expectOne(
-                    "http://service/p/api/content/my-app/my-schema/query",
+                    'http://service/p/api/content/my-app/my-schema/query',
                 );
 
-                expect(req.request.method).toEqual("POST");
-                expect(req.request.headers.get("If-Match")).toBeNull();
-                expect(req.request.headers.get("X-NoSlowTotal")).toEqual(
+                expect(req.request.method).toEqual('POST');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(
                     x.noSlowTotal,
                 );
-                expect(req.request.headers.get("X-NoTotal")).toEqual(x.noTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
                 expect(req.request.body).toEqual({ ...x.requestBody });
 
                 req.flush({
@@ -125,8 +109,8 @@ describe("ContentsService", () => {
                     items: [contentResponse(12), contentResponse(13)],
                     statuses: [
                         {
-                            status: "Draft",
-                            color: "Gray",
+                            status: 'Draft',
+                            color: 'Gray',
                         },
                     ],
                     _links: {},
@@ -138,8 +122,8 @@ describe("ContentsService", () => {
                         total: 10,
                         statuses: [
                             new StatusInfoDto({
-                                status: "Draft",
-                                color: "Gray",
+                                status: 'Draft',
+                                color: 'Gray',
                             }),
                         ],
                         _links: {},
@@ -156,22 +140,22 @@ describe("ContentsService", () => {
                 contentsService: ContentsService,
                 httpMock: HttpTestingController,
             ) => {
-                const ids = ["1", "2", "3"];
+                const ids = ['1', '2', '3'];
 
                 contentsService
-                    .getAllContents("my-app", { ids }, x.query)
+                    .getAllContents('my-app', { ids }, x.query)
                     .subscribe();
 
                 const req = httpMock.expectOne(
-                    "http://service/p/api/content/my-app",
+                    'http://service/p/api/content/my-app',
                 );
 
-                expect(req.request.method).toEqual("POST");
-                expect(req.request.headers.get("If-Match")).toBeNull();
-                expect(req.request.headers.get("X-NoSlowTotal")).toEqual(
+                expect(req.request.method).toEqual('POST');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(
                     x.noSlowTotal,
                 );
-                expect(req.request.headers.get("X-NoTotal")).toEqual(x.noTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
                 expect(req.request.body).toEqual({ ids, ...x.requestBody });
 
                 req.flush({ total: 10, items: [] });
@@ -187,19 +171,19 @@ describe("ContentsService", () => {
                 httpMock: HttpTestingController,
             ) => {
                 contentsService
-                    .getContentReferences("my-app", "my-schema", "42", x.query)
+                    .getContentReferences('my-app', 'my-schema', '42', x.query)
                     .subscribe();
 
                 const req = httpMock.expectOne(
                     `http://service/p/api/content/my-app/my-schema/42/references?${x.requestString}`,
                 );
 
-                expect(req.request.method).toEqual("GET");
-                expect(req.request.headers.get("If-Match")).toBeNull();
-                expect(req.request.headers.get("X-NoSlowTotal")).toEqual(
+                expect(req.request.method).toEqual('GET');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(
                     x.noSlowTotal,
                 );
-                expect(req.request.headers.get("X-NoTotal")).toEqual(x.noTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
 
                 req.flush({ total: 10, items: [] });
             },
@@ -214,41 +198,41 @@ describe("ContentsService", () => {
                 httpMock: HttpTestingController,
             ) => {
                 contentsService
-                    .getContentReferencing("my-app", "my-schema", "42", x.query)
+                    .getContentReferencing('my-app', 'my-schema', '42', x.query)
                     .subscribe();
 
                 const req = httpMock.expectOne(
                     `http://service/p/api/content/my-app/my-schema/42/referencing?${x.requestString}`,
                 );
 
-                expect(req.request.method).toEqual("GET");
-                expect(req.request.headers.get("If-Match")).toBeNull();
-                expect(req.request.headers.get("X-NoSlowTotal")).toEqual(
+                expect(req.request.method).toEqual('GET');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(
                     x.noSlowTotal,
                 );
-                expect(req.request.headers.get("X-NoTotal")).toEqual(x.noTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
 
                 req.flush({ total: 10, items: [] });
             },
         ));
     });
 
-    it("should make get request to get content", inject(
+    it('should make get request to get content', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             let content: ContentDto;
             contentsService
-                .getContent("my-app", "my-schema", "1")
+                .getContent('my-app', 'my-schema', '1')
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/1",
+                'http://service/p/api/content/my-app/my-schema/1',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(contentResponse(12));
 
@@ -256,74 +240,74 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make get request to get raw content", inject(
+    it('should make get request to get raw content', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             let content: any;
             contentsService
-                .getRawContent("my-app", "my-schema", "1")
+                .getRawContent('my-app', 'my-schema', '1')
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/1",
+                'http://service/p/api/content/my-app/my-schema/1',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
-            expect(req.request.headers.get("X-Flatten")).toBeNull();
-            expect(req.request.headers.get("X-Languages")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.headers.get('X-Flatten')).toBeNull();
+            expect(req.request.headers.get('X-Languages')).toBeNull();
 
-            req.flush({ id: "1" });
+            req.flush({ id: '1' });
 
-            expect(content!).toEqual({ id: "1" });
+            expect(content!).toEqual({ id: '1' });
         },
     ));
 
-    it("should make get request to get raw content with language", inject(
+    it('should make get request to get raw content with language', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             let content: any;
             contentsService
-                .getRawContent("my-app", "my-schema", "1", "en")
+                .getRawContent('my-app', 'my-schema', '1', 'en')
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/1",
+                'http://service/p/api/content/my-app/my-schema/1',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
-            expect(req.request.headers.get("X-Flatten")).toEqual("1");
-            expect(req.request.headers.get("X-Languages")).toEqual("en");
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.headers.get('X-Flatten')).toEqual('1');
+            expect(req.request.headers.get('X-Languages')).toEqual('en');
 
-            req.flush({ id: "1" });
+            req.flush({ id: '1' });
 
-            expect(content!).toEqual({ id: "1" });
+            expect(content!).toEqual({ id: '1' });
         },
     ));
 
-    it("should make post request to create content", inject(
+    it('should make post request to create content', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const dto = {};
 
             let content: ContentDto;
             contentsService
-                .postContent("my-app", "my-schema", dto, true, "my-id")
+                .postContent('my-app', 'my-schema', dto, true, 'my-id')
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema?publish=true&id=my-id",
+                'http://service/p/api/content/my-app/my-schema?publish=true&id=my-id',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(contentResponse(12));
 
@@ -331,24 +315,24 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make get request to get versioned content data", inject(
+    it('should make get request to get versioned content data', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const response = {};
 
             let data: Versioned<any>;
             contentsService
-                .getVersionData("my-app", "my-schema", "content1", 42)
+                .getVersionData('my-app', 'my-schema', 'content1', 42)
                 .subscribe((result) => {
                     data = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/content1/42",
+                'http://service/p/api/content/my-app/my-schema/content1/42',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(response);
 
@@ -356,7 +340,7 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make put request to update content", inject(
+    it('should make put request to update content', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const dto = {};
@@ -364,25 +348,25 @@ describe("ContentsService", () => {
             const resource: Resource = {
                 _links: {
                     update: {
-                        method: "PUT",
-                        href: "/api/content/my-app/my-schema/content1?asDraft=true",
+                        method: 'PUT',
+                        href: '/api/content/my-app/my-schema/content1?asDraft=true',
                     },
                 },
             };
 
             let content: ContentDto;
             contentsService
-                .putContent("my-app", resource, dto, version)
+                .putContent('my-app', resource, dto, version)
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/content1?asDraft=true",
+                'http://service/p/api/content/my-app/my-schema/content1?asDraft=true',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toBe(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
             req.flush(contentResponse(12));
 
@@ -390,7 +374,7 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make patch request to update content", inject(
+    it('should make patch request to update content', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const dto = {};
@@ -398,25 +382,25 @@ describe("ContentsService", () => {
             const resource: Resource = {
                 _links: {
                     patch: {
-                        method: "PATCH",
-                        href: "/api/content/my-app/my-schema/content1",
+                        method: 'PATCH',
+                        href: '/api/content/my-app/my-schema/content1',
                     },
                 },
             };
 
             let content: ContentDto;
             contentsService
-                .patchContent("my-app", resource, dto, version)
+                .patchContent('my-app', resource, dto, version)
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/content1",
+                'http://service/p/api/content/my-app/my-schema/content1',
             );
 
-            expect(req.request.method).toEqual("PATCH");
-            expect(req.request.headers.get("If-Match")).toBe(version.value);
+            expect(req.request.method).toEqual('PATCH');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
             req.flush(contentResponse(12));
 
@@ -424,31 +408,31 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make post request to create draft", inject(
+    it('should make post request to create draft', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    "draft/create": {
-                        method: "POST",
-                        href: "/api/content/my-app/my-schema/content1/draft",
+                    'draft/create': {
+                        method: 'POST',
+                        href: '/api/content/my-app/my-schema/content1/draft',
                     },
                 },
             };
 
             let content: ContentDto;
             contentsService
-                .createVersion("my-app", resource, version)
+                .createVersion('my-app', resource, version)
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/content1/draft",
+                'http://service/p/api/content/my-app/my-schema/content1/draft',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBe(version.value);
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
             req.flush(contentResponse(12));
 
@@ -456,31 +440,31 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make delete request to delete draft", inject(
+    it('should make delete request to delete draft', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    "draft/delete": {
-                        method: "DELETE",
-                        href: "/api/content/my-app/my-schema/content1/draft",
+                    'draft/delete': {
+                        method: 'DELETE',
+                        href: '/api/content/my-app/my-schema/content1/draft',
                     },
                 },
             };
 
             let content: ContentDto;
             contentsService
-                .deleteVersion("my-app", resource, version)
+                .deleteVersion('my-app', resource, version)
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/content1/draft",
+                'http://service/p/api/content/my-app/my-schema/content1/draft',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toBe(version.value);
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
             req.flush(contentResponse(12));
 
@@ -488,31 +472,31 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make delete request to cancel content", inject(
+    it('should make delete request to cancel content', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     cancel: {
-                        method: "DELETE",
-                        href: "/api/content/my-app/my-schema/content1/status",
+                        method: 'DELETE',
+                        href: '/api/content/my-app/my-schema/content1/status',
                     },
                 },
             };
 
             let content: ContentDto;
             contentsService
-                .cancelStatus("my-app", resource, version)
+                .cancelStatus('my-app', resource, version)
                 .subscribe((result) => {
                     content = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/content1/status",
+                'http://service/p/api/content/my-app/my-schema/content1/status',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toBe(version.value);
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
             req.flush(contentResponse(12));
 
@@ -520,66 +504,66 @@ describe("ContentsService", () => {
         },
     ));
 
-    it("should make post request to for bulk update", inject(
+    it('should make post request to for bulk update', inject(
         [ContentsService, HttpTestingController],
         (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const dto = new BulkUpdateContentsDto({
                 jobs: [
                     new BulkUpdateContentsJobDto({
-                        id: "123",
-                        type: "Delete",
+                        id: '123',
+                        type: 'Delete',
                     }),
                     new BulkUpdateContentsJobDto({
-                        id: "456",
-                        type: "Delete",
+                        id: '456',
+                        type: 'Delete',
                     }),
                 ],
             });
 
             let results: ReadonlyArray<BulkResultDto>;
             contentsService
-                .bulkUpdate("my-app", "my-schema", dto)
+                .bulkUpdate('my-app', 'my-schema', dto)
                 .subscribe((result) => {
                     results = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/content/my-app/my-schema/bulk",
+                'http://service/p/api/content/my-app/my-schema/bulk',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([
                 {
                     jobIndex: 0,
-                    id: "123",
+                    id: '123',
                 },
                 {
                     jobIndex: 1,
-                    id: "456",
+                    id: '456',
                     error: {
                         statusCode: 400,
-                        message: "Invalid",
+                        message: 'Invalid',
                     },
                 },
             ]);
 
             expect(results!).toEqual([
-                new BulkResultDto({ jobIndex: 0, id: "123" }),
+                new BulkResultDto({ jobIndex: 0, id: '123' }),
                 new BulkResultDto({
                     jobIndex: 1,
-                    id: "456",
+                    id: '456',
                     error: new ServerErrorDto({
                         statusCode: 400,
-                        message: "Invalid",
+                        message: 'Invalid',
                     }),
                 }),
             ]);
         },
     ));
 
-    function contentResponse(id: number, suffix = "") {
+    function contentResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
         return {
@@ -591,30 +575,30 @@ describe("ContentsService", () => {
             lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
             newStatus: `StatusNew${id}`,
-            newStatusColor: "black",
+            newStatusColor: 'black',
             referenceData: {},
             referenceFields: [],
             scheduleJob: {
-                id: "42",
-                status: "Draft",
+                id: '42',
+                status: 'Draft',
                 scheduledBy: `Scheduler${id}`,
-                color: "red",
+                color: 'red',
                 dueTime: buildDate(id, 30),
             },
             schemaId: key,
-            schemaDisplayName: "MySchema",
-            schemaName: "my-schema",
+            schemaDisplayName: 'MySchema',
+            schemaName: 'my-schema',
             status: `Status${id}`,
-            statusColor: "black",
+            statusColor: 'black',
             version: id,
             _links: {
-                update: { method: "PUT", href: `/contents/id${id}` },
+                update: { method: 'PUT', href: `/contents/id${id}` },
             },
         };
     }
 });
 
-export function createContent(id: number, suffix = "") {
+export function createContent(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new ContentDto({
@@ -626,25 +610,25 @@ export function createContent(id: number, suffix = "") {
         lastModified: DateTime.parseISO(buildDate(id, 20)),
         lastModifiedBy: `modifier${id}`,
         newStatus: `StatusNew${id}`,
-        newStatusColor: "black",
+        newStatusColor: 'black',
         referenceData: {},
         referenceFields: [],
         scheduleJob: new ScheduleJobDto({
-            id: "42",
-            status: "Draft",
+            id: '42',
+            status: 'Draft',
             scheduledBy: `Scheduler${id}`,
-            color: "red",
+            color: 'red',
             dueTime: DateTime.parseISO(buildDate(id, 30)),
         }),
         schemaId: key,
-        schemaDisplayName: "MySchema",
-        schemaName: "my-schema",
+        schemaDisplayName: 'MySchema',
+        schemaName: 'my-schema',
         status: `Status${id}`,
-        statusColor: "black",
+        statusColor: 'black',
         version: id,
         _links: {
             update: new ResourceLinkDto({
-                method: "PUT",
+                method: 'PUT',
                 href: `/contents/id${id}`,
             }),
         },

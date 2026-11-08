@@ -5,36 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    AssetDto,
-    AssetFolderDto,
-    AssetFoldersDto,
-    AssetsDto,
-    AssetsService,
-    DateTime,
-    ErrorDto,
-    MathHelper,
-    Resource,
-    sanitize,
-    ScriptCompletions,
-    VersionTag,} from "@app/shared/internal";
-import {AnnotateAssetDto,
-    AssetMetaDto,
-    CreateAssetFolderDto,
-    MoveAssetDto,
-    MoveAssetFolderDto,
-    RenameAssetFolderDto,
-    RenameTagDto,
-    ResourceLinkDto,} from "./../model";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, sanitize, ScriptCompletions, VersionTag } from '@app/shared/internal';
+import { AnnotateAssetDto, AssetMetaDto, CreateAssetFolderDto, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto, ResourceLinkDto } from './../model';
 
-describe("AssetsService", () => {
-    const version = new VersionTag("1");
+describe('AssetsService', () => {
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -45,7 +23,7 @@ describe("AssetsService", () => {
                 AssetsService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -60,7 +38,7 @@ describe("AssetsService", () => {
 
     const tests = [
         {
-            name: "basic query",
+            name: 'basic query',
             query: { take: 17, skip: 13 },
             requestBody: {
                 q: sanitize({ take: 17, skip: 13 }),
@@ -70,33 +48,33 @@ describe("AssetsService", () => {
             noTotal: null,
         },
         {
-            name: "basic query without total",
+            name: 'basic query without total',
             query: { take: 17, skip: 13, noTotal: true, noSlowTotal: true },
             requestBody: {
                 q: sanitize({ take: 17, skip: 13 }),
                 parentId: undefined,
             },
-            noSlowTotal: "1",
-            noTotal: "1",
+            noSlowTotal: '1',
+            noTotal: '1',
         },
         {
-            name: "query by parent",
-            query: { take: 17, skip: 13, parentId: "1" },
-            requestBody: { q: sanitize({ take: 17, skip: 13 }), parentId: "1" },
+            name: 'query by parent',
+            query: { take: 17, skip: 13, parentId: '1' },
+            requestBody: { q: sanitize({ take: 17, skip: 13 }), parentId: '1' },
             noSlowTotal: null,
             noTotal: null,
         },
         {
-            name: "query by name",
-            query: { take: 17, skip: 13, query: { fullText: "my-query" } },
+            name: 'query by name',
+            query: { take: 17, skip: 13, query: { fullText: 'my-query' } },
             requestBody: {
                 q: sanitize({
                     filter: {
                         and: [
                             {
-                                path: "fileName",
-                                op: "contains",
-                                value: "my-query",
+                                path: 'fileName',
+                                op: 'contains',
+                                value: 'my-query',
                             },
                         ],
                     },
@@ -109,12 +87,12 @@ describe("AssetsService", () => {
             noTotal: null,
         },
         {
-            name: "query by tag",
-            query: { take: 17, skip: 13, tags: ["tag1"] },
+            name: 'query by tag',
+            query: { take: 17, skip: 13, tags: ['tag1'] },
             requestBody: {
                 q: sanitize({
                     filter: {
-                        and: [{ path: "tags", op: "eq", value: "tag1" }],
+                        and: [{ path: 'tags', op: 'eq', value: 'tag1' }],
                     },
                     take: 17,
                     skip: 13,
@@ -125,46 +103,46 @@ describe("AssetsService", () => {
             noTotal: null,
         },
         {
-            name: "query by ids",
-            query: { ids: ["1", "2"] },
-            requestBody: { ids: ["1", "2"] },
+            name: 'query by ids',
+            query: { ids: ['1', '2'] },
+            requestBody: { ids: ['1', '2'] },
             noSlowTotal: null,
             noTotal: null,
         },
         {
-            name: "query by ref",
-            query: { ref: "1" },
+            name: 'query by ref',
+            query: { ref: '1' },
             requestBody: {
                 q: sanitize({
                     filter: {
                         or: [
-                            { path: "id", op: "eq", value: "1" },
-                            { path: "slug", op: "eq", value: "1" },
+                            { path: 'id', op: 'eq', value: '1' },
+                            { path: 'slug', op: 'eq', value: '1' },
                         ],
                     },
                     take: 1,
                 }),
             },
             noSlowTotal: null,
-            noTotal: "1",
+            noTotal: '1',
         },
     ];
 
-    it("should make get request to get asset tags", inject(
+    it('should make get request to get asset tags', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let tags: any;
 
-            assetsService.getTags("my-app").subscribe((result) => {
+            assetsService.getTags('my-app').subscribe((result) => {
                 tags = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/tags",
+                'http://service/p/api/apps/my-app/assets/tags',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 tag1: 1,
@@ -178,24 +156,24 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make put request to rename asset tag", inject(
+    it('should make put request to rename asset tag', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = new RenameTagDto({ tagName: "new-name" });
+            const dto = new RenameTagDto({ tagName: 'new-name' });
 
             let tags: any;
             assetsService
-                .putTag("my-app", "old-name", dto)
+                .putTag('my-app', 'old-name', dto)
                 .subscribe((result) => {
                     tags = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/tags/old-name",
+                'http://service/p/api/apps/my-app/assets/tags/old-name',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 tag1: 1,
@@ -215,21 +193,21 @@ describe("AssetsService", () => {
             (assetsService: AssetsService, httpMock: HttpTestingController) => {
                 let assets: AssetsDto;
                 assetsService
-                    .getAssets("my-app", x.query)
+                    .getAssets('my-app', x.query)
                     .subscribe((result) => {
                         assets = result;
                     });
 
                 const req = httpMock.expectOne(
-                    "http://service/p/api/apps/my-app/assets/query",
+                    'http://service/p/api/apps/my-app/assets/query',
                 );
 
-                expect(req.request.method).toEqual("POST");
-                expect(req.request.headers.get("If-Match")).toBeNull();
-                expect(req.request.headers.get("X-NoSlowTotal")).toEqual(
+                expect(req.request.method).toEqual('POST');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoSlowTotal')).toEqual(
                     x.noSlowTotal,
                 );
-                expect(req.request.headers.get("X-NoTotal")).toEqual(x.noTotal);
+                expect(req.request.headers.get('X-NoTotal')).toEqual(x.noTotal);
                 expect(req.request.body).toEqual(x.requestBody);
 
                 req.flush({
@@ -249,22 +227,22 @@ describe("AssetsService", () => {
         ));
     });
 
-    it("should make get request to get asset folders", inject(
+    it('should make get request to get asset folders', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let assetFolders: AssetFoldersDto;
             assetsService
-                .getAssetFolders("my-app", "parent1", "Path")
+                .getAssetFolders('my-app', 'parent1', 'Path')
                 .subscribe((result) => {
                     assetFolders = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/folders?parentId=parent1&scope=Path",
+                'http://service/p/api/apps/my-app/assets/folders?parentId=parent1&scope=Path',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 total: 10,
@@ -284,20 +262,20 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make get request to get asset", inject(
+    it('should make get request to get asset', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let asset: AssetDto;
-            assetsService.getAsset("my-app", "123").subscribe((result) => {
+            assetsService.getAsset('my-app', '123').subscribe((result) => {
                 asset = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/123",
+                'http://service/p/api/apps/my-app/assets/123',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(assetResponse(12));
 
@@ -305,20 +283,20 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make post request to create asset", inject(
+    it('should make post request to create asset', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let asset: AssetDto;
-            assetsService.postAssetFile("my-app", null!).subscribe((result) => {
+            assetsService.postAssetFile('my-app', null!).subscribe((result) => {
                 asset = <AssetDto>result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets",
+                'http://service/p/api/apps/my-app/assets',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(assetResponse(12));
 
@@ -326,22 +304,22 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make post with parent id to create asset", inject(
+    it('should make post with parent id to create asset', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let asset: AssetDto;
             assetsService
-                .postAssetFile("my-app", null!, "parent1")
+                .postAssetFile('my-app', null!, 'parent1')
                 .subscribe((result) => {
                     asset = <AssetDto>result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets?parentId=parent1",
+                'http://service/p/api/apps/my-app/assets?parentId=parent1',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(assetResponse(12));
 
@@ -349,22 +327,22 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make post with duplicate flag to create asset", inject(
+    it('should make post with duplicate flag to create asset', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let asset: AssetDto;
             assetsService
-                .postAssetFile("my-app", null!, "parent1", true)
+                .postAssetFile('my-app', null!, 'parent1', true)
                 .subscribe((result) => {
                     asset = <AssetDto>result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets?parentId=parent1&duplicate=true",
+                'http://service/p/api/apps/my-app/assets?parentId=parent1&duplicate=true',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(assetResponse(12));
 
@@ -372,54 +350,54 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should return proper error if upload failed with 413", inject(
+    it('should return proper error if upload failed with 413', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let error: ErrorDto;
-            assetsService.postAssetFile("my-app", null!).subscribe({
+            assetsService.postAssetFile('my-app', null!).subscribe({
                 error: (e) => {
                     error = e;
                 },
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets",
+                'http://service/p/api/apps/my-app/assets',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush({}, { status: 413, statusText: "Payload too large" });
+            req.flush({}, { status: 413, statusText: 'Payload too large' });
 
-            expect(error!).toEqual(new ErrorDto(413, "i18n:assets.fileTooBig"));
+            expect(error!).toEqual(new ErrorDto(413, 'i18n:assets.fileTooBig'));
         },
     ));
 
-    it("should make put request to replace asset content", inject(
+    it('should make put request to replace asset content', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     upload: {
-                        method: "PUT",
-                        href: "api/apps/my-app/assets/123/content",
+                        method: 'PUT',
+                        href: 'api/apps/my-app/assets/123/content',
                     },
                 },
             };
 
             let asset: AssetDto;
             assetsService
-                .putAssetFile("my-app", resource, null!, version)
+                .putAssetFile('my-app', resource, null!, version)
                 .subscribe((result) => {
                     asset = <AssetDto>result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/123/content",
+                'http://service/p/api/apps/my-app/assets/123/content',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(assetResponse(123));
 
@@ -427,21 +405,21 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should return proper error if replacing asset content failed with 413", inject(
+    it('should return proper error if replacing asset content failed with 413', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     upload: {
-                        method: "PUT",
-                        href: "api/apps/my-app/assets/123/content",
+                        method: 'PUT',
+                        href: 'api/apps/my-app/assets/123/content',
                     },
                 },
             };
 
             let error: ErrorDto;
             assetsService
-                .putAssetFile("my-app", resource, null!, version)
+                .putAssetFile('my-app', resource, null!, version)
                 .subscribe({
                     error: (e) => {
                         error = e;
@@ -449,45 +427,45 @@ describe("AssetsService", () => {
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/123/content",
+                'http://service/p/api/apps/my-app/assets/123/content',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-            req.flush({}, { status: 413, statusText: "Payload too large" });
+            req.flush({}, { status: 413, statusText: 'Payload too large' });
 
-            expect(error!).toEqual(new ErrorDto(413, "i18n:assets.fileTooBig"));
+            expect(error!).toEqual(new ErrorDto(413, 'i18n:assets.fileTooBig'));
         },
     ));
 
-    it("should make put request to annotate asset", inject(
+    it('should make put request to annotate asset', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = new AnnotateAssetDto({ fileName: "New-Name.png" });
+            const dto = new AnnotateAssetDto({ fileName: 'New-Name.png' });
 
             const resource: Resource = {
                 _links: {
                     update: {
-                        method: "PUT",
-                        href: "api/apps/my-app/assets/123",
+                        method: 'PUT',
+                        href: 'api/apps/my-app/assets/123',
                     },
                 },
             };
 
             let asset: AssetDto;
             assetsService
-                .putAsset("my-app", resource, dto, version)
+                .putAsset('my-app', resource, dto, version)
                 .subscribe((result) => {
                     asset = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/123",
+                'http://service/p/api/apps/my-app/assets/123',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(assetResponse(123));
 
@@ -495,33 +473,33 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make put request to move asset", inject(
+    it('should make put request to move asset', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = new MoveAssetDto({ parentId: "parent1" });
+            const dto = new MoveAssetDto({ parentId: 'parent1' });
 
             const resource: Resource = {
                 _links: {
                     move: {
-                        method: "PUT",
-                        href: "api/apps/my-app/assets/123/parent",
+                        method: 'PUT',
+                        href: 'api/apps/my-app/assets/123/parent',
                     },
                 },
             };
 
             let asset: AssetDto;
             assetsService
-                .putAssetParent("my-app", resource, dto, version)
+                .putAssetParent('my-app', resource, dto, version)
                 .subscribe((result) => {
                     asset = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/123/parent",
+                'http://service/p/api/apps/my-app/assets/123/parent',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(assetResponse(123));
 
@@ -529,33 +507,33 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make put request to move asset folder", inject(
+    it('should make put request to move asset folder', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = new MoveAssetFolderDto({ parentId: "parent1" });
+            const dto = new MoveAssetFolderDto({ parentId: 'parent1' });
 
             const resource: Resource = {
                 _links: {
                     move: {
-                        method: "PUT",
-                        href: "api/apps/my-app/assets/folders/123/parent",
+                        method: 'PUT',
+                        href: 'api/apps/my-app/assets/folders/123/parent',
                     },
                 },
             };
 
             let assetFolder: AssetFolderDto;
             assetsService
-                .putAssetFolderParent("my-app", resource, dto, version)
+                .putAssetFolderParent('my-app', resource, dto, version)
                 .subscribe((result) => {
                     assetFolder = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/folders/123/parent",
+                'http://service/p/api/apps/my-app/assets/folders/123/parent',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(assetFolderResponse(123));
 
@@ -563,49 +541,49 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make delete request to delete asset item", inject(
+    it('should make delete request to delete asset item', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
                     delete: {
-                        method: "DELETE",
-                        href: "api/apps/my-app/assets/123",
+                        method: 'DELETE',
+                        href: 'api/apps/my-app/assets/123',
                     },
                 },
             };
 
             assetsService
-                .deleteAssetItem("my-app", resource, true, version)
+                .deleteAssetItem('my-app', resource, true, version)
                 .subscribe();
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/123?checkReferrers=true",
+                'http://service/p/api/apps/my-app/assets/123?checkReferrers=true',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush({});
         },
     ));
 
-    it("should make post request to create asset folder", inject(
+    it('should make post request to create asset folder', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = new CreateAssetFolderDto({ folderName: "My Folder" });
+            const dto = new CreateAssetFolderDto({ folderName: 'My Folder' });
 
             let assetFolder: AssetFolderDto;
-            assetsService.postAssetFolder("my-app", dto).subscribe((result) => {
+            assetsService.postAssetFolder('my-app', dto).subscribe((result) => {
                 assetFolder = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/folders",
+                'http://service/p/api/apps/my-app/assets/folders',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(assetFolderResponse(22));
 
@@ -613,33 +591,33 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make put request to update asset folder", inject(
+    it('should make put request to update asset folder', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = new RenameAssetFolderDto({ folderName: "My Folder" });
+            const dto = new RenameAssetFolderDto({ folderName: 'My Folder' });
 
             const resource: Resource = {
                 _links: {
                     update: {
-                        method: "PUT",
-                        href: "api/apps/my-app/assets/folders/123",
+                        method: 'PUT',
+                        href: 'api/apps/my-app/assets/folders/123',
                     },
                 },
             };
 
             let assetFolder: AssetFolderDto;
             assetsService
-                .putAssetFolder("my-app", resource, dto, version)
+                .putAssetFolder('my-app', resource, dto, version)
                 .subscribe((result) => {
                     assetFolder = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/folders/123",
+                'http://service/p/api/apps/my-app/assets/folders/123',
             );
 
-            expect(req.request.method).toEqual("PUT");
-            expect(req.request.headers.get("If-Match")).toBe(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
             req.flush(assetFolderResponse(22));
 
@@ -647,20 +625,20 @@ describe("AssetsService", () => {
         },
     ));
 
-    it("should make get request to get completions", inject(
+    it('should make get request to get completions', inject(
         [AssetsService, HttpTestingController],
         (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let completions: ScriptCompletions;
-            assetsService.getCompletions("my-app").subscribe((result) => {
+            assetsService.getCompletions('my-app').subscribe((result) => {
                 completions = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/assets/completion",
+                'http://service/p/api/apps/my-app/assets/completion',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([]);
 
@@ -668,7 +646,7 @@ describe("AssetsService", () => {
         },
     ));
 
-    function assetResponse(id: number, suffix = "", parentId?: string) {
+    function assetResponse(id: number, suffix = '', parentId?: string) {
         parentId = parentId || MathHelper.EMPTY_GUID;
 
         const key = `${id}${suffix}`;
@@ -680,13 +658,13 @@ describe("AssetsService", () => {
             fileHash: `My Hash${key}`,
             fileName: `My Name${key}.png`,
             fileSize: id * 2,
-            fileType: "png",
+            fileType: 'png',
             fileVersion: id * 4,
             isImage: false,
             isProtected: true,
             lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
-            mimeType: "image/png",
+            mimeType: 'image/png',
             metadataText: `my-metadata${key}`,
             metadata: {
                 pixelWidth: id * 3,
@@ -694,19 +672,19 @@ describe("AssetsService", () => {
             },
             parentId,
             slug: `my-name${key}.png`,
-            tags: ["tag1", "tag2"],
+            tags: ['tag1', 'tag2'],
             type: `my-type${key}`,
             version: id,
             _links: {
-                update: { method: "PUT", href: `/assets/${id}` },
+                update: { method: 'PUT', href: `/assets/${id}` },
             },
             _meta: {
-                isDuplicate: "true",
+                isDuplicate: 'true',
             },
         };
     }
 
-    function assetFolderResponse(id: number, suffix = "", parentId?: string) {
+    function assetFolderResponse(id: number, suffix = '', parentId?: string) {
         parentId = parentId || MathHelper.EMPTY_GUID;
 
         const key = `${id}${suffix}`;
@@ -717,7 +695,7 @@ describe("AssetsService", () => {
             parentId,
             version: id,
             _links: {
-                update: { method: "PUT", href: `/assets/folders/${id}` },
+                update: { method: 'PUT', href: `/assets/folders/${id}` },
             },
         };
     }
@@ -726,7 +704,7 @@ describe("AssetsService", () => {
 export function createAsset(
     id: number,
     tags?: string[],
-    suffix = "",
+    suffix = '',
     parentId?: string,
     isDuplicate = true,
 ) {
@@ -741,13 +719,13 @@ export function createAsset(
         fileHash: `My Hash${key}`,
         fileName: `My Name${key}.png`,
         fileSize: id * 2,
-        fileType: "png",
+        fileType: 'png',
         fileVersion: id * 4,
         isImage: false,
         isProtected: true,
         lastModified: DateTime.parseISO(buildDate(id, 20)),
         lastModifiedBy: `modifier${id}`,
-        mimeType: "image/png",
+        mimeType: 'image/png',
         metadataText: `my-metadata${key}`,
         metadata: {
             pixelWidth: id * 3,
@@ -755,22 +733,22 @@ export function createAsset(
         },
         parentId,
         slug: `my-name${key}.png`,
-        tags: tags || ["tag1", "tag2"],
+        tags: tags || ['tag1', 'tag2'],
         type: `my-type${key}` as any,
         version: id,
         _links: {
             update: new ResourceLinkDto({
-                method: "PUT",
+                method: 'PUT',
                 href: `/assets/${id}`,
             }),
         },
         _meta: new AssetMetaDto({
-            isDuplicate: isDuplicate ? "true" : "false",
+            isDuplicate: isDuplicate ? 'true' : 'false',
         }),
     });
 }
 
-export function createAssetFolder(id: number, suffix = "", parentId?: string) {
+export function createAssetFolder(id: number, suffix = '', parentId?: string) {
     parentId = parentId || MathHelper.EMPTY_GUID;
 
     const key = `${id}${suffix}`;
@@ -782,7 +760,7 @@ export function createAssetFolder(id: number, suffix = "", parentId?: string) {
         version: id,
         _links: {
             update: new ResourceLinkDto({
-                method: "PUT",
+                method: 'PUT',
                 href: `/assets/folders/${id}`,
             }),
         },

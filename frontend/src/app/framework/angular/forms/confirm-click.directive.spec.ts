@@ -5,13 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { Component, signal } from "@angular/core";
-import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { By } from "@angular/platform-browser";
-import { of } from "rxjs";
-import { IMock, It, Mock, Times } from "typemoq";
-import { DialogService } from "@app/framework/internal";
-import { ConfirmClickDirective } from "./confirm-click.directive";
+import { Component, signal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { of } from 'rxjs';
+import { IMock, It, Mock, Times } from 'typemoq';
+import { DialogService } from '@app/framework/internal';
+import { ConfirmClickDirective } from './confirm-click.directive';
 
 @Component({
     template: `
@@ -32,7 +32,7 @@ class TestHostComponent {
     public readonly confirmTitle = signal<string | undefined>(undefined);
 }
 
-describe("ConfirmClickDirective", () => {
+describe('ConfirmClickDirective', () => {
     let dialogs: IMock<DialogService>;
     let fixture: ComponentFixture<TestHostComponent>;
     let confirmClickDirective: ConfirmClickDirective;
@@ -56,8 +56,8 @@ describe("ConfirmClickDirective", () => {
         button = element.nativeElement;
     });
 
-    it("Should invoke action directly when disabled", () => {
-        setInputs(false, "confirmText", "confirmTitle", "confirmKey");
+    it('Should invoke action directly when disabled', () => {
+        setInputs(false, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -74,14 +74,14 @@ describe("ConfirmClickDirective", () => {
         );
     });
 
-    it("Should invoke action when confirmed", () => {
+    it('Should invoke action when confirmed', () => {
         dialogs
             .setup((x) =>
-                x.confirm("confirmTitle", "confirmText", "confirmKey"),
+                x.confirm('confirmTitle', 'confirmText', 'confirmKey'),
             )
             .returns(() => of(true));
 
-        setInputs(true, "confirmText", "confirmTitle", "confirmKey");
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -94,14 +94,14 @@ describe("ConfirmClickDirective", () => {
         expect(invoked).toBe(true);
     });
 
-    it("Should invoke action when unsubscribed in between", () => {
+    it('Should invoke action when unsubscribed in between', () => {
         dialogs
             .setup((x) =>
-                x.confirm("confirmTitle", "confirmText", "confirmKey"),
+                x.confirm('confirmTitle', 'confirmText', 'confirmKey'),
             )
             .returns(() => of(true));
 
-        setInputs(true, "confirmText", "confirmTitle", "confirmKey");
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -120,14 +120,14 @@ describe("ConfirmClickDirective", () => {
         expect(invoked).toBe(true);
     });
 
-    it("Should not invoke action when not confirmed", () => {
+    it('Should not invoke action when not confirmed', () => {
         dialogs
             .setup((x) =>
-                x.confirm("confirmTitle", "confirmText", "confirmKey"),
+                x.confirm('confirmTitle', 'confirmText', 'confirmKey'),
             )
             .returns(() => of(false));
 
-        setInputs(true, "confirmText", "confirmTitle", "confirmKey");
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -140,14 +140,14 @@ describe("ConfirmClickDirective", () => {
         expect(invoked).toBe(false);
     });
 
-    it("Should invoke action when unsubscribed before", () => {
+    it('Should invoke action when unsubscribed before', () => {
         dialogs
             .setup((x) =>
-                x.confirm("confirmTitle", "confirmText", "confirmKey"),
+                x.confirm('confirmTitle', 'confirmText', 'confirmKey'),
             )
             .returns(() => of(true));
 
-        setInputs(true, "confirmText", "confirmTitle", "confirmKey");
+        setInputs(true, 'confirmText', 'confirmTitle', 'confirmKey');
 
         let invoked = false;
 
@@ -162,14 +162,14 @@ describe("ConfirmClickDirective", () => {
         expect(invoked).toBe(false);
     });
 
-    it("Should not confirm when text is empty", () => {
+    it('Should not confirm when text is empty', () => {
         dialogs
             .setup((x) =>
-                x.confirm("confirmTitle", "confirmText", "confirmKey"),
+                x.confirm('confirmTitle', 'confirmText', 'confirmKey'),
             )
             .returns(() => of(false));
 
-        setInputs(true, undefined, "confirmTitle", undefined);
+        setInputs(true, undefined, 'confirmTitle', undefined);
 
         button.click();
 
@@ -179,14 +179,14 @@ describe("ConfirmClickDirective", () => {
         );
     });
 
-    it("Should not confirm when title is empty", () => {
+    it('Should not confirm when title is empty', () => {
         dialogs
             .setup((x) =>
-                x.confirm("confirmTitle", "confirmText", "confirmKey"),
+                x.confirm('confirmTitle', 'confirmText', 'confirmKey'),
             )
             .returns(() => of(false));
 
-        setInputs(true, "confirmText", undefined, undefined);
+        setInputs(true, 'confirmText', undefined, undefined);
 
         button.click();
 

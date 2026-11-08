@@ -5,17 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    LanguageDto,
-    LanguagesService,} from "@app/shared/internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, LanguageDto, LanguagesService } from '@app/shared/internal';
 
-describe("LanguageService", () => {
+describe('LanguageService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -25,7 +20,7 @@ describe("LanguageService", () => {
                 LanguagesService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -38,7 +33,7 @@ describe("LanguageService", () => {
         },
     ));
 
-    it("should make get request to get languages", inject(
+    it('should make get request to get languages', inject(
         [LanguagesService, HttpTestingController],
         (
             languagesService: LanguagesService,
@@ -50,30 +45,30 @@ describe("LanguageService", () => {
                 languages = result;
             });
 
-            const req = httpMock.expectOne("http://service/p/api/languages");
+            const req = httpMock.expectOne('http://service/p/api/languages');
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([
                 {
-                    iso2Code: "de",
-                    englishName: "German",
+                    iso2Code: 'de',
+                    englishName: 'German',
                 },
                 {
-                    iso2Code: "en",
-                    englishName: "English",
+                    iso2Code: 'en',
+                    englishName: 'English',
                 },
             ]);
 
             expect(languages!).toEqual([
                 new LanguageDto({
-                    iso2Code: "de",
-                    englishName: "German",
+                    iso2Code: 'de',
+                    englishName: 'German',
                 }),
                 new LanguageDto({
-                    iso2Code: "en",
-                    englishName: "English",
+                    iso2Code: 'en',
+                    englishName: 'English',
                 }),
             ]);
         },

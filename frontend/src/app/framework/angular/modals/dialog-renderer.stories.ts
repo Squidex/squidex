@@ -5,22 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {Component,
-    inject,
-    input,} from "@angular/core";
-import { Meta, moduleMetadata, StoryObj } from "@storybook/angular";
-import {ConfirmClickDirective,
-    DialogRendererComponent,
-    DialogService,
-    ErrorDto,
-    LocalizerService,
-    RootViewComponent,
-    TooltipDirective,} from "@app/framework";
+import { Component, inject, input } from '@angular/core';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
+import { ConfirmClickDirective, DialogRendererComponent, DialogService, ErrorDto, LocalizerService, RootViewComponent, TooltipDirective } from '@app/framework';
 
-type TestMode = "ErrorText" | "ErrorDetails" | "Info";
+type TestMode = 'ErrorText' | 'ErrorDetails' | 'Info';
 
 @Component({
-    selector: "sqx-test",
+    selector: 'sqx-test',
     template: `
         <button class="btn btn-primary" (click)="test()">
             Show {{ mode() }}
@@ -31,28 +23,28 @@ class TestComponent {
     public readonly dialogs = inject(DialogService);
 
     /** The kind of notification to show. */
-    public readonly mode = input<TestMode>("Info");
+    public readonly mode = input<TestMode>('Info');
 
     public test() {
-        if (this.mode() === "ErrorDetails") {
-            const error = new ErrorDto(500, "Error in Server", "Error Code", [
-                "Details 1",
-                "Details 2",
-                "Details 3",
-                "Details 4",
+        if (this.mode() === 'ErrorDetails') {
+            const error = new ErrorDto(500, 'Error in Server', 'Error Code', [
+                'Details 1',
+                'Details 2',
+                'Details 3',
+                'Details 4',
             ]);
 
             this.dialogs.notifyError(error);
-        } else if (this.mode() === "ErrorText") {
-            this.dialogs.notifyError("Error");
+        } else if (this.mode() === 'ErrorText') {
+            this.dialogs.notifyError('Error');
         } else {
-            this.dialogs.notifyInfo("Info");
+            this.dialogs.notifyInfo('Info');
         }
     }
 }
 
 export default {
-    title: "Framework/Dialogs",
+    title: 'Framework/Dialogs',
     component: DialogRendererComponent,
     decorators: [
         moduleMetadata({
@@ -67,9 +59,9 @@ export default {
                 {
                     provide: LocalizerService,
                     useValue: new LocalizerService({
-                        "common.no": "No",
-                        "common.remember": "Remember",
-                        "common.yes": "Yes",
+                        'common.no': 'No',
+                        'common.remember': 'Remember',
+                        'common.yes': 'Yes',
                     }),
                 },
             ],

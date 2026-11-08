@@ -5,18 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    TranslateDto,
-    TranslationDto,
-    TranslationsService,} from "@app/shared/internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, TranslateDto, TranslationDto, TranslationsService } from '@app/shared/internal';
 
-describe("TranslationsService", () => {
+describe('TranslationsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -26,7 +20,7 @@ describe("TranslationsService", () => {
                 TranslationsService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -39,41 +33,41 @@ describe("TranslationsService", () => {
         },
     ));
 
-    it("should make post request to translate text", inject(
+    it('should make post request to translate text', inject(
         [TranslationsService, HttpTestingController],
         (
             translationsService: TranslationsService,
             httpMock: HttpTestingController,
         ) => {
             const dto = new TranslateDto({
-                text: "Hello",
-                sourceLanguage: "en",
-                targetLanguage: "de",
+                text: 'Hello',
+                sourceLanguage: 'en',
+                targetLanguage: 'de',
             });
 
             let translation: TranslationDto;
-            translationsService.translate("my-app", dto).subscribe((result) => {
+            translationsService.translate('my-app', dto).subscribe((result) => {
                 translation = result;
             });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/translations",
+                'http://service/p/api/apps/my-app/translations',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
-                result: "Translated",
-                status: "Translated",
-                text: "Hallo",
+                result: 'Translated',
+                status: 'Translated',
+                text: 'Hallo',
             });
 
             expect(translation!).toEqual(
                 new TranslationDto({
-                    result: "Translated",
-                    status: "Translated",
-                    text: "Hallo",
+                    result: 'Translated',
+                    status: 'Translated',
+                    text: 'Hallo',
                 }),
             );
         },

@@ -57,13 +57,13 @@ export class ContentSchemaBuilder {
             return rules.some(x => x.action === action && x.eval(context, itemData));
         };
 
-        disabled(path, {
-            when: (ctx: FieldContext<any, any>) => field.isDisabled || isRuleActive(ctx, 'Disable'),
-        });
+        disabled(path,
+            {when: (ctx: FieldContext<any, any>) => field.isDisabled || isRuleActive(ctx, 'Disable') }
+        );
 
-        hidden(path, {
-            when: (ctx: FieldContext<any, any>) => isRuleActive(ctx, 'Hide'),
-        });
+        hidden(path,
+            {when: (ctx: FieldContext<any, any>) => isRuleActive(ctx, 'Hide') }
+        );
 
         validate(path, ctx => {
             const value = ctx.value();

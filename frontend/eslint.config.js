@@ -123,6 +123,7 @@ module.exports = defineConfig([{
     "no-else-return": "off",
     "no-extra-boolean-cast": "off",
     "no-mixed-operators": "off",
+    "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
     "no-nested-ternary": "off",
     "no-param-reassign": "off",
     "no-plusplus": "off",

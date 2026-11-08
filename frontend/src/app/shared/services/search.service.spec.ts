@@ -5,18 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    SearchResultDto,
-    SearchService,} from "@app/shared/internal";
-import { ResourceLinkDto } from "./../model";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, SearchResultDto, SearchService } from '@app/shared/internal';
+import { ResourceLinkDto } from './../model';
 
-describe("SearchService", () => {
+describe('SearchService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -26,7 +21,7 @@ describe("SearchService", () => {
                 SearchService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -39,23 +34,23 @@ describe("SearchService", () => {
         },
     ));
 
-    it("should make get request to get search results", inject(
+    it('should make get request to get search results', inject(
         [SearchService, HttpTestingController],
         (searchService: SearchService, httpMock: HttpTestingController) => {
             let results: ReadonlyArray<SearchResultDto>;
 
             searchService
-                .getResults("my-app", "my-query")
+                .getResults('my-app', 'my-query')
                 .subscribe((result) => {
                     results = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/apps/my-app/search?query=my-query",
+                'http://service/p/api/apps/my-app/search?query=my-query',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([searchResultResponse(1), searchResultResponse(2)]);
 
@@ -72,7 +67,7 @@ describe("SearchService", () => {
             type: `Search Type ${id}`,
             label: `Label ${id}`,
             _links: {
-                url: { method: "GET", href: `/url${id}` },
+                url: { method: 'GET', href: `/url${id}` },
             },
         };
     }
@@ -84,7 +79,7 @@ export function createSearchResult(id: number) {
         type: `Search Type ${id}` as any,
         label: `Label ${id}`,
         _links: {
-            url: new ResourceLinkDto({ method: "GET", href: `/url${id}` }),
+            url: new ResourceLinkDto({ method: 'GET', href: `/url${id}` }),
         },
     });
 }

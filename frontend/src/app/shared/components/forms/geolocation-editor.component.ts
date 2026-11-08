@@ -61,7 +61,9 @@ export class GeolocationEditorComponent extends FormValueControlBase<Geolocation
     protected readonly geolocationForm = form(this.geolocationModel, path => {
         SignalValidators.between(path.latitude, -90, 90);
         SignalValidators.between(path.longitude, -180, 180);
-        disabled(path, { when: () => this.disabled() });
+        disabled(path,
+            {when: () => this.disabled() }
+        );
     });
 
     constructor() {

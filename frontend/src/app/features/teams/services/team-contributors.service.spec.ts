@@ -5,25 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import {ApiUrlConfig,
-    ContributorDto,
-    ContributorsDto,
-    Resource,
-    Versioned,
-    VersionTag,} from "@app/shared/internal";
-import {AssignContributorDto,
-    ContributorsMetadataDto,
-    ResourceLinkDto,} from "@app/shared/model";
-import { TeamContributorsService } from "../internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { ApiUrlConfig, ContributorDto, ContributorsDto, Resource, Versioned, VersionTag } from '@app/shared/internal';
+import { AssignContributorDto, ContributorsMetadataDto, ResourceLinkDto } from '@app/shared/model';
+import { TeamContributorsService } from '../internal';
 
-describe("TeamContributorsService", () => {
-    const version = new VersionTag("1");
+describe('TeamContributorsService', () => {
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -34,7 +24,7 @@ describe("TeamContributorsService", () => {
                 TeamContributorsService,
                 {
                     provide: ApiUrlConfig,
-                    useValue: new ApiUrlConfig("http://service/p/"),
+                    useValue: new ApiUrlConfig('http://service/p/'),
                 },
             ],
         });
@@ -47,7 +37,7 @@ describe("TeamContributorsService", () => {
         },
     ));
 
-    it("should make get request to get team contributors", inject(
+    it('should make get request to get team contributors', inject(
         [TeamContributorsService, HttpTestingController],
         (
             contributorsService: TeamContributorsService,
@@ -55,70 +45,70 @@ describe("TeamContributorsService", () => {
         ) => {
             let contributors: Versioned<ContributorsDto>;
             contributorsService
-                .getContributors("my-team")
+                .getContributors('my-team')
                 .subscribe((result) => {
                     contributors = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/teams/my-team/contributors",
+                'http://service/p/api/teams/my-team/contributors',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush(contributorsResponse(1, 2, 3), {
                 headers: {
-                    etag: "2",
+                    etag: '2',
                 },
             });
 
             expect(contributors!).toEqual({
                 payload: createContributors(1, 2, 3),
-                version: new VersionTag("2"),
+                version: new VersionTag('2'),
             });
         },
     ));
 
-    it("should make post request to assign contributor", inject(
+    it('should make post request to assign contributor', inject(
         [TeamContributorsService, HttpTestingController],
         (
             contributorsService: TeamContributorsService,
             httpMock: HttpTestingController,
         ) => {
             const dto = new AssignContributorDto({
-                contributorId: "123",
-                role: "Owner",
+                contributorId: '123',
+                role: 'Owner',
             });
 
             let contributors: Versioned<ContributorsDto>;
             contributorsService
-                .postContributor("my-team", dto, version)
+                .postContributor('my-team', dto, version)
                 .subscribe((result) => {
                     contributors = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/teams/my-team/contributors",
+                'http://service/p/api/teams/my-team/contributors',
             );
 
-            expect(req.request.method).toEqual("POST");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(contributorsResponse(1, 2, 3), {
                 headers: {
-                    etag: "2",
+                    etag: '2',
                 },
             });
 
             expect(contributors!).toEqual({
                 payload: createContributors(1, 2, 3),
-                version: new VersionTag("2"),
+                version: new VersionTag('2'),
             });
         },
     ));
 
-    it("should make delete request to remove contributor", inject(
+    it('should make delete request to remove contributor', inject(
         [TeamContributorsService, HttpTestingController],
         (
             contributorsService: TeamContributorsService,
@@ -127,35 +117,35 @@ describe("TeamContributorsService", () => {
             const resource: Resource = {
                 _links: {
                     delete: {
-                        method: "DELETE",
-                        href: "/api/teams/my-team/contributors/123",
+                        method: 'DELETE',
+                        href: '/api/teams/my-team/contributors/123',
                     },
                 },
             };
 
             let contributors: Versioned<ContributorsDto>;
             contributorsService
-                .deleteContributor("my-team", resource, version)
+                .deleteContributor('my-team', resource, version)
                 .subscribe((result) => {
                     contributors = result;
                 });
 
             const req = httpMock.expectOne(
-                "http://service/p/api/teams/my-team/contributors/123",
+                'http://service/p/api/teams/my-team/contributors/123',
             );
 
-            expect(req.request.method).toEqual("DELETE");
-            expect(req.request.headers.get("If-Match")).toEqual(version.value);
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
             req.flush(contributorsResponse(1, 2, 3), {
                 headers: {
-                    etag: "2",
+                    etag: '2',
                 },
             });
 
             expect(contributors!).toEqual({
                 payload: createContributors(1, 2, 3),
-                version: new VersionTag("2"),
+                version: new VersionTag('2'),
             });
         },
     ));
@@ -166,17 +156,17 @@ describe("TeamContributorsService", () => {
                 contributorId: `id${id}`,
                 contributorName: `name${id}`,
                 contributorEmail: `mail${id}@squidex.io`,
-                role: id % 2 === 0 ? "Owner" : "Developer",
+                role: id % 2 === 0 ? 'Owner' : 'Developer',
                 _links: {
-                    update: { method: "PUT", href: `/contributors/id${id}` },
+                    update: { method: 'PUT', href: `/contributors/id${id}` },
                 },
             })),
             maxContributors: ids.length * 13,
             _links: {
-                create: { method: "POST", href: "/contributors" },
+                create: { method: 'POST', href: '/contributors' },
             },
             _meta: {
-                isInvited: "true",
+                isInvited: 'true',
             },
         };
     }
@@ -188,12 +178,12 @@ export function createContributors(...ids: ReadonlyArray<number>) {
         maxContributors: ids.length * 13,
         _links: {
             create: new ResourceLinkDto({
-                method: "POST",
-                href: "/contributors",
+                method: 'POST',
+                href: '/contributors',
             }),
         },
         _meta: new ContributorsMetadataDto({
-            isInvited: "true",
+            isInvited: 'true',
         }),
     });
 }
@@ -203,10 +193,10 @@ export function createContributor(id: number) {
         contributorId: `id${id}`,
         contributorName: `name${id}`,
         contributorEmail: `mail${id}@squidex.io`,
-        role: id % 2 === 0 ? "Owner" : "Developer",
+        role: id % 2 === 0 ? 'Owner' : 'Developer',
         _links: {
             update: new ResourceLinkDto({
-                method: "PUT",
+                method: 'PUT',
                 href: `/contributors/id${id}`,
             }),
         },

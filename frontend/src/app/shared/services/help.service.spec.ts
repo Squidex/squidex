@@ -5,15 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {provideHttpClient,
-    withInterceptorsFromDi,
-    withXhr,} from "@angular/common/http";
-import {HttpTestingController,
-    provideHttpClientTesting,} from "@angular/common/http/testing";
-import { inject, TestBed } from "@angular/core/testing";
-import { HelpService, SDKEntry } from "@app/shared/internal";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+import { HelpService, SDKEntry } from '@app/shared/internal';
 
-describe("HelpService", () => {
+describe('HelpService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [],
@@ -32,51 +29,51 @@ describe("HelpService", () => {
         },
     ));
 
-    it("should make get request to get help sections", inject(
+    it('should make get request to get help sections', inject(
         [HelpService, HttpTestingController],
         (helpService: HelpService, httpMock: HttpTestingController) => {
             let helpSections: string;
 
-            helpService.getHelp("01-chapter/02-article").subscribe((result) => {
+            helpService.getHelp('01-chapter/02-article').subscribe((result) => {
                 helpSections = result;
             });
 
             const req = httpMock.expectOne(
-                "https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md",
+                'https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush("Markdown");
+            req.flush('Markdown');
 
-            expect(helpSections!).toEqual("Markdown");
+            expect(helpSections!).toEqual('Markdown');
         },
     ));
 
-    it("should return empty sections if get request fails", inject(
+    it('should return empty sections if get request fails', inject(
         [HelpService, HttpTestingController],
         (helpService: HelpService, httpMock: HttpTestingController) => {
             let helpSections: string;
 
-            helpService.getHelp("01-chapter/02-article").subscribe((result) => {
+            helpService.getHelp('01-chapter/02-article').subscribe((result) => {
                 helpSections = result;
             });
 
             const req = httpMock.expectOne(
-                "https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md",
+                'https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.error(new ProgressEvent("error"));
+            req.error(new ProgressEvent('error'));
 
-            expect(helpSections!).toEqual("");
+            expect(helpSections!).toEqual('');
         },
     ));
 
-    it("should make get request to get sdks", inject(
+    it('should make get request to get sdks', inject(
         [HelpService, HttpTestingController],
         (helpService: HelpService, httpMock: HttpTestingController) => {
             let sdks: Record<string, SDKEntry>;
@@ -86,11 +83,11 @@ describe("HelpService", () => {
             });
 
             const req = httpMock.expectOne(
-                "https://raw.githubusercontent.com/Squidex/sdk-fern/main/sdks.json",
+                'https://raw.githubusercontent.com/Squidex/sdk-fern/main/sdks.json',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
                 dotnet: {},
@@ -102,7 +99,7 @@ describe("HelpService", () => {
         },
     ));
 
-    it("should return empty sdks if get request fails", inject(
+    it('should return empty sdks if get request fails', inject(
         [HelpService, HttpTestingController],
         (helpService: HelpService, httpMock: HttpTestingController) => {
             let sdks: Record<string, SDKEntry>;
@@ -112,13 +109,13 @@ describe("HelpService", () => {
             });
 
             const req = httpMock.expectOne(
-                "https://raw.githubusercontent.com/Squidex/sdk-fern/main/sdks.json",
+                'https://raw.githubusercontent.com/Squidex/sdk-fern/main/sdks.json',
             );
 
-            expect(req.request.method).toEqual("GET");
-            expect(req.request.headers.get("If-Match")).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.error(new ProgressEvent("error"));
+            req.error(new ProgressEvent('error'));
 
             expect(sdks!).toEqual({});
         },
