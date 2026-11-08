@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppsState, LayoutComponent, TitleComponent } from '@app/shared';
 import { SettingsMenuComponent } from './settings-menu.component';
@@ -14,6 +14,7 @@ import { SettingsMenuComponent } from './settings-menu.component';
     selector: 'sqx-settings-area',
     styleUrls: ['./settings-area.component.scss'],
     templateUrl: './settings-area.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LayoutComponent,
         RouterOutlet,

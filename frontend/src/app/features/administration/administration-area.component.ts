@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutContainerDirective, TitleComponent, TranslatePipe, UIState } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { LayoutContainerDirective, TitleComponent, TranslatePipe, UIState } from
     selector: 'sqx-administration-area',
     styleUrls: ['./administration-area.component.scss'],
     templateUrl: './administration-area.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LayoutContainerDirective,
         RouterLink,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -16,6 +16,7 @@ import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileD
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AvatarComponent,
         ConfirmClickDirective,

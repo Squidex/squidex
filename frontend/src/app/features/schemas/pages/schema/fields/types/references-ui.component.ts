@@ -6,7 +6,7 @@
  */
 
 
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ChangeDetectionStrategy } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldEditorValues, ReferencesFieldFormModel, ReferencesFieldPropertiesDto } from '@app/shared';
 
@@ -14,6 +14,7 @@ import { FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldEditorValues
     selector: 'sqx-references-ui',
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

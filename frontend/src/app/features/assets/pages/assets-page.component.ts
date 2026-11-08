@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathComponent, AssetsListComponent, AssetsState, DialogModel, LayoutComponent, ListViewComponent, LocalStoreService, MathHelper, ModalDirective, PagerComponent, Queries, Query, QueryFullTextSynchronizer, Router2State, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, TagEditorComponent, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIState } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
     selector: 'sqx-assets-page',
     styleUrls: ['./assets-page.component.scss'],
     templateUrl: './assets-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State,
     ],

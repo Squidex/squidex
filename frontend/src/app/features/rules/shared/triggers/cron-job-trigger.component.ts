@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, ChangeDetectionStrategy } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
@@ -15,6 +15,7 @@ import { AppsState, CodeComponent, CronJobTriggerForm, FormHintComponent, FormRo
     selector: 'sqx-cron-job-trigger',
     styleUrls: ['./cron-job-trigger.component.scss'],
     templateUrl: './cron-job-trigger.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeComponent,
         FormField,

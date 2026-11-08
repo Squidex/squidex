@@ -5,13 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/shared';
 
 @Component({
     selector: 'sqx-login',
     template: '',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginPageComponent {
     private readonly authService = inject(AuthService);

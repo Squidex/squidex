@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, RulesState, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -15,6 +15,7 @@ import { RuleEventComponent } from './rule-event.component';
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
     templateUrl: './rule-events-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State,
     ],

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, inject, input, output } from '@angular/core';
+import { Component, effect, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
@@ -16,6 +16,7 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
     selector: 'sqx-asset-folder-dialog',
     styleUrls: ['./asset-folder-dialog.component.scss'],
     templateUrl: './asset-folder-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,
         FormAlertComponent,

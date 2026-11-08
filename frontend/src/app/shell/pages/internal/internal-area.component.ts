@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { DialogService, LoadingService, Notification, UIOptions } from '@app/shared';
@@ -21,6 +21,7 @@ import { SearchMenuComponent } from './search-menu.component';
     selector: 'sqx-internal-area',
     styleUrls: ['./internal-area.component.scss'],
     templateUrl: './internal-area.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AppsMenuComponent,
         AssetUploaderComponent,

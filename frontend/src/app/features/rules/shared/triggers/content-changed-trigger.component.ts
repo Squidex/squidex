@@ -6,7 +6,7 @@
  */
 
 
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
 import { CodeComponent, ContentChangedTriggerForm, FormHintComponent, SchemaDto, TranslatePipe } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
@@ -16,6 +16,7 @@ import { ContentChangedSchemaComponent } from './content-changed-schema.componen
     selector: 'sqx-content-changed-trigger',
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         CompletionsCache,
     ],

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommentsComponent, ContentsState, LayoutComponent, queryParam, routeParam, TranslatePipe } from '@app/shared';
 
@@ -15,6 +15,7 @@ type Tab = 'unresolved' | 'all';
     selector: 'sqx-comments-page',
     styleUrls: ['./comments-page.component.scss'],
     templateUrl: './comments-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommentsComponent,
         LayoutComponent,

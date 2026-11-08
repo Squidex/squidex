@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, FormHintComponent, TranslatePipe, UIOptions } from '@app/shared';
 
@@ -14,6 +14,7 @@ import { AuthService, FormHintComponent, TranslatePipe, UIOptions } from '@app/s
     selector: 'sqx-home-page',
     styleUrls: ['./home-page.component.scss'],
     templateUrl: './home-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormHintComponent,
         TranslatePipe,

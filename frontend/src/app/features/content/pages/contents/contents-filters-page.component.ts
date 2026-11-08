@@ -5,13 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ContentsState, LayoutComponent, Queries, Query, QueryListComponent, SavedQueriesComponent, SchemasState, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-filters-page',
     styleUrls: ['./contents-filters-page.component.scss'],
     templateUrl: './contents-filters-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LayoutComponent,
         QueryListComponent,

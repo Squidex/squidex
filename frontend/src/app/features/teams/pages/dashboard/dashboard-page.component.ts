@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild } from '@angular/core';
+import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, safeResource, Settings, SupportCardComponent, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
 import { AppsCardComponent } from './cards/apps-card.component';
@@ -14,6 +14,7 @@ import { AppsCardComponent } from './cards/apps-card.component';
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
     templateUrl: './dashboard-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ApiCallsCardComponent,
         ApiCallsSummaryCardComponent,

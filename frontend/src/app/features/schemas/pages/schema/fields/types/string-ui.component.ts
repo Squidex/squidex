@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, inject, input, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldFormModel, StringFieldPropertiesDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponen
     selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetFolderDropdownComponent,
         FormField,

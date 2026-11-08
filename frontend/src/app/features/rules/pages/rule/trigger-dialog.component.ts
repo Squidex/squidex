@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, effect, inject, Injector, input, output, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, effect, inject, Injector, input, output, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { AnyTriggerForm, createTriggerForm, EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe } from '@app/shared';
@@ -21,6 +21,7 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
     selector: 'sqx-trigger-dialog',
     styleUrls: ['./trigger-dialog.component.scss'],
     templateUrl: './trigger-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetChangedTriggerComponent,
         CommentTriggerComponent,

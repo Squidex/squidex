@@ -6,13 +6,14 @@
  */
 
 import { Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TitleComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-forbidden-page',
     styleUrls: ['./forbidden-page.component.scss'],
     templateUrl: './forbidden-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TitleComponent,
         TranslatePipe,

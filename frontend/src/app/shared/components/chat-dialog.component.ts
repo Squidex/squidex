@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { HTTP, MathHelper, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -18,6 +18,7 @@ type ChatItem = { content: string | Observable<ChatEventDto>; type: 'User' | 'As
     selector: 'sqx-chat-dialog',
     styleUrls: ['./chat-dialog.component.scss'],
     templateUrl: './chat-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ChatItemComponent,
         FormsModule,

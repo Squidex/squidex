@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { AllAppsState, AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, ModalDirective, NewsService, PagerComponent, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
@@ -20,6 +20,7 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
     templateUrl: './apps-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AppComponent,
         AppFormComponent,

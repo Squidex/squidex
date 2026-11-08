@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AppsState, ExternalLinkDirective, LayoutComponent, TitleComponent, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -13,6 +13,7 @@ import { AppsState, ExternalLinkDirective, LayoutComponent, TitleComponent, Tour
     selector: 'sqx-api-area',
     styleUrls: ['./api-area.component.scss'],
     templateUrl: './api-area.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ExternalLinkDirective,
         LayoutComponent,

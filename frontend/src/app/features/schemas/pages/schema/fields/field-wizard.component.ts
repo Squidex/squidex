@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
@@ -19,6 +19,7 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
     selector: 'sqx-field-wizard',
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         FieldFormComponent,
