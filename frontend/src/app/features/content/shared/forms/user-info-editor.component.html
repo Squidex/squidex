@@ -1,4 +1,4 @@
-<div class="form" (focusout)="touched.set(true)">
+<div class="form" (focusout)="markTouched()">
     <sqx-form-row #apiKeyRow [for]="userInfoForm.apiKey" label="common.apiKey" [prefix]="formId()" required>
         <div class="form-group">
             <input class="form-control key" [id]="apiKeyRow.fieldName()" autocomplete="off" [formField]="userInfoForm.apiKey" />

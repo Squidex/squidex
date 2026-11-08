@@ -49,7 +49,7 @@
 
     @case ("boolean") {
         <div class="form-check">
-            <sqx-checkbox [disabled]="disabled()" [inputId]="id()" (touchedChange)="markTouched()" [value]="valueCurrent()" (valueChange)="setValue($event)" />
+            <sqx-checkbox [disabled]="disabled()" [inputId]="id()" (touch)="markTouched()" [value]="valueCurrent()" (valueChange)="setValue($event)" />
             <label class="form-check-label" [attr.for]="id()"></label>
         </div>
     }

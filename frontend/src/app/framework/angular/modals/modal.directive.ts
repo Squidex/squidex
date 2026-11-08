@@ -65,8 +65,10 @@ export class ModalDirective<T = unknown> implements OpenModal {
         this.destroyRef.onDestroy(() => {
             this.hideModal(this.model());
 
-            this.modalService.remove(this);
+            // Effects do not run after the directive is destroyed, so the view in the root container must be removed directly.
+            this.update(false);
 
+            this.modalService.remove(this);
             this.unlistenView();
         });
 

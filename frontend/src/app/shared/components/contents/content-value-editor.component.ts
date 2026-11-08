@@ -9,7 +9,7 @@
 import { Component, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
-import { CheckboxComponent, SignalSelectDirective, StarsComponent, ToggleComponent, TransformInputDirective } from '@app/framework';
+import { CheckboxComponent, SignalSelectDirective, StarsComponent, TextInputDirective, ToggleComponent } from '@app/framework';
 import { FieldDto, MathHelper } from '@app/shared/internal';
 
 @Component({
@@ -22,8 +22,8 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
         FormsModule,
         SignalSelectDirective,
         StarsComponent,
+        TextInputDirective,
         ToggleComponent,
-        TransformInputDirective,
     ],
 })
 export class ContentValueEditorComponent {

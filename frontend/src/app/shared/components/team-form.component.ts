@@ -9,7 +9,7 @@ import { Component, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { tap } from 'rxjs';
-import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
+import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TextInputDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { CreateTeamForm, TeamsState } from '@app/shared/internal';
 
 @Component({
@@ -24,8 +24,8 @@ import { CreateTeamForm, TeamsState } from '@app/shared/internal';
         FormRowComponent,
         FormsModule,
         ModalDialogComponent,
+        TextInputDirective,
         TooltipDirective,
-        TransformInputDirective,
         TranslatePipe,
     ],
 })

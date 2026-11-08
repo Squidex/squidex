@@ -238,7 +238,7 @@
                     @case ("String") {
                         @switch (field.rawProperties.editor) {
                             @case ("Input") {
-                                <input class="form-control" [formField]="fieldForm()" [placeholder]="field.displayPlaceholder" />
+                                <input class="form-control" [formField]="fieldForm()" [placeholder]="field.displayPlaceholder" sqxTextInput />
                             }
 
                             @case ("Slug") {
@@ -246,7 +246,7 @@
                                     class="form-control"
                                     [formField]="fieldForm()"
                                     [placeholder]="field.displayPlaceholder"
-                                    sqxTransformInput="Slugify" />
+                                    sqxTextInput="Slugify" />
                             }
 
                             @case ("TextArea") {

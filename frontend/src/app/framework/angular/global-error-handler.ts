@@ -14,6 +14,8 @@ export class GlobalErrorHandler implements ErrorHandler {
     private readonly zone = inject(NgZone);
 
     public handleError(error: any): void {
+        console.error(error);
+
         const chunkFailedMessage = /Loading chunk [\d]+ failed/;
 
         if (chunkFailedMessage.test(error.message)) {

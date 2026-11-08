@@ -106,7 +106,7 @@
     </sqx-form-row>
 
     <sqx-form-row #defaultValueRow [for]="form().defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
-        <input class="form-control" [id]="defaultValueRow.fieldName()" [formField]="form().defaultValue" />
+        <input class="form-control" [id]="defaultValueRow.fieldName()" [formField]="form().defaultValue" sqxTextInput />
     </sqx-form-row>
 
     @if (isLocalizable()) {

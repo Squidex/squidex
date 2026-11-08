@@ -27,11 +27,11 @@
         @case ("String") {
             @switch (f.rawProperties.editor) {
                 @case ("Input") {
-                    <input class="form-control" [formField]="control" [placeholder]="f.displayPlaceholder" />
+                    <input class="form-control" [formField]="control" [placeholder]="f.displayPlaceholder" sqxTextInput />
                 }
 
                 @case ("Slug") {
-                    <input class="form-control" [formField]="control" [placeholder]="f.displayPlaceholder" sqxTransformInput="Slugify" />
+                    <input class="form-control" [formField]="control" [placeholder]="f.displayPlaceholder" sqxTextInput="Slugify" />
                 }
 
                 @case ("Dropdown") {

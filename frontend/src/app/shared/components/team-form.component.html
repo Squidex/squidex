@@ -5,7 +5,7 @@
             <sqx-form-error [error]="createForm.error()" />
 
             <sqx-form-row class="mt-2" [for]="createForm.form.name" hint="teams.teamNameHint" label="common.name" required vertical>
-                <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTextInput="LowerCase" />
             </sqx-form-row>
 
             <sqx-form-alert marginBottom="0" marginTop="2"> {{ "teams.teamNameWarning" | sqxTranslate }}</sqx-form-alert>

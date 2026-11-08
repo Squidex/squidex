@@ -9,7 +9,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, Component, computed, inject, Injector, input, output, viewChildren } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, Injector, input, output, untracked, viewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
 
@@ -87,7 +87,11 @@ export class ContentComponent {
             return undefined;
         }
 
-        return new PatchContentForm(this.tableFields(), this.language(), this.injector);
+        const fields = this.tableFields();
+        const language = this.language();
+
+        // Forms create effects, which is not allowed in a reactive context.
+        return untracked(() => new PatchContentForm(fields, language, this.injector));
     });
 
     protected readonly isDirty = computed(() => {

@@ -153,7 +153,7 @@
                         </sqx-form-row>
 
                         <sqx-form-row [for]="annotateForm.form.slug" label="common.slug" required vertical>
-                            <input class="form-control slug" id="slug" [formField]="annotateForm.form.slug" spellcheck="false" sqxTransformInput="Slugify" />
+                            <input class="form-control slug" id="slug" [formField]="annotateForm.form.slug" spellcheck="false" sqxTextInput="Slugify" />
                             <button class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()" type="button">
                                 {{ "common.generate" | sqxTranslate }}
                             </button>

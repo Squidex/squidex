@@ -9,7 +9,7 @@ import { Component, computed, effect, inject, input, linkedSignal, output, signa
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { switchMap, tap } from 'rxjs';
-import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, SignalSelectDirective, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, SignalSelectDirective, TextInputDirective, TooltipDirective, TranslatePipe, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
@@ -27,8 +27,8 @@ import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective,
         LoaderComponent,
         ModalDialogComponent,
         SignalSelectDirective,
+        TextInputDirective,
         TooltipDirective,
-        TransformInputDirective,
         TranslatePipe,
     ],
 })

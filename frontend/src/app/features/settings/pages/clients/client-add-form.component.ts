@@ -8,7 +8,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
+import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TextInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-add-form',
@@ -19,7 +19,7 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
         FormField,
         FormHintComponent,
         FormsModule,
-        TransformInputDirective,
+        TextInputDirective,
         TranslatePipe,
     ],
 })

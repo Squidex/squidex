@@ -36,7 +36,7 @@
                                     @if (property.isFormattable) {
                                         <sqx-formattable-input [id]="property.name" [formField]="currentStep.field(property.name)" type="Text" />
                                     } @else {
-                                        <input class="form-control" id="{{ property.name }}" [formField]="currentStep.field(property.name)" />
+                                        <input class="form-control" id="{{ property.name }}" [formField]="currentStep.field(property.name)" sqxTextInput />
                                     }
                                 }
 

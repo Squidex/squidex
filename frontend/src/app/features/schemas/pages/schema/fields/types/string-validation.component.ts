@@ -8,7 +8,7 @@
 import { booleanAttribute, Component, computed, effect, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
-import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, SignalSelectDirective, StringContentTypeValues, StringFieldFormModel, StringFieldPropertiesDto, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, SignalSelectDirective, StringContentTypeValues, StringFieldFormModel, StringFieldPropertiesDto, TextInputDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',
@@ -23,6 +23,7 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FieldF
         ModalDirective,
         ModalPlacementDirective,
         SignalSelectDirective,
+        TextInputDirective,
         TranslatePipe,
     ],
 })

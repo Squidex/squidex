@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, Component, computed, forwardRef, inject, Injector, input, signal } from '@angular/core';
+import { booleanAttribute, Component, computed, forwardRef, inject, Injector, input, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateFieldDto } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
@@ -62,9 +62,12 @@ export class FieldComponent {
     protected readonly editForm = computed(() => {
         const properties = this.field().properties;
 
-        const editForm = new EditFieldForm(properties, this.injector);
-        editForm.load(properties);
-        return editForm;
+        // Forms create effects, which is not allowed in a reactive context.
+        return untracked(() => {
+            const editForm = new EditFieldForm(properties, this.injector);
+            editForm.load(properties);
+            return editForm;
+        });
     });
 
     protected readonly isLocalizable = computed(() => {

@@ -14,7 +14,7 @@
                         <sqx-form-error [error]="createForm.error()" />
 
                         <sqx-form-row class="mt-2" [for]="createForm.form.name" hint="apps.appNameHint" label="common.name" required vertical>
-                            <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                            <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTextInput="LowerCase" />
                         </sqx-form-row>
 
                         <sqx-form-alert marginBottom="4" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }}</sqx-form-alert>

@@ -46,7 +46,7 @@ export * from './angular/safe-resource';
 export * from './angular/forms/signal-form-server-errors';
 export * from './angular/forms/signal-select.directive';
 export * from './angular/forms/signal-validators';
-export * from './angular/forms/transform-input.directive';
+export * from './angular/forms/text-input.directive';
 export * from './angular/forms/validators';
 export * from './angular/global-error-handler';
 export * from './angular/hover-background.directive';

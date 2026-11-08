@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Directive, effect, input, model, ModelSignal, untracked, WritableSignal } from '@angular/core';
+import { booleanAttribute, Directive, effect, input, ModelSignal, output, untracked, WritableSignal } from '@angular/core';
 import { FormValueControl } from '@angular/forms/signals';
 import { Types } from '@app/framework/internal';
 
@@ -17,13 +17,16 @@ export abstract class FormValueControlBase<T> implements FormValueControl<T> {
     /** Indicates whether the value is invalid, provided by the form. */
     public readonly invalid = input(false, { transform: booleanAttribute });
 
-    /** Indicates whether the control has been touched. */
-    public readonly touched = model(false);
+    /** Indicates whether the control has been touched, provided by the form. */
+    public readonly touched = input(false, { transform: booleanAttribute });
+
+    /** Emits when the user has finished interacting with the control. */
+    public readonly touch = output();
 
     public abstract readonly value: ModelSignal<T>;
 
     public markTouched() {
-        this.touched.set(true);
+        this.touch.emit();
     }
 }
 
