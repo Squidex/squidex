@@ -1,4 +1,4 @@
-@for (button of buttons(); track button) {
+@for (button of toolbarService.buttons(); track button) {
     <button class="btn btn-{{ button.color }} ms-2" (click)="button.method()" [disabled]="button.disabled" type="submit">
         {{ button.name | sqxTranslate }}
     </button>

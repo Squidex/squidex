@@ -5,25 +5,42 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
-import { APP_BASE_HREF } from '@angular/common';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { enableProdMode, ErrorHandler } from '@angular/core';
-import { bootstrapApplication } from '@angular/platform-browser';
-import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, provideRouter, RouteReuseStrategy } from '@angular/router';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { TourService as BaseTourService, UI_TOUR_OPTIONS } from 'ngx-ui-tour-core';
-import { ApiUrlConfig, authInterceptor, buildTasks, cachingInterceptor, DateHelper, GlobalErrorHandler, loadingInterceptor, LocalizerService, TASK_CONFIGURATION, TitlesConfig, TourService, UIOptions } from '@app/shared';
-import { AppComponent } from './app/app.component';
-import { APP_ROUTES } from './app/app.routes';
-import { environment } from './environments/environment';
+import { OVERLAY_DEFAULT_CONFIG } from "@angular/cdk/overlay";
+import { APP_BASE_HREF } from "@angular/common";
+import {provideHttpClient,
+    withInterceptors,
+    withXhr,} from "@angular/common/http";
+import { enableProdMode, ErrorHandler } from "@angular/core";
+import { bootstrapApplication } from "@angular/platform-browser";
+import {ActivatedRouteSnapshot,
+    BaseRouteReuseStrategy,
+    provideRouter,
+    RouteReuseStrategy,} from "@angular/router";
+import { provideCharts, withDefaultRegisterables } from "ng2-charts";
+import {TourService as BaseTourService,
+    UI_TOUR_OPTIONS,} from "ngx-ui-tour-core";
+import {ApiUrlConfig,
+    authInterceptor,
+    buildTasks,
+    cachingInterceptor,
+    DateHelper,
+    GlobalErrorHandler,
+    loadingInterceptor,
+    LocalizerService,
+    TASK_CONFIGURATION,
+    TitlesConfig,
+    TourService,
+    UIOptions,} from "@app/shared";
+import { AppComponent } from "./app/app.component";
+import { APP_ROUTES } from "./app/app.routes";
+import { environment } from "./environments/environment";
 
-const options = (window as any)['options'] || {};
+const options = (window as any)["options"] || {};
 
 DateHelper.setlocale(options.more?.culture);
 
 function basePath() {
-    const baseElements = document.getElementsByTagName('base');
+    const baseElements = document.getElementsByTagName("base");
 
     let baseHref: string = null!;
 
@@ -31,17 +48,17 @@ function basePath() {
         baseHref = baseElements[0].href;
     }
 
-    if (baseHref.indexOf('http') === 0) {
+    if (baseHref.indexOf("http") === 0) {
         baseHref = new URL(baseHref).pathname;
     }
 
     if (!baseHref) {
-        baseHref = '';
+        baseHref = "";
     }
 
-    let path = options.embedPath || '/';
+    let path = options.embedPath || "/";
 
-    while (baseHref.endsWith('/')) {
+    while (baseHref.endsWith("/")) {
         baseHref = baseHref.substring(0, baseHref.length - 1);
     }
 
@@ -49,7 +66,7 @@ function basePath() {
 }
 
 function configApiUrl() {
-    const baseElements = document.getElementsByTagName('base');
+    const baseElements = document.getElementsByTagName("base");
 
     let baseHref: string = null!;
 
@@ -58,13 +75,15 @@ function configApiUrl() {
     }
 
     if (!baseHref) {
-        baseHref = '/';
+        baseHref = "/";
     }
 
-    if (baseHref.indexOf('http') === 0) {
+    if (baseHref.indexOf("http") === 0) {
         return new ApiUrlConfig(baseHref);
     } else {
-        return new ApiUrlConfig(`${window.location.protocol}//${window.location.host}${baseHref}`);
+        return new ApiUrlConfig(
+            `${window.location.protocol}//${window.location.host}${baseHref}`,
+        );
     }
 }
 
@@ -73,7 +92,7 @@ function configUIOptions() {
 }
 
 function configTitles() {
-    return new TitlesConfig(undefined, 'i18n:common.product');
+    return new TitlesConfig(undefined, "i18n:common.product");
 }
 
 function configLocalizerService() {
@@ -81,8 +100,15 @@ function configLocalizerService() {
 }
 
 export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
-    public shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot) {
-       return (future.routeConfig === curr.routeConfig) || (future.data['reuseId'] && future.data['reuseId'] === curr.data['reuseId']);
+    public shouldReuseRoute(
+        future: ActivatedRouteSnapshot,
+        curr: ActivatedRouteSnapshot,
+    ) {
+        return (
+            future.routeConfig === curr.routeConfig ||
+            (future.data["reuseId"] &&
+                future.data["reuseId"] === curr.data["reuseId"])
+        );
     }
 }
 
@@ -96,6 +122,7 @@ bootstrapApplication(AppComponent, {
     providers: [
         provideCharts(withDefaultRegisterables()),
         provideHttpClient(
+            withXhr(),
             withInterceptors([
                 loadingInterceptor,
                 cachingInterceptor,
@@ -128,12 +155,12 @@ bootstrapApplication(AppComponent, {
             useValue: basePath(),
         },
         {
-          provide: UI_TOUR_OPTIONS,
-          useValue: TASKS.defaults,
+            provide: UI_TOUR_OPTIONS,
+            useValue: TASKS.defaults,
         },
         {
             provide: OVERLAY_DEFAULT_CONFIG,
-            useValue: { usePopover: false }
+            useValue: { usePopover: false },
         },
         {
             provide: BaseTourService,

@@ -9,7 +9,7 @@ import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, Htt
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { ErrorDto, getActualVersion, Types, Versioned, VersionOrTag, VersionTag } from '@app/framework/internal';
 
-export module HTTP {
+export namespace HTTP {
     export type UploadFile = File | { url: string; name: string };
 
     export function upload<T = any>(http: HttpClient, method: string, url: string, file: UploadFile,

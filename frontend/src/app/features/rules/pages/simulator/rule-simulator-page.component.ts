@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent, ListViewComponent, MessageBus, RuleSimulatorState, RulesState, SimulatedRuleEventDto, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -29,13 +29,12 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 export class RuleSimulatorPageComponent {
     private readonly messageBus = inject(MessageBus);
     private readonly route = inject(ActivatedRoute);
-    private readonly rulesState = inject(RulesState);
+
+    protected readonly rulesState = inject(RulesState);
 
     protected readonly ruleSimulatorState = inject(RuleSimulatorState);
 
     protected readonly selectedRuleEvent = signal<string | null | undefined>(undefined);
-
-    protected readonly availableSteps = this.rulesState.steps;
 
     constructor() {
         this.messageBus.on(RuleConfigured, message => {

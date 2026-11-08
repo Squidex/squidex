@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, computed, effect, forwardRef, inject, input, linkedSignal, numberAttribute, output, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, linkedSignal, numberAttribute, output, signal, untracked } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { LanguageSelectorComponent, ListViewComponent, ModalDialogComponent, PagerComponent, SyncWidthDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppLanguageDto, AppsState, ComponentContentsState, ContentDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';

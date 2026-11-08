@@ -15,7 +15,7 @@ function isEmptyInputValue(value: any): boolean {
     return value == null || value === undefined || value.length === 0;
 }
 
-export module ValidatorsEx {
+export namespace ValidatorsEx {
     export const nullValidator: ValueValidator = () => null;
 
     export function required(): ValueValidator {

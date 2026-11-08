@@ -9,7 +9,7 @@ import { FieldTree, PathKind, pattern, SchemaPath, validate, ValidationError } f
 import { DateTime, LocalizerService, Types } from '@app/framework/internal';
 import { formatError } from './error-formatting';
 
-export module SignalValidators {
+export namespace SignalValidators {
     export function patternWithMessage<TKind extends PathKind>(path: SchemaPath<string, any, TKind>, regex: string, message?: string) {
         pattern(path, new RegExp(`^(?:${regex})$`), message ? { message } : undefined);
     }

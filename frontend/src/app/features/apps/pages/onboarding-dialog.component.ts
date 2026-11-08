@@ -6,7 +6,7 @@
  */
 
 
-import { Component, inject, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { FormRowComponent, MarkdownDirective, ModalDialogComponent, SignalSelectDirective, TourState, TranslatePipe, UsersService } from '@app/shared';

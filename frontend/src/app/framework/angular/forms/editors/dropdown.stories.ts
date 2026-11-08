@@ -5,24 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
-import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { DropdownComponent, LocalizerService, RootViewComponent } from '@app/framework';
+import { Component } from "@angular/core";
+import { Meta, moduleMetadata, StoryObj } from "@storybook/angular";
+import {DropdownComponent,
+    LocalizerService,
+    RootViewComponent,} from "@app/framework";
 
 const TRANSLATIONS = {
-    'common.search': 'Search',
-    'common.empty': 'Nothing available.',
+    "common.search": "Search",
+    "common.empty": "Nothing available.",
 };
 
 @Component({
-    selector: 'sqx-dropdown-test',
+    selector: "sqx-dropdown-test",
     imports: [DropdownComponent, RootViewComponent],
     template: `
         <sqx-root-view>
             <sqx-dropdown
                 [items]="items"
                 [itemsLoading]="itemsLoading"
-                (dropdownOpen)="load()">
+                (dropdownOpen)="load()"
+            >
             </sqx-dropdown>
         </sqx-root-view>
     `,
@@ -36,37 +39,34 @@ class TestComponent {
         this.itemsLoading = true;
 
         setTimeout(() => {
-            this.items = ['A', 'B'];
+            this.items = ["A", "B"];
             this.itemsLoading = false;
         }, 1000);
     }
 }
 
 export default {
-    title: 'Framework/Dropdown',
+    title: "Framework/Dropdown",
     component: DropdownComponent,
     argTypes: {
         disabled: {
-            control: 'boolean',
+            control: "boolean",
         },
         dropdownFullWidth: {
-            control: 'boolean',
+            control: "boolean",
         },
         change: {
-            action: 'valueChange',
+            action: "valueChange",
         },
         position: {
-            control: 'radio',
-            options: [
-                'bottom-start',
-                'bottom-end',
-            ],
+            control: "radio",
+            options: ["bottom-start", "bottom-end"],
         },
     },
     args: {
-        position: 'bottom-start',
+        position: "bottom-start",
     },
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-root-view>
@@ -84,10 +84,7 @@ export default {
     }),
     decorators: [
         moduleMetadata({
-            imports: [
-                RootViewComponent,
-                TestComponent,
-            ],
+            imports: [RootViewComponent, TestComponent],
             providers: [
                 {
                     provide: LocalizerService,
@@ -102,29 +99,29 @@ type Story = StoryObj<DropdownComponent & { model: any }>;
 
 export const Default: Story = {
     args: {
-        items: ['A', 'B', 'C'],
-        model: 'B',
+        items: ["A", "B", "C"],
+        model: "B",
     },
 };
 
 export const Long: Story = {
     args: {
-        items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'],
-        model: 'B',
+        items: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"],
+        model: "B",
     },
 };
 
 export const WrongModel: Story = {
     args: {
-        items: ['A', 'B', 'C'],
-        model: 'D',
+        items: ["A", "B", "C"],
+        model: "D",
     },
 };
 
 export const Empty: Story = {
     args: {
         items: [],
-        model: 'B',
+        model: "B",
     },
 };
 
@@ -137,20 +134,20 @@ export const EmptyLoading: Story = {
 
 export const NoSearch: Story = {
     args: {
-        items: ['A', 'B', 'C'],
+        items: ["A", "B", "C"],
         canSearch: false,
     },
 };
 
 export const FullWidth: Story = {
     args: {
-        items: ['A', 'B', 'C'],
+        items: ["A", "B", "C"],
         dropdownFullWidth: true,
     },
 };
 
 export const Lazy: Story = {
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-dropdown-test></sqx-dropdown-test>
@@ -159,7 +156,7 @@ export const Lazy: Story = {
 };
 
 export const ComplexValues: Story = {
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-root-view>
@@ -180,21 +177,26 @@ export const ComplexValues: Story = {
         `,
     }),
     args: {
-        searchProperty: 'label',
-        items: [{
-            id: 1,
-            label: 'Lorem',
-        }, {
-            id: 2,
-            label: 'ipsum',
-        }, {
-            id: 3,
-            label: 'dolor',
-        }, {
-            id: 4,
-            label: 'sit',
-        }],
+        searchProperty: "label",
+        items: [
+            {
+                id: 1,
+                label: "Lorem",
+            },
+            {
+                id: 2,
+                label: "ipsum",
+            },
+            {
+                id: 3,
+                label: "dolor",
+            },
+            {
+                id: 4,
+                label: "sit",
+            },
+        ],
         model: 2,
-        valueProperty: 'id',
+        valueProperty: "id",
     },
 };

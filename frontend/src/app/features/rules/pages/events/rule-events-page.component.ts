@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, RulesState, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -34,13 +34,12 @@ import { RuleEventComponent } from './rule-event.component';
 export class RuleEventsPageComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly ruleEventsRoute = inject(Router2State);
-    private readonly rulesState = inject(RulesState);
+
+    protected readonly rulesState = inject(RulesState);
 
     protected readonly ruleEventsState = inject(RuleEventsState);
 
     protected readonly selectedEventId = signal<string | null>(null);
-
-    protected readonly availableSteps = this.rulesState.steps;
 
     constructor() {
         this.route.queryParams

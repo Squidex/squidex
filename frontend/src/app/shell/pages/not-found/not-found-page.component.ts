@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { TitleComponent, TranslatePipe } from '@app/shared';
 
 @Component({

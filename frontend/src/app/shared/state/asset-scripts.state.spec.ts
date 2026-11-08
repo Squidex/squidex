@@ -12,7 +12,7 @@ import { AppsService } from '../services/apps.service';
 import { createAssetScripts } from '../services/apps.service.spec';
 import { TestValues } from './_test-helpers';
 import { AssetScriptsState } from './asset-scripts.state';
-import 'src/spec/matchers';
+import '../../../spec/matchers';
 
 describe('AssetScriptsState', () => {
     const { app, appsState, newVersion, version } = TestValues;

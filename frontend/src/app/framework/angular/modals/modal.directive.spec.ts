@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { DialogModel, ModalModel, ModalService } from '@app/framework/internal';
-import { ModalDirective } from './modal.directive';
-import { RootViewComponent } from './root-view.component';
+import { Component } from "@angular/core";
+import { TestBed } from "@angular/core/testing";
+import { DialogModel, ModalModel, ModalService } from "@app/framework/internal";
+import { ModalDirective } from "./modal.directive";
+import { RootViewComponent } from "./root-view.component";
 
 @Component({
     template: `
@@ -23,9 +23,7 @@ import { RootViewComponent } from './root-view.component';
             <div></div>
         </ng-container>
     `,
-    imports: [
-        ModalDirective,
-    ],
+    imports: [ModalDirective],
 })
 class TestHostComponent {
     public dialog1 = new DialogModel();
@@ -33,16 +31,14 @@ class TestHostComponent {
     public dropdown = new ModalModel();
 }
 
-describe('ModalDirective', () => {
+describe("ModalDirective", () => {
     let host: TestHostComponent;
     let modalService: ModalService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [TestHostComponent],
-            providers: [
-                { provide: RootViewComponent, useValue: {} },
-            ],
+            providers: [{ provide: RootViewComponent, useValue: {} }],
         });
 
         const fixture = TestBed.createComponent(TestHostComponent);
@@ -59,7 +55,7 @@ describe('ModalDirective', () => {
         fixture.detectChanges();
     });
 
-    it('should hide all open modals', () => {
+    it("should hide all open modals", () => {
         modalService.hideAll();
 
         expect(host.dialog1.isOpen()).toBeFalsy();
@@ -67,8 +63,8 @@ describe('ModalDirective', () => {
         expect(host.dropdown.isOpen()).toBeFalsy();
     });
 
-    it('should not hide modal that contains the element', () => {
-        const anchor = document.getElementById('anchor');
+    it("should not hide modal that contains the element", () => {
+        const anchor = document.getElementById("anchor");
 
         modalService.hideAll(anchor);
 

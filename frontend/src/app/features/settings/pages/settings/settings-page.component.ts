@@ -34,12 +34,10 @@ import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettin
     ],
 })
 export class SettingsPageComponent {
-    private readonly appsState = inject(AppsState);
-
-    protected readonly editingSettings = this.appsState.selectedSettings;
+    protected readonly appsState = inject(AppsState);
 
     protected readonly isEditable = computed(() => {
-        return this.editingSettings()?.canUpdate === true;
+        return this.appsState.selectedSettings()?.canUpdate === true;
     });
 
     protected readonly editForm = new EditAppSettingsForm();
@@ -48,7 +46,7 @@ export class SettingsPageComponent {
         this.appsState.loadSettings();
 
         effect(() => {
-            const settings = this.editingSettings();
+            const settings = this.appsState.selectedSettings();
             if (!settings) {
                 return;
             }
@@ -63,7 +61,7 @@ export class SettingsPageComponent {
     }
 
     protected save() {
-        const settings = this.editingSettings();
+        const settings = this.appsState.selectedSettings();
         if (!settings) {
             return;
         }

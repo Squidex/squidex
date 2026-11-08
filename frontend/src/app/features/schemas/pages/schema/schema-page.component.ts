@@ -60,8 +60,6 @@ export class SchemaPageComponent {
 
     protected readonly languageState = inject(LanguagesState);
 
-    protected readonly schema = this.schemasState.selectedSchema;
-
     protected readonly schemaTab = queryParam('tab', 'fields');
 
     protected readonly hideIndexes = this.uiOptions.value.hideIndexes;
@@ -73,7 +71,7 @@ export class SchemaPageComponent {
     }
 
     protected cloneSchema() {
-        const schema = this.schema();
+        const schema = this.schemasState.selectedSchema();
         if (!schema) {
             return;
         }
@@ -82,7 +80,7 @@ export class SchemaPageComponent {
     }
 
     protected publish() {
-        const schema = this.schema();
+        const schema = this.schemasState.selectedSchema();
         if (!schema) {
             return;
         }
@@ -91,7 +89,7 @@ export class SchemaPageComponent {
     }
 
     protected unpublish() {
-        const schema = this.schema();
+        const schema = this.schemasState.selectedSchema();
         if (!schema) {
             return;
         }
@@ -100,7 +98,7 @@ export class SchemaPageComponent {
     }
 
     protected deleteSchema() {
-        const schema = this.schema();
+        const schema = this.schemasState.selectedSchema();
         if (!schema) {
             return;
         }

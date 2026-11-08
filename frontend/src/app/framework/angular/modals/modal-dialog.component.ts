@@ -5,17 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkTrapFocus  } from '@angular/cdk/a11y';
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, inject, input, output, Renderer2, viewChild } from '@angular/core';
-import { TranslatePipe } from '../pipes/translate.pipe';
-import { ShortcutComponent } from '../shortcut.component';
-import { TourStepDirective } from './tour-step.directive';
+import { CdkTrapFocus } from "@angular/cdk/a11y";
+import {afterNextRender,
+    booleanAttribute,
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    inject,
+    input,
+    output,
+    Renderer2,
+    viewChild,} from "@angular/core";
+import { TranslatePipe } from "../pipes/translate.pipe";
+import { ShortcutComponent } from "../shortcut.component";
+import { TourStepDirective } from "./tour-step.directive";
 
 @Component({
-    selector: 'sqx-modal-dialog',
-    styleUrls: ['./modal-dialog.component.scss'],
-    templateUrl: './modal-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.Default,
+    selector: "sqx-modal-dialog",
+    styleUrls: ["./modal-dialog.component.scss"],
+    templateUrl: "./modal-dialog.component.html",
+    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CdkTrapFocus,
         ShortcutComponent,
@@ -42,7 +52,7 @@ export class ModalDialogComponent {
     public readonly hasTabs = input(false, { transform: booleanAttribute });
 
     /** The width of the dialog. */
-    public readonly size = input<'sm' | 'md' | 'lg' | 'xl'>('md');
+    public readonly size = input<"sm" | "md" | "lg" | "xl">("md");
 
     /** Renders the body as flex container. */
     public readonly flexBody = input(false, { transform: booleanAttribute });
@@ -53,9 +63,11 @@ export class ModalDialogComponent {
     /** The ID of the tour step that points to this dialog. */
     public readonly tourId = input<string>();
 
-    protected readonly tabsElement = viewChild<ElementRef<ParentNode>>('tabsElement');
+    protected readonly tabsElement =
+        viewChild<ElementRef<ParentNode>>("tabsElement");
 
-    protected readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
+    protected readonly footerElement =
+        viewChild<ElementRef<ParentNode>>("footerElement");
 
     constructor() {
         afterNextRender(() => {
@@ -65,12 +77,15 @@ export class ModalDialogComponent {
     }
 }
 
-function hideWhenEmpty(renderer: Renderer2, element: ElementRef<ParentNode> | undefined) {
+function hideWhenEmpty(
+    renderer: Renderer2,
+    element: ElementRef<ParentNode> | undefined,
+) {
     if (!element?.nativeElement) {
         return;
     }
 
     if (element.nativeElement.children.length === 0) {
-        renderer.setStyle(element.nativeElement, 'display', 'none');
+        renderer.setStyle(element.nativeElement, "display", "none");
     }
 }

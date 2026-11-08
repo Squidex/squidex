@@ -17,7 +17,7 @@
                         </li>
                     }
                 </ul>
-                <button class="float-end btn btn-primary" [class.invisible]="!isEditable()" type="submit">
+                <button class="float-end btn btn-primary" [class.invisible]="!assetScriptsState.canUpdate()" type="submit">
                     {{ "common.save" | sqxTranslate }}
                 </button>
             </div>

@@ -6,7 +6,7 @@
  */
 
 
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
 import { CodeComponent, ContentChangedTriggerForm, FormHintComponent, SchemaDto, TranslatePipe } from '@app/shared';
 import { CompletionsCache } from './completions-cache';

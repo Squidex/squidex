@@ -1,5 +1,5 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
-@if (selectedApp(); as app) {
+@if (appsState.selectedApp(); as app) {
     <div class="dashboard" animate.enter="fade-in" animate.leave="fade-out">
         @if (!isScrolled()) {
             <div class="dashboard-summary" animate.enter="fade-in" animate.leave="fade-out" sqxTourStep="appDashboard">

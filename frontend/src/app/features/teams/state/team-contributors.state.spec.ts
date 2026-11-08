@@ -7,10 +7,10 @@
 
 import { EMPTY, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { createContributors } from 'src/app/shared/services/contributors.service.spec';
-import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { AssignContributorDto, ContributorsDto, DialogService, ErrorDto, versioned } from '@app/shared';
+import { createContributors } from '../../../shared/services/contributors.service.spec';
+import { TestValues } from '../../../shared/state/_test-helpers';
 import { TeamContributorsService, TeamContributorsState } from '../internal';
 
 describe('TeamContributorsState', () => {

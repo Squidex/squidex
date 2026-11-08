@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export module Cookies {
+export namespace Cookies {
     export function set(name: string, value: string, days: number) {
         let expires = '';
 

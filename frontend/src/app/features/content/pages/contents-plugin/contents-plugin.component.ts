@@ -20,7 +20,6 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
     ],
 })
 export class ContentsPluginComponent {
-    private readonly schemasState = inject(SchemasState);
+    protected readonly schemasState = inject(SchemasState);
 
-    protected readonly schema = this.schemasState.selectedSchema;
 }

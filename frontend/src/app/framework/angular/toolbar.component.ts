@@ -19,7 +19,6 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ],
 })
 export class ToolbarComponent {
-    private readonly toolbarService = inject(ToolbarService);
+    protected readonly toolbarService = inject(ToolbarService);
 
-    protected readonly buttons = this.toolbarService.buttons;
 }

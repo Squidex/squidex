@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Directive, inject, input } from '@angular/core';
-import { FieldTree, FormField } from '@angular/forms/signals';
+import { computed, Directive, inject, input, WritableSignal } from '@angular/core';
+import { FormField } from '@angular/forms/signals';
 import { generateSlug, Types } from '@app/framework/internal';
 
 type Transform = (value: string) => string;
@@ -60,6 +60,6 @@ export class TransformInputDirective {
         // Update the element and the field, regardless of whether the form field has already processed the event.
         target.value = transformed;
 
-        (this.formField.formField() as FieldTree<string>)().value.set(transformed);
+        (this.formField.state().value as WritableSignal<string>).set(transformed);
     }
 }

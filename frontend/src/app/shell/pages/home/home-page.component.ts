@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, FormHintComponent, TranslatePipe, UIOptions } from '@app/shared';
 

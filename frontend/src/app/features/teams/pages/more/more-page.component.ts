@@ -36,23 +36,22 @@ import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowCo
 })
 export class MorePageComponent {
     private readonly router = inject(Router);
-    private readonly teamsState = inject(TeamsState);
 
-    protected readonly team = this.teamsState.selectedTeam;
+    protected readonly teamsState = inject(TeamsState);
 
     protected readonly isEditable = computed(() => {
-        return !!this.team()?.canUpdateGeneral;
+        return !!this.teamsState.selectedTeam()?.canUpdateGeneral;
     });
 
     protected readonly isDeletable = computed(() => {
-        return !!this.team()?.canDelete;
+        return !!this.teamsState.selectedTeam()?.canDelete;
     });
 
     protected readonly updateForm = new UpdateTeamForm();
 
     constructor() {
         effect(() => {
-            const team = this.team();
+            const team = this.teamsState.selectedTeam();
             if (!team) {
                 return;
             }
@@ -65,7 +64,7 @@ export class MorePageComponent {
     }
 
     protected save() {
-        const team = this.team();
+        const team = this.teamsState.selectedTeam();
         if (!team || !this.isEditable()) {
             return;
         }
@@ -76,7 +75,7 @@ export class MorePageComponent {
     }
 
     protected deleteTeam() {
-        const team = this.team();
+        const team = this.teamsState.selectedTeam();
         if (!team || !this.isDeletable()) {
             return;
         }

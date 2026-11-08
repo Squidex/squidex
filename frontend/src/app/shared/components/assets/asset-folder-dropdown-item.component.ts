@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectorRef, Component, computed, inject, input, numberAttribute, output, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, input, numberAttribute, output } from '@angular/core';
 import { LoaderComponent, StopClickDirective, TranslatePipe } from '@app/framework';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';

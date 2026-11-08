@@ -1,5 +1,5 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
-@if (selectedTeam(); as team) {
+@if (teamsState.selectedTeam(); as team) {
     <div class="dashboard" animate.enter="fade-in" animate.leave="fade-out">
         @if (!isScrolled()) {
             <div class="dashboard-summary" animate.enter="fade-in" animate.leave="fade-out">

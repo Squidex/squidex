@@ -8,6 +8,7 @@ const importPlugin = require("eslint-plugin-import");
 const typescriptEslint = require("@typescript-eslint/eslint-plugin");
 
 const js = require("@eslint/js");
+const angular = require("angular-eslint");
 
 const {
   FlatCompat,
@@ -34,11 +35,12 @@ module.exports = defineConfig([{
     },
   },
 
-  extends: compat.extends(
-    "eslint:recommended",
-    "plugin:@angular-eslint/recommended",
-    "plugin:@angular-eslint/template/process-inline-templates",
-  ),
+  extends: [
+    ...compat.extends("eslint:recommended"),
+    ...angular.configs.tsRecommended,
+  ],
+
+  processor: angular.processInlineTemplates,
 
   plugins: {
     import: importPlugin,

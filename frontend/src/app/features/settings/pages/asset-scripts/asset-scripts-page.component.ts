@@ -37,12 +37,11 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
 })
 export class AssetScriptsPageComponent {
     private readonly appsState = inject(AppsState);
-    private readonly assetScriptsState = inject(AssetScriptsState);
     private readonly assetsService = inject(AssetsService);
 
-    protected readonly assetScript = signal('query');
+    protected readonly assetScriptsState = inject(AssetScriptsState);
 
-    protected readonly isEditable = this.assetScriptsState.canUpdate;
+    protected readonly assetScript = signal('query');
 
     protected readonly assetCompletions = rxResource({
         stream: () => this.assetsService.getCompletions(this.appsState.appName),
@@ -56,7 +55,7 @@ export class AssetScriptsPageComponent {
         });
 
         effect(() => {
-            this.editForm.setEnabled(this.isEditable());
+            this.editForm.setEnabled(this.assetScriptsState.canUpdate());
         });
 
         this.assetScriptsState.load();
@@ -71,7 +70,7 @@ export class AssetScriptsPageComponent {
     }
 
     protected saveScripts() {
-        if (!this.isEditable()) {
+        if (!this.assetScriptsState.canUpdate()) {
             return;
         }
 

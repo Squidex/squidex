@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectorRef, Component, inject, linkedSignal, model, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, linkedSignal, model, signal } from '@angular/core';
 import { FormValueControlBase, ModalDirective, ModalModel, ModalPlacementDirective, syncExternalValue, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
 import { AssetFolderDropdownItemComponent } from './asset-folder-dropdown-item.component';

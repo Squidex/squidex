@@ -31,8 +31,6 @@ export class NotificationDropdownComponent {
 
     protected readonly commentsState = inject(CommentsState);
 
-    protected readonly commentItems = this.commentsState.groupedUnresolvedComments;
-
     protected readonly modalMenu = new ModalModel();
 
     protected readonly commentUser = this.authService.user!.token;

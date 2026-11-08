@@ -80,7 +80,7 @@
               },
               {
                 "glob": "*.min.*",
-                "input": "/node_modules/video.js/dist/",
+                "input": "./node_modules/video.js/dist/",
                 "output": "./dependencies/videojs/"
               },
               {

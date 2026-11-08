@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export module Keys {
+export namespace Keys {
     const ALT = 18;
     const CONTROL = 17;
     const DELETE = 8;

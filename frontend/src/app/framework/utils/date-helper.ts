@@ -7,7 +7,7 @@
 
 import { enUS, it, Locale, nl, zhCN } from 'date-fns/locale';
 
-export module DateHelper {
+export namespace DateHelper {
     let locale: string | null;
 
     export const FNSLOCALES = {

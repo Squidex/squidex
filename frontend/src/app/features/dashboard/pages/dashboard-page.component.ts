@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import { afterEveryRender, ChangeDetectionStrategy, Component, effect, inject, NgZone, Renderer2, signal, viewChild } from '@angular/core';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, safeResource, Settings, SupportCardComponent, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
 import { ApiCardComponent } from './cards/api-card.component';
@@ -48,7 +48,6 @@ import { DashboardConfigComponent } from './dashboard-config.component';
     ],
 })
 export class DashboardPageComponent {
-    private readonly appsState = inject(AppsState);
     private readonly authState = inject(AuthService);
     private readonly localStore = inject(LocalStoreService);
     private readonly renderer = inject(Renderer2);
@@ -56,6 +55,8 @@ export class DashboardPageComponent {
     private readonly usageDateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
     private readonly usagesService = inject(UsagesService);
     private readonly zone = inject(NgZone);
+
+    protected readonly appsState = inject(AppsState);
 
     protected readonly grid = viewChild<Gridster>('grid');
 
@@ -67,22 +68,20 @@ export class DashboardPageComponent {
 
     protected readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
 
-    protected readonly selectedApp = this.appsState.selectedApp;
-
     protected readonly storageCurrent = safeResource({
-        params: () => this.selectedApp()?.name,
+        params: () => this.appsState.selectedApp()?.name,
         stream: ({ params: appName }) => this.usagesService.getTodayStorage(appName),
         defaultValue: undefined,
     });
 
     protected readonly storageUsage = safeResource({
-        params: () => this.selectedApp()?.name,
+        params: () => this.appsState.selectedApp()?.name,
         stream: ({ params: appName }) => this.usagesService.getStorageUsages(appName, this.usageDateFrom, this.usageDateTo),
         defaultValue: undefined,
     });
 
     protected readonly callsUsage = safeResource({
-        params: () => this.selectedApp()?.name,
+        params: () => this.appsState.selectedApp()?.name,
         stream: ({ params: appName }) => this.usagesService.getCallsUsages(appName, this.usageDateFrom, this.usageDateTo),
         defaultValue: undefined,
     });

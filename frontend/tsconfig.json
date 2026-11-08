@@ -2,7 +2,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "declaration": false,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
@@ -27,7 +26,7 @@
     ],
     "paths": {
       "@app*": [
-        "src/app*"
+        "./src/app*"
       ],
     },
     "useDefineForClassFields": false

@@ -13,7 +13,7 @@
     scrollY="true"
     [sqxAnchoredTo]="button"
     *sqxModal="modalMenu; onRoot: false">
-    @if (commentItems(); as items) {
+    @if (commentsState.groupedUnresolvedComments(); as items) {
         @for (item of items.slice().reverse(); track $index) {
             <sqx-comment
                 canAnswer="false"

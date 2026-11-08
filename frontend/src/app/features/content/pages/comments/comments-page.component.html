@@ -20,6 +20,6 @@
             </ul>
         </ng-container>
 
-        <sqx-comments [content]="content()" [commentsId]="commentsId()" [resolved]="tab === 'all'" />
+        <sqx-comments [content]="contentStates.selectedContent()" [commentsId]="commentsId()" [resolved]="tab === 'all'" />
     </sqx-layout>
 }

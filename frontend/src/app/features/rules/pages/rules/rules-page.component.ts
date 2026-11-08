@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { RuleComponent } from './rule.component';
@@ -35,8 +35,6 @@ export class RulesPageComponent {
     private readonly schemasState = inject(SchemasState);
 
     protected readonly rulesState = inject(RulesState);
-
-    protected readonly availableSteps = this.rulesState.steps;
 
     protected readonly availableTriggers = ALL_TRIGGERS;
 

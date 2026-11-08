@@ -6,9 +6,9 @@
  */
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
-import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, ResourceLinkDto, TeamsService, versioned } from '@app/shared';
+import { TestValues } from '../../../shared/state/_test-helpers';
 import { TeamAuthState } from '../internal';
 
 describe('TeamAuthState', () => {

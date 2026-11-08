@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { AllAppsState, AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, ModalDirective, NewsService, PagerComponent, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
@@ -41,9 +41,10 @@ export class AppsPageComponent {
     private readonly localStore = inject(LocalStoreService);
     private readonly newsService = inject(NewsService);
     private readonly teamsState = inject(TeamsState);
-    private readonly templatesState = inject(TemplatesState);
     private readonly tourState = inject(TourState);
     private readonly uiOptions = inject(UIOptions);
+
+    protected readonly templatesState = inject(TemplatesState);
 
     protected readonly allAppsState = inject(AllAppsState);
 
@@ -83,8 +84,6 @@ export class AppsPageComponent {
 
         return grouped;
     });
-
-    protected readonly starters = this.templatesState.starters;
 
     protected readonly addAppDialog = new DialogModel();
 

@@ -88,7 +88,7 @@
 
 <sqx-onboarding-dialog (dialogClose)="onboardingDialog.hide()" *sqxModal="onboardingDialog" />
 
-@if (starters(); as templates) {
+@if (templatesState.starters(); as templates) {
     <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate()" [templates]="templates" />
 }
 

@@ -94,7 +94,7 @@
     }
 </ul>
 
-@if (starters(); as templates) {
+@if (templatesState.starters(); as templates) {
     <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [templates]="templates" />
 }
 

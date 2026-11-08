@@ -11,7 +11,7 @@ import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFiel
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
-import 'src/spec/matchers';
+import '../../../spec/matchers';
 
 describe('SchemasState', () => {
     const { app, appsState, newVersion } = TestValues;

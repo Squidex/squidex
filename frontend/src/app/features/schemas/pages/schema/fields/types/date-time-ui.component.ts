@@ -6,7 +6,7 @@
  */
 
 
-import { Component, computed, input, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { DateTimeFieldEditorValues, DateTimeFieldFormModel, DateTimeFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent } from '@app/shared';
 

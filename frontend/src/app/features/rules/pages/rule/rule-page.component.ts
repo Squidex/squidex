@@ -79,8 +79,6 @@ export class RulePageComponent {
         return this.rule()?.trigger?.triggerType === 'Manual';
     });
 
-    protected readonly availableSteps = this.rulesState.steps;
-
     protected readonly scriptCompletions = rxResource<ScriptCompletions | null, string | undefined>({
         params: () => this.editableRule().trigger?.triggerType || undefined,
         stream: ({ params }) => this.rulesService.getCompletions(this.rulesState.appName, params),

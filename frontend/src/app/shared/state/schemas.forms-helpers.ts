@@ -23,7 +23,7 @@ export function submitWithoutEmpty<T extends object>(value: T): Record<string, u
     const result = { ...value } as Record<string, unknown>;
 
     for (const [key, submitted] of Object.entries(result)) {
-        if (submitted === '' || Number.isNaN(submitted)) {
+        if (submitted === '' || submitted === null || Number.isNaN(submitted)) {
             result[key] = undefined;
         }
     }

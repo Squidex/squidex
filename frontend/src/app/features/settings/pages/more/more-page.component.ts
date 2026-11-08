@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -40,8 +40,9 @@ import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileD
     ],
 })
 export class MorePageComponent {
-    private readonly appsState = inject(AppsState);
     private readonly dialogs = inject(DialogService);
+
+    protected readonly appsState = inject(AppsState);
 
     protected readonly router = inject(Router);
 
@@ -52,22 +53,20 @@ export class MorePageComponent {
     protected readonly uploadProgress = signal(10);
 
     protected readonly isEditable = computed(() => {
-        return this.app()?.canUpdateGeneral === true;
+        return this.appsState.selectedApp()?.canUpdateGeneral === true;
     });
 
     protected readonly isEditableImage = computed(() => {
-        return this.app()?.canUpdateImage === true;
+        return this.appsState.selectedApp()?.canUpdateImage === true;
     });
 
     protected readonly isDeletable = computed(() => {
-        return this.app()?.canDelete === true;
+        return this.appsState.selectedApp()?.canDelete === true;
     });
 
     protected readonly isTransferable = computed(() => {
-        return this.app()?.canUpdateTeam === true;
+        return this.appsState.selectedApp()?.canUpdateTeam === true;
     });
-
-    protected readonly app = this.appsState.selectedApp;
 
     protected readonly transferForm = new TransferAppForm();
 
@@ -75,7 +74,7 @@ export class MorePageComponent {
 
     constructor() {
         effect(() => {
-            const app = this.app();
+            const app = this.appsState.selectedApp();
             if (!app) {
                 return;
             }
@@ -91,7 +90,7 @@ export class MorePageComponent {
     }
 
     protected save() {
-        const app = this.app();
+        const app = this.appsState.selectedApp();
         if (!app || !this.isEditable()) {
             return;
         }
@@ -103,7 +102,7 @@ export class MorePageComponent {
     }
 
     protected transfer() {
-        const app = this.app();
+        const app = this.appsState.selectedApp();
         if (!app || !this.isTransferable()) {
             return;
         }
@@ -115,7 +114,7 @@ export class MorePageComponent {
     }
 
     protected uploadImage(file: ReadonlyArray<File>) {
-        const app = this.app();
+        const app = this.appsState.selectedApp();
         if (!app || !this.isEditableImage()) {
             return;
         }
@@ -140,7 +139,7 @@ export class MorePageComponent {
     }
 
     protected removeImage() {
-        const app = this.app();
+        const app = this.appsState.selectedApp();
         if (!app || !this.isEditableImage()) {
             return;
         }
@@ -149,7 +148,7 @@ export class MorePageComponent {
     }
 
     protected deleteApp() {
-        const app = this.app();
+        const app = this.appsState.selectedApp();
         if (!app || !this.isDeletable()) {
             return;
         }

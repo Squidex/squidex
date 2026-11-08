@@ -23,7 +23,7 @@ const ColorSchema: ReadonlyArray<string> = [
     '211,  50, 131',
 ];
 
-export module ChartHelpers {
+export namespace ChartHelpers {
     export function label(category: string) {
         return category === '*' ? 'anonymous' : category;
     }
@@ -66,7 +66,7 @@ export function syncChartTheme(themeService: ThemeService) {
     });
 }
 
-export module ChartOptions {
+export namespace ChartOptions {
     export const Default: IChartOptions = {
         responsive: true,
         scales: {

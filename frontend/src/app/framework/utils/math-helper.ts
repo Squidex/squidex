@@ -57,7 +57,7 @@ const ColorDefinitions: ReadonlyArray<ColorDefinition> = [
     },
 ];
 
-export module MathHelper {
+export namespace MathHelper {
     export const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
 
     const CRC32_TABLE: ReadonlyArray<number> = createCrc32Table();

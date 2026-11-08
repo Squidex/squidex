@@ -5,19 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgTemplateOutlet } from '@angular/common';
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, Renderer2, signal, viewChild } from '@angular/core';
-import { CompensateScrollbarDirective } from './compensate-scrollbar.directive';
-import { LoaderComponent } from './loader.component';
-import { SyncScollingDirective } from './sync-scrolling.directive';
+import { NgTemplateOutlet } from "@angular/common";
+import {afterNextRender,
+    booleanAttribute,
+    ChangeDetectionStrategy,
+    Component,
+    effect,
+    ElementRef,
+    inject,
+    input,
+    Renderer2,
+    signal,
+    viewChild,} from "@angular/core";
+import { CompensateScrollbarDirective } from "./compensate-scrollbar.directive";
+import { LoaderComponent } from "./loader.component";
+import { SyncScollingDirective } from "./sync-scrolling.directive";
 
 @Component({
-    selector: 'sqx-list-view',
-    styleUrls: ['./list-view.component.scss'],
-    templateUrl: './list-view.component.html',
-    changeDetection: ChangeDetectionStrategy.Default,
+    selector: "sqx-list-view",
+    styleUrls: ["./list-view.component.scss"],
+    templateUrl: "./list-view.component.html",
+    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+    changeDetection: ChangeDetectionStrategy.Eager,
     host: {
-        ['[class.overflow]']: 'overflow()',
+        ["[class.overflow]"]: "overflow()",
     },
     imports: [
         CompensateScrollbarDirective,
@@ -33,16 +44,20 @@ export class ListViewComponent {
     public readonly overflow = input(false, { transform: booleanAttribute });
 
     /** Syncs the horizontal scroll position of header and content, for wide tables. */
-    public readonly syncedHeader = input(false, { transform: booleanAttribute });
+    public readonly syncedHeader = input(false, {
+        transform: booleanAttribute,
+    });
 
     /** The width of the inner header, content and footer. */
-    public readonly innerWidth = input('100%');
+    public readonly innerWidth = input("100%");
 
     /** Renders the content as table. */
     public readonly table = input(false, { transform: booleanAttribute });
 
     /** Renders the synced header and the table without padding. */
-    public readonly tableNoPadding = input(false, { transform: booleanAttribute });
+    public readonly tableNoPadding = input(false, {
+        transform: booleanAttribute,
+    });
 
     /** Renders the content without padding. */
     public readonly noPadding = input(false, { transform: booleanAttribute });
@@ -53,20 +68,25 @@ export class ListViewComponent {
     /** Shows the loading indicator. It is hidden with a short delay to avoid flickering. */
     public readonly isLoading = input(false, { transform: booleanAttribute });
 
-    protected readonly headerElement = viewChild<ElementRef<ParentNode>>('headerElement');
+    protected readonly headerElement =
+        viewChild<ElementRef<ParentNode>>("headerElement");
 
-    protected readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
+    protected readonly footerElement =
+        viewChild<ElementRef<ParentNode>>("footerElement");
 
     protected readonly isLoadingVisible = signal(false);
 
     constructor() {
-        effect(onCleanup => {
+        effect((onCleanup) => {
             if (this.isLoading()) {
                 this.isLoadingVisible.set(true);
                 return;
             }
 
-            const timer = setTimeout(() => this.isLoadingVisible.set(false), 250);
+            const timer = setTimeout(
+                () => this.isLoadingVisible.set(false),
+                250,
+            );
 
             onCleanup(() => clearTimeout(timer));
         });
@@ -78,12 +98,15 @@ export class ListViewComponent {
     }
 }
 
-function hideWhenEmpty(renderer: Renderer2, element: ElementRef<ParentNode> | undefined) {
+function hideWhenEmpty(
+    renderer: Renderer2,
+    element: ElementRef<ParentNode> | undefined,
+) {
     if (!element?.nativeElement) {
         return;
     }
 
     if (element.nativeElement.children[0].children.length === 0) {
-        renderer.setStyle(element.nativeElement, 'display', 'none');
+        renderer.setStyle(element.nativeElement, "display", "none");
     }
 }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommentsComponent, ContentsState, LayoutComponent, queryParam, routeParam, TranslatePipe } from '@app/shared';
 
@@ -24,12 +24,12 @@ type Tab = 'unresolved' | 'all';
     ],
 })
 export class CommentsPageComponent {
-    private readonly contentStates = inject(ContentsState);
     private readonly route = inject(ActivatedRoute);
+
+    protected readonly contentStates = inject(ContentsState);
 
     protected readonly commentsId = routeParam('contentId', this.route.parent!);
 
     protected readonly commentsTab = queryParam<Tab>('commentsTab', 'unresolved');
 
-    protected readonly content = this.contentStates.selectedContent;
 }

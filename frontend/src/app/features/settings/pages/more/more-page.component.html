@@ -10,7 +10,7 @@
                             <sqx-form-error [error]="updateForm.error()" />
 
                             <sqx-form-row for="name" label="common.name" vertical>
-                                <input class="form-control" readonly [value]="app()?.name" />
+                                <input class="form-control" readonly [value]="appsState.selectedApp()?.name" />
                             </sqx-form-row>
 
                             <sqx-form-row [for]="updateForm.form.label" label="common.label" vertical>
@@ -46,8 +46,11 @@
                                         <div class="app-progress"><sqx-progress-bar mode="Circle" [value]="uploadProgress()" /></div>
                                     } @else {
                                         <div>
-                                            <sqx-avatar [identifier]="app()?.name" [image]="app()?.image" size="150" />
-                                            @if (isEditableImage() && app()?.image) {
+                                            <sqx-avatar
+                                                [identifier]="appsState.selectedApp()?.name"
+                                                [image]="appsState.selectedApp()?.image"
+                                                size="150" />
+                                            @if (isEditableImage() && appsState.selectedApp()?.image) {
                                                 <button
                                                     class="btn btn-danger btn-sm app-image-remove"
                                                     attr.aria-label="{{ 'apps.removeImage' | sqxTranslate }}"

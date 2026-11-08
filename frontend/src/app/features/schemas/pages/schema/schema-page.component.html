@@ -1,5 +1,5 @@
 <sqx-title [message]="schemasState.schemaName" />
-@if (schema(); as schema) {
+@if (schemasState.selectedSchema(); as schema) {
     @let tab = schemaTab();
     <sqx-layout innerWidth="50" layout="main">
         <ng-container title>

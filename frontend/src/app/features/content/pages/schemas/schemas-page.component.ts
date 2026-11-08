@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AppDto, AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, SchemaDto, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions } from '@app/shared';

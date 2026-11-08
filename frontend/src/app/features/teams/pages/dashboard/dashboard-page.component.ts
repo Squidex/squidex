@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterEveryRender, Component, effect, inject, NgZone, Renderer2, signal, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import { afterEveryRender, ChangeDetectionStrategy, Component, effect, inject, NgZone, Renderer2, signal, viewChild } from '@angular/core';
 import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, DateTime, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, safeResource, Settings, SupportCardComponent, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
 import { AppsCardComponent } from './cards/apps-card.component';
@@ -40,11 +40,12 @@ export class DashboardPageComponent {
     private readonly authState = inject(AuthService);
     private readonly localStore = inject(LocalStoreService);
     private readonly renderer = inject(Renderer2);
-    private readonly teamsState = inject(TeamsState);
     private readonly usageDateFrom = DateTime.today().addDays(-20).toStringFormat('yyyy-MM-dd');
     private readonly usageDateTo = DateTime.today().toStringFormat('yyyy-MM-dd');
     private readonly usagesService = inject(UsagesService);
     private readonly zone = inject(NgZone);
+
+    protected readonly teamsState = inject(TeamsState);
 
     protected readonly grid = viewChild<Gridster>('grid');
 
@@ -56,22 +57,20 @@ export class DashboardPageComponent {
 
     protected readonly isStacked = signal(this.localStore.getBoolean(Settings.Local.DASHBOARD_CHART_STACKED));
 
-    protected readonly selectedTeam = this.teamsState.selectedTeam;
-
     protected readonly storageCurrent = safeResource({
-        params: () => this.selectedTeam()?.id,
+        params: () => this.teamsState.selectedTeam()?.id,
         stream: ({ params: teamId }) => this.usagesService.getTodayStorageForTeam(teamId),
         defaultValue: undefined,
     });
 
     protected readonly storageUsage = safeResource({
-        params: () => this.selectedTeam()?.id,
+        params: () => this.teamsState.selectedTeam()?.id,
         stream: ({ params: teamId }) => this.usagesService.getStorageUsagesForTeam(teamId, this.usageDateFrom, this.usageDateTo),
         defaultValue: undefined,
     });
 
     protected readonly callsUsage = safeResource({
-        params: () => this.selectedTeam()?.id,
+        params: () => this.teamsState.selectedTeam()?.id,
         stream: ({ params: teamId }) => this.usagesService.getCallsUsagesForTeam(teamId, this.usageDateFrom, this.usageDateTo),
         defaultValue: undefined,
     });
