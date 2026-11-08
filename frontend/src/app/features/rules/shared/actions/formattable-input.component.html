@@ -9,7 +9,6 @@
             singleLine="true"
             [snippets]="mode === 'Script'"
             (touch)="markTouched()"
-            [touched]="touched()"
             [value]="text()"
             (valueChange)="setText($event)" />
         <div class="input-group-apppend">
@@ -35,7 +34,6 @@
         [mode]="editorMode()"
         [snippets]="mode === 'Script'"
         (touch)="markTouched()"
-        [touched]="touched()"
         [value]="text()"
         (valueChange)="setText($event)" />
 }
