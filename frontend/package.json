@@ -31,7 +31,6 @@
     "@floating-ui/dom": "^1.7.5",
     "@graphiql/toolkit": "^0.11.3",
     "@iharbeck/ngx-virtual-scroller": "^20.0.0",
-    "@lithiumjs/angular": "^9.0.0",
     "@sindresorhus/slugify": "^3.0.0",
     "ace-builds": "^1.43.6",
     "angular-gridster2": "22.0.0",
@@ -73,6 +72,7 @@
   },
   "devDependencies": {
     "@analogjs/storybook-angular": "^2.9.6",
+    "@analogjs/vite-plugin-angular": "^2.9.6",
     "@angular-devkit/architect": "^0.2202.6",
     "@angular-devkit/build-angular": "^22.2.6",
     "@angular-eslint/builder": "22.6.0",
@@ -87,6 +87,7 @@
     "@angular/elements": "^22.2.5",
     "@compodoc/compodoc": "^1.2.1",
     "@storybook/addon-links": "^10.6.6",
+    "@storybook/angular": "^10.6.6",
     "@storybook/testing-library": "^0.2.2",
     "@types/ace": "^0.0.52",
     "@types/codemirror": "5.60.17",
@@ -126,6 +127,11 @@
     },
     "tui-calendar": {
       "dompurify": "^2.5.8"
+    },
+    "ngx-inline-filter": {
+      "@angular/cdk": "$@angular/cdk",
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
     }
   }
 }
