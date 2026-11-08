@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
@@ -17,7 +17,6 @@ import { JobComponent } from './job.component';
     selector: 'sqx-jobs-page',
     styleUrls: ['./jobs-page.component.scss'],
     templateUrl: './jobs-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         JobComponent,

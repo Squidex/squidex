@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { ConfirmClickDirective, DarkenPipe, ExternalLinkDirective, RuleTriggerMetadataDto, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleIconComponent } from './rule-icon.component';
 
@@ -14,7 +14,6 @@ import { RuleIconComponent } from './rule-icon.component';
     selector: 'sqx-rule-element',
     styleUrls: ['./rule-element.component.scss'],
     templateUrl: './rule-element.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         DarkenPipe,

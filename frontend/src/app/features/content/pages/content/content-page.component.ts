@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Injector, linkedSignal, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, Injector, linkedSignal, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { firstValueFrom, Observable, of } from 'rxjs';
@@ -26,7 +26,6 @@ type Tab = 'editor' | 'references' | 'referencing' | 'inspect' | 'extension';
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         CollaborationService,
         CommentsState,

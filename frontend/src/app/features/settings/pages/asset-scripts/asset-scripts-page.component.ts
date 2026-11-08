@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
@@ -17,7 +17,6 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     selector: 'sqx-asset-scripts-page',
     styleUrls: ['./asset-scripts-page.component.scss'],
     templateUrl: './asset-scripts-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormField,

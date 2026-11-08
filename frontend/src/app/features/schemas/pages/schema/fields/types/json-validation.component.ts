@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, JsonFieldPropertiesDto } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { FieldDto, FieldFormModel, JsonFieldPropertiesDto } from '@app/shared';
     selector: 'sqx-json-validation',
     styleUrls: ['json-validation.component.scss'],
     templateUrl: 'json-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JsonValidationComponent {
     /** The form to edit the field properties. */

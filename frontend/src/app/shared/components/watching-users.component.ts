@@ -6,7 +6,7 @@
  */
 
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { StringColorPipe, TooltipDirective } from '@app/framework';
 import { CollaborationService } from '@app/shared/internal';
 import { UserPicturePipe } from './pipes';
@@ -15,7 +15,6 @@ import { UserPicturePipe } from './pipes';
     selector: 'sqx-watching-users',
     styleUrls: ['./watching-users.component.scss'],
     templateUrl: './watching-users.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SlicePipe,
         StringColorPipe,

@@ -9,7 +9,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, Injector, input, output, viewChildren } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, Injector, input, output, viewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
 
@@ -17,7 +17,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     selector: '[sqxContent][language][languages][tableFields][schema][tableSettings]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ContentListCellDirective,

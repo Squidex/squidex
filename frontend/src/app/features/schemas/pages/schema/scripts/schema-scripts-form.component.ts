@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
@@ -15,7 +15,6 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, SchemaDto, Schem
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormField,

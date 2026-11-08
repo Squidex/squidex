@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, signal, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -19,7 +19,6 @@ import { ContributorsDataSource } from './data-source';
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         ContributorsDataSource,
     ],

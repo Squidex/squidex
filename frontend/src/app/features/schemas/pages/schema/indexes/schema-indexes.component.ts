@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap, timer } from 'rxjs';
 import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, TranslatePipe, UIOptions } from '@app/shared';
@@ -17,7 +17,6 @@ import { IndexComponent } from './index.component';
     selector: 'sqx-schema-indexes',
     styleUrls: ['./schema-indexes.component.scss'],
     templateUrl: './schema-indexes.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeComponent,
         IndexComponent,

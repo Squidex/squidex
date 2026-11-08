@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, model, output, signal, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, ElementRef, inject, input, linkedSignal, model, output, signal, viewChild } from '@angular/core';
 import { DateHelper, DateTime, UIOptions } from '@app/framework/internal';
 import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -17,7 +17,6 @@ import { FocusComponent } from '../forms-helper';
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ResizedDirective,
         TooltipDirective,

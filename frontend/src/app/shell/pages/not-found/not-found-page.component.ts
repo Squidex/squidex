@@ -6,14 +6,13 @@
  */
 
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TitleComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-not-found-page',
     styleUrls: ['./not-found-page.component.scss'],
     templateUrl: './not-found-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TitleComponent,
         TranslatePipe,

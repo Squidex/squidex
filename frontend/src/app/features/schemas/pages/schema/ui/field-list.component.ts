@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output } from '@angular/core';
 import { FormAlertComponent, META_FIELDS, SchemaDto, TableField, TranslatePipe } from '@app/shared';
 
 const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
@@ -16,7 +16,6 @@ const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELD
     selector: 'sqx-field-list',
     styleUrls: ['./field-list.component.scss'],
     templateUrl: './field-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDropList,

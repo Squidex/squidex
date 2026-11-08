@@ -6,7 +6,7 @@
  */
 
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, UpdateRoleDto } from '@app/shared';
@@ -38,7 +38,6 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutocompleteComponent,
         ConfirmClickDirective,

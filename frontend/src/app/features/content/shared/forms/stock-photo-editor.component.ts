@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, model, signal } from '@angular/core';
+import { Component, computed, inject, linkedSignal, model, signal } from '@angular/core';
 import { of, timer } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, FormValueControlBase, LoaderComponent, ModalDialogComponent, ModalDirective, safeResource, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -16,7 +16,6 @@ type StockPhotoPage = { page: number; items: ReadonlyArray<StockPhotoDto> };
     selector: 'sqx-stock-photo-editor',
     styleUrls: ['./stock-photo-editor.component.scss'],
     templateUrl: './stock-photo-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ExternalLinkDirective,
         FocusOnInitDirective,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
+import { booleanAttribute, Component, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField, maxLength, required } from '@angular/forms/signals';
 import { Keys } from '@app/framework/internal';
@@ -17,7 +17,6 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
     selector: 'sqx-editable-title',
     styleUrls: ['./editable-title.component.scss'],
     templateUrl: './editable-title.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
         FocusOnInitDirective,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output } from '@angular/core';
 import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalPlacementDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@app/shared/internal';
 import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
@@ -14,7 +14,6 @@ import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
     selector: 'sqx-asset-folder',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetFolderDialogComponent,
         ConfirmClickDirective,

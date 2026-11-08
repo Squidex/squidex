@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { ComponentFieldFormModel, FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { ComponentFieldFormModel, FieldDto, FieldFormModel, FormRowComponent, Re
     selector: 'sqx-component-validation',
     styleUrls: ['component-validation.component.scss'],
     templateUrl: 'component-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

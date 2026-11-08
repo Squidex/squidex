@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, RolesState, SignalSelectDirective, UserInfoFieldFormModel, UserInfoFieldPropertiesDto } from '@app/shared';
@@ -14,7 +14,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, RolesState, SignalSelectDir
     selector: 'sqx-user-info-validation',
     styleUrls: ['user-info-validation.component.scss'],
     templateUrl: 'user-info-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, RichTextFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponen
     selector: 'sqx-rich-text-ui',
     styleUrls: ['rich-text-ui.component.scss'],
     templateUrl: 'rich-text-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetFolderDropdownComponent,
         FormField,

@@ -6,14 +6,13 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, input, linkedSignal } from '@angular/core';
+import { Component, inject, input, linkedSignal } from '@angular/core';
 import { CodeEditorComponent, safeResource } from '@app/framework';
 
 @Component({
     selector: 'sqx-asset-text-editor',
     styleUrls: ['./asset-text-editor.component.scss'],
     templateUrl: './asset-text-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
     ],

@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input, numberAttribute } from '@angular/core';
+import { Component, input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-form-hint',
     styleUrls: ['./form-hint.component.scss'],
     templateUrl: './form-hint.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormHintComponent {
     /** Additional CSS classes for the hint element. */

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, TagEditorComponent, TagsFieldEditorValues, TagsFieldFormModel, TagsFieldPropertiesDto } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, TagEditorComponent, TagsFie
     selector: 'sqx-tags-ui',
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

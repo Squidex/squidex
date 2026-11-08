@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { StringColorPipe } from '@app/framework';
 import { CollaborationService, Profile } from '@app/shared/internal';
 
@@ -15,7 +15,6 @@ type CursorState = { user: Profile; cursor: { x: number; y: number } };
     selector: 'sqx-cursors',
     styleUrls: ['./cursors.component.scss'],
     templateUrl: './cursors.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         StringColorPipe,
     ],

@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, signal, untracked, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, signal, untracked, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -21,7 +21,6 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State,
     ],

@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 /* eslint-disable @angular-eslint/no-output-native */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output } from '@angular/core';
 import { ConfirmClickDirective, FlowView, FromNowPipe, RuleElementDto, RuleEventDto, TranslatePipe } from '@app/shared';
 import { RuleClassPipe } from '../../shared/pipes';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -18,7 +18,6 @@ import { StateDetailsComponent } from '../../shared/state-details.component';
     selector: '[sqxRuleEvent]',
     styleUrls: ['./rule-event.component.scss'],
     templateUrl: './rule-event.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         FromNowPipe,

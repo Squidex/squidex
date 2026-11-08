@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, output } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { EditableTitleComponent, StopDragDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
 import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
@@ -18,7 +18,6 @@ const ITEM_HEIGHT = 2.5;
     selector: 'sqx-schema-category',
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDragHandle,

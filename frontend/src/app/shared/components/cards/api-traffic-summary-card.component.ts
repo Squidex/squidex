@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
 
@@ -13,7 +13,6 @@ import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
     selector: 'sqx-api-traffic-summary-card',
     styleUrls: ['./api-traffic-summary-card.component.scss'],
     templateUrl: './api-traffic-summary-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FileSizePipe,
         TranslatePipe,

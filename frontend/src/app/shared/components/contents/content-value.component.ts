@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
@@ -14,7 +14,6 @@ import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/interna
     selector: 'sqx-content-value',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LongHoverDirective,
         ModalDirective,

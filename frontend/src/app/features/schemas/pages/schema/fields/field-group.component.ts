@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, inject, input, linkedSignal, output } from '@angular/core';
+import { booleanAttribute, Component, inject, input, linkedSignal, output } from '@angular/core';
 import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, LocalStoreService, SchemaDto, Settings } from '@app/shared';
 import { FieldComponent } from './field.component';
 
@@ -15,7 +15,6 @@ import { FieldComponent } from './field.component';
     selector: 'sqx-field-group',
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDragHandle,

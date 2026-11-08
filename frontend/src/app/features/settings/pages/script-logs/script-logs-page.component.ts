@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormAlertComponent, LayoutComponent, ListViewComponent, ScriptLogsState, ShortcutDirective, TitleComponent, TranslatePipe } from '@app/shared';
 import { ScriptLogComponent } from './script-log.component';
 
@@ -13,7 +13,6 @@ import { ScriptLogComponent } from './script-log.component';
     selector: 'sqx-script-logs-page',
     styleUrls: ['./script-logs-page.component.scss'],
     templateUrl: './script-logs-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormAlertComponent,
         LayoutComponent,

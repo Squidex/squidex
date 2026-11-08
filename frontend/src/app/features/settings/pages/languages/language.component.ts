@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, SignalSelectDirective, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
@@ -16,7 +16,6 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowCompone
     selector: 'sqx-language',
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDragHandle,

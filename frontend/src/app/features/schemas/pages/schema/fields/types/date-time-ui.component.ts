@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { DateTimeFieldEditorValues, DateTimeFieldFormModel, DateTimeFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { DateTimeFieldEditorValues, DateTimeFieldFormModel, DateTimeFieldPropert
     selector: 'sqx-date-time-ui',
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

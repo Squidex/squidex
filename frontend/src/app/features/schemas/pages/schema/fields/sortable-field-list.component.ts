@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, input, output } from '@angular/core';
+import { booleanAttribute, Component, computed, forwardRef, input, output } from '@angular/core';
 import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, groupFields, SchemaDto } from '@app/shared';
 import { FieldGroupComponent } from './field-group.component';
 
@@ -15,7 +15,6 @@ import { FieldGroupComponent } from './field-group.component';
     selector: 'sqx-sortable-field-list',
     styleUrls: ['./sortable-field-list.component.scss'],
     templateUrl: './sortable-field-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDragHandle,

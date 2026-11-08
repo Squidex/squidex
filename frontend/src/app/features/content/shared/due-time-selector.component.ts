@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { booleanAttribute, Component, input, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { Observable, of, Subject } from 'rxjs';
 import { DateTime, DateTimeEditorComponent, DialogModel, FocusOnInitDirective, ModalDialogComponent, ModalDirective, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -16,7 +16,6 @@ const OPTION_IMMEDIATELY = 'Immediately';
     selector: 'sqx-due-time-selector',
     styleUrls: ['./due-time-selector.component.scss'],
     templateUrl: './due-time-selector.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DateTimeEditorComponent,
         FocusOnInitDirective,

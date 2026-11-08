@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, Ric
     selector: 'sqx-rich-text-validation',
     styleUrls: ['rich-text-validation.component.scss'],
     templateUrl: 'rich-text-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

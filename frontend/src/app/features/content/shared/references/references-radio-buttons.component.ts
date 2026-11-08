@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
+import { Component, computed, inject, input, model } from '@angular/core';
 import { map } from 'rxjs';
 import { AppLanguageDto, AppsState, ContentDto, ContentsService, FormValueControlBase, LocalizerService, RadioGroupComponent, safeResource, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
@@ -14,7 +14,6 @@ import { ReferencesTagsConverter } from './references-tag-converter';
     selector: 'sqx-references-radio-buttons',
     styleUrls: ['./references-radio-buttons.component.scss'],
     templateUrl: './references-radio-buttons.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RadioGroupComponent,
     ],

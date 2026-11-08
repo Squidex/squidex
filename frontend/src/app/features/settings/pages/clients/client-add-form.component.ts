@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
@@ -14,7 +14,6 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
     selector: 'sqx-client-add-form',
     styleUrls: ['./client-add-form.component.scss'],
     templateUrl: './client-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
         FormField,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input } from '@angular/core';
 import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ScheduleJobDto } from '@app/shared/internal';
 
@@ -13,7 +13,6 @@ import { ScheduleJobDto } from '@app/shared/internal';
     selector: 'sqx-content-status',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FullDateTimePipe,
         TooltipDirective,

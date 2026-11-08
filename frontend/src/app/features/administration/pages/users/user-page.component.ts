@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,7 +17,6 @@ import { UserDto, UserForm, UsersState } from '../../internal';
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormErrorComponent,
         FormField,

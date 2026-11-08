@@ -6,14 +6,13 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { CodeEditorComponent, FlowExecutionStepAttemptDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-state-attempt',
     styleUrls: ['./state-attempt.component.scss'],
     templateUrl: './state-attempt.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         TranslatePipe,

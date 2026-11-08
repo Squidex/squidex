@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent, ListViewComponent, MessageBus, RuleSimulatorState, RulesState, SimulatedRuleEventDto, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -16,7 +16,6 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
     selector: 'sqx-simulator-events-page',
     styleUrls: ['./rule-simulator-page.component.scss'],
     templateUrl: './rule-simulator-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LayoutComponent,
         ListViewComponent,

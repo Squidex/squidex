@@ -6,14 +6,13 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-event',
     styleUrls: ['./content-event.component.scss'],
     templateUrl: './content-event.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FromNowPipe,
         HistoryMessagePipe,

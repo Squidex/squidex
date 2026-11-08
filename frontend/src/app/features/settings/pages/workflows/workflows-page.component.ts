@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
 import { WorkflowAddFormComponent } from './workflow-add-form.component';
@@ -15,7 +15,6 @@ import { WorkflowComponent } from './workflow.component';
     selector: 'sqx-workflows-page',
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LayoutComponent,
         ListViewComponent,

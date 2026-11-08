@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, numberAttribute } from '@angular/core';
+import { booleanAttribute, Component, input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-form-alert',
     styleUrls: ['./form-alert.component.scss'],
     templateUrl: './form-alert.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormAlertComponent {
     /** Additional CSS classes for the alert element. */

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
+import { Component, computed, inject, input, model } from '@angular/core';
 import { map } from 'rxjs';
 import { AppLanguageDto, AppsState, CheckboxGroupComponent, ContentDto, ContentsService, FormValueControlBase, LocalizerService, safeResource, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
@@ -14,7 +14,6 @@ import { ReferencesTagsConverter } from './references-tag-converter';
     selector: 'sqx-references-checkboxes',
     styleUrls: ['./references-checkboxes.component.scss'],
     templateUrl: './references-checkboxes.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CheckboxGroupComponent,
     ],

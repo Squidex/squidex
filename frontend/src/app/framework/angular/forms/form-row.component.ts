@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { Types } from '@app/framework/internal';
 import { MarkdownDirective } from '../markdown.directive';
@@ -19,7 +19,6 @@ import { getFieldKey } from './signal-validators';
     selector: 'sqx-form-row',
     styleUrls: ['./form-row.component.scss'],
     templateUrl: './form-row.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         'class': 'form-group',
         '[class]': 'class()',

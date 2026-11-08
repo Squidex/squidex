@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, Injectable, viewChild } from '@angular/core';
+import { Component, inject, Injectable, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, ShortcutComponent, ShortcutDirective, TooltipDirective, TranslatePipe, Types } from '@app/shared';
@@ -34,7 +34,6 @@ export class SearchSource implements AutocompleteSource {
     providers: [
         SearchSource,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutocompleteComponent_1,
         ShortcutComponent,

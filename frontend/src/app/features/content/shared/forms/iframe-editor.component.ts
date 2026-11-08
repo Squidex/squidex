@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, untracked, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, untracked, viewChild } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, ModalDirective, SafeResourceUrlPipe, ThemeService, Types } from '@app/shared';
@@ -14,7 +14,6 @@ import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEdi
     selector: 'sqx-iframe-editor',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetSelectorComponent,
         ContentSelectorComponent,

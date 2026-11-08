@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, contentChild, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, output, signal, TemplateRef, untracked, viewChild } from '@angular/core';
+import { booleanAttribute, Component, contentChild, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, output, signal, TemplateRef, untracked, viewChild } from '@angular/core';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap } from 'rxjs/operators';
 import getCaretCoordinates from 'textarea-caret';
@@ -75,7 +75,6 @@ function parseQuery(text: unknown, startCharacter: string, cursor: number): Quer
     selector: 'sqx-autocomplete',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutosizeDirective,
         DropdownMenuComponent,

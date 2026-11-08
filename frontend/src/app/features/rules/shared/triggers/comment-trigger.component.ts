@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
 import { CodeComponent, ConditionTriggerForm, FormHintComponent, FormRowComponent, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { CodeComponent, ConditionTriggerForm, FormHintComponent, FormRowComponen
     selector: 'sqx-comment-trigger',
     styleUrls: ['./comment-trigger.component.scss'],
     templateUrl: './comment-trigger.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeComponent,
         FormField,

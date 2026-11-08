@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { ExternalLinkDirective, FromNowPipe, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -18,7 +18,6 @@ import { AssetUrlPipe } from './pipes';
     selector: 'sqx-asset-history',
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetUrlPipe,
         ExternalLinkDirective,

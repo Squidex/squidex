@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { booleanAttribute, Component, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, AppSettingsDto, FieldDto, FieldFormModel, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayValidationComponent } from '../types/array-validation.component';
@@ -28,7 +28,6 @@ import { UserInfoValidationComponent } from '../types/user-info-validation.compo
     selector: 'sqx-field-form-validation',
     styleUrls: ['./field-form-validation.component.scss'],
     templateUrl: './field-form-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ArrayValidationComponent,
         AssetsValidationComponent,

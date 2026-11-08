@@ -6,7 +6,7 @@
  */
 
 import { KeyValuePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -15,7 +15,6 @@ import { ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, C
     selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
     templateUrl: './client-connect-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeComponent,
         ExternalLinkDirective,

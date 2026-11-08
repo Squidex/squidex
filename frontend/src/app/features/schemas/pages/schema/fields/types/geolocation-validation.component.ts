@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, GeolocationFieldPropertiesDto } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { FieldDto, FieldFormModel, GeolocationFieldPropertiesDto } from '@app/sh
     selector: 'sqx-geolocation-validation',
     styleUrls: ['geolocation-validation.component.scss'],
     templateUrl: 'geolocation-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GeolocationValidationComponent {
     /** The form to edit the field properties. */

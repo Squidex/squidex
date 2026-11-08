@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, model, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, Component, DestroyRef, effect, ElementRef, inject, input, model, output, signal, viewChild } from '@angular/core';
 import { FormValueControlBase, HTTP, ModalDirective, safeResource, syncExternalValue, ThemeService } from '@app/framework';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
@@ -17,7 +17,6 @@ import { ContentSelectorComponent } from '../references/content-selector.compone
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetDialogComponent,
         AssetSelectorComponent,

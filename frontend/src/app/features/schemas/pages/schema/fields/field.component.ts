@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, inject, Injector, input, signal } from '@angular/core';
+import { booleanAttribute, Component, computed, forwardRef, inject, Injector, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateFieldDto } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
@@ -17,7 +17,6 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     selector: 'sqx-field',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         DropdownMenuComponent,

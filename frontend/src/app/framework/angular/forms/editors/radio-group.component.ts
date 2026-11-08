@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
 import { getTagValues, MathHelper, TagValue, TextMeasurer } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
 import { FormValueControlBase } from '../form-value-control';
@@ -14,7 +14,6 @@ import { FormValueControlBase } from '../form-value-control';
     selector: 'sqx-radio-group',
     styleUrls: ['./radio-group.component.scss'],
     templateUrl: './radio-group.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ResizedDirective,
     ],

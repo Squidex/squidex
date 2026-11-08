@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, linkedSignal, model, signal, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, ElementRef, input, linkedSignal, model, signal, viewChild } from '@angular/core';
 import { getTagValues, MathHelper, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
 import { FormValueControlBase } from '../form-value-control';
@@ -14,7 +14,6 @@ import { FormValueControlBase } from '../form-value-control';
     selector: 'sqx-checkbox-group',
     styleUrls: ['./checkbox-group.component.scss'],
     templateUrl: './checkbox-group.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ResizedDirective,
     ],

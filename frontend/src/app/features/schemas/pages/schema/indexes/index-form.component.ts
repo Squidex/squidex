@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIndexForm, FormHintComponent, IndexesState, MarkdownDirective, ModalDialogComponent, SchemaDto, SignalSelectDirective, TranslatePipe } from '@app/shared';
@@ -15,7 +15,6 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
     selector: 'sqx-index-form',
     styleUrls: ['./index-form.component.scss'],
     templateUrl: './index-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ControlErrorsComponent,

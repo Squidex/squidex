@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { ListViewComponent, ResourceLoaderService, ThemeService, WorkflowView } from '@app/shared';
 
 declare const vis: any;
@@ -14,7 +14,6 @@ declare const vis: any;
     selector: 'sqx-workflow-diagram',
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ListViewComponent,
     ],

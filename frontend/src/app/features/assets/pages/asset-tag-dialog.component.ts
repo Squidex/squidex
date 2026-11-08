@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
+import { Component, effect, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
@@ -16,7 +16,6 @@ import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/i
     selector: 'sqx-asset-tag-dialog',
     styleUrls: ['./asset-tag-dialog.component.scss'],
     templateUrl: './asset-tag-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,
         FormErrorComponent,

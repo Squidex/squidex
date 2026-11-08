@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, numberAttribute, output, TemplateRef, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, DestroyRef, inject, input, numberAttribute, output, TemplateRef, viewChild } from '@angular/core';
 import { LocalizerService } from '../internal';
 import { ConfirmClickDirective } from './forms/confirm-click.directive';
 import { MenuItemRegistry } from './menu.component';
@@ -16,7 +16,6 @@ import { TranslatePipe } from './pipes/translate.pipe';
     selector: 'sqx-menu-item',
     styleUrls: ['./menu-item.component.scss'],
     templateUrl: './menu-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         TooltipDirective,

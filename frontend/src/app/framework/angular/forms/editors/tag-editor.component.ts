@@ -6,7 +6,7 @@
  */
 
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, input, model, output, signal, untracked, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, Component, computed, effect, ElementRef, inject, Injector, input, model, output, signal, untracked, viewChild } from '@angular/core';
 import { getTagValues, Keys, ModalModel, StringConverter, TagConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
@@ -44,7 +44,6 @@ function convertTags(obj: any, converter: TagConverter) {
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         LoaderComponent,

@@ -6,14 +6,13 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { TooltipDirective } from './modals/tooltip.directive';
 
 @Component({
     selector: 'sqx-status-icon',
     styleUrls: ['./status-icon.component.scss'],
     templateUrl: './status-icon.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
     ],

@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, linkedSignal } from '@angular/core';
+import { booleanAttribute, Component, input, linkedSignal } from '@angular/core';
 import { ErrorDto } from '@app/framework/internal';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
@@ -15,7 +15,6 @@ import { TranslatePipe } from '../pipes/translate.pipe';
     selector: 'sqx-form-error',
     styleUrls: ['./form-error.component.scss'],
     templateUrl: './form-error.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MarkdownDirective,
         TranslatePipe,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, Renderer2, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, Renderer2, viewChild } from '@angular/core';
 import { ResourceLoaderService, UIOptions } from '@app/framework';
 import { AuthService } from '@app/shared/internal';
 import { TourHintDirective } from './tour-hint.directive';
@@ -14,7 +14,6 @@ import { TourHintDirective } from './tour-hint.directive';
     selector: 'sqx-notifo',
     styleUrls: ['./notifo.component.scss'],
     templateUrl: './notifo.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TourHintDirective,
     ],

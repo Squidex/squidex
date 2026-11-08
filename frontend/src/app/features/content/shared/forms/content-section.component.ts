@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, input, linkedSignal, numberAttribute, output } from '@angular/core';
+import { booleanAttribute, Component, forwardRef, inject, input, linkedSignal, numberAttribute, output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldDto, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, SchemaDto, Settings } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
 
@@ -13,7 +13,6 @@ import { ContentFieldComponent } from './content-field.component';
     selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         forwardRef(() => ContentFieldComponent),
         FormHintComponent,

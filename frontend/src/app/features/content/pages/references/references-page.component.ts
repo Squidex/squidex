@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, untracked } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, routeParam, Router2State, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../shared/references/reference-item.component';
 
@@ -13,7 +13,6 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
     selector: 'sqx-references-page',
     styleUrls: ['./references-page.component.scss'],
     templateUrl: './references-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         ComponentContentsState,
         Router2State,

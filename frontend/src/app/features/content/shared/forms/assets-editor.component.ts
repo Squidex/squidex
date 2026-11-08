@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
 import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, FormValueControlBase, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, TranslatePipe, Types } from '@app/shared';
 
 class AssetUpdated {
@@ -22,7 +22,6 @@ class AssetUpdated {
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetComponent,
         AssetDialogComponent,

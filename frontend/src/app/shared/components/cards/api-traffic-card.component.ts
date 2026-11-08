@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output } from '@angular/core';
 import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { FileSizePipe, TranslatePipe } from '@app/framework';
@@ -15,7 +15,6 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared/internal'
     selector: 'sqx-api-traffic-card',
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         BaseChartDirective,
         FileSizePipe,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, numberAttribute, signal } from '@angular/core';
+import { booleanAttribute, Component, effect, ElementRef, inject, input, numberAttribute, signal } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
 import { ThemeService } from '@app/framework/internal';
 
@@ -20,7 +20,6 @@ import { ThemeService } from '@app/framework/internal';
     host: {
         style: 'display: block',
     },
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressBarComponent {
     private readonly element = inject(ElementRef);

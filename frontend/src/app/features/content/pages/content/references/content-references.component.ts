@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ToolbarService, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../../shared/references/reference-item.component';
 
@@ -13,7 +13,6 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
     selector: 'sqx-content-references',
     styleUrls: ['./content-references.component.scss'],
     templateUrl: './content-references.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         ComponentContentsState,
         Router2State,

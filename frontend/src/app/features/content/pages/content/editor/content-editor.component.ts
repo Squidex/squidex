@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FormErrorComponent, ListViewComponent, MarkdownDirective, SchemaDto, TranslatePipe, Version } from '@app/shared';
 import { ContentSectionComponent } from '../../../shared/forms/content-section.component';
 
@@ -13,7 +13,6 @@ import { ContentSectionComponent } from '../../../shared/forms/content-section.c
     selector: 'sqx-content-editor',
     styleUrls: ['./content-editor.component.scss'],
     templateUrl: './content-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ContentSectionComponent,
         CursorsComponent,

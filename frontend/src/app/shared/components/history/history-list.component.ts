@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FromNowPipe, TooltipDirective } from '@app/framework';
 import { HistoryEventDto } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
@@ -16,7 +16,6 @@ import { HistoryMessagePipe } from './pipes';
     selector: 'sqx-history-list',
     styleUrls: ['./history-list.component.scss'],
     templateUrl: './history-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FromNowPipe,
         HistoryMessagePipe,

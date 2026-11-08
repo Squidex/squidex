@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { switchMap, tap } from 'rxjs';
@@ -15,7 +15,6 @@ import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective,
     selector: 'sqx-schema-form',
     styleUrls: ['./schema-form.component.scss'],
     templateUrl: './schema-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FocusOnInitDirective,

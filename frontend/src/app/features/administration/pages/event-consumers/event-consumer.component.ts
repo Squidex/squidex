@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { EventConsumerDto, TooltipDirective, TranslatePipe } from '@app/shared';
 import { EventConsumersState } from '../../internal';
 
@@ -16,7 +16,6 @@ import { EventConsumersState } from '../../internal';
     selector: '[sqxEventConsumer]',
     styleUrls: ['./event-consumer.component.scss'],
     templateUrl: './event-consumer.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
         TranslatePipe,

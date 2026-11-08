@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfigureUIFieldsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 import { FieldListComponent } from './field-list.component';
@@ -14,7 +14,6 @@ import { FieldListComponent } from './field-list.component';
     selector: 'sqx-schema-ui-form',
     styleUrls: ['./schema-ui-form.component.scss'],
     templateUrl: './schema-ui-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FieldListComponent,
         FormsModule,

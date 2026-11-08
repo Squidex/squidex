@@ -7,7 +7,7 @@
 
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { booleanAttribute, Component, input, signal } from '@angular/core';
 import { RuleTriggerMetadataDto, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from './rule-element.component';
 
@@ -15,7 +15,6 @@ import { RuleElementComponent } from './rule-element.component';
     selector: 'sqx-history-step',
     styleUrls: ['./history-step.component.scss'],
     templateUrl: './history-step.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         NgTemplateOutlet,
         RuleElementComponent,

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
+import { Component, computed, input, model, signal } from '@angular/core';
 import { CodeEditorComponent, FormValueControlBase, ScriptCompletions, syncExternalValue, Types } from '@app/shared';
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
@@ -15,7 +15,6 @@ type TemplateMode = 'Text' | 'Script' | 'Liquid';
     selector: 'sqx-formattable-input',
     styleUrls: ['./formattable-input.component.scss'],
     templateUrl: './formattable-input.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
     ],

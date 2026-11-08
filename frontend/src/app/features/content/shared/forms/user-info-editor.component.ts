@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { disabled, form, FormField, required } from '@angular/forms/signals';
 import { CodeComponent, FormHintComponent, FormRowComponent, FormValueControlBase, generateApiKey, MarkdownDirective, RolesState, SignalSelectDirective, syncExternalValue, TranslatePipe, Types } from '@app/shared';
@@ -16,7 +16,6 @@ type UserInfo = { apiKey: string; role: string };
     selector: 'sqx-user-info-editor',
     styleUrls: ['./user-info-editor.component.scss'],
     templateUrl: './user-info-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeComponent,
         FormField,

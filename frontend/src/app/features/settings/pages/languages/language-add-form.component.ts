@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
@@ -44,7 +44,6 @@ class LanguageSource implements AutocompleteSource {
     selector: 'sqx-language-add-form',
     styleUrls: ['./language-add-form.component.scss'],
     templateUrl: './language-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutocompleteComponent,
         FormField,

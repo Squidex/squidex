@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
@@ -13,7 +13,6 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     selector: 'sqx-asset-uploader',
     styleUrls: ['./asset-uploader.component.scss'],
     templateUrl: './asset-uploader.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         FileDropDirective,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { LocalizerService, Types } from '@app/framework/internal';
 import { ControlErrorsMessagesComponent } from './control-errors-messages.component';
@@ -15,7 +15,6 @@ import { formatSignalErrors, getFieldKey } from './signal-validators';
     selector: 'sqx-control-errors',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsMessagesComponent,
     ],

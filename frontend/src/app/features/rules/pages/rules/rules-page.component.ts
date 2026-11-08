@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, ListViewComponent, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { RuleComponent } from './rule.component';
@@ -14,7 +14,6 @@ import { RuleComponent } from './rule.component';
     selector: 'sqx-rules-page',
     styleUrls: ['./rules-page.component.scss'],
     templateUrl: './rules-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LayoutComponent,
         ListViewComponent,

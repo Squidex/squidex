@@ -6,14 +6,13 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FeatureDto, HelpMarkdownPipe, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-news-dialog',
     styleUrls: ['./news-dialog.component.scss'],
     templateUrl: './news-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         HelpMarkdownPipe,
         ModalDialogComponent,

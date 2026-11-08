@@ -6,7 +6,7 @@
  */
 
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, model, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, model, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { disabled, form, FormField } from '@angular/forms/signals';
 import { ControlErrorsComponent, FormValueControlBase, ResizedDirective, SignalValidators, StringHelper, syncExternalValue, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -23,7 +23,6 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
         FormField,

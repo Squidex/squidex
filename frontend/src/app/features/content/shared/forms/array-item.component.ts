@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, numberAttribute, output, viewChildren } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, input, numberAttribute, output, viewChildren } from '@angular/core';
 import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
@@ -13,7 +13,6 @@ import { ComponentSectionComponent } from './component-section.component';
     selector: 'sqx-array-item',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ComponentSectionComponent,
         FormHintComponent,

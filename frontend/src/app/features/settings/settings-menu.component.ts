@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppDto, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { AppDto, TourStepDirective, TranslatePipe } from '@app/shared';
     selector: 'sqx-settings-menu',
     styleUrls: ['./settings-menu.component.scss'],
     templateUrl: './settings-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         RouterLinkActive,

@@ -5,14 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { ConfirmClickDirective, IndexDto, IndexesState, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-index',
     styleUrls: ['./index.component.scss'],
     templateUrl: './index.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         TranslatePipe,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Injectable, input } from '@angular/core';
+import { Component, computed, effect, inject, Injectable, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { firstValueFrom, Observable, of } from 'rxjs';
@@ -43,7 +43,6 @@ export class UsersDataSource implements AutocompleteSource {
     selector: 'sqx-contributor-add-form',
     styleUrls: ['./contributor-add-form.component.scss'],
     templateUrl: './contributor-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         UsersDataSource,
     ],

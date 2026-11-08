@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, UserInfoFieldPropertiesDto } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { FieldDto, FieldFormModel, UserInfoFieldPropertiesDto } from '@app/share
     selector: 'sqx-user-info-ui',
     styleUrls: ['user-info-ui.component.scss'],
     templateUrl: 'user-info-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserInfoUIComponent {
     /** The form to edit the field properties. */

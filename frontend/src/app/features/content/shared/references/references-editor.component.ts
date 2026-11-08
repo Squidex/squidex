@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, forwardRef, inject, input, model, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, effect, forwardRef, inject, input, model, signal, untracked } from '@angular/core';
 import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, FormValueControlBase, ModalDirective, ResizedDirective, ResolveContents, sorted, TranslatePipe, Types } from '@app/shared';
 import { ContentCreatorComponent } from './content-creator.component';
 import { ReferenceItemComponent } from './reference-item.component';
@@ -16,7 +16,6 @@ import { ReferenceItemComponent } from './reference-item.component';
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDragHandle,

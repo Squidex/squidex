@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, model } from '@angular/core';
+import { booleanAttribute, Component, effect, input, model } from '@angular/core';
 import { FloatingPlacement, ModalModel } from '@app/framework/internal';
 import { DropdownMenuComponent } from './dropdown-menu.component';
 import { ModalPlacementDirective } from './modals/modal-placement.directive';
@@ -19,7 +19,6 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
     selector: 'sqx-language-selector',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         ModalDirective,

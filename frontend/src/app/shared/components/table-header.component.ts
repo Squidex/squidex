@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
+import { booleanAttribute, Component, input, linkedSignal, output } from '@angular/core';
 import { SortOrder } from 'ngx-inline-filter';
 import { TranslatePipe } from '@app/framework';
 import { AppLanguageDto, Query, Types } from '@app/shared/internal';
@@ -14,7 +14,6 @@ import { AppLanguageDto, Query, Types } from '@app/shared/internal';
     selector: 'sqx-table-header',
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],

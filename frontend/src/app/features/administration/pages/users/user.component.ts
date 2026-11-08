@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ConfirmClickDirective, StopClickDirective, TooltipDirective, TranslatePipe, UserDtoPicture } from '@app/shared';
 import { UserDto, UsersState } from '../../internal';
@@ -17,7 +17,6 @@ import { UserDto, UsersState } from '../../internal';
     selector: '[sqxUser]',
     styleUrls: ['./user.component.scss'],
     templateUrl: './user.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         RouterLink,

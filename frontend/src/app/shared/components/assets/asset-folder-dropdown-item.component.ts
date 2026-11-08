@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, input, numberAttribute, output } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, input, numberAttribute, output } from '@angular/core';
 import { LoaderComponent, StopClickDirective, TranslatePipe } from '@app/framework';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
@@ -15,7 +15,6 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     selector: 'sqx-asset-folder-dropdown-item',
     styleUrls: ['./asset-folder-dropdown-item.component.scss'],
     templateUrl: './asset-folder-dropdown-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LoaderComponent,
         StopClickDirective,

@@ -6,7 +6,7 @@
  */
 
 import { LowerCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ALL_TRIGGERS, ConfirmClickDirective, DialogModel, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RulesService, RulesState, RuleTriggerDto, SchemasState, ScriptCompletions, SidebarMenuDirective, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
@@ -29,7 +29,6 @@ type Snapshot = {
     selector: 'sqx-rule-page',
     styleUrls: ['./rule-page.component.scss'],
     templateUrl: './rule-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         BranchComponent,
         ConfirmClickDirective,

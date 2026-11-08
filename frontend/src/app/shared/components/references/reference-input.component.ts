@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, model, signal } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, model, signal } from '@angular/core';
 import { FormValueControlBase, ModalDirective, syncExternalValue } from '@app/framework';
 import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, Types } from '@app/shared/internal';
 import { ContentSelectorComponent } from './content-selector.component';
@@ -14,7 +14,6 @@ import { ContentSelectorComponent } from './content-selector.component';
     selector: 'sqx-reference-input',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ContentSelectorComponent,
         ModalDirective,

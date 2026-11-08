@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from '../../shared/history-step.component';
 
@@ -14,7 +14,6 @@ import { HistoryStepComponent } from '../../shared/history-step.component';
     selector: 'sqx-rule-transition',
     styleUrls: ['./rule-transition.component.scss'],
     templateUrl: './rule-transition.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         HistoryStepComponent,
         TranslatePipe,

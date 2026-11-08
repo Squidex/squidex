@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, Renderer2, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, Renderer2, signal, viewChild } from '@angular/core';
 import { ResourceLoaderService } from '@app/framework/internal';
 
 declare const videojs: any;
@@ -14,7 +14,6 @@ declare const videojs: any;
     selector: 'sqx-video-player',
     styleUrls: ['./video-player.component.scss'],
     templateUrl: './video-player.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoPlayerComponent {
     private readonly destroyRef = inject(DestroyRef);

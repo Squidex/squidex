@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { StringColorPipe } from '@app/framework';
 import { CollaborationService } from '@app/shared/internal';
 
@@ -13,7 +13,6 @@ import { CollaborationService } from '@app/shared/internal';
     selector: 'sqx-focus-marker',
     styleUrls: ['./focus-marker.component.scss'],
     templateUrl: './focus-marker.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         '(window:click)': 'onWindowClick($event)',
     },

@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, numberAttribute, viewChild, viewChildren } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, numberAttribute, viewChild, viewChildren } from '@angular/core';
 import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
 import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
@@ -15,7 +15,6 @@ import { ArrayItemComponent } from './array-item.component';
     selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ArrayItemComponent,
         CdkDrag,

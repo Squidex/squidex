@@ -5,14 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, inject, untracked } from '@angular/core';
+import { Component, effect, inject, untracked } from '@angular/core';
 import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-notification-dropdown',
     styleUrls: ['./notification-dropdown.component.scss'],
     templateUrl: './notification-dropdown.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         CollaborationService,
         CommentsState,

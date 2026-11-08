@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, AssetsFieldFormModel, AssetsFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, SignalSelectDirective, TagEditorComponent, TranslatePipe } from '@app/shared';
@@ -15,7 +15,6 @@ import { AppLanguageDto, AssetsFieldFormModel, AssetsFieldPropertiesDto, FieldDt
     selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

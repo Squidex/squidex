@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, ExportContentsDto, ExportFormat, FormRowComponent, MarkdownDirective, ModalDialogComponent, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
@@ -15,7 +15,6 @@ type FieldPaths = { label: string; paths: ReadonlyArray<string> };
     selector: 'sqx-contents-export-dialog',
     styleUrls: ['./contents-export-dialog.component.scss'],
     templateUrl: './contents-export-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

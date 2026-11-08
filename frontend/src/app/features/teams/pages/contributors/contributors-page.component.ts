@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamContributorsState } from '../../internal';
@@ -16,7 +16,6 @@ import { ContributorComponent } from './contributor.component';
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
     templateUrl: './contributors-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State,
     ],

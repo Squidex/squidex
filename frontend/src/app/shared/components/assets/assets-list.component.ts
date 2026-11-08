@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { booleanAttribute, Component, input, output, signal } from '@angular/core';
 import { FileDropDirective, HTTP, TourStepDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetFolderDto, AssetsState, getFiles, Types } from '@app/shared/internal';
 import { AssetFolderComponent } from './asset-folder.component';
@@ -16,7 +16,6 @@ import { AssetComponent } from './asset.component';
     selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetComponent,
         AssetFolderComponent,

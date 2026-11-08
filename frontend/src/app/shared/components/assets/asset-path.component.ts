@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
 import { AssetPathItem } from '@app/shared/internal';
 
@@ -14,7 +14,6 @@ import { AssetPathItem } from '@app/shared/internal';
     selector: 'sqx-asset-path',
     styleUrls: ['./asset-path.component.scss'],
     templateUrl: './asset-path.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],

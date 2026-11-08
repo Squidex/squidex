@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, viewChild } from '@angular/core';
 import { ApiUrlConfig, ThemeService, Types } from '@app/framework';
 import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
 
@@ -13,7 +13,6 @@ import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
     selector: 'sqx-iframe-card',
     styleUrls: ['./iframe-card.component.scss'],
     templateUrl: './iframe-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         '(window:message)': 'onWindowMessage($event)',
     },

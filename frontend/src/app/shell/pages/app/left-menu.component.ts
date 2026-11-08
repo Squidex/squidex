@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppDto, Settings, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { AppDto, Settings, TourStepDirective, TranslatePipe } from '@app/shared'
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         RouterLinkActive,

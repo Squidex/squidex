@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, viewChild } from '@angular/core';
 import Cropper from 'cropperjs';
 import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
 
@@ -13,7 +13,6 @@ import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
     selector: 'sqx-image-editor',
     styleUrls: ['./image-cropper.component.scss'],
     templateUrl: './image-cropper.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
         TranslatePipe,

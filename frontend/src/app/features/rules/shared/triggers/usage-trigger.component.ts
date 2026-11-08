@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
 import { FormRowComponent, UsageTriggerForm } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { FormRowComponent, UsageTriggerForm } from '@app/shared';
     selector: 'sqx-usage-trigger',
     styleUrls: ['./usage-trigger.component.scss'],
     templateUrl: './usage-trigger.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

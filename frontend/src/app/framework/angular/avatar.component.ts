@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, numberAttribute } from '@angular/core';
+import { Component, computed, input, linkedSignal, numberAttribute } from '@angular/core';
 import { picasso } from '@app/framework/internal';
 import { SafeUrlPipe } from './safe-html.pipe';
 
@@ -13,7 +13,6 @@ import { SafeUrlPipe } from './safe-html.pipe';
     selector: 'sqx-avatar',
     styleUrls: ['./avatar.component.scss'],
     templateUrl: './avatar.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SafeUrlPipe,
     ],

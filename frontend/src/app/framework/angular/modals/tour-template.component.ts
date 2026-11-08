@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ModalPlacementDirective } from './modal-placement.directive';
@@ -17,7 +17,6 @@ import { StepDefinition, TourService } from './tour.service';
     selector: 'sqx-tour-template',
     styleUrls: ['./tour-template.component.scss'],
     templateUrl: './tour-template.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MarkdownDirective,
         ModalDirective,

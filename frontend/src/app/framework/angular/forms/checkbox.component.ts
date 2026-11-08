@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
+import { booleanAttribute, Component, computed, input, model } from '@angular/core';
 import { Types } from '@app/framework/internal';
 import { FormValueControlBase } from './form-value-control';
 
@@ -25,7 +25,6 @@ import { FormValueControlBase } from './form-value-control';
     host: {
         'style': 'display: contents',
     },
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckboxComponent extends FormValueControlBase<boolean | null> {
     /** The value of the control. */

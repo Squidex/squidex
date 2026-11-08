@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
 
@@ -13,7 +13,6 @@ import { TeamPlansState } from '../../internal';
     selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         FileSizePipe,

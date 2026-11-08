@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
+import { booleanAttribute, Component, computed, input, model } from '@angular/core';
 import { Types } from '@app/framework/internal';
 import { FormValueControlBase } from '../form-value-control';
 
@@ -13,7 +13,6 @@ import { FormValueControlBase } from '../form-value-control';
     selector: 'sqx-toggle',
     styleUrls: ['./toggle.component.scss'],
     templateUrl: './toggle.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToggleComponent extends FormValueControlBase<boolean | null> {
     /** The value of the control. */

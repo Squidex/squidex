@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, Notification, Tooltip } from '@app/framework/internal';
@@ -22,7 +22,6 @@ import { TooltipDirective } from './tooltip.directive';
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,
         MarkdownDirective,

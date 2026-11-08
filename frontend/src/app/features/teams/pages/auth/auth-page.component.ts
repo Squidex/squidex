@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -17,7 +17,6 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     selector: 'sqx-auth-page',
     styleUrls: ['./auth-page.component.scss'],
     templateUrl: './auth-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CopyDirective,
         FormErrorComponent,

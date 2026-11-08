@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AssetFolderDropdownComponent, AssetsFieldFormModel, AssetsFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, SignalSelectDirective, TranslatePipe } from '@app/shared';
@@ -14,7 +14,6 @@ import { AssetFolderDropdownComponent, AssetsFieldFormModel, AssetsFieldProperti
     selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
     templateUrl: 'assets-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetFolderDropdownComponent,
         FormField,

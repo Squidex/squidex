@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ContentsState, LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
@@ -13,7 +13,6 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
     selector: 'sqx-sidebar-page',
     styleUrls: ['./sidebar-page.component.scss'],
     templateUrl: './sidebar-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ContentExtensionComponent,
         LayoutComponent,

@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input, numberAttribute } from '@angular/core';
+import { Component, input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-loader',
     styleUrls: ['./loader.component.scss'],
     templateUrl: './loader.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoaderComponent {
     /** The width and height of the spinner in pixels. */

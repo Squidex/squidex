@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePipe, WorkflowsState } from '@app/shared';
@@ -14,7 +14,6 @@ import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePi
     selector: 'sqx-workflow-add-form',
     styleUrls: ['./workflow-add-form.component.scss'],
     templateUrl: './workflow-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
         FormField,

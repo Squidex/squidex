@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, contentChild, DestroyRef, ElementRef, inject, input, numberAttribute, Renderer2, signal, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectorRef, Component, computed, contentChild, DestroyRef, ElementRef, inject, input, numberAttribute, Renderer2, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router, RouterLink } from '@angular/router';
 import { EMPTY, filter, map } from 'rxjs';
@@ -21,7 +21,6 @@ type DisplayMode = 'Normal' | 'Expanded' | 'Collapsed';
     selector: 'sqx-layout',
     styleUrls: ['./layout.component.scss'],
     templateUrl: './layout.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         NgTemplateOutlet,
         RouterLink,

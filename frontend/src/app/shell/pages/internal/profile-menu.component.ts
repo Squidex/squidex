@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, ThemeMode, ThemeService, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLink
     selector: 'sqx-profile-menu',
     styleUrls: ['./profile-menu.component.scss'],
     templateUrl: './profile-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         ExternalLinkDirective,

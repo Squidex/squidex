@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { Component, computed, effect, forwardRef, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { tap } from 'rxjs';
@@ -16,7 +16,6 @@ import { ContentSectionComponent } from '../forms/content-section.component';
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         ResolveAssets,
         ResolveContents,

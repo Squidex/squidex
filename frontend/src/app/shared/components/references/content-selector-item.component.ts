@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { StopClickDirective } from '@app/framework';
 import { AppLanguageDto, ContentDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
 import { ContentListCellDirective } from '../contents/content-list-cell.directive';
@@ -17,7 +17,6 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
     selector: '[sqxContentSelectorItem][language][languages][schema]',
     styleUrls: ['./content-selector-item.component.scss'],
     templateUrl: './content-selector-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ContentListCellDirective,
         ContentListFieldComponent,

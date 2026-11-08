@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, input, numberAttribute, viewChildren } from '@angular/core';
+import { booleanAttribute, Component, forwardRef, input, numberAttribute, viewChildren } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldDto, FieldSection, FormHintComponent, MarkdownDirective } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
@@ -13,7 +13,6 @@ import { FieldEditorComponent } from './field-editor.component';
     selector: 'sqx-component-section',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         forwardRef(() => FieldEditorComponent),
         FormHintComponent,

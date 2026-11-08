@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { CheckboxComponent, SignalSelectDirective, StarsComponent, ToggleComponent, TransformInputDirective } from '@app/framework';
@@ -16,7 +16,6 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
     selector: 'sqx-content-value-editor',
     styleUrls: ['./content-value-editor.component.scss'],
     templateUrl: './content-value-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CheckboxComponent,
         FormField,

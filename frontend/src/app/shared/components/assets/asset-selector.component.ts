@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { ListViewComponent, ModalDialogComponent, PagerComponent, TagEditorComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings } from '@app/shared/internal';
 import { SearchFormComponent } from '../search/search-form.component';
@@ -18,7 +18,6 @@ import { AssetsListComponent } from './assets-list.component';
     providers: [
         ComponentAssetsState,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetsListComponent,
         ListViewComponent,

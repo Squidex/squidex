@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, numberAttribute, viewChildren } from '@angular/core';
+import { booleanAttribute, Component, computed, input, numberAttribute, viewChildren } from '@angular/core';
 import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, DropdownMenuComponent, EditContentForm, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, TranslatePipe, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
@@ -13,7 +13,6 @@ import { ComponentSectionComponent } from './component-section.component';
     selector: 'sqx-component',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ComponentSectionComponent,
         DropdownMenuComponent,

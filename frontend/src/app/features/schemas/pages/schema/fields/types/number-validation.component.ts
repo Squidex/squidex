@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, NumberFieldFormModel, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedIn
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

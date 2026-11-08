@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, contentChildren, effect, input, model, output, signal, TemplateRef, untracked } from '@angular/core';
+import { booleanAttribute, Component, computed, contentChildren, effect, input, model, output, signal, TemplateRef, untracked } from '@angular/core';
 import { FloatingPlacement, Keys, ModalModel, StringHelper, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
@@ -22,7 +22,6 @@ import { FormValueControlBase, syncExternalValue } from '../form-value-control';
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         FocusOnInitDirective,

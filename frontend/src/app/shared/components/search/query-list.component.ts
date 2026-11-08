@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/no-output-native */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { StopClickDirective, TranslatePipe } from '@app/framework';
 import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
 
@@ -15,7 +15,6 @@ import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
     selector: 'sqx-query-list',
     styleUrls: ['./query-list.component.scss'],
     templateUrl: './query-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         StopClickDirective,
         TranslatePipe,

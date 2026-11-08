@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import { booleanAttribute, Component, effect, input, output, signal } from '@angular/core';
 import { AppLanguageDto, AppSettingsDto, EditFieldForm, FieldDto, SchemaDto, TranslatePipe } from '@app/shared';
 import { JsonMoreComponent } from '../types/json-more.component';
 import { FieldFormCommonComponent } from './field-form-common.component';
@@ -17,7 +17,6 @@ import { FieldFormValidationComponent } from './field-form-validation.component'
     selector: 'sqx-field-form',
     styleUrls: ['./field-form.component.scss'],
     templateUrl: './field-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FieldFormCommonComponent,
         FieldFormUIComponent,

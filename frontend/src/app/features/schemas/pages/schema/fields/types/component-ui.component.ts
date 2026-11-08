@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, ReferencesFieldPropertiesDto } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { FieldDto, FieldFormModel, ReferencesFieldPropertiesDto } from '@app/sha
     selector: 'sqx-component-ui',
     styleUrls: ['component-ui.component.scss'],
     templateUrl: 'component-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentUIComponent {
     /** The form to edit the field properties. */

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamFormComponent, TeamsState, TemplatesState, TitleService, TranslatePipe, UIState } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalD
     selector: 'sqx-apps-menu',
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AppFormComponent,
         DropdownMenuComponent,

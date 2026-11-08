@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LanguagesState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { LanguageAddFormComponent } from './language-add-form.component';
@@ -15,7 +15,6 @@ import { LanguageComponent } from './language.component';
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
     templateUrl: './languages-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LanguageAddFormComponent,
         LanguageComponent,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, inject, input, linkedSignal, viewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, linkedSignal, viewChild } from '@angular/core';
 import { FocusedImage, FocusPicker } from 'image-focus';
 import { TranslatePipe, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
@@ -14,7 +14,6 @@ import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
     selector: 'sqx-image-focus-point',
     styleUrls: ['./image-focus-point.component.scss'],
     templateUrl: './image-focus-point.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],

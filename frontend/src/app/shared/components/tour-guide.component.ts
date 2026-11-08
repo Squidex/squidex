@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, linkedSignal } from '@angular/core';
+import { Component, inject, linkedSignal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, merge } from 'rxjs';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
@@ -15,7 +15,6 @@ import { TaskSnapshot, TourService, TourState } from '@app/shared/internal';
     selector: 'sqx-tour-guide',
     styleUrls: ['./tour-guide.component.scss'],
     templateUrl: './tour-guide.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ScrollActiveDirective,
         TranslatePipe,

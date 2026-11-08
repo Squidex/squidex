@@ -6,7 +6,7 @@
  */
 
 import { CdkTrapFocus  } from '@angular/cdk/a11y';
-import { ChangeDetectionStrategy, Component, ElementRef, inject, input } from '@angular/core';
+import { Component, ElementRef, inject, input } from '@angular/core';
 
 @Component({
     selector: 'sqx-dropdown-menu',
@@ -21,7 +21,6 @@ import { ChangeDetectionStrategy, Component, ElementRef, inject, input } from '@
     hostDirectives: [
         CdkTrapFocus ,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownMenuComponent {
     private readonly element = inject(ElementRef);

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal, model, numberAttribute } from '@angular/core';
+import { Component, computed, input, linkedSignal, model, numberAttribute } from '@angular/core';
 import { Types } from '@app/framework/internal';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { FormValueControlBase } from '../form-value-control';
@@ -14,7 +14,6 @@ import { FormValueControlBase } from '../form-value-control';
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],

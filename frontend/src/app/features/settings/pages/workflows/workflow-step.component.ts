@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, linkedSignal, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, linkedSignal, output } from '@angular/core';
 import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, WorkflowStepValues, WorkflowStepView, WorkflowView } from '@app/shared';
 import { WorkflowTransitionComponent } from './workflow-transition.component';
 
@@ -14,7 +14,6 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
     selector: 'sqx-workflow-step',
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ColorPickerComponent,
         DropdownComponent,

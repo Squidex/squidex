@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { FieldDto, FieldFormModel, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayUIComponent } from '../types/array-ui.component';
@@ -28,7 +28,6 @@ import { UserInfoUIComponent } from '../types/user-info-ui.component';
     selector: 'sqx-field-form-ui',
     styleUrls: ['./field-form-ui.component.scss'],
     templateUrl: './field-form-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ArrayUIComponent,
         AssetsUIComponent,

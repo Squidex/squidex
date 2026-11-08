@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, ElementRef, inject, input, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, ThemeService, Types } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, Saf
     selector: 'sqx-content-extension',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SafeResourceUrlPipe,
     ],

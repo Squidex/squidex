@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { FormRowComponent, MarkdownDirective, ModalDialogComponent, SignalSelectDirective, TourState, TranslatePipe, UsersService } from '@app/shared';
@@ -15,7 +15,6 @@ import { FormRowComponent, MarkdownDirective, ModalDialogComponent, SignalSelect
     selector: 'sqx-onboarding-dialog',
     styleUrls: ['./onboarding-dialog.component.scss'],
     templateUrl: './onboarding-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

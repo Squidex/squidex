@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
+import { booleanAttribute, Component, effect, inject, input, output } from '@angular/core';
 import { ShortcutService } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-shortcut',
     template: '',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShortcutComponent {
     private readonly shortcutService = inject(ShortcutService);

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Settings, StopClickDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, 
     selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AvatarComponent,
         ConfirmClickDirective,

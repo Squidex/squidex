@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, FormValueControlBase, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, Types } from '@app/shared';
 
@@ -15,7 +15,6 @@ type ContentName = { name: string; id?: string };
     selector: 'sqx-reference-dropdown',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownComponent,
         HighlightPipe,

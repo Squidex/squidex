@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ContentDto, ContentsDto, FormValueControlBase, LocalizerService, ResolveContents, TagEditorComponent, TranslatePipe, Types } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
@@ -14,7 +14,6 @@ import { ReferencesTagsConverter } from './references-tag-converter';
     selector: 'sqx-references-tags',
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TagEditorComponent,
         TranslatePipe,

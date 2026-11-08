@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, numberAttribute, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, numberAttribute, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListFieldComponent, ContentValueComponent, getContentValue, META_FIELDS, TooltipDirective, TranslatePipe } from '@app/shared';
 
@@ -16,7 +16,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     selector: '[sqxReferenceItem][language][languages]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ContentListCellDirective,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { CodeEditorComponent, FieldDto, FieldFormModel, FormRowComponent, JsonFieldFormModel, JsonFieldPropertiesDto } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { CodeEditorComponent, FieldDto, FieldFormModel, FormRowComponent, JsonFi
     selector: 'sqx-json-more',
     styleUrls: ['json-more.component.scss'],
     templateUrl: 'json-more.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormField,

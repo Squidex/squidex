@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { CodeEditorComponent, FormRowComponent, RuleElementPropertyDto, Types } from '@app/shared';
 
 type ValueType = 'Raw' | 'Singleline' | 'MultilineAny' | 'MultilineJson';
@@ -15,7 +15,6 @@ type ValueType = 'Raw' | 'Singleline' | 'MultilineAny' | 'MultilineJson';
     selector: 'sqx-state-step-property',
     styleUrls: ['./state-step-property.component.scss'],
     templateUrl: './state-step-property.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormRowComponent,

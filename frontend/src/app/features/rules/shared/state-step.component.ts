@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
+import { Component, computed, input, linkedSignal } from '@angular/core';
 import { BranchItem, FlowExecutionStepStateDto, FlowStepDto, RuleElementDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from './history-step.component';
 import { RuleClassPipe } from './pipes';
@@ -17,7 +17,6 @@ import { StateStepPropertyComponent } from './state-step-property.component';
     selector: 'sqx-state-step',
     styleUrls: ['./state-step.component.scss'],
     templateUrl: './state-step.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         HistoryStepComponent,
         RuleClassPipe,

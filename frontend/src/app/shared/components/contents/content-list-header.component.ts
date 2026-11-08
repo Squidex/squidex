@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { SortOrder } from 'ngx-inline-filter';
 import { AppLanguageDto, META_FIELDS, Query, TableField } from '@app/shared/internal';
 import { TableHeaderComponent } from '../table-header.component';
@@ -14,7 +14,6 @@ import { TableHeaderComponent } from '../table-header.component';
     selector: 'sqx-content-list-header',
     styleUrls: ['./content-list-header.component.scss'],
     templateUrl: './content-list-header.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TableHeaderComponent,
     ],

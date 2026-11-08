@@ -5,14 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { FromNowPipe, ScriptLogDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-script-log',
     styleUrls: ['./script-log.component.scss'],
     templateUrl: './script-log.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FromNowPipe,
         TranslatePipe,

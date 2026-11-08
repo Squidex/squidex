@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
+import { Component, computed, input, linkedSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, SignalSelectDirective, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -15,7 +15,6 @@ import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldFor
     selector: 'sqx-field-copy-button',
     styleUrls: ['./field-copy-button.component.scss'],
     templateUrl: './field-copy-button.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CheckboxGroupComponent,
         DropdownMenuComponent,

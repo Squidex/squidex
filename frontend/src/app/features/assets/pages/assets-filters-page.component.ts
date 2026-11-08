@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AssetsState, LayoutComponent, Queries, Query, SavedQueriesComponent, TranslatePipe, UIState } from '@app/shared';
 import { AssetTagsComponent } from './asset-tags.component';
 
@@ -13,7 +13,6 @@ import { AssetTagsComponent } from './asset-tags.component';
     selector: 'sqx-assets-filters-page',
     styleUrls: ['./assets-filters-page.component.scss'],
     templateUrl: './assets-filters-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetTagsComponent,
         LayoutComponent,

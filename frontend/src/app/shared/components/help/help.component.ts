@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '@app/framework';
@@ -16,7 +16,6 @@ import { HelpMarkdownPipe } from './help-markdown.pipe';
     selector: 'sqx-help',
     styleUrls: ['./help.component.scss'],
     templateUrl: './help.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         HelpMarkdownPipe,
         LayoutComponent,

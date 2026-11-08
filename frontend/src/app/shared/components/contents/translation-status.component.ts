@@ -5,14 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { AppLanguageDto, contentTranslationStatus, SchemaDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-translation-status',
     styleUrls: ['./translation-status.component.scss'],
     templateUrl: './translation-status.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TranslationStatusComponent {
     /** The content data to compute the translation status for. */

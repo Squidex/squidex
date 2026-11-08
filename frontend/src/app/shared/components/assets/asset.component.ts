@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { ConfirmClickDirective, ExternalLinkDirective, FileDropDirective, FromNowPipe, HTTP, ImageSourceDirective, ProgressBarComponent, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetUploaderState, DialogService, Types, UploadCanceled } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
@@ -16,7 +16,6 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, FileIconPipe } from './pipes';
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         '[class.isListView]': 'isListView()',
     },

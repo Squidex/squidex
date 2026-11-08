@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output } from '@angular/core';
 import { CodeEditorComponent, FlowView, JoinPipe, RuleElementDto, SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from '../../shared/history-step.component';
 import { RuleClassPipe, SimulatedRuleEventStatusPipe } from '../../shared/pipes';
@@ -34,7 +34,6 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
     selector: '[sqxSimulatedRuleEvent]',
     styleUrls: ['./simulated-rule-event.component.scss'],
     templateUrl: './simulated-rule-event.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         HistoryStepComponent,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, forwardRef, inject, input } from '@angular/core';
+import { Component, forwardRef, inject, input } from '@angular/core';
 import { AppLanguageDto, AppsState, DialogModel, FieldDto, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
@@ -14,7 +14,6 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FieldWizardComponent,
         ModalDirective,

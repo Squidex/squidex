@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, viewChild } from '@angular/core';
+import { Component, computed, inject, viewChild } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { timer } from 'rxjs';
 import { AppsState, ConfirmClickDirective, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -17,7 +17,6 @@ import { ContentPageComponent } from './content-page.component';
     selector: 'sqx-history',
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ContentEventComponent,

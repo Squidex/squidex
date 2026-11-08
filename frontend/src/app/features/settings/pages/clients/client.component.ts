@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, inject, input, linkedSignal } from '@angular/core';
+import { Component, inject, input, linkedSignal } from '@angular/core';
 import { disabled, form, FormField, min } from '@angular/forms/signals';
 import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormRowComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, UpdateClientDto } from '@app/shared';
 import { ClientConnectFormComponent } from './client-connect-form.component';
@@ -15,7 +15,6 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ClientConnectFormComponent,
         ConfirmClickDirective,

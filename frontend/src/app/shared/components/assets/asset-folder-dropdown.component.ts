@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, linkedSignal, model, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, linkedSignal, model, signal } from '@angular/core';
 import { FormValueControlBase, ModalDirective, ModalModel, ModalPlacementDirective, syncExternalValue, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
 import { AssetFolderDropdownItemComponent } from './asset-folder-dropdown-item.component';
@@ -16,7 +16,6 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     selector: 'sqx-asset-folder-dropdown',
     styleUrls: ['./asset-folder-dropdown.component.scss'],
     templateUrl: './asset-folder-dropdown.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetFolderDropdownItemComponent,
         ModalDirective,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { AppsState, AutocompleteSource, FormHintComponent, LayoutComponent, ListViewComponent, RolesService, RolesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -32,7 +32,6 @@ class PermissionsAutocomplete implements AutocompleteSource {
     selector: 'sqx-roles-page',
     styleUrls: ['./roles-page.component.scss'],
     templateUrl: './roles-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormHintComponent,
         LayoutComponent,

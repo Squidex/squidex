@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, signal, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, Component, computed, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, signal, viewChild } from '@angular/core';
 import { debounceTime, Subject } from 'rxjs';
 import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, ThemeService, Types } from '@app/framework/internal';
 import { FormValueControlBase, syncExternalValue } from '../form-value-control';
@@ -44,7 +44,6 @@ function getDocHTML(item: AceAjax.Completion) {
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeEditorComponent extends FormValueControlBase<any> implements FocusComponent {
     private readonly destroyRef = inject(DestroyRef);

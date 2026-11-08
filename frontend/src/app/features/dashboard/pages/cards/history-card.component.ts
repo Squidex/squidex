@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AppDto, HistoryListComponent, HistoryService, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { AppDto, HistoryListComponent, HistoryService, TranslatePipe } from '@ap
     selector: 'sqx-history-card',
     styleUrls: ['./history-card.component.scss'],
     templateUrl: './history-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         HistoryListComponent,
         TranslatePipe,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output } from '@angular/core';
 import { PagingInfo } from '../state';
 import { TooltipDirective } from './modals/tooltip.directive';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -16,7 +16,6 @@ export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
     selector: 'sqx-pager',
     styleUrls: ['./pager.component.scss'],
     templateUrl: './pager.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
         TranslatePipe,

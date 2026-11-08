@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, ElementRef, input, model, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, input, model, viewChild } from '@angular/core';
 import { MathHelper } from '@app/framework/internal';
 import { FormValueControlBase } from '../form-value-control';
 import { FocusComponent } from '../forms-helper';
@@ -16,7 +16,6 @@ let canvas: HTMLCanvasElement;
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorPickerComponent extends FormValueControlBase<string | null> implements FocusComponent {
     /** The color value. */

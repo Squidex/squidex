@@ -5,14 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-languages',
     styleUrls: ['./field-languages.component.scss'],
     templateUrl: './field-languages.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LanguageSelectorComponent,
         TourHintDirective,

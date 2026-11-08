@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { ArrayFieldFormModel, ArrayFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { ArrayFieldFormModel, ArrayFieldPropertiesDto, FieldDto, FieldFormModel,
     selector: 'sqx-array-validation',
     styleUrls: ['array-validation.component.scss'],
     templateUrl: 'array-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

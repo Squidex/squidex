@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input, linkedSignal, output } from '@angular/core';
+import { Component, inject, input, linkedSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
@@ -15,7 +15,6 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
     selector: 'sqx-app-form',
     styleUrls: ['./app-form.component.scss'],
     templateUrl: './app-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,
         FormAlertComponent,

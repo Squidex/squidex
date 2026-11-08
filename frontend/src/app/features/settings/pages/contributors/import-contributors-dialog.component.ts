@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { EMPTY, of } from 'rxjs';
@@ -23,7 +23,6 @@ type ImportStatus = {
     selector: 'sqx-import-contributors-dialog',
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormHintComponent,

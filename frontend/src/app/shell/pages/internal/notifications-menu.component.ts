@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService, NotifoComponent, UIOptions } from '@app/shared';
 import { NotificationDropdownComponent } from './notification-dropdown.component';
 
@@ -14,7 +14,6 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     selector: 'sqx-notifications-menu',
     styleUrls: ['./notifications-menu.component.scss'],
     templateUrl: './notifications-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         NotificationDropdownComponent,
         NotifoComponent,

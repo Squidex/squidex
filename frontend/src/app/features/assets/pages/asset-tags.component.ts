@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/no-output-native */
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output, signal } from '@angular/core';
 import { DialogModel, ModalDirective, StopClickDirective, TagItem, TagsSelected, TranslatePipe } from '@app/shared';
 import { AssetTagDialogComponent } from './asset-tag-dialog.component';
 
@@ -16,7 +16,6 @@ import { AssetTagDialogComponent } from './asset-tag-dialog.component';
     selector: 'sqx-asset-tags',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetTagDialogComponent,
         ModalDirective,

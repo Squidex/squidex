@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
@@ -18,7 +18,6 @@ import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
     selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutocompleteComponent,
         ConfirmClickDirective,

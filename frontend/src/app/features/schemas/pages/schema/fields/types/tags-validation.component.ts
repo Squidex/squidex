@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, TagEditorComponent, TagsFieldFormModel, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedIn
     selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
@@ -16,7 +16,6 @@ import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, Co
     selector: 'sqx-schema-field-rules-form',
     styleUrls: ['./schema-field-rules-form.component.scss'],
     templateUrl: './schema-field-rules-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         ConfirmClickDirective,

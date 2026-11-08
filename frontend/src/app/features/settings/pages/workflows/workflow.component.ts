@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormRowComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowView } from '@app/shared';
 import { WorkflowDiagramComponent } from './workflow-diagram.component';
 import { WorkflowStepComponent } from './workflow-step.component';
@@ -14,7 +14,6 @@ import { WorkflowStepComponent } from './workflow-step.component';
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         FormErrorComponent,

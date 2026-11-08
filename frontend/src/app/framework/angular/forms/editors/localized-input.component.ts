@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
+import { Component, computed, input, model, signal } from '@angular/core';
 import { Types } from '@app/framework/internal';
 import { Language, LanguageSelectorComponent } from '../../language-selector.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -22,7 +22,6 @@ type LocalizedValue = { [key: string]: any };
     selector: 'sqx-localized-input',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CheckboxComponent,
         DateTimeEditorComponent,

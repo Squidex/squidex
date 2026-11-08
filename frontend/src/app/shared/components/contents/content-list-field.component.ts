@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, untracked } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, input, untracked } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { FromNowPipe, ShortDatePipe, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppLanguageDto, ContentDto, FieldValue, getContentValue, META_FIELDS, SchemaDto, TableField, TableSettings } from '@app/shared/internal';
@@ -20,7 +20,6 @@ import { TranslationStatusComponent } from './translation-status.component';
     selector: 'sqx-content-list-field',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ContentStatusComponent,
         ContentValueComponent,

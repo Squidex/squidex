@@ -6,7 +6,7 @@
  */
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -18,7 +18,6 @@ import { SchemaFormComponent } from './schema-form.component';
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDropListGroup,
         FormField,

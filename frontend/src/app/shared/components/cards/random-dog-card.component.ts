@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'sqx-random-dog-card',
     styleUrls: ['./random-dog-card.component.scss'],
     templateUrl: './random-dog-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RandomDogCardComponent {
     protected get random() {

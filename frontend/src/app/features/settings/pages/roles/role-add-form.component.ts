@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, TranslatePipe } from '@app/shared';
@@ -14,7 +14,6 @@ import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, Tra
     selector: 'sqx-role-add-form',
     styleUrls: ['./role-add-form.component.scss'],
     templateUrl: './role-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
         FormField,

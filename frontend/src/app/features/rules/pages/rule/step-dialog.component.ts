@@ -6,7 +6,7 @@
  */
 
 import { LowerCasePipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { booleanAttribute, Component, effect, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField, maxLength } from '@angular/forms/signals';
 import { lastValueFrom } from 'rxjs';
@@ -19,7 +19,6 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     selector: 'sqx-step-dialog',
     styleUrls: ['./step-dialog.component.scss'],
     templateUrl: './step-dialog.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         BranchesInputComponent,
         CodeEditorComponent,

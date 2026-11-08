@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, inject, Injector, signal } from '@angular/core';
+import { Component, inject, Injector, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, syncChartTheme, ThemeService, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootVie
     selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CopyGlobalDirective,
         DialogRendererComponent,

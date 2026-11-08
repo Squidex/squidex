@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, ReferencesFieldFormModel, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedIn
     selector: 'sqx-references-validation',
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

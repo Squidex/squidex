@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { tap } from 'rxjs';
@@ -16,7 +16,6 @@ import { CreateTeamForm, TeamsState } from '@app/shared/internal';
     selector: 'sqx-team-form',
     styleUrls: ['./team-form.component.scss'],
     templateUrl: './team-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,
         FormAlertComponent,

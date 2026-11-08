@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { BooleanFieldEditorValues, BooleanFieldFormModel, BooleanFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { BooleanFieldEditorValues, BooleanFieldFormModel, BooleanFieldProperties
     selector: 'sqx-boolean-ui',
     styleUrls: ['boolean-ui.component.scss'],
     templateUrl: 'boolean-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormField,
         FormRowComponent,

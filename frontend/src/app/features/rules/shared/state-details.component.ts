@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { booleanAttribute, Component, input } from '@angular/core';
 import { BranchItem, CodeEditorComponent, FlowExecutionStateDto, RuleElementDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from './history-step.component';
 import { StateStepComponent } from './state-step.component';
@@ -15,7 +15,6 @@ import { StateStepComponent } from './state-step.component';
     selector: 'sqx-state-details',
     styleUrls: ['./state-details.component.scss'],
     templateUrl: './state-details.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         HistoryStepComponent,

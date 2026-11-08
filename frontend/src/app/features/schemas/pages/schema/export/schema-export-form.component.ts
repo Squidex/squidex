@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, TranslatePipe } from '@app/shared';
@@ -15,7 +15,6 @@ import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, Tr
     selector: 'sqx-schema-export-form',
     styleUrls: ['./schema-export-form.component.scss'],
     templateUrl: './schema-export-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormField,

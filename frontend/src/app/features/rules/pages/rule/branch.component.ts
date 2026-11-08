@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { BranchItem, BranchList, FlowView, RuleElementDto, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
@@ -14,7 +14,6 @@ import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
     selector: 'sqx-branch',
     styleUrls: ['./branch.component.scss'],
     templateUrl: './branch.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RuleElementComponent,
         TranslatePipe,

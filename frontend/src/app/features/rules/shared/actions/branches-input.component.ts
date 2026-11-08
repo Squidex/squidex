@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
 import { ControlErrorsComponent, StepForm, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { ControlErrorsComponent, StepForm, TranslatePipe } from '@app/shared';
     selector: 'sqx-branches-input',
     styleUrls: ['./branches-input.component.scss'],
     templateUrl: './branches-input.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
         FormField,

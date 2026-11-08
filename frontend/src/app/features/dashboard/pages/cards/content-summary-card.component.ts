@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { map } from 'rxjs';
 import { AppDto, ContentsService, safeResource, TranslatePipe, Types } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { AppDto, ContentsService, safeResource, TranslatePipe, Types } from '@ap
     selector: 'sqx-content-summary-card',
     styleUrls: ['./content-summary-card.component.scss'],
     templateUrl: './content-summary-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],

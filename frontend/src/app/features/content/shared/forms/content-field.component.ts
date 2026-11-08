@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
 import { AppLanguageDto, AppsState, CommentSelected, CommentsState, EditContentForm, FieldForm, FocusMarkerComponent, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, Types, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
@@ -16,7 +16,6 @@ import { FieldLanguagesComponent } from './field-languages.component';
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FieldCopyButtonComponent,
         FieldEditorComponent,

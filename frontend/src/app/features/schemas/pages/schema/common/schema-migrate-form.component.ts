@@ -6,14 +6,13 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { ConfirmClickDirective, FormRowComponent, MarkdownDirective, MigrateContentsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-migrate-form',
     templateUrl: './schema-migrate-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         FormField,

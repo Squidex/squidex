@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, FlowView, ModalDirective, ModalModel, ModalPlacementDirective, RuleElementDto, RulesState, RuleTriggerMetadataDto, ToggleComponent, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -15,7 +15,6 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         DropdownMenuComponent,

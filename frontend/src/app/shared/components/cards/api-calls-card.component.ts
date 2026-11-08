@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
@@ -15,7 +15,6 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     selector: 'sqx-api-calls-card',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         BaseChartDirective,
         TranslatePipe,
