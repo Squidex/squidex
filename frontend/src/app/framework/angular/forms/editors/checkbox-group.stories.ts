@@ -22,6 +22,9 @@ export default {
             action: 'valueChange',
         },
     },
+    args: {
+        layout: 'Auto',
+    },
     render: args => ({
         props: args,
         template: `

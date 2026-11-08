@@ -46,6 +46,11 @@ export class RadioGroupComponent extends FormValueControlBase<any> {
     });
 
     protected readonly tagValuesWidth = computed(() => {
+        // The font can only be read from a rendered element, which is the case when the container has a size.
+        if (this.containerWidth() === 0) {
+            return -1;
+        }
+
         let width = 0;
         for (const value of this.tagValuesUnsorted()) {
             width += 40;
