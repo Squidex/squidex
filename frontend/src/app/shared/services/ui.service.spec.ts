@@ -72,7 +72,7 @@ describe("UIService", () => {
             expect(req.request.method).toEqual("GET");
             expect(req.request.headers.get("If-Match")).toBeNull();
 
-            req.error(new ErrorEvent("500"));
+            req.error(new ProgressEvent("error"));
 
             expect(settings!).toEqual({
                 mapType: "OSM",
@@ -122,7 +122,7 @@ describe("UIService", () => {
             expect(req.request.method).toEqual("GET");
             expect(req.request.headers.get("If-Match")).toBeNull();
 
-            req.error(new ErrorEvent("500"));
+            req.error(new ProgressEvent("error"));
 
             expect(settings!).toBeDefined();
         },
@@ -168,7 +168,7 @@ describe("UIService", () => {
             expect(req.request.method).toEqual("GET");
             expect(req.request.headers.get("If-Match")).toBeNull();
 
-            req.error(new ErrorEvent("500"));
+            req.error(new ProgressEvent("error"));
 
             expect(settings!).toBeDefined();
         },

@@ -14,13 +14,14 @@ import { LocalStoreService } from './local-store.service';
 
 export class DialogRequest {
     private readonly resultStream$ = new ReplaySubject<boolean>();
+    private isFinished = false;
 
     public get result(): Observable<boolean> {
         return this.resultStream$;
     }
 
     public get isCompleted() {
-        return this.resultStream$.isStopped;
+        return this.isFinished;
     }
 
     public get canRemember() {
@@ -41,8 +42,7 @@ export class DialogRequest {
             const isConfirmed = this.localStore.getBoolean(this.rememberKey);
 
             if (isConfirmed) {
-                this.resultStream$.next(true);
-                this.resultStream$.complete();
+                this.finish(true);
             }
         }
     }
@@ -52,6 +52,11 @@ export class DialogRequest {
             this.localStore.setBoolean(this.rememberKey, true);
         }
 
+        this.finish(confirmed);
+    }
+
+    private finish(confirmed: boolean) {
+        this.isFinished = true;
         this.resultStream$.next(confirmed);
         this.resultStream$.complete();
     }

@@ -70,7 +70,7 @@ describe("HelpService", () => {
             expect(req.request.method).toEqual("GET");
             expect(req.request.headers.get("If-Match")).toBeNull();
 
-            req.error(<any>{});
+            req.error(new ProgressEvent("error"));
 
             expect(helpSections!).toEqual("");
         },
@@ -118,7 +118,7 @@ describe("HelpService", () => {
             expect(req.request.method).toEqual("GET");
             expect(req.request.headers.get("If-Match")).toBeNull();
 
-            req.error(<any>{});
+            req.error(new ProgressEvent("error"));
 
             expect(sdks!).toEqual({});
         },

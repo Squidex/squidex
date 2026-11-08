@@ -57,12 +57,12 @@ export class ContentSchemaBuilder {
             return rules.some(x => x.action === action && x.eval(context, itemData));
         };
 
-        disabled(path, (ctx: FieldContext<any, any>) => {
-            return field.isDisabled || isRuleActive(ctx, 'Disable');
+        disabled(path, {
+            when: (ctx: FieldContext<any, any>) => field.isDisabled || isRuleActive(ctx, 'Disable'),
         });
 
-        hidden(path, (ctx: FieldContext<any, any>) => {
-            return isRuleActive(ctx, 'Hide');
+        hidden(path, {
+            when: (ctx: FieldContext<any, any>) => isRuleActive(ctx, 'Hide'),
         });
 
         validate(path, ctx => {
@@ -138,6 +138,6 @@ export function isEmpty(value: any) {
     return Types.isUndefined(value) || Types.isNull(value) || value === '' || (Types.isArray(value) && value.length === 0);
 }
 
-export function toErrors(validators: ReadonlyArray<ValueValidator>, value: any): ValidationError.WithoutField[] {
+export function toErrors(validators: ReadonlyArray<ValueValidator>, value: any): ValidationError.WithoutFieldTree[] {
     return validateValue(validators, value);
 }

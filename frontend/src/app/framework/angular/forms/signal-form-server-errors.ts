@@ -10,7 +10,7 @@ import { ErrorDto, Types } from '@app/framework/internal';
 
 const SERVER_ERROR_KIND = 'custom';
 
-export interface ServerValidationError extends ValidationError.WithOptionalField {
+export interface ServerValidationError extends ValidationError.WithOptionalFieldTree {
     readonly errors: ReadonlyArray<string>;
 }
 

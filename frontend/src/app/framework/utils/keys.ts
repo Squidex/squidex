@@ -6,59 +6,27 @@
  */
 
 export namespace Keys {
-    const ALT = 18;
-    const CONTROL = 17;
-    const DELETE = 8;
-    const ENTER = 13;
-    const ESCAPE = 27;
-    const DOWN = 40;
-    const UP = 38;
-
-    export function isAlt(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === 'ALTLEFT' || key === 'ALTRIGHT' || event.keyCode === CONTROL;
-    }
-
-    export function isControl(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === 'CONTROL' || event.keyCode === ALT;
-    }
-
     export function isComma(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === ',';
+        return event.key === ',';
     }
 
     export function isDelete(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === 'DELETE' || event.keyCode === DELETE;
+        return event.key === 'Delete' || event.key === 'Backspace';
     }
 
     export function isEnter(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === 'ENTER' || event.keyCode === ENTER;
+        return event.key === 'Enter';
     }
 
     export function isDown(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === 'ARROWDOWN' || event.keyCode === DOWN;
+        return event.key === 'ArrowDown';
     }
 
     export function isUp(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === 'ARROWUP' || event.keyCode === UP;
+        return event.key === 'ArrowUp';
     }
 
     export function isEscape(event: KeyboardEvent) {
-        const key = event.key?.toUpperCase();
-
-        return key === 'ESCAPE' || key === 'ESC' || event.keyCode === ESCAPE;
+        return event.key === 'Escape' || event.key === 'Esc';
     }
- }
+}

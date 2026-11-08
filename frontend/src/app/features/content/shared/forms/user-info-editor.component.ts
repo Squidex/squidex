@@ -45,7 +45,7 @@ export class UserInfoEditorComponent extends FormValueControlBase<UserInfo | nul
     });
 
     protected readonly userInfoForm = form(this.userInfo, path => {
-        disabled(path, () => this.disabled());
+        disabled(path, { when: () => this.disabled() });
         required(path.apiKey);
         required(path.role);
     });
