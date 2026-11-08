@@ -6,7 +6,7 @@
  */
 
 import { AppSettingsDto, EditorDto } from '../model';
-import { computeEditorUrl } from './editor-utils';
+import { computeEditorUrl, isSafeUrl } from './editor-utils';
 
 describe('EditorUtils', () => {
     const settings = new AppSettingsDto({
@@ -100,6 +100,22 @@ describe('EditorUtils', () => {
             const result = computeEditorUrl(url, settings);
 
             expect(result).toEqual('');
+        });
+    });
+
+    ['http://squidex.io/preview', 'https://squidex.io/preview?id=1', '/preview/1'].forEach(url => {
+        it(`should treat url as safe ${url}`, () => {
+            const result = isSafeUrl(url);
+
+            expect(result).toBe(true);
+        });
+    });
+
+    ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,<script>alert(1)</script>', 'vbscript:msgbox(1)', '', null, undefined].forEach(url => {
+        it(`should treat url as unsafe ${url}`, () => {
+            const result = isSafeUrl(url);
+
+            expect(result).toBe(false);
         });
     });
 });

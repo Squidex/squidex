@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DateTime, Types, ValidatorsEx, ValueValidator } from '@app/framework';
+import { DateTime, escapeHTML, Types, ValidatorsEx, ValueValidator } from '@app/framework';
 import { AppLanguageDto, ContentDto, FieldDto, NestedFieldDto, UserInfoFieldPropertiesDto } from '../model';
 import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../model';
 
@@ -96,12 +96,13 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
                         format = `width=50&height=50&mode=Pad&${format}`;
                     }
 
-                    return `<img src="${src}?${format}" />`;
+                    return `<img src="${escapeHTML(`${src}?${format}`)}" />`;
                 };
 
                 switch (properties.previewMode) {
                     case 'ImageAndFileName':
-                        return new HtmlValue(`<div class="image">${buildImage(reference[0])} <span>${reference[1]}</span></div>`, reference[0]);
+                        // The file name is user input and must not be interpreted as HTML.
+                        return new HtmlValue(`<div class="image">${buildImage(reference[0])} <span>${escapeHTML(`${reference[1]}`)}</span></div>`, reference[0]);
                     case 'Image':
                         return new HtmlValue(`<div class="image">${buildImage(reference[0])}</div>`, reference[0]);
                     default:
@@ -269,7 +270,8 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
 
         if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
-            return new HtmlValue(`<div class="image"><img src="${thumbnail(this.value, undefined, 50)}" /></div>`, this.value);
+            // The value is user input and must not break out of the attribute.
+            return new HtmlValue(`<div class="image"><img src="${escapeHTML(thumbnail(this.value, undefined, 50))}" /></div>`, this.value);
         }
 
         return this.value;

@@ -199,7 +199,7 @@ describe('GetContentValue', () => {
 
         expect(result).toEqual({
             value: undefined,
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /> <span>file13</span></div>', 'url/to/13'),
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&amp;height=50&amp;mode=Pad&amp;" /> <span>file13</span></div>', 'url/to/13'),
         });
     });
 
@@ -218,7 +218,7 @@ describe('GetContentValue', () => {
 
         expect(result).toEqual({
             value: undefined,
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /></div>', 'url/to/13'),
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&amp;height=50&amp;mode=Pad&amp;" /></div>', 'url/to/13'),
         });
     });
 
@@ -237,7 +237,7 @@ describe('GetContentValue', () => {
 
         expect(result).toEqual({
             value: undefined,
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=100&height=100" /></div>', 'url/to/13'),
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=100&amp;height=100" /></div>', 'url/to/13'),
         });
     });
 
@@ -256,7 +256,7 @@ describe('GetContentValue', () => {
 
         expect(result).toEqual({
             value: undefined,
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&bg=red" /></div>', 'url/to/13'),
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&amp;height=50&amp;mode=Pad&amp;bg=red" /></div>', 'url/to/13'),
         });
     });
 

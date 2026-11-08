@@ -22,15 +22,15 @@ export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto 
 
     const result = interpolate(url, editors) || '';
 
-    return isSafeEditorUrl(result) ? result : '';
+    return isSafeUrl(result) ? result : '';
 }
 
-function isSafeEditorUrl(url: string) {
+export function isSafeUrl(url: string | undefined | null) {
     if (!url) {
         return false;
     }
 
-    // The url is trusted for the iframe, therefore protocols like 'javascript:' would run in our origin.
+    // The url is trusted for iframes and new windows, therefore protocols like 'javascript:' would run in our origin.
     try {
         const protocol = new URL(url, window.location.href).protocol;
 
