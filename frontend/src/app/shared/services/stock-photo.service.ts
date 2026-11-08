@@ -6,7 +6,7 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { StringHelper } from '@app/framework';
@@ -21,14 +21,9 @@ export class StockPhotoDto {
     }
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class StockPhotoService {
-    constructor(
-        private readonly http: HttpClient,
-    ) {
-    }
+    private readonly http = inject(HttpClient);
 
     public getImages(query: string, page = 1): Observable<ReadonlyArray<StockPhotoDto>> {
         const url = `https://stockphoto.squidex.io${StringHelper.buildQuery({ query, page })}`;

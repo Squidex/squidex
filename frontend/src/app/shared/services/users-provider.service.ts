@@ -5,24 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable, Signal, signal, untracked } from '@angular/core';
+import { computed, inject, Service, Signal, signal, untracked } from '@angular/core';
 import { catchError, of } from 'rxjs';
 import { UserDto } from '../model';
 import { AuthService } from './auth.service';
 import { UsersService } from './users.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class UsersProviderService {
+    private readonly authService = inject(AuthService);
+    private readonly usersService = inject(UsersService);
     private readonly loaded: { [id: string]: Signal<UserDto | undefined> } = {};
     private readonly mapped: { [key: string]: Signal<UserDto | undefined> } = {};
-
-    constructor(
-        private readonly usersService: UsersService,
-        private readonly authService: AuthService,
-    ) {
-    }
 
     public user(id: string, me: string | null = 'Me'): Signal<UserDto | undefined> {
         const key = `${id}|${me}`;

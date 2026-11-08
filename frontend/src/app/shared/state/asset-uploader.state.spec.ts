@@ -7,7 +7,8 @@
 
 import { lastValueFrom, NEVER, Observable, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AssetsService, AssetUploaderState, DialogService } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, AssetsService, AssetUploaderState, DialogService } from '@app/shared/internal';
 import { createAsset } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -24,7 +25,11 @@ describe('AssetUploaderState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         assetsService = Mock.ofType<AssetsService>();
-        assetUploader = new AssetUploaderState(appsState.object, assetsService.object, dialogs.object);
+        assetUploader = createService(AssetUploaderState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: AssetsService, useValue: assetsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {

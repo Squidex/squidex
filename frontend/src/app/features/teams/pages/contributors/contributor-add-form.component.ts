@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, Injectable } from '@angular/core';
+import { Component, inject, Service } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
@@ -16,7 +16,7 @@ import { AssignTeamContributorForm } from '../../internal';
 import { TeamContributorsState } from '../../state/team-contributors.state';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class UsersDataSource implements AutocompleteSource {
     private readonly contributorsState = inject(TeamContributorsState);
     private readonly usersService = inject(UsersService);

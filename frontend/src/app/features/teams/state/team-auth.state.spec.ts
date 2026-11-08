@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, ResourceLinkDto, TeamsService, versioned } from '@app/shared';
+import { createService } from '@app/framework/testing';
+import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, ResourceLinkDto, TeamsService, TeamsState, versioned } from '@app/shared';
 import { TestValues } from '../../../shared/state/_test-helpers';
 import { TeamAuthState } from '../internal';
 
@@ -30,7 +31,11 @@ describe('TeamAuthState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         authService = Mock.ofType<TeamsService>();
-        authState = new TeamAuthState(teamsState.object, dialogs.object, authService.object);
+        authState = createService(TeamAuthState, [
+            { provide: TeamsState, useValue: teamsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: TeamsService, useValue: authService.object },
+        ]);
     });
 
     afterEach(() => {

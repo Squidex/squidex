@@ -6,9 +6,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { NavigationExtras, Params, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Params, Router } from '@angular/router';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { LocalStoreService } from '@app/framework/internal';
+import { createService } from '@app/framework/testing';
 import { State } from '../../state';
 import { PagingSynchronizer, QueryParams, Router2State, StringKeysSynchronizer, StringSynchronizer } from './router-2-state';
 
@@ -198,7 +199,11 @@ describe('Router2State', () => {
 
             state = new State<any>({});
 
-            router2State = TestBed.runInInjectionContext(() => new Router2State(route, router.object, localStore.object));
+            router2State = createService(Router2State, [
+                { provide: ActivatedRoute, useValue: route },
+                { provide: Router, useValue: router.object },
+                { provide: LocalStoreService, useValue: localStore.object },
+            ]);
             router2State.mapTo(state)
                 .withString('state1')
                 .withStrings('state2')

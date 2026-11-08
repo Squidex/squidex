@@ -6,7 +6,7 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
@@ -57,17 +57,11 @@ export interface ChatToolEndDto {
 
 export type ChatEventDto = ChatChunkDto | ChatToolStartDto | ChatToolEndDto | ChatHistoryLoaded;
 
-
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TranslationsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly authService: AuthService,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly authService = inject(AuthService);
+    private readonly http = inject(HttpClient);
 
     public translate(appName: string, dto: TranslateDto): Observable<TranslationDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/translations`);

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, effect, inject, Injectable, input } from '@angular/core';
+import { Component, computed, effect, inject, input, Service } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { firstValueFrom, Observable, of } from 'rxjs';
@@ -13,7 +13,7 @@ import { map } from 'rxjs/operators';
 import { AssignContributorForm, AssignContributorFormModel, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, SignalSelectDirective, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class UsersDataSource implements AutocompleteSource {
     private readonly contributorsState = inject(ContributorsState);
     private readonly usersService = inject(UsersService);

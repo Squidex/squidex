@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, Resource, shareSubscribed, State } from '@app/framework';
@@ -24,10 +24,12 @@ interface Snapshot extends LoadingState {
     textIndexResource?: Resource;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class JobsState extends State<Snapshot> {
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly jobsService = inject(JobsService);
+
     public readonly jobs =
         this.project(x => x.jobs);
 
@@ -54,11 +56,7 @@ export class JobsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly jobsService: JobsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ jobs: [] });
 
         debug(this, 'jobs');

@@ -5,12 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { Types } from '../utils/types';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class LocalStoreService {
     private readonly fallback: { [key: string]: string } = {};
     private store = localStorage;

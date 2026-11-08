@@ -4,8 +4,8 @@
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
 import { NgZone } from '@angular/core';
+import { createService } from '@app/framework/testing';
 import { MessageBus } from './message-bus.service';
 
 class Event1 {
@@ -21,13 +21,17 @@ describe('MessageBus', () => {
     } as NgZone;
 
     it('should instantiate', () => {
-        const messageBus = new MessageBus(zone);
+        const messageBus = createService(MessageBus, [
+            { provide: NgZone, useValue: zone },
+        ]);
 
         expect(messageBus).toBeDefined();
     });
 
     it('should publish events and subscribe', () => {
-        const messageBus = new MessageBus(zone);
+        const messageBus = createService(MessageBus, [
+            { provide: NgZone, useValue: zone },
+        ]);
         const event1 = new Event1();
         const event2 = new Event2();
 

@@ -6,21 +6,16 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, Resource } from '@app/framework';
 import { TemplateDetailsDto, TemplatesDto } from './../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TemplatesService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getTemplates(): Observable<TemplatesDto> {
         const url = this.apiUrl.buildUrl('api/templates?includeDetails=true');

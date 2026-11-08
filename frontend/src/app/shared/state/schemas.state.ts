@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, StringHelper, Version } from '@app/framework';
@@ -29,10 +29,12 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class SchemasState extends State<Snapshot> {
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly schemasService = inject(SchemasService);
+
     public readonly selectedSchema =
         this.project(x => x.selectedSchema);
 
@@ -77,11 +79,7 @@ export class SchemasState extends State<Snapshot> {
         return this.snapshot.schemas.toMap(x => x.id);
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly schemasService: SchemasService,
-    ) {
+    constructor() {
         super({ schemas: [], addedCategories: new Set() });
 
         debug(this, 'schemas');

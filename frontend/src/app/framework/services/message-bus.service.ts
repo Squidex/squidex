@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DestroyRef, inject, Injectable, NgZone } from '@angular/core';
+import { DestroyRef, inject, NgZone, Service } from '@angular/core';
 import { filter, map, Observable, Subject } from 'rxjs';
 
 interface Message {
@@ -18,16 +18,10 @@ interface Message {
 
 type MessageType<T> = { new(...args: ReadonlyArray<any>): T };
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class MessageBus {
+    private readonly zone = inject(NgZone);
     private readonly message$ = new Subject<Message>();
-
-    constructor(
-        private readonly zone: NgZone,
-    ) {
-    }
 
     public emit<T>(data: T) {
         const channel = ((<any>data)['constructor']).name;

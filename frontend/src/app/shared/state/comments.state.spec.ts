@@ -8,6 +8,7 @@
 import { signal } from '@angular/core';
 import { IMock, It, Mock } from 'typemoq';
 import * as Y from 'yjs';
+import { createService } from '@app/framework/testing';
 import { CollaborationService, SharedArray } from '../internal';
 import { Comment, CommentsState } from './comments.state';
 
@@ -26,7 +27,9 @@ describe('CommentsState', () => {
         collaborationSevice.setup(x => x.getArray<Comment>(It.isAnyString()))
             .returns(() => signal(sharedArray));
 
-        commentsState = new CommentsState(collaborationSevice.object);
+        commentsState = createService(CommentsState, [
+            { provide: CollaborationService, useValue: collaborationSevice.object },
+        ]);
     });
 
     it('should get total items', () => {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AssignContributorDto, ContributorDto, ContributorsDto, debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, StringHelper, TeamsState, Types, VersionTag } from '@app/shared';
@@ -25,8 +25,12 @@ interface Snapshot extends ListState<string> {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class TeamContributorsState extends State<Snapshot> {
+    private readonly contributorsService = inject(TeamContributorsService);
+    private readonly dialogs = inject(DialogService);
+    private readonly teamsState = inject(TeamsState);
+
     public readonly contributors =
         this.project(x => x.contributors);
 
@@ -58,11 +62,7 @@ export class TeamContributorsState extends State<Snapshot> {
         return this.teamsState.teamId;
     }
 
-    constructor(
-        private readonly teamsState: TeamsState,
-        private readonly contributorsService: TeamContributorsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({
             contributors: [],
             maxContributors: -1,

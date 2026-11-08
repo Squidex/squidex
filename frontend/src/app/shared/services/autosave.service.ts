@@ -5,19 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { LocalStoreService, Version } from '@app/framework';
 
 export declare type AutoSaveKey = { schemaId: string; schemaVersion: Version; contentId?: string };
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AutoSaveService {
-    constructor(
-        private readonly localStore: LocalStoreService,
-    ) {
-    }
+    private readonly localStore = inject(LocalStoreService);
 
     public fetch(key: AutoSaveKey): {} | null {
         if (!key) {

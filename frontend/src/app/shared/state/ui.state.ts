@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, inject, Injectable, Injector, Signal } from '@angular/core';
+import { computed, inject, Injector, Service, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map, take, tap } from 'rxjs/operators';
@@ -41,10 +41,10 @@ interface Snapshot {
     appName?: string;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class UIState extends State<Snapshot> {
+    private readonly uiService = inject(UIService);
+    private readonly usersService = inject(UsersService);
     private readonly injector = inject(Injector);
 
     public readonly settings =
@@ -113,10 +113,7 @@ export class UIState extends State<Snapshot> {
             map(x => getValue(x, path, defaultValue)));
     }
 
-    constructor(
-        private readonly uiService: UIService,
-        private readonly usersService: UsersService,
-    ) {
+    constructor() {
         super({});
 
         debug(this, 'settings');

@@ -6,7 +6,7 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -27,14 +27,9 @@ export interface SDKEntry {
     logo: string;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class HelpService {
-    constructor(
-        private readonly http: HttpClient,
-    ) {
-    }
+    private readonly http = inject(HttpClient);
 
     public getHelp(helpPage: string): Observable<string> {
         const url = `https://raw.githubusercontent.com/squidex/squidex-docs2/master/${helpPage}.md`;

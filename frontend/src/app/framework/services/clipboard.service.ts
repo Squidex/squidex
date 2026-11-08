@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, signal } from '@angular/core';
+import { Service, signal } from '@angular/core';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ClipboardService {
     private readonly textValue = signal('');
 

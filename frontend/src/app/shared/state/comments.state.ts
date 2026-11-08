@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { DateTime, MathHelper } from '@app/framework';
 import { CollaborationService, SharedArray } from '../services/collaboration.service';
 
@@ -44,8 +44,9 @@ export interface Comment {
     to?: number;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class CommentsState {
+    private readonly collaboration = inject(CollaborationService);
     private readonly comments = this.collaboration.getArray<Comment>('stream');
 
     public readonly items = computed(() => {
@@ -63,11 +64,6 @@ export class CommentsState {
     public readonly groupedUnresolvedComments = computed(() => {
         return groupComments(this.items(), true);
     });
-
-    constructor(
-        private readonly collaboration: CollaborationService,
-    ) {
-    }
 
     public create(user: string, text: string, url: string, optional?: Pick<Comment, 'editorId' | 'from' | 'to' | 'replyTo'>) {
         this.updateInternal(comments => {

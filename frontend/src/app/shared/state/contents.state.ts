@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { DateTime, debug, DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
@@ -46,6 +46,10 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly dialogs = inject(DialogService);
+
     public readonly selectedContent =
         this.project(x => x.selectedContent, Types.equals);
 
@@ -90,11 +94,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    protected constructor(name: string,
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService,
-    ) {
+    protected constructor(name: string) {
         super({
             contents: [],
             fieldNames: null,
@@ -443,14 +443,12 @@ function isReferrerError(error?: ServerErrorDto) {
     return error?.errorCode === 'OBJECT_REFERENCED';
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ContentsState extends ContentsStateBase {
-    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
-        private readonly schemasState: SchemasState,
-    ) {
-        super('contents', appsState, contentsService, dialogs);
+    private readonly schemasState = inject(SchemasState);
+
+    constructor() {
+        super('contents');
     }
 
     public get schemaName() {
@@ -458,14 +456,12 @@ export class ContentsState extends ContentsStateBase {
     }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ComponentContentsState extends ContentsStateBase {
     public schema!: { name: string };
 
-    constructor(
-        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
-    ) {
-        super('componentContents', appsState, contentsService, dialogs);
+    constructor() {
+        super('componentContents');
     }
 
     public get schemaName() {

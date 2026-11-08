@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, MathHelper, Mutable, safeResource, shareSubscribed, State, Types } from '@app/framework';
@@ -33,10 +33,12 @@ interface Snapshot extends LoadingState {
     canReadEvents?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class RulesState extends State<Snapshot> {
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly rulesService = inject(RulesService);
+
     private readonly stepsResource = safeResource<StepsDto | undefined>({
         stream: () => this.rulesService.getSteps(),
         defaultValue: undefined,
@@ -83,11 +85,7 @@ export class RulesState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService,
-    ) {
+    constructor() {
         super({ rules: [] });
 
         debug(this, 'rules');

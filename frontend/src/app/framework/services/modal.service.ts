@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
 export interface OpenModal {
     contains(element: Element): boolean;
@@ -13,9 +13,7 @@ export interface OpenModal {
     hide(): void;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ModalService {
     private readonly openModals = new Set<OpenModal>();
 

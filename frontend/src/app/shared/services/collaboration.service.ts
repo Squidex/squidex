@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, inject, Injectable, Signal, signal, untracked, WritableSignal } from '@angular/core';
+import { computed, inject, Service, Signal, signal, untracked, WritableSignal } from '@angular/core';
 import { Awareness } from 'y-protocols/awareness';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
@@ -16,8 +16,9 @@ type AwarenessState = { user: Profile; [key: string]: any };
 
 export type CollaborationProvider = { awareness: Awareness; doc: Y.Doc; destroy: () => void };
 
-@Injectable()
+@Service({ autoProvided: false })
 export class CollaborationService {
+    private readonly authService = inject(AuthService);
     private readonly provider = signal<CollaborationProvider | null>(null);
     private readonly uiOptions = inject(UIOptions);
     private readonly basePath = this.uiOptions.value.collaborationService;
@@ -30,8 +31,8 @@ export class CollaborationService {
 
     public providerFactory: (name: string, doc: Y.Doc) => CollaborationProvider;
 
-    constructor(authService: AuthService) {
-        this.profile = authService.user!;
+    constructor() {
+        this.profile = this.authService.user!;
 
         this.providerFactory = (name, doc) => {
             const websocket = new WebsocketProvider(this.basePath, `api/${name}?access_token=${this.profile.accessToken}`, doc);

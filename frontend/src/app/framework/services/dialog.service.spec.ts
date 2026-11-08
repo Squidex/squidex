@@ -4,8 +4,8 @@
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
 import { IMock, It, Mock, Times } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { DialogRequest, DialogService, Notification, Tooltip } from './dialog.service';
 import { LocalStoreService } from './local-store.service';
 
@@ -17,7 +17,9 @@ describe('DialogService', () => {
     });
 
     it('should instantiate', () => {
-        const dialogService = new DialogService(localStore.object);
+        const dialogService = createService(DialogService, [
+            { provide: LocalStoreService, useValue: localStore.object },
+        ]);
 
         expect(dialogService).toBeDefined();
     });
@@ -40,7 +42,9 @@ describe('DialogService', () => {
 
     [true, false].forEach(confirmed => {
         it(`should confirm dialog with ${confirmed}`, () => {
-            const dialogService = new DialogService(localStore.object);
+            const dialogService = createService(DialogService, [
+                { provide: LocalStoreService, useValue: localStore.object },
+            ]);
 
             let isCompleted = false;
             let isNext: boolean;
@@ -66,7 +70,9 @@ describe('DialogService', () => {
 
     [true, false].forEach(confirmed => {
         it(`should confirm dialog with '${confirmed}' but not remember`, () => {
-            const dialogService = new DialogService(localStore.object);
+            const dialogService = createService(DialogService, [
+                { provide: LocalStoreService, useValue: localStore.object },
+            ]);
 
             let isCompleted = false;
             let isNext: boolean;
@@ -95,7 +101,9 @@ describe('DialogService', () => {
         { confirmed: false, saved: 0 },
     ].forEach(({ confirmed, saved }) => {
         it(`should confirm dialog with '${confirmed}' and remember if remembered and confirmed`, () => {
-            const dialogService = new DialogService(localStore.object);
+            const dialogService = createService(DialogService, [
+                { provide: LocalStoreService, useValue: localStore.object },
+            ]);
 
             let isCompleted = false;
             let isNext: boolean;
@@ -125,7 +133,9 @@ describe('DialogService', () => {
         { confirmed: false, saved: false, render: 1 },
     ].forEach(({ confirmed, saved, render }) => {
         it(`should confirm dialog with '${confirmed}' from local store if saved`, () => {
-            const dialogService = new DialogService(localStore.object);
+            const dialogService = createService(DialogService, [
+                { provide: LocalStoreService, useValue: localStore.object },
+            ]);
 
             localStore.setup(x => x.getBoolean('dialogs.confirm.MyKey'))
                 .returns(() => saved);
@@ -155,7 +165,9 @@ describe('DialogService', () => {
     });
 
     it('should publish tooltip', () => {
-        const dialogService = new DialogService(localStore.object);
+        const dialogService = createService(DialogService, [
+            { provide: LocalStoreService, useValue: localStore.object },
+        ]);
 
         const tooltip = new Tooltip('target', 'text', 'left');
 
@@ -171,7 +183,9 @@ describe('DialogService', () => {
     });
 
     it('should publish notification', () => {
-        const dialogService = new DialogService(localStore.object);
+        const dialogService = createService(DialogService, [
+            { provide: LocalStoreService, useValue: localStore.object },
+        ]);
 
         const notification = Notification.error('Message');
 
@@ -187,7 +201,9 @@ describe('DialogService', () => {
     });
 
     it('should publish dialog request', () => {
-        const dialogService = new DialogService(localStore.object);
+        const dialogService = createService(DialogService, [
+            { provide: LocalStoreService, useValue: localStore.object },
+        ]);
 
         let pushedDialog: DialogRequest;
 

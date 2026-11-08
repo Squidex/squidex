@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AppLanguagesDto, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, UpdateLanguageDto, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppLanguagesDto, AppLanguagesService, AppsState, DialogService, LanguageDto, LanguagesService, LanguagesState, UpdateLanguageDto, versioned } from '@app/shared/internal';
 import { createLanguages } from '../services/app-languages.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -37,7 +38,12 @@ describe('LanguagesState', () => {
         languagesService.setup(x => x.getLanguages(app))
             .returns(() => of({ payload: oldLanguages, version })).verifiable();
 
-        languagesState = new LanguagesState(languagesService.object, appsState.object, dialogs.object, allLanguagesService.object);
+        languagesState = createService(LanguagesState, [
+            { provide: AppLanguagesService, useValue: languagesService.object },
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: LanguagesService, useValue: allLanguagesService.object },
+        ]);
     });
 
     afterEach(() => {

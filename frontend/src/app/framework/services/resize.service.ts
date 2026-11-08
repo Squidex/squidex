@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DestroyRef, inject, Injectable } from '@angular/core';
+import { DestroyRef, inject, Service } from '@angular/core';
 
 export interface ResizeListener {
     onResize(rect: DOMRect, element: Element): void;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ResizeService {
     private readonly destroyRef = inject(DestroyRef);
     private readonly listeners = new WeakMap<Element, ResizeListener>();

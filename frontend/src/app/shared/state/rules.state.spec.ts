@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, Types, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, Types, versioned } from '@app/shared/internal';
 import { createRule } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { FlowView, RulesState } from './rules.state';
@@ -32,7 +32,11 @@ describe('RulesState', () => {
         rulesService.setup(x => x.getSteps())
             .returns(() => of({}));
 
-        rulesState = TestBed.runInInjectionContext(() => new RulesState(appsState.object, dialogs.object, rulesService.object));
+        rulesState = createService(RulesState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: RulesService, useValue: rulesService.object },
+        ]);
     });
 
     afterEach(() => {

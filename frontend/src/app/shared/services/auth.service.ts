@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { defer, from, map, Observable, of } from 'rxjs';
 import { ApiUrlConfig } from '@app/framework';
@@ -74,10 +74,9 @@ export class Profile {
     }
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AuthService {
+    private readonly apiUrl = inject(ApiUrlConfig);
     private readonly userManager!: UserManager;
     private readonly currentUser = signal<Profile | null | undefined>(undefined);
     private readonly currentUserLoaded: Promise<unknown> = Promise.resolve();
@@ -99,8 +98,8 @@ export class AuthService {
         });
     }
 
-    constructor(apiUrl: ApiUrlConfig) {
-        if (!apiUrl) {
+    constructor() {
+        if (!this.apiUrl) {
             return;
         }
 
@@ -109,11 +108,11 @@ export class AuthService {
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
                            scope: 'squidex-api openid profile email permissions',
-                    redirect_uri: apiUrl.buildUrl('login;'),
-        post_logout_redirect_uri: apiUrl.buildUrl('logout'),
-             silent_redirect_uri: apiUrl.buildUrl('client-callback-silent.html'),
-              popup_redirect_uri: apiUrl.buildUrl('client-callback-popup.html'),
-                       authority: apiUrl.buildUrl('identity-server/'),
+                    redirect_uri: this.apiUrl.buildUrl('login;'),
+        post_logout_redirect_uri: this.apiUrl.buildUrl('logout'),
+             silent_redirect_uri: this.apiUrl.buildUrl('client-callback-silent.html'),
+              popup_redirect_uri: this.apiUrl.buildUrl('client-callback-popup.html'),
+                       authority: this.apiUrl.buildUrl('identity-server/'),
                       userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
         });
 

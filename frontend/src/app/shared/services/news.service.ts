@@ -6,20 +6,15 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
 import { FeaturesDto } from '../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class NewsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getFeatures(version: number): Observable<FeaturesDto> {
         const url = this.apiUrl.buildUrl(`api/news/features${StringHelper.buildQuery({ version })}`);

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { effect, EffectRef, inject, Injectable, Injector, OnDestroy, untracked } from '@angular/core';
+import { effect, EffectRef, inject, Injector, OnDestroy, Service, untracked } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { LocalStoreService, Types } from '@app/framework/internal';
 import { State } from '@app/framework/state';
@@ -160,17 +160,13 @@ export interface StateSynchronizerMap<T> {
     getInitial(): Partial<T>;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class Router2State implements OnDestroy, StateSynchronizer {
+    private readonly localStore = inject(LocalStoreService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private readonly injector = inject(Injector);
     private mapper?: Router2StateMap<any>;
-
-    constructor(
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly localStore: LocalStoreService,
-    ) {
-    }
 
     public getInitial() {
         return this.mapper?.getInitial();

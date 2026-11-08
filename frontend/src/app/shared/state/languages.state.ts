@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, VersionTag } from '@app/framework';
@@ -42,10 +42,12 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class LanguagesState extends State<Snapshot> {
+    private readonly appLanguagesService = inject(AppLanguagesService);
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly languagesService = inject(LanguagesService);
     private cachedLanguage$?: Observable<ReadonlyArray<LanguageDto>>;
 
     public readonly languages =
@@ -77,12 +79,7 @@ export class LanguagesState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appLanguagesService: AppLanguagesService,
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly languagesService: LanguagesService,
-    ) {
+    constructor() {
         super({
             allLanguages: [],
             allLanguagesNew: [],

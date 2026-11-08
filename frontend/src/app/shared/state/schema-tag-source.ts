@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { TagConverter, TagValue } from '@app/framework';
 import { SchemaDto } from '../model';
 import { SchemasState } from './schemas.state';
@@ -45,10 +45,10 @@ class SchemaConverter implements TagConverter {
     }
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class SchemaTagSource {
+    public readonly schemasState = inject(SchemasState);
+
     public readonly converter = computed(() => {
         return new SchemaConverter(this.schemasState.schemas(), false);
     });
@@ -57,9 +57,7 @@ export class SchemaTagSource {
         return new SchemaConverter(this.schemasState.schemas(), true);
     });
 
-    constructor(
-        readonly schemasState: SchemasState,
-    ) {
+    constructor() {
         this.schemasState.loadIfNotLoaded();
     }
 }

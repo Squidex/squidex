@@ -6,22 +6,17 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, Versioned, VersionOrTag } from '@app/framework';
 import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, ExportContentsDto, GenerateSchemaDto, GenerateSchemaResponseDto, MigrateContentsDto, SchemaDto, SchemasDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from './../model';
 import { QueryModel } from './query';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class SchemasService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getSchemas(appName: string): Observable<SchemasDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);

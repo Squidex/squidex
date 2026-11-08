@@ -6,7 +6,7 @@
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { computed, Injectable, Signal } from '@angular/core';
+import { computed, inject, Service, Signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, escapeHTML, pretifyError, StringHelper } from '@app/framework';
@@ -55,15 +55,10 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
     });
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class HistoryService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getHistory(appName: string, channel: string): Observable<ReadonlyArray<HistoryEventDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history${StringHelper.buildQuery({ channel })}`);

@@ -9,6 +9,7 @@ import { TestBed } from '@angular/core/testing';
 import { Mock } from 'typemoq';
 import { applyAwarenessUpdate, Awareness, encodeAwarenessUpdate } from 'y-protocols/awareness';
 import * as Y from 'yjs';
+import { createService } from '@app/framework/testing';
 import { AuthService, CollaborationProvider, CollaborationService, UIOptions } from '@app/shared/internal';
 
 describe('CollaborationService', () => {
@@ -26,7 +27,9 @@ describe('CollaborationService', () => {
         });
 
         TestBed.runInInjectionContext(() => {
-            collaborationService = new CollaborationService(Mock.ofType<AuthService>().object);
+            collaborationService = createService(CollaborationService, [
+                { provide: AuthService, useValue: Mock.ofType<AuthService>().object },
+            ]);
         });
 
         collaborationService.providerFactory = (_, doc) => {

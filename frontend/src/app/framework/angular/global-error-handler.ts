@@ -5,16 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ErrorHandler, Injectable, NgZone } from '@angular/core';
+import { ErrorHandler, inject, NgZone, Service } from '@angular/core';
 import { DialogService } from '../internal';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class GlobalErrorHandler implements ErrorHandler {
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly zone: NgZone,
-    ) {
-    }
+    private readonly dialogs = inject(DialogService);
+    private readonly zone = inject(NgZone);
 
     public handleError(error: any): void {
         const chunkFailedMessage = /Loading chunk [\d]+ failed/;

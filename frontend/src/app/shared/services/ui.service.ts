@@ -6,7 +6,7 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiUrlConfig } from '@app/framework';
@@ -16,15 +16,10 @@ export type UISettingsDto = Readonly<{
     canCreateApps?: boolean;
 }> & Record<string, any>;
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class UIService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getCommonSettings(): Observable<UISettingsDto> {
         const url = this.apiUrl.buildUrl('api/ui/settings');

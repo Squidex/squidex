@@ -7,6 +7,7 @@
 
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { AppsService, AppsState, CreateAppDto, DialogService, UpdateAppDto } from '@app/shared/internal';
 import { createApp, createAppSettings } from '../services/apps.service.spec';
 
@@ -30,7 +31,10 @@ describe('AppsState', () => {
         appsService.setup(x => x.getSettings(It.isAnyString()))
             .returns(() => of(app1Settings));
 
-        appsState = new AppsState(appsService.object, dialogs.object);
+        appsState = createService(AppsState, [
+            { provide: AppsService, useValue: appsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
         appsState.load().subscribe();
     });
 

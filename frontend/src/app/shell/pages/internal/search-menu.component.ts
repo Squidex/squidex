@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, Injectable, viewChild } from '@angular/core';
+import { Component, inject, Service, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, ShortcutComponent, ShortcutDirective, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { AutocompleteComponent as AutocompleteComponent_1 } from '../../../framework/angular/forms/editors/autocomplete.component';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class SearchSource implements AutocompleteSource {
     private readonly appsState = inject(AppsState);
     private readonly searchService = inject(SearchService);

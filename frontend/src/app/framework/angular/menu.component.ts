@@ -6,7 +6,7 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, Component, computed, effect, ElementRef, inject, Injectable, input, signal, viewChild } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, ElementRef, inject, input, Service, signal, viewChild } from '@angular/core';
 import { ModalModel, ResizeListener, ResizeService } from '@app/framework/internal';
 import { DropdownMenuComponent } from './dropdown-menu.component';
 import { MenuItemComponent } from './menu-item.component';
@@ -14,7 +14,7 @@ import { ModalPlacementDirective } from './modals/modal-placement.directive';
 import { ModalDirective } from './modals/modal.directive';
 import { TranslatePipe } from './pipes/translate.pipe';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class MenuItemRegistry {
     public readonly menuItems = signal(new Set<MenuItemComponent>());
 

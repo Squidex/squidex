@@ -5,17 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { inject, Renderer2, RendererFactory2, Service } from '@angular/core';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ResourceLoaderService {
+    private readonly rendererFactory = inject(RendererFactory2);
     private readonly cache: { [path: string]: Promise<any> } = {};
     private readonly renderer: Renderer2;
 
-    constructor(rendererFactory: RendererFactory2) {
-        this.renderer = rendererFactory.createRenderer(null, null);
+    constructor() {
+        this.renderer = this.rendererFactory.createRenderer(null, null);
     }
 
     public loadStyle(url: string): Promise<any> {

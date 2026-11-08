@@ -6,20 +6,15 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiUrlConfig, pretifyError, Resource } from '@app/framework';
 import { CreateIndexDto, IndexesDto } from './../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class IndexesService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getIndexes(appName: string, schemaName: string): Observable<IndexesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/indexes`);

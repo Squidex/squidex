@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { compareStrings, debug, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
@@ -60,6 +60,10 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class AssetsStateBase extends State<Snapshot> {
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
+    private readonly dialogs = inject(DialogService);
+
     public readonly tagsUnsorted =
         this.project(x => x.tagsAvailable);
 
@@ -123,11 +127,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    protected constructor(name: string,
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService,
-    ) {
+    protected constructor(name: string) {
         super({
             folders: [],
             assets: [],
@@ -587,22 +587,16 @@ function getParent(path: ReadonlyArray<AssetPathItem>) {
     }
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AssetsState extends AssetsStateBase {
-    constructor(
-        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
-    ) {
-        super('assets', appsState, assetsService, dialogs);
+    constructor() {
+        super('assets');
     }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ComponentAssetsState extends AssetsStateBase {
-    constructor(
-        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
-    ) {
-        super('componentAssets', appsState, assetsService, dialogs);
+    constructor() {
+        super('componentAssets');
     }
 }

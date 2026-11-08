@@ -8,7 +8,8 @@
 import { catchError, EMPTY, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
-import { AssignContributorDto, ContributorsDto, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, AssignContributorDto, ContributorsDto, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
 import { createContributors } from '../services/contributors.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -34,7 +35,11 @@ describe('ContributorsState', () => {
         contributorsService.setup(x => x.getContributors(app))
             .returns(() => of(versioned(version, oldContributors))).verifiable(Times.atLeastOnce());
 
-        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object);
+        contributorsState = createService(ContributorsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: ContributorsService, useValue: contributorsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {

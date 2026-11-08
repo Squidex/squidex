@@ -7,6 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { DialogService, TemplatesDto, TemplatesService, TemplatesState } from '@app/shared/internal';
 import { createTemplate } from '../services/templates.service.spec';
 
@@ -22,7 +23,10 @@ describe('TemplatesState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         templatesService = Mock.ofType<TemplatesService>();
-        templatesState = new TemplatesState(templatesService.object, dialogs.object);
+        templatesState = createService(TemplatesState, [
+            { provide: TemplatesService, useValue: templatesService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {

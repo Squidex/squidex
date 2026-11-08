@@ -5,14 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { Types } from '../utils/types';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class LoadingService {
     private readonly router = inject(Router);
     private readonly loadingCount = signal(0);

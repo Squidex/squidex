@@ -7,6 +7,7 @@
 
 import { of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { AuthService, Profile, UserDto, UsersProviderService, UsersService } from '@app/shared/internal';
 
 describe('UsersProviderService', () => {
@@ -17,7 +18,10 @@ describe('UsersProviderService', () => {
     beforeEach(() => {
         authService = Mock.ofType<AuthService>();
         usersService = Mock.ofType<UsersService>();
-        usersProviderService = new UsersProviderService(usersService.object, authService.object);
+        usersProviderService = createService(UsersProviderService, [
+            { provide: UsersService, useValue: usersService.object },
+            { provide: AuthService, useValue: authService.object },
+        ]);
     });
 
     it('should return users service if user not cached', () => {

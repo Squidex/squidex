@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, effect, EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext, untracked } from '@angular/core';
+import { computed, effect, EnvironmentInjector, inject, runInInjectionContext, Service, untracked } from '@angular/core';
 import { debug, State, TourService, UIOptions } from '@app/framework';
-import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
+import { TASK_CONFIGURATION, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
 
 export interface TaskSnapshot extends TaskDefinition {
@@ -29,10 +29,11 @@ interface Snapshot {
     status?: 'Ready' | 'Started' | 'Completed';
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TourState extends State<Snapshot> {
+    private readonly definition = inject(TASK_CONFIGURATION);
+    private readonly tourService = inject(TourService);
+    private readonly uiState = inject(UIState);
     private readonly uiOptions = inject(UIOptions);
     private readonly injector = inject(EnvironmentInjector);
     private readonly isDisabled = this.uiOptions.value.hideOnboarding;
@@ -49,11 +50,7 @@ export class TourState extends State<Snapshot> {
     public readonly pendingTasks =
         computed(() => this.tasks().filter(t => !t.isCompleted).length);
 
-    constructor(
-        @Inject(TASK_CONFIGURATION) private readonly definition: TaskConfiguration,
-        private readonly tourService: TourService,
-        private readonly uiState: UIState,
-    ) {
+    constructor() {
         super({});
 
         debug(this, 'tour');
@@ -71,7 +68,7 @@ export class TourState extends State<Snapshot> {
             .subscribe(change => {
                 this.next({ ...change, status: change.status || 'Ready' }, LoadedEvent);
 
-                for (const tasks of definition.tasks) {
+                for (const tasks of this.definition.tasks) {
                     runInInjectionContext(this.injector, tasks.onComplete).subscribe(() => {
                         this.next(state => ({
                             ...state,

@@ -7,7 +7,8 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, ExportContentsDto, MigrateContentsDto, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AddFieldDto, AppsState, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, ExportContentsDto, MigrateContentsDto, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
@@ -35,7 +36,11 @@ describe('SchemasState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         schemasService = Mock.ofType<SchemasService>();
-        schemasState = new SchemasState(appsState.object, dialogs.object, schemasService.object);
+        schemasState = createService(SchemasState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: SchemasService, useValue: schemasService.object },
+        ]);
     });
 
     afterEach(() => {

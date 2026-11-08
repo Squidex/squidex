@@ -6,7 +6,7 @@
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
@@ -20,15 +20,10 @@ export class AccessTokenDto {
     }
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ClientsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getClients(appName: string): Observable<Versioned<ClientsDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);

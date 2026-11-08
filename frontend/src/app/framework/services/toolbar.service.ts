@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, signal, untracked } from '@angular/core';
+import { Service, signal, untracked } from '@angular/core';
 import { Types } from '../utils/types';
 
 export type ButtonItem = { owner: any; name: string; method: () => void } & ButtonOptions;
 export type ButtonOptions = { disabled?: boolean; color?: string };
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ToolbarService {
     private readonly buttonsValue = signal<ReadonlyArray<ButtonItem>>([]);
 

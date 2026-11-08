@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { from, Observable, of, shareReplay } from 'rxjs';
 import { UIOptions } from '@app/framework';
 import { AssetsService, ContentsService } from '../internal';
@@ -102,18 +102,13 @@ abstract class ResolverBase<T extends { id: string }, TResult extends { items: R
     }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ResolveContents extends ResolverBase<ContentDto, ContentsDto> {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
     private readonly uiOptions = inject(UIOptions);
     private readonly schemas: { [name: string]: Observable<ContentsDto> } = {};
     private readonly itemCount = this.uiOptions.value.referencesDropdownItemCount;
-
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-    ) {
-        super();
-    }
 
     public resolveAll(schema: string) {
         let result = this.schemas[schema];
@@ -140,14 +135,10 @@ export class ResolveContents extends ResolverBase<ContentDto, ContentsDto> {
     }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ResolveAssets extends ResolverBase<AssetDto, AssetsDto> {
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-    ) {
-        super();
-    }
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
 
     protected createResult(items: AssetDto[]): AssetsDto {
         return { items, total: items.length } as any;

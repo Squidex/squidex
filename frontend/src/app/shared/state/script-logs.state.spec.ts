@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, ScriptLogsService, ScriptLogsState } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, DialogService, ScriptLogsService, ScriptLogsState } from '@app/shared/internal';
 import { createScriptLog } from '../services/script-logs.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -25,7 +26,11 @@ describe('ScriptLogsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         scriptLogsService = Mock.ofType<ScriptLogsService>();
-        scriptLogsState = new ScriptLogsState(appsState.object, scriptLogsService.object, dialogs.object);
+        scriptLogsState = createService(ScriptLogsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: ScriptLogsService, useValue: scriptLogsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {

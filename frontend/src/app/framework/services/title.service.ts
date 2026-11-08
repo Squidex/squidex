@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, signal, untracked } from '@angular/core';
+import { inject, Service, signal, untracked } from '@angular/core';
 import { Types } from '../utils/types';
 import { LocalizerService } from './localizer.service';
 
@@ -20,21 +20,18 @@ export class TitlesConfig {
 
 export type Title = { route?: any; localized: string; value: string };
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TitleService {
+    private readonly localizer = inject(LocalizerService);
+    private readonly titles = inject(TitlesConfig);
     private readonly pathValue = signal<ReadonlyArray<Title>>([]);
 
     public readonly path = this.pathValue.asReadonly();
 
-    constructor(
-        private readonly titles: TitlesConfig,
-        private readonly localizer: LocalizerService,
-    ) {
+    constructor() {
         this.titles = new TitlesConfig(
-            this.localizer.getOrKey(titles.prefix),
-            this.localizer.getOrKey(titles.suffix),
+            this.localizer.getOrKey(this.titles.prefix),
+            this.localizer.getOrKey(this.titles.suffix),
             this.titles.separator,
         );
 

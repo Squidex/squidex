@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { TourService as BaseTourService, IStepOption, TourAnchorDirective, TourState } from 'ngx-ui-tour-core';
 import { filter, Observable, Subscription, take } from 'rxjs';
 import { FloatingPlacement } from '@app/framework/internal';
@@ -94,9 +94,7 @@ export function waitForElement(selector: string) {
     };
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TourService extends BaseTourService<StepDefinition> {
     private onNext?: Subscription;
     private onEnd?: Subscription;

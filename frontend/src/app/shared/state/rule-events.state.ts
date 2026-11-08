@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, getPagingInfo, ListState, Resource, shareSubscribed, State } from '@app/framework';
@@ -27,10 +27,12 @@ interface Snapshot extends ListState {
     resource: Resource;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class RuleEventsState extends State<Snapshot> {
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly rulesService = inject(RulesService);
+
     public readonly ruleEvents =
         this.project(x => x.ruleEvents);
 
@@ -57,11 +59,7 @@ export class RuleEventsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService,
-    ) {
+    constructor() {
         super({
             resource: { _links: {} },
             ruleEvents: [],
