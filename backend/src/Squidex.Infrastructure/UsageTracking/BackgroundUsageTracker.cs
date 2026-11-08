@@ -6,13 +6,17 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Timers;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.UsageTracking;
 
 public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
 {
+    // The result contains one entry per day and category, therefore the range must be limited.
+    public const int MaxQueryDays = 3660;
     private const int Intervall = 60 * 1000;
     private readonly IUsageRepository usageRepository;
     private readonly ILogger<BackgroundUsageTracker> log;
@@ -128,6 +132,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         Guard.NotNullOrEmpty(key);
 
         ThrowIfDisposed();
+        ValidateRange(fromDate, toDate);
 
         var result = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>();
 
@@ -150,11 +155,17 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         {
             var enriched = new List<(DateOnly Date, Counters Counters)>();
 
+            // Use the first entry per date, if the store returns duplicates.
+            var countersByDate = new Dictionary<DateOnly, Counters>();
+
+            foreach (var usage in value)
+            {
+                countersByDate.TryAdd(usage.Date, usage.Counters);
+            }
+
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {
-                var counters = value.Find(x => x.Date == date)?.Counters;
-
-                enriched.Add((date, counters ?? []));
+                enriched.Add((date, countersByDate.GetValueOrDefault(date) ?? []));
             }
 
             result[category] = enriched;
@@ -199,5 +210,24 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     private string GetCategory(string? category)
     {
         return !string.IsNullOrWhiteSpace(category) ? category.Trim() : FallbackCategory;
+    }
+
+    private static void ValidateRange(DateOnly fromDate, DateOnly toDate)
+    {
+        if (toDate < fromDate)
+        {
+            throw new ValidationException(Not.GreaterEqualsThan("ToDate", "FromDate"));
+        }
+
+        if (toDate.DayNumber - fromDate.DayNumber >= MaxQueryDays)
+        {
+            throw new ValidationException(Not.LessEqualsThan("Days", MaxQueryDays.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        // The result is created day by day and would overflow at the end.
+        if (toDate == DateOnly.MaxValue)
+        {
+            throw new ValidationException(Not.LessThan("ToDate", DateOnly.MaxValue.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)));
+        }
     }
 }
