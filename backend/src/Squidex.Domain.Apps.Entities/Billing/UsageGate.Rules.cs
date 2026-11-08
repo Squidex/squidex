@@ -63,27 +63,27 @@ public sealed partial class UsageGate : IRuleUsageTracker
         var result = new List<RuleStats>();
 
         var usages = await usageTracker.QueryAsync(key, fromDate, toDate, ct);
+        var usagesByDate = new Dictionary<DateOnly, RuleCounters>();
+
+        foreach (var (_, byCategory) in usages)
+        {
+            foreach (var (counterDate, counters) in byCategory)
+            {
+                var currentCounters = GetRuleCounters(counters);
+
+                var aggregated = usagesByDate.GetValueOrDefault(counterDate);
+
+                aggregated.TotalCreated += currentCounters.TotalCreated;
+                aggregated.TotalSucceeded += currentCounters.TotalSucceeded;
+                aggregated.TotalFailed += currentCounters.TotalFailed;
+
+                usagesByDate[counterDate] = aggregated;
+            }
+        }
 
         for (var date = fromDate; date <= toDate; date = date.AddDays(1))
         {
-            var aggregated = default(RuleCounters);
-
-            foreach (var (_, byCategory) in usages)
-            {
-                foreach (var (counterDate, counters) in byCategory)
-                {
-                    if (counterDate == date)
-                    {
-                        var currentCounters = GetRuleCounters(counters);
-
-                        aggregated.TotalCreated += currentCounters.TotalCreated;
-                        aggregated.TotalSucceeded += currentCounters.TotalSucceeded;
-                        aggregated.TotalFailed += currentCounters.TotalFailed;
-                    }
-                }
-            }
-
-            result.Add(new RuleStats(date, aggregated));
+            result.Add(new RuleStats(date, usagesByDate.GetValueOrDefault(date)));
         }
 
         return result;

@@ -71,26 +71,26 @@ public sealed partial class UsageGate : IAssetUsageTracker
         var result = new List<AssetStats>();
 
         var usages = await usageTracker.QueryAsync(key, fromDate, toDate, ct);
+        var usagesByDate = new Dictionary<DateOnly, AssetCounters>();
+
+        foreach (var (_, byCategory) in usages)
+        {
+            foreach (var (counterDate, counters) in byCategory)
+            {
+                var currentCounters = GetAssetCounters(counters);
+
+                var aggregated = usagesByDate.GetValueOrDefault(counterDate);
+
+                aggregated.TotalSize += currentCounters.TotalSize;
+                aggregated.TotalAssets += currentCounters.TotalAssets;
+
+                usagesByDate[counterDate] = aggregated;
+            }
+        }
 
         for (var date = fromDate; date <= toDate; date = date.AddDays(1))
         {
-            var aggregated = default(AssetCounters);
-
-            foreach (var (_, byCategory) in usages)
-            {
-                foreach (var (counterDate, counters) in byCategory)
-                {
-                    if (counterDate == date)
-                    {
-                        var currentCounters = GetAssetCounters(counters);
-
-                        aggregated.TotalSize += currentCounters.TotalSize;
-                        aggregated.TotalAssets += currentCounters.TotalAssets;
-                    }
-                }
-            }
-
-            result.Add(new AssetStats(date, aggregated));
+            result.Add(new AssetStats(date, usagesByDate.GetValueOrDefault(date)));
         }
 
         return result;

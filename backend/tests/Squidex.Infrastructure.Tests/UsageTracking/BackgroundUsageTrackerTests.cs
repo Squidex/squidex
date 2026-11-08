@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.UsageTracking;
 
@@ -39,6 +40,50 @@ public class BackgroundUsageTrackerTests
         sut.Dispose();
 
         await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync(key, date, date.AddDays(1), ct));
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_if_querying_with_to_date_before_from_date()
+    {
+        await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(key, date, date.AddDays(-1), ct));
+
+        A.CallTo(() => usageStore.QueryAsync(A<string>._, A<DateOnly>._, A<DateOnly>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_if_querying_too_many_days()
+    {
+        var dateFrom = new DateOnly(1, 1, 1);
+        var dateTo = new DateOnly(9999, 12, 30);
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(key, dateFrom, dateTo, ct));
+
+        A.CallTo(() => usageStore.QueryAsync(A<string>._, A<DateOnly>._, A<DateOnly>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_if_querying_until_max_date()
+    {
+        var dateFrom = DateOnly.MaxValue.AddDays(-1);
+        var dateTo = DateOnly.MaxValue;
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(key, dateFrom, dateTo, ct));
+    }
+
+    [Fact]
+    public async Task Should_query_max_days()
+    {
+        var dateFrom = date;
+        var dateTo = dateFrom.AddDays(BackgroundUsageTracker.MaxQueryDays - 1);
+
+        A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
+            .Returns([]);
+
+        var actual = await sut.QueryAsync(key, dateFrom, dateTo, ct);
+
+        Assert.Equal(BackgroundUsageTracker.MaxQueryDays, actual["*"].Count);
     }
 
     [Fact]
