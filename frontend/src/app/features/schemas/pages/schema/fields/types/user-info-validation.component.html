@@ -7,7 +7,7 @@
         [prefix]="field().fieldId">
         <select class="form-select" [id]="roleRow.fieldName()" autocomplete="off" [formField]="form().defaultRole">
             @for (role of rolesState.roles(); track role.name) {
-                <option [ngValue]="role.name">{{ role.name }}</option>
+                <option [value]="role.name">{{ role.name }}</option>
             }
         </select>
     </sqx-form-row>

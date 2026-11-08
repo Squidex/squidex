@@ -2,7 +2,7 @@
     <sqx-form-row [for]="form().calculatedDefaultValue" label="schemas.field.defaultValue">
         <select class="form-select" [formField]="form().calculatedDefaultValue">
             @for (value of calculatedDefaultValues; track value) {
-                <option [ngValue]="value">{{ value }}</option>
+                <option [value]="value">{{ value }}</option>
             }
         </select>
     </sqx-form-row>

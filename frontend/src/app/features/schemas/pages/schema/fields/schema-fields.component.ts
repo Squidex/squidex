@@ -18,9 +18,9 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     imports: [
         FieldWizardComponent,
         ModalDirective,
+        forwardRef(() => SortableFieldListComponent),
         TourStepDirective,
         TranslatePipe,
-        forwardRef(() => SortableFieldListComponent),
     ],
 })
 export class SchemaFieldsComponent {

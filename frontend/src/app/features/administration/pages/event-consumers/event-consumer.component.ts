@@ -18,8 +18,8 @@ import { EventConsumersState } from '../../internal';
     templateUrl: './event-consumer.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        TranslatePipe,
         TooltipDirective,
+        TranslatePipe,
     ],
 })
 export class EventConsumerComponent {

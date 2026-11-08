@@ -17,8 +17,8 @@ type FieldPaths = { label: string; paths: ReadonlyArray<string> };
     templateUrl: './contents-export-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormRowComponent,
         FormField,
+        FormRowComponent,
         MarkdownDirective,
         ModalDialogComponent,
         TranslatePipe,

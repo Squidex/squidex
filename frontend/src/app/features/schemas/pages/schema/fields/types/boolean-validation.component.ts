@@ -16,9 +16,9 @@ import { AppLanguageDto, BooleanFieldFormModel, BooleanFieldPropertiesDto, Check
     templateUrl: 'boolean-validation.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        CheckboxComponent,
         FormField,
         FormRowComponent,
-        CheckboxComponent,
         LocalizedInputComponent,
     ],
 })

@@ -23,8 +23,8 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
     imports: [
         FormField,
         FormHintComponent,
-        FormsModule,
         FormRowComponent,
+        FormsModule,
         LayoutComponent,
         ModalDialogComponent,
         ModalDirective,

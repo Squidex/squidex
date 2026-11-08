@@ -15,9 +15,9 @@ import { ContentFieldComponent } from './content-field.component';
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        forwardRef(() => ContentFieldComponent),
         FormHintComponent,
         MarkdownDirective,
-        forwardRef(() => ContentFieldComponent),
     ],
 })
 export class ContentSectionComponent {

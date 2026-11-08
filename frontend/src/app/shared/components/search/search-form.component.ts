@@ -25,6 +25,7 @@ import { TourHintDirective } from '../tour-hint.directive';
         DropdownComponent,
         FilterInput,
         FocusOnInitDirective,
+        FormErrorComponent,
         FormField,
         FormRowComponent,
         FormsModule,
@@ -38,7 +39,6 @@ import { TourHintDirective } from '../tour-hint.directive';
         TourStepDirective,
         TranslatePipe,
         UserDtoPicture,
-        FormErrorComponent,
     ],
 })
 export class SearchFormComponent {

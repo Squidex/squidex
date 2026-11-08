@@ -55,6 +55,8 @@ describe('ModalDirective', () => {
         host.dialog1.show();
         host.dialog2.show();
         host.dropdown.show();
+
+        fixture.detectChanges();
     });
 
     it('should hide all open modals', () => {

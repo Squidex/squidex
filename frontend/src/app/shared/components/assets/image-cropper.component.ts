@@ -15,8 +15,8 @@ import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
     templateUrl: './image-cropper.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        TranslatePipe,
         TooltipDirective,
+        TranslatePipe,
     ],
 })
 export class ImageCropperComponent {

@@ -30,10 +30,10 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         ListViewComponent,
         ModalDialogComponent,
         PagerComponent,
+        forwardRef(() => SearchFormComponent),
         SyncWidthDirective,
         TooltipDirective,
         TranslatePipe,
-        forwardRef(() => SearchFormComponent),
     ],
 })
 export class ContentSelectorComponent {

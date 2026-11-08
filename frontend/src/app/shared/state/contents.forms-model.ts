@@ -128,7 +128,6 @@ export class FieldArrayForm extends AbstractContentForm<AnyFieldDto> {
     }
 
     private getItemForm(form: FieldTree<any>) {
-        // The field tree tracks the identity of items, so the forms can be cached per field.
         let result = this.itemForms.get(form);
         if (!result) {
             result = this.isComponents ?

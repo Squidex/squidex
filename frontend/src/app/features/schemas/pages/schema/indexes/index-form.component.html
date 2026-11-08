@@ -11,7 +11,7 @@
                         <sqx-control-errors [for]="field.name" />
                         <select class="form-select" [formField]="field.name">
                             @for (fieldName of fieldNames(); track fieldName) {
-                                <option [ngValue]="fieldName">{{ fieldName }}</option>
+                                <option [value]="fieldName">{{ fieldName }}</option>
                             }
                         </select>
                     </div>
@@ -19,9 +19,9 @@
                     <div class="col-4">
                         <sqx-control-errors [for]="field.order" />
                         <select class="form-select" [formField]="field.order">
-                            <option [ngValue]="'Ascending'">Ascending</option>
+                            <option value="Ascending">Ascending</option>
 
-                            <option [ngValue]="'Descending'">Descending</option>
+                            <option value="Descending">Descending</option>
                         </select>
                     </div>
 

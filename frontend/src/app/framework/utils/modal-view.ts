@@ -5,37 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Signal, signal } from '@angular/core';
+import { Signal, signal, WritableSignal } from '@angular/core';
 import { Placement } from '@floating-ui/dom';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 export type FloatingPlacement = Placement | [Placement, 'inside' | 'outside'];
 
 export interface Openable {
-    isOpenChanges: Observable<boolean>;
-
     isOpen: Signal<boolean>;
 }
 
 abstract class OpenableBase implements Openable {
-    private readonly isOpen$: BehaviorSubject<boolean>;
-    private readonly isOpenState;
+    private readonly isOpenState: WritableSignal<boolean>;
 
     public readonly isOpen: Signal<boolean>;
 
-    public get isOpenChanges(): Observable<boolean> {
-        return this.isOpen$;
-    }
-
     constructor(isOpen: boolean) {
-        this.isOpen$ = new BehaviorSubject<boolean>(isOpen);
         this.isOpenState = signal(isOpen);
         this.isOpen = this.isOpenState.asReadonly();
     }
 
     protected setOpen(isOpen: boolean) {
         this.isOpenState.set(isOpen);
-        this.isOpen$.next(isOpen);
     }
 }
 

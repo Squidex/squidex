@@ -5,13 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, model, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, of } from 'rxjs';
-import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, FormValueControlBase, LoaderComponent, ModalDialogComponent, ModalDirective, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, model, signal } from '@angular/core';
+import { of, timer } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, FormValueControlBase, LoaderComponent, ModalDialogComponent, ModalDirective, safeResource, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe } from '@app/shared';
 
-type Request = { search?: string; page: number };
+type StockPhotoPage = { page: number; items: ReadonlyArray<StockPhotoDto> };
 
 @Component({
     selector: 'sqx-stock-photo-editor',
@@ -30,7 +29,6 @@ type Request = { search?: string; page: number };
     ],
 })
 export class StockPhotoEditorComponent extends FormValueControlBase<string | null> {
-    private readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
     private readonly stockPhotoService = inject(StockPhotoService);
 
     /** The value of the control. */
@@ -38,15 +36,46 @@ export class StockPhotoEditorComponent extends FormValueControlBase<string | nul
 
     protected readonly stockPhotoSearch = signal('');
 
-    protected readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
+    protected readonly stockPhotoPage = linkedSignal(() => {
+        this.stockPhotoSearch();
 
-    protected readonly stockPhotosHasMore = signal(false);
+        return 1;
+    });
 
-    protected readonly stockPhotosLoading = signal(false);
+    protected readonly stockPhotos = linkedSignal<StockPhotoPage | undefined, ReadonlyArray<StockPhotoDto>>({
+        source: () => this.stockPhotoResult.isLoading() ? undefined : this.stockPhotoResult.value(),
+        computation: (result, previous) => {
+            // Keep the current photos while the next page or search is loading.
+            if (!result) {
+                return previous?.value ?? [];
+            }
+
+            if (result.page > 1) {
+                return [...previous?.value ?? [], ...result.items];
+            }
+
+            return result.items;
+        },
+    });
+
+    protected readonly stockPhotosHasMore = linkedSignal<StockPhotoPage | undefined, boolean>({
+        source: () => this.stockPhotoResult.isLoading() ? undefined : this.stockPhotoResult.value(),
+        computation: (result, previous) => {
+            if (!result) {
+                return previous?.value ?? false;
+            }
+
+            return result.items.length === 20;
+        },
+    });
 
     protected readonly thumbnailStatus = linkedSignal<string | null, 'Loaded' | 'Failed' | undefined>({
         source: this.value,
         computation: () => undefined,
+    });
+
+    protected readonly stockPhotosLoading = computed(() => {
+        return this.stockPhotoResult.isLoading() && this.stockPhotoSearch().length > 0;
     });
 
     protected readonly stockPhotoThumbnail = computed(() => {
@@ -55,36 +84,22 @@ export class StockPhotoEditorComponent extends FormValueControlBase<string | nul
         return value ? thumbnail(value, undefined, 300) || value : null;
     });
 
+    protected readonly stockPhotoResult = safeResource<StockPhotoPage, { search: string; page: number }>({
+        params: () => ({ search: this.stockPhotoSearch(), page: this.stockPhotoPage() }),
+        stream: ({ params: { search, page } }) => {
+            if (!search) {
+                return of({ page, items: [] });
+            }
+
+            // The previous request is cancelled when the params change, so the timer debounces typing.
+            return timer(page > 1 ? 0 : 500).pipe(
+                switchMap(() => this.stockPhotoService.getImages(search, page)),
+                map(items => ({ page, items })));
+        },
+        defaultValue: { page: 1, items: [] },
+    });
+
     protected readonly searchDialog = new DialogModel();
-
-    constructor() {
-        super();
-
-        effect(() => {
-            this.stockPhotoRequests.next({ search: this.stockPhotoSearch(), page: 1 });
-        });
-
-        this.stockPhotoRequests.pipe(
-                debounceTime(500),
-                tap(request => {
-                    if (request.search && request.search.length > 0) {
-                        this.stockPhotosLoading.set(true);
-                    }
-                }),
-                switchMap(request => {
-                    if (request.search && request.search.length > 0) {
-                        return this.stockPhotoService.getImages(request.search, request.page).pipe(map(result => ({ request, result })));
-                    } else {
-                        return of(({ request, result: [] }));
-                    }
-                }),
-                takeUntilDestroyed())
-            .subscribe(({ request, result }) => {
-                this.stockPhotosLoading.set(false);
-                this.stockPhotos.update(x => request.page > 1 ? [...x, ...result] : result);
-                this.stockPhotosHasMore.set(result.length === 20);
-            });
-    }
 
     protected selectPhoto(photo: StockPhotoDto) {
         if (!this.disabled()) {
@@ -105,9 +120,7 @@ export class StockPhotoEditorComponent extends FormValueControlBase<string | nul
     }
 
     protected loadMore() {
-        const request = this.stockPhotoRequests.value;
-
-        this.stockPhotoRequests.next({ search: request.search, page: request.page + 1 });
+        this.stockPhotoPage.update(x => x + 1);
     }
 
     protected onThumbnailLoaded() {

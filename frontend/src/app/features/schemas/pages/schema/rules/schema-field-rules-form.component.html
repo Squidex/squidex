@@ -14,7 +14,7 @@
                             <sqx-control-errors [for]="rule.action" />
                             <select class="form-select" [formField]="rule.action">
                                 @for (fieldAction of fieldActions; track fieldAction) {
-                                    <option [ngValue]="fieldAction">{{ fieldAction }}</option>
+                                    <option [value]="fieldAction">{{ fieldAction }}</option>
                                 }
                             </select>
                         </div>
@@ -23,7 +23,7 @@
                             <sqx-control-errors [for]="rule.field" />
                             <select class="form-select" [formField]="rule.field">
                                 @for (option of fieldOptions(); track option.value) {
-                                    <option [ngValue]="option.value">{{ option.label }}</option>
+                                    <option [value]="option.value">{{ option.label }}</option>
                                 }
                             </select>
                         </div>

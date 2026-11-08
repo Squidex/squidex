@@ -28,11 +28,11 @@ import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
         MarkdownDirective,
         RouterLink,
         ScrollActiveDirective,
+        StopClickDirective,
         TooltipDirective,
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-        StopClickDirective,
     ],
 })
 export class CommentComponent {

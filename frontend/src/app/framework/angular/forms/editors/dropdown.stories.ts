@@ -16,7 +16,7 @@ const TRANSLATIONS = {
 
 @Component({
     selector: 'sqx-dropdown-test',
-    imports: [RootViewComponent, DropdownComponent],
+    imports: [DropdownComponent, RootViewComponent],
     template: `
         <sqx-root-view>
             <sqx-dropdown

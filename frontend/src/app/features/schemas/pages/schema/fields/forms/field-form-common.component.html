@@ -18,9 +18,9 @@
 
         <sqx-form-row #searchModeRow [for]="fieldForm().searchMode" hint="schemas.field.searchModeHint" label="schemas.field.searchMode" [prefix]="field().fieldId">
             <select class="form-select" [id]="searchModeRow.fieldName()" [formField]="fieldForm().searchMode">
-                <option ngValue="Default">{{ "schemas.field.searchModeDefault" | sqxTranslate }}</option>
-                <option ngValue="Title">{{ "schemas.field.searchModeTitle" | sqxTranslate }}</option>
-                <option ngValue="Exclude">{{ "schemas.field.searchModeExclude" | sqxTranslate }}</option>
+                <option value="Default">{{ "schemas.field.searchModeDefault" | sqxTranslate }}</option>
+                <option value="Title">{{ "schemas.field.searchModeTitle" | sqxTranslate }}</option>
+                <option value="Exclude">{{ "schemas.field.searchModeExclude" | sqxTranslate }}</option>
             </select>
         </sqx-form-row>
 

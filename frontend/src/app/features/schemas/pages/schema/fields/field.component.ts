@@ -26,10 +26,10 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
+        forwardRef(() => SortableFieldListComponent),
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-        forwardRef(() => SortableFieldListComponent),
     ],
 })
 export class FieldComponent {

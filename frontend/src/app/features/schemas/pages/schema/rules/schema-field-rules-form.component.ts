@@ -9,8 +9,8 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { TranslatePipe } from '@app/framework';
-import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState, SignalSelectDirective } from '@app/shared';
+import { SignalSelectDirective, TranslatePipe } from '@app/framework';
+import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',

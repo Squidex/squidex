@@ -57,9 +57,13 @@ export class ContentSchemaBuilder {
             return rules.some(x => x.action === action && x.eval(context, itemData));
         };
 
-        disabled(path, ctx => field.isDisabled || isRuleActive(ctx, 'Disable'));
+        disabled(path, ctx => {
+            return field.isDisabled || isRuleActive(ctx, 'Disable');
+        });
 
-        hidden(path, ctx => isRuleActive(ctx, 'Hide'));
+        hidden(path, ctx => {
+            return isRuleActive(ctx, 'Hide');
+        });
 
         validate(path, ctx => {
             const value = ctx.value();
@@ -97,7 +101,6 @@ export class ContentSchemaBuilder {
     }
 
     private getComponentSchema(id: string, schemaDto: SchemaDto) {
-        // Schemas are compiled eagerly, therefore recursive components must reuse the same instance.
         let result = this.componentSchemas.get(id);
         if (!result) {
             result = schema<any>(path => {

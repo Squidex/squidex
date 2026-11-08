@@ -15,9 +15,9 @@ import { FieldEditorComponent } from './field-editor.component';
     templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        forwardRef(() => FieldEditorComponent),
         FormHintComponent,
         MarkdownDirective,
-        forwardRef(() => FieldEditorComponent),
     ],
 })
 export class ComponentSectionComponent {

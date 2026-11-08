@@ -11,7 +11,7 @@
     <sqx-form-row #roleRow [for]="userInfoForm.role" label="common.role" [prefix]="formId()" required>
         <select class="form-select" [id]="roleRow.fieldName()" autocomplete="off" [formField]="userInfoForm.role">
             @for (role of rolesState.roles(); track role.name) {
-                <option [ngValue]="role.name">{{ role.name }}</option>
+                <option [value]="role.name">{{ role.name }}</option>
             }
         </select>
     </sqx-form-row>

@@ -94,7 +94,7 @@ export class EditContentForm extends SignalForm<any, any> {
         injector?: Injector,
     ) {
         const partitions = new PartitionConfig(languages);
-        const values = new ContentValues(partitions, schemas);
+        const contentValues = new ContentValues(partitions, schemas);
         const contextSignal = signal<any>(context);
 
         let root: Signal<any> | undefined;
@@ -107,16 +107,16 @@ export class EditContentForm extends SignalForm<any, any> {
             schemas,
         });
 
-        super(values.createData(schema), path => {
+        super(contentValues.createData(schema), path => {
             builder.build(path, schema);
         }, injector);
 
         root = this.model;
 
         this.context = contextSignal;
-        this.values = values;
+        this.values = contentValues;
 
-        const globals: FormGlobals = { partitions, schema, schemas, values };
+        const globals: FormGlobals = { partitions, schema, schemas, values: contentValues };
 
         this.sections = groupFields(schema.fields).map(({ separator, fields }) => {
             const forms: FieldForm[] = [];

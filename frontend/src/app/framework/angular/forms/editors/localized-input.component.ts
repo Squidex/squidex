@@ -24,8 +24,8 @@ type LocalizedValue = { [key: string]: any };
     templateUrl: './localized-input.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        DateTimeEditorComponent,
         CheckboxComponent,
+        DateTimeEditorComponent,
         LanguageSelectorComponent,
         TagEditorComponent,
         TranslatePipe,

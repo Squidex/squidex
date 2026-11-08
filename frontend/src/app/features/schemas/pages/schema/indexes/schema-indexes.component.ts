@@ -20,11 +20,11 @@ import { IndexComponent } from './index.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeComponent,
-        IndexFormComponent,
         IndexComponent,
+        IndexFormComponent,
+        ListViewComponent,
         MarkdownDirective,
         ModalDirective,
-        ListViewComponent,
         TranslatePipe,
     ],
 })

@@ -19,8 +19,8 @@ import { TourStepDirective } from './tour-step.directive';
     imports: [
         CdkTrapFocus,
         ShortcutComponent,
-        TranslatePipe,
         TourStepDirective,
+        TranslatePipe,
     ],
 })
 export class ModalDialogComponent {

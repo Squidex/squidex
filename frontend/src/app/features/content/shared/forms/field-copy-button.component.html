@@ -22,7 +22,7 @@
                 <div class="col">
                     <select class="form-select" id="languagesSource" [formField]="copySourceForm">
                         @for (language of languages(); track language) {
-                            <option [ngValue]="language.iso2Code">{{ language.iso2Code }}</option>
+                            <option [value]="language.iso2Code">{{ language.iso2Code }}</option>
                         }
                     </select>
                 </div>

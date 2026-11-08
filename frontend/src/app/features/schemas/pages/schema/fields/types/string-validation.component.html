@@ -64,7 +64,7 @@
     <sqx-form-row [for]="form().contentType" label="schemas.fieldTypes.string.contentType" [prefix]="field().fieldId">
         <select class="form-select" [formField]="form().contentType">
             @for (contentType of contentTypes; track contentType) {
-                <option [ngValue]="contentType">{{ contentType }}</option>
+                <option [value]="contentType">{{ contentType }}</option>
             }
         </select>
     </sqx-form-row>

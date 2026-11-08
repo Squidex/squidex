@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, Notification, Tooltip } from '@app/framework/internal';
@@ -46,12 +46,11 @@ export class DialogRendererComponent {
     protected readonly dialogView = new DialogModel();
 
     constructor() {
-        this.dialogView.isOpenChanges.pipe(takeUntilDestroyed())
-            .subscribe(isOpen => {
-                if (!isOpen) {
-                    this.finishRequest(false);
-                }
-            });
+        effect(() => {
+            if (!this.dialogView.isOpen()) {
+                untracked(() => this.finishRequest(false));
+            }
+        });
 
         this.dialogs.notifications.pipe(takeUntilDestroyed())
             .subscribe(notification => {

@@ -70,19 +70,19 @@ export class ModalDirective<T = unknown> implements OpenModal {
             this.unlistenView();
         });
 
-        effect(onCleanup => {
+        effect(() => {
             const model = this.model();
+            if (isModel(model)) {
+                const isOpen = model.isOpen();
+
+                untracked(() => this.update(isOpen));
+                return;
+            }
 
             untracked(() => {
-                if (isModel(model)) {
-                    const subscription = model.isOpenChanges.subscribe(isOpen => this.update(isOpen));
+                this.currentContext.$implicit = model;
 
-                    onCleanup(() => subscription.unsubscribe());
-                } else {
-                    this.currentContext.$implicit = model;
-
-                    this.update(!!model);
-                }
+                this.update(!!model);
             });
         });
     }

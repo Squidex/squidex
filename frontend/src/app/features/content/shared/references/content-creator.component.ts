@@ -23,6 +23,7 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         ComponentContentsState,
     ],
     imports: [
+        forwardRef(() => ContentSectionComponent),
         FormErrorComponent,
         FormField,
         FormsModule,
@@ -31,7 +32,6 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         SignalSelectDirective,
         TooltipDirective,
         TranslatePipe,
-        forwardRef(() => ContentSectionComponent),
     ],
 })
 export class ContentCreatorComponent {

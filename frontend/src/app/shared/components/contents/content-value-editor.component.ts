@@ -18,9 +18,9 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
     templateUrl: './content-value-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        CheckboxComponent,
         FormField,
         FormsModule,
-        CheckboxComponent,
         SignalSelectDirective,
         StarsComponent,
         ToggleComponent,

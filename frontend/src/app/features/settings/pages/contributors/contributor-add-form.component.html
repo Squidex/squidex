@@ -22,7 +22,7 @@
             <div class="col-3">
                 <select class="form-select" [formField]="assignContributorForm.form.role">
                     @for (role of roles(); track role) {
-                        <option [ngValue]="role.name">{{ role.name }}</option>
+                        <option [value]="role.name">{{ role.name }}</option>
                     }
                 </select>
             </div>

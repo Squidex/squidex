@@ -13,7 +13,7 @@
                 <option></option>
 
                 @for (value of calculatedDefaultValues; track value) {
-                    <option [ngValue]="value">{{ value }}</option>
+                    <option [value]="value">{{ value }}</option>
                 }
             </select>
         </sqx-form-row>
