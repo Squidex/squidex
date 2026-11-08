@@ -18,12 +18,22 @@ public static class SecurityExtensions
     {
         var content = context.Snapshot;
 
-        if (Equals(content.CreatedBy, context.Actor) || context.User == null)
+        if (Equals(content.CreatedBy, context.Actor))
         {
             return;
         }
 
-        var permissions = context.User?.Claims.Permissions();
+        context.MustHaveUserPermission(permissionId);
+    }
+
+    public static void MustHaveUserPermission(this ContentOperation context, string permissionId)
+    {
+        if (context.User == null)
+        {
+            return;
+        }
+
+        var permissions = context.User.Claims.Permissions();
 
         if (permissions == null)
         {

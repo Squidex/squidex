@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
@@ -189,16 +190,49 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Create_should_change_status_if_set()
     {
-        var command = new CreateContent { Data = data, Status = Status.Archived };
+        var command = new CreateContent
+        {
+            Data = data,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
+        };
 
         var actual = await PublishAsync(command);
 
         await VerifySutAsync(actual);
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, command.User), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft, command.User), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Create_should_throw_exception_if_status_set_and_user_has_no_change_status_permission()
+    {
+        var command = new CreateContent
+        {
+            Data = data,
+            Status = Status.Published,
+            User = Mocks.FrontendUser(),
+        };
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(command));
+    }
+
+    [Fact]
+    public async Task Create_should_change_status_if_set_and_user_has_own_change_status_permission()
+    {
+        var command = new CreateContent
+        {
+            Data = data,
+            Status = Status.Published,
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
+        };
+
+        await PublishAsync(command);
+
+        Assert.Equal(Status.Published, sut.Snapshot.EditingStatus);
     }
 
     [Fact]
@@ -264,15 +298,20 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Upsert_should_change_status_on_create_if_status_set()
     {
-        var command = new UpsertContent { Data = data, Status = Status.Archived };
+        var command = new UpsertContent
+        {
+            Data = data,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
+        };
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
         await VerifySutAsync(actual);
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, command.User), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft, command.User), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -324,7 +363,12 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Upsert_should_change_status_on_update_if_status_set()
     {
-        var command = new UpsertContent { Data = otherData, Status = Status.Archived };
+        var command = new UpsertContent
+        {
+            Data = otherData,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
+        };
 
         await ExecuteCreateAsync();
 
@@ -332,10 +376,27 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         await VerifySutAsync(actual);
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft, command.User), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft, command.User), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Upsert_should_throw_exception_if_status_set_on_own_content_and_user_has_no_change_status_permission()
+    {
+        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsUpdate, AppId.Name, SchemaId.Name).Id;
+
+        await ExecuteCreateAsync();
+
+        var command = new UpsertContent
+        {
+            Data = otherData,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [userPermission]),
+        };
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(command));
     }
 
     [Fact]
@@ -763,6 +824,46 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     }
 
     [Fact]
+    public async Task EnrichContentDefaults_should_throw_exception_if_content_is_from_another_user_and_user_has_no_permission()
+    {
+        await ExecuteCreateAsync();
+
+        Schema =
+            Schema.AddString(3, "defaults", Partitioning.Invariant,
+                new StringFieldProperties { DefaultValue = "Default Value" });
+
+        var command = new EnrichContentDefaults
+        {
+            Actor = RefToken.User("other"),
+            User = Mocks.FrontendUser(),
+        };
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(command));
+    }
+
+    [Fact]
+    public async Task EnrichContentDefaults_should_update_content_from_another_user_if_user_has_permission()
+    {
+        await ExecuteCreateAsync();
+
+        Schema =
+            Schema.AddString(3, "defaults", Partitioning.Invariant,
+                new StringFieldProperties { DefaultValue = "Default Value" });
+
+        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsUpdate, AppId.Name, SchemaId.Name).Id;
+
+        var command = new EnrichContentDefaults
+        {
+            Actor = RefToken.User("other"),
+            User = Mocks.FrontendUser(permissions: [userPermission]),
+        };
+
+        await PublishAsync(command);
+
+        Assert.Single(LastEvents);
+    }
+
+    [Fact]
     public async Task MigrateContent_should_migrate_current_version()
     {
         await PublishAsync(new CreateContent { Data = otherData });
@@ -975,17 +1076,17 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
     }
 
-    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus)
+    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, ClaimsPrincipal? user = null)
     {
-        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, default));
+        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, default, user));
     }
 
-    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
+    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus, ClaimsPrincipal? user = null)
     {
-        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, oldStatus));
+        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, oldStatus, user));
     }
 
-    private bool Matches(DataScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
+    private bool Matches(DataScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus, ClaimsPrincipal? user)
     {
         return
             Equals(x["contentId"], contentId) &&
@@ -993,7 +1094,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
             Equals(x["dataOld"], oldData) &&
             Equals(x["status"], newStatus) &&
             Equals(x["statusOld"], oldStatus) &&
-            Equals(x["user"], ApiContext.UserPrincipal);
+            Equals(x["user"], user ?? ApiContext.UserPrincipal);
     }
 
     private T CreateContentEvent<T>(T @event) where T : ContentEvent
