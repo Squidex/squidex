@@ -7,7 +7,8 @@
 
 import { of } from 'rxjs';
 import { IMock, It, Mock } from 'typemoq';
-import { BulkResultDto, ComponentContentsState, ContentsDto, ContentsService, DialogService } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, BulkResultDto, ComponentContentsState, ContentsDto, ContentsService, DialogService } from '@app/shared/internal';
 import { createContent } from '../services/contents.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -27,7 +28,11 @@ describe('ContentsState', () => {
 
         contentsService = Mock.ofType<ContentsService>();
 
-        contentsState = new ComponentContentsState(appsState.object, contentsService.object, dialogs.object);
+        contentsState = createService(ComponentContentsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: ContentsService, useValue: contentsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
         contentsState.schema = { name: 'my-schema' };
 
         contentsService.setup(x => x.getContents(app, 'my-schema', It.isAny()))
