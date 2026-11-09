@@ -108,7 +108,12 @@ Array.prototype.removeBy = function<T>(field: keyof T, value: T) {
         return self;
     }
 
-    self.splice(self.findIndex(x => x[field] === value[field]), 1);
+    const index = self.findIndex(x => x[field] === value[field]);
+
+    // Splice with -1 would remove the last element.
+    if (index >= 0) {
+        self.splice(index, 1);
+    }
 
     return self;
 };
@@ -132,7 +137,10 @@ Array.prototype.remove = function<T>(value?: T) {
 
     const index = self.indexOf(value);
 
-    self.splice(index, 1);
+    // Splice with -1 would remove the last element.
+    if (index >= 0) {
+        self.splice(index, 1);
+    }
 
     return self;
 };

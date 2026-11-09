@@ -62,6 +62,14 @@ describe('ArrayExtensions', () => {
             expect(array_1).toBe(array_0);
             expect(array_1).toEqual([1, 3]);
         });
+
+        it('should return same array if value is not found', () => {
+            const array_0 = [1, 2, 3];
+            const array_1 = array_0.remove(4);
+
+            expect(array_1).toBe(array_0);
+            expect(array_1).toEqual([1, 2, 3]);
+        });
     });
 
     describe('removedBy', () => {
@@ -95,6 +103,14 @@ describe('ArrayExtensions', () => {
 
             expect(array_1).toBe(array_0);
             expect(array_1).toEqual([{ id: 2 }]);
+        });
+
+        it('should return same array if value is not found', () => {
+            const array_0 = [{ id: 1 }, { id: 2 }];
+            const array_1 = array_0.removeBy('id', { id: 3 });
+
+            expect(array_1).toBe(array_0);
+            expect(array_1).toEqual([{ id: 1 }, { id: 2 }]);
         });
     });
 
