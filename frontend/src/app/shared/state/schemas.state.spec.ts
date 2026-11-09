@@ -127,6 +127,14 @@ describe('SchemasState', () => {
             expect([...schemasState.snapshot.addedCategories]).toEqualIgnoringProps([]);
         });
 
+        it('should not remove other category if removed category was never added', () => {
+            schemasState.addCategory('A/B');
+            schemasState.addCategory('schema-category3');
+            schemasState.removeCategory('A');
+
+            expect([...schemasState.snapshot.addedCategories]).toEqualIgnoringProps(['A/B', 'schema-category3']);
+        });
+
         it('should return schema on select and reload if already loaded', () => {
             schemasService.setup(x => x.getSchema(app, schema1.name))
                 .returns(() => of(schema1)).verifiable(Times.exactly(2));
