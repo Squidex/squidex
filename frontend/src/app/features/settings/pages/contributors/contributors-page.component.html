@@ -12,7 +12,7 @@
                 placeholder="{{ 'contributors.search' | sqxTranslate }}"
                 shortcut="CTRL + I"
                 shortcutAction="focus"
-                [value]="contributorsState.query()" />
+                [value]="contributorsState.query() ?? ''" />
         </div>
     </ng-container>
     <ng-container>

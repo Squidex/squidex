@@ -35,6 +35,15 @@ describe('TagValue', () => {
         ]);
     });
 
+    it('should get tags with name if input is array of numbers', () => {
+        const result = getTagValues([1, 2], false);
+
+        expect(result).toEqual([
+            new TagValue(1, '1', 1),
+            new TagValue(2, '2', 2),
+        ]);
+    });
+
     it('should get sorted tags if input is array of tags', () => {
         const input = [
             new TagValue(2, '2', 2),

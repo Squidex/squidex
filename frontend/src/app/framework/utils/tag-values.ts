@@ -123,7 +123,7 @@ export class StringConverter implements TagConverter {
     }
 }
 
-export function getTagValues(values: ReadonlyArray<string | TagValue> | undefined | null, sorted = true) {
+export function getTagValues(values: ReadonlyArray<string | number | TagValue> | undefined | null, sorted = true) {
     if (!Types.isArray(values)) {
         return [];
     }
@@ -131,8 +131,8 @@ export function getTagValues(values: ReadonlyArray<string | TagValue> | undefine
     const result: TagValue[] = [];
 
     for (const value of values) {
-        if (Types.isString(value)) {
-            result.push(new TagValue(value, value, value));
+        if (Types.isString(value) || Types.isNumber(value)) {
+            result.push(new TagValue(value, `${value}`, value));
         } else {
             result.push(value);
         }

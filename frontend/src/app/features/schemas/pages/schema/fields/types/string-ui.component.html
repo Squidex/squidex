@@ -12,38 +12,44 @@
         }
     </sqx-form-row>
 
-    <sqx-form-row
-        #classNamesRow
-        [class.hidden]="form().classNames().hidden()"
-        [for]="form().classNames"
-        hint="schemas.fieldTypes.string.classNamesHint"
-        label="schemas.fieldTypes.string.classNames"
-        [prefix]="field().fieldId">
-        <sqx-tag-editor [id]="classNamesRow.fieldName()" [formField]="form().classNames" />
-    </sqx-form-row>
+    @if (!form().classNames().hidden()) {
+        <sqx-form-row
+            #classNamesRow
+            [for]="form().classNames"
+            hint="schemas.fieldTypes.string.classNamesHint"
+            label="schemas.fieldTypes.string.classNames"
+            [prefix]="field().fieldId">
+            <sqx-tag-editor [id]="classNamesRow.fieldName()" [formField]="form().classNames" />
+        </sqx-form-row>
+    }
 
-    <sqx-form-row #allowedValuesRow [class.hidden]="form().allowedValues().hidden()" [for]="form().allowedValues" label="schemas.field.allowedValues" [prefix]="field().fieldId">
-        <sqx-tag-editor [id]="allowedValuesRow.fieldName()" [formField]="form().allowedValues" />
-    </sqx-form-row>
+    @if (!form().allowedValues().hidden()) {
+        <sqx-form-row #allowedValuesRow [for]="form().allowedValues" label="schemas.field.allowedValues" [prefix]="field().fieldId">
+            <sqx-tag-editor [id]="allowedValuesRow.fieldName()" [formField]="form().allowedValues" />
+        </sqx-form-row>
+    }
 
     <sqx-form-row [for]="form().folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field().fieldId">
         <sqx-asset-folder-dropdown [formField]="form().folderId" />
     </sqx-form-row>
 
-    <sqx-form-row
-        #createEnumRow
-        check
-        [class.hidden]="form().createEnum().hidden()"
-        [for]="form().createEnum"
-        hint="schemas.field.createEnumHint"
-        label="schemas.field.createEnum"
-        [prefix]="field().fieldId">
-        <input class="form-check-input" [id]="createEnumRow.fieldName()" [formField]="form().createEnum" type="checkbox" />
-    </sqx-form-row>
+    @if (!form().createEnum().hidden()) {
+        <sqx-form-row
+            #createEnumRow
+            check
+            [for]="form().createEnum"
+            hint="schemas.field.createEnumHint"
+            label="schemas.field.createEnum"
+            [prefix]="field().fieldId">
+            <input class="form-check-input" [id]="createEnumRow.fieldName()" [formField]="form().createEnum" type="checkbox" />
+        </sqx-form-row>
+    }
 
-    <sqx-form-row #inlineEditableRow check [class.hidden]="form().inlineEditable().hidden()" [for]="form().inlineEditable" label="schemas.field.inlineEditable" [prefix]="field().fieldId">
-        <input class="form-check-input" [id]="inlineEditableRow.fieldName()" [formField]="form().inlineEditable" type="checkbox" />
-    </sqx-form-row>
+    @if (!form().inlineEditable().hidden()) {
+        <sqx-form-row #inlineEditableRow check [for]="form().inlineEditable" label="schemas.field.inlineEditable" [prefix]="field().fieldId">
+            <input class="form-check-input" [id]="inlineEditableRow.fieldName()" [formField]="form().inlineEditable" type="checkbox" />
+        </sqx-form-row>
+    }
 
     <sqx-form-row #isEmbeddableRow check [for]="form().isEmbeddable" hint="schemas.field.isEmbeddableHint" label="schemas.field.isEmbeddable" [prefix]="field().fieldId">
         <input class="form-check-input" [id]="isEmbeddableRow.fieldName()" [formField]="form().isEmbeddable" type="checkbox" />

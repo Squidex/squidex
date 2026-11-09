@@ -208,11 +208,13 @@ export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
 
     public listen() {
         this.stateEffect?.destroy();
-        this.stateEffect = effect(() => {
+
+        // Some components start to listen from an effect, where creating another effect is not allowed.
+        this.stateEffect = untracked(() => effect(() => {
             const value = this.state.value();
 
             untracked(() => this.syncToRoute(value));
-        }, { injector: this.injector });
+        }, { injector: this.injector }));
 
         return this;
     }

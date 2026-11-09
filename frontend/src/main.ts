@@ -9,6 +9,8 @@ import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 import { APP_BASE_HREF } from '@angular/common';
 import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { enableProdMode, ErrorHandler } from '@angular/core';
+import { provideSignalFormsConfig } from '@angular/forms/signals';
+import { NG_STATUS_CLASSES } from '@angular/forms/signals/compat';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, provideRouter, RouteReuseStrategy } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -113,6 +115,7 @@ bootstrapApplication(AppComponent, {
             ]),
         ),
         provideRouter(APP_ROUTES),
+        provideSignalFormsConfig({ classes: NG_STATUS_CLASSES }),
         {
             provide: RouteReuseStrategy,
             useClass: AppRouteReuseStrategy,

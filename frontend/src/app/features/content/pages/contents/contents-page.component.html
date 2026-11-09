@@ -28,7 +28,7 @@
                     placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     [queries]="queries()"
                     [queriesTypes]="'common.contents' | sqxTranslate"
-                   
+                    [query]="contentsState.query()"
                     (queryChange)="search($event)"
                     [queryModel]="queryModel.value()" />
             </div>

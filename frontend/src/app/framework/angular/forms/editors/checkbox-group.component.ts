@@ -67,7 +67,6 @@ export class CheckboxGroupComponent extends FormValueControlBase<ReadonlyArray<s
             return -1;
         }
 
-
         let width = 0;
         for (const value of this.tagValuesUnsorted()) {
             width += 40;

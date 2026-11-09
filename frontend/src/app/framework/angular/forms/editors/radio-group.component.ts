@@ -31,7 +31,7 @@ export class RadioGroupComponent extends FormValueControlBase<any> {
     public readonly unsorted = input(true, { transform: booleanAttribute });
 
     /** The values to choose from. */
-    public readonly values = input<ReadonlyArray<string | TagValue>>([]);
+    public readonly values = input<ReadonlyArray<string | number | TagValue>>([]);
 
     protected readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
 

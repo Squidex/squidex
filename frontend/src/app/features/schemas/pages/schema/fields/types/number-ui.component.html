@@ -12,11 +12,15 @@
         }
     </sqx-form-row>
 
-    <sqx-form-row #allowedValuesRow [class.hidden]="form().allowedValues().hidden()" [for]="form().allowedValues" label="schemas.field.allowedValues" [prefix]="field().fieldId">
-        <sqx-tag-editor [id]="allowedValuesRow.fieldName()" [formField]="form().allowedValues" [itemConverter]="converter" />
-    </sqx-form-row>
+    @if (!form().allowedValues().hidden()) {
+        <sqx-form-row #allowedValuesRow [for]="form().allowedValues" label="schemas.field.allowedValues" [prefix]="field().fieldId">
+            <sqx-tag-editor [id]="allowedValuesRow.fieldName()" [formField]="form().allowedValues" [itemConverter]="converter" />
+        </sqx-form-row>
+    }
 
-    <sqx-form-row #inlineEditableRow check [class.hidden]="form().inlineEditable().hidden()" [for]="form().inlineEditable" label="schemas.field.inlineEditable" [prefix]="field().fieldId">
-        <input class="form-check-input" [id]="inlineEditableRow.fieldName()" [formField]="form().inlineEditable" type="checkbox" />
-    </sqx-form-row>
+    @if (!form().inlineEditable().hidden()) {
+        <sqx-form-row #inlineEditableRow check [for]="form().inlineEditable" label="schemas.field.inlineEditable" [prefix]="field().fieldId">
+            <input class="form-check-input" [id]="inlineEditableRow.fieldName()" [formField]="form().inlineEditable" type="checkbox" />
+        </sqx-form-row>
+    }
 </div>

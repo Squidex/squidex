@@ -49,6 +49,8 @@
             [name]="formName()"
             [placeholder]="placeholder()"
             [sqxFocusOnInit]="autoFocus()"
+            [class.ng-invalid]="invalid()"
+            [class.ng-touched]="touched()"
             [value]="queryText()" />
     }
 
