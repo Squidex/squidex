@@ -5,26 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamDto, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
+import { ConfirmClickDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -34,65 +33,53 @@ import { ConfirmClickDirective, defined, FormErrorComponent, FormHintComponent, 
         TranslatePipe,
     ],
 })
-export class MorePageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class MorePageComponent {
+    private readonly router = inject(Router);
 
-    public team!: TeamDto;
+    protected readonly teamsState = inject(TeamsState);
 
-    public isEditable = false;
-    public isDeletable = false;
+    protected readonly isEditable = computed(() => {
+        return !!this.teamsState.selectedTeam()?.canUpdateGeneral;
+    });
 
-    public updateForm = new UpdateTeamForm();
+    protected readonly isDeletable = computed(() => {
+        return !!this.teamsState.selectedTeam()?.canDelete;
+    });
 
-    constructor(
-        private readonly router: Router,
-        private readonly teamsState: TeamsState,
-    ) {
-    }
+    protected readonly updateForm = new UpdateTeamForm();
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.teamsState.selectedTeam.pipe(defined())
-                .subscribe(team => {
-                    this.team = team;
+    constructor() {
+        effect(() => {
+            const team = this.teamsState.selectedTeam();
+            if (!team) {
+                return;
+            }
 
-                    this.isEditable = team.canUpdateGeneral;
-                    this.isDeletable = team.canDelete;
-
-                    this.updateForm.load(team);
-                    this.updateForm.setEnabled(this.isEditable);
-                }));
+            this.updateForm.load(team);
+            this.updateForm.setEnabled(team.canUpdateGeneral);
+        });
 
         this.teamsState.reloadTeams();
     }
 
-    public save() {
-        if (!this.isEditable) {
+    protected save() {
+        const team = this.teamsState.selectedTeam();
+        if (!team || !this.isEditable()) {
             return;
         }
 
-        const value = this.updateForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.teamsState.update(this.team, value)
-            .subscribe({
-                next: team => {
-                    this.updateForm.submitCompleted({ newValue: team });
-                },
-                error: error => {
-                    this.updateForm.submitFailed(error);
-                },
-            });
+        this.updateForm.submitAndUpdate(value => {
+            return this.teamsState.update(team, value);
+        }, { resetAfterSubmit: true });
     }
 
-    public deleteTeam() {
-        if (!this.isDeletable) {
+    protected deleteTeam() {
+        const team = this.teamsState.selectedTeam();
+        if (!team || !this.isDeletable()) {
             return;
         }
 
-        this.teamsState.delete(this.team)
+        this.teamsState.delete(team)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             });

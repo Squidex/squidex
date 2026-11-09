@@ -6,31 +6,32 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { IndeterminateValueDirective, StarsComponent, ToggleComponent, TransformInputDirective } from '@app/framework';
+import { Component, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { CheckboxComponent, SignalSelectDirective, StarsComponent, TextInputDirective, ToggleComponent } from '@app/framework';
 import { FieldDto, MathHelper } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-value-editor',
     styleUrls: ['./content-value-editor.component.scss'],
     templateUrl: './content-value-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        CheckboxComponent,
+        FormField,
         FormsModule,
-        IndeterminateValueDirective,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         StarsComponent,
+        TextInputDirective,
         ToggleComponent,
-        TransformInputDirective,
     ],
 })
 export class ContentValueEditorComponent {
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to render an editor for. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public form!: UntypedFormGroup;
+    /** The form group that contains a control with the name of the field. */
+    public readonly form = input.required<FieldTree<Record<string, any>>>();
 
-    public readonly uniqueId = MathHelper.guid();
+    protected readonly uniqueId = MathHelper.guid();
 }

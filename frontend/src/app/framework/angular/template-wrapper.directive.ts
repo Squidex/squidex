@@ -5,63 +5,64 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EmbeddedViewRef, Input, numberAttribute, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
-import { TypedSimpleChanges } from '@app/framework/internal';
+import { Directive, effect, EmbeddedViewRef, inject, input, numberAttribute, TemplateRef, untracked, ViewContainerRef } from '@angular/core';
 
 @Directive({
     selector: '[sqxTemplateWrapper]',
 })
-export class TemplateWrapperDirective implements OnDestroy, OnInit {
-    @Input()
-    public item: any;
+export class TemplateWrapperDirective {
+    private readonly viewContainer = inject(ViewContainerRef);
+    private view?: EmbeddedViewRef<any>;
 
-    @Input({ transform: numberAttribute })
-    public index = 0;
+    /** The item that is passed to the template as implicit context. */
+    public readonly item = input<any>();
 
-    @Input()
-    public context: any;
+    /** The index that is passed to the template. */
+    public readonly index = input(0, { transform: numberAttribute });
 
-    @Input('sqxTemplateWrapper')
-    public templateRef!: TemplateRef<any>;
+    /** The additional context that is passed to the template. */
+    public readonly context = input<any>();
 
-    public view?: EmbeddedViewRef<any>;
+    /** The template to render. */
+    public readonly templateRef = input<TemplateRef<any> | null | undefined>(undefined, { alias: 'sqxTemplateWrapper' });
 
-    public constructor(
-        private readonly viewContainer: ViewContainerRef,
-    ) {
-    }
-
-    public ngOnDestroy() {
-        if (this.view) {
-            this.view.destroy();
-        }
-    }
-
-    public ngOnInit() {
-        const { index, context } = this;
-
-        const data = {
-            $implicit: this.item,
-            index,
-            context,
-        };
-
-        this.view = this.viewContainer.createEmbeddedView(this.templateRef, data);
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (this.view) {
-            if (changes.item) {
-                this.view.context.$implicit = this.item;
+    constructor() {
+        effect(onCleanup => {
+            const templateRef = this.templateRef();
+            if (!templateRef) {
+                return;
             }
 
-            if (changes.index) {
-                this.view.context.index = this.index;
+            const view = untracked(() => this.viewContainer.createEmbeddedView(templateRef, {
+                $implicit: this.item(),
+                index: this.index(),
+                context: this.context(),
+            }));
+
+            this.view = view;
+
+            onCleanup(() => {
+                view.destroy();
+
+                if (this.view === view) {
+                    this.view = undefined;
+                }
+            });
+        });
+
+        effect(() => {
+            const item = this.item();
+            const index = this.index();
+            const context = this.context();
+
+            const view = this.view;
+            if (!view) {
+                return;
             }
 
-            if (changes.context) {
-                this.view.context.context = this.context;
-            }
-        }
+            view.context.$implicit = item;
+            view.context.index = index;
+            view.context.context = context;
+        });
     }
 }

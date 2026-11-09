@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RuleEventsDto, RuleEventsState, RulesService } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, DialogService, RuleEventsDto, RuleEventsState, RulesService } from '@app/shared/internal';
 import { createRuleEvent } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -34,7 +35,11 @@ describe('RuleEventsState', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, undefined))
             .returns(() => of(oldRuleEvents));
 
-        ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, rulesService.object);
+        ruleEventsState = createService(RuleEventsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: RulesService, useValue: rulesService.object },
+        ]);
         ruleEventsState.load().subscribe();
     });
 

@@ -5,111 +5,99 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormRowComponent, hasNoValue$, hasValue$, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, StringContentTypeValues, StringFieldPropertiesDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types, value$ } from '@app/shared';
+import { booleanAttribute, Component, computed, effect, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, SignalSelectDirective, StringContentTypeValues, StringFieldFormModel, StringFieldPropertiesDto, TextInputDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
     imports: [
-        AsyncPipe,
         DropdownMenuComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
+        SignalSelectDirective,
+        TextInputDirective,
         TranslatePipe,
     ],
 })
-export class StringValidationComponent  {
-    private readonly subscriptions = new Subscriptions();
+export class StringValidationComponent {
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    public readonly contentTypes = StringContentTypeValues;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The schema the field belongs to. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<StringFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The settings of the app, which provide the predefined patterns. */
+    public readonly settings = input.required<AppSettingsDto>();
 
-    @Input({ required: true })
-    public properties!: StringFieldPropertiesDto;
+    /** The languages of the app, used to edit localized default values. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public settings!: AppSettingsDto;
+    /** Shows the localized default values, if the field is localizable. */
+    public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<StringFieldFormModel>;
+    });
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isLocalizable!: boolean;
+    protected readonly showPatternMessage = computed(() => {
+        return !!this.form().pattern().value();
+    });
 
-    public showPatternMessage?: Observable<boolean>;
-    public showPatternSuggestions?: Observable<boolean>;
+    protected readonly showPatternSuggestions = computed(() => {
+        return !this.form().pattern().value();
+    });
 
-    public patternName = '';
-    public patternsModal = new ModalModel();
-
-    public get showUnique() {
-        return Types.is(this.field, FieldDto) && !this.field.isLocalizable && this.schema.type !== 'Component';
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.settings) {
-            this.setPatternName();
-        }
-
-        if (changes.fieldForm) {
-            this.subscriptions.unsubscribeAll();
-
-            this.showPatternSuggestions =
-                hasNoValue$(this.fieldForm.controls['pattern']);
-
-            this.showPatternSuggestions =
-                hasNoValue$(this.fieldForm.controls['pattern']);
-
-            this.showPatternMessage =
-                hasValue$(this.fieldForm.controls['pattern']);
-
-            this.subscriptions.add(
-                value$(this.fieldForm.controls['pattern'])
-                    .subscribe((value: string) => {
-                        if (!value) {
-                            this.fieldForm.controls['patternMessage'].setValue(undefined);
-                        }
-
-                        this.setPatternName();
-                    }));
-        }
-    }
-
-    public setPattern(pattern: PatternDto) {
-        this.fieldForm.controls['pattern'].setValue(pattern.regex);
-        this.fieldForm.controls['patternMessage'].setValue(pattern.message);
-    }
-
-    private setPatternName() {
-        const regex = this.fieldForm.controls['pattern']?.value;
-
+    protected readonly patternName = computed(() => {
+        const regex = this.form().pattern().value();
         if (!regex) {
-            this.patternName = '';
-        } else {
-            const matchingPattern = this.settings.patterns.find(x => x.regex === regex);
-
-            if (matchingPattern) {
-                this.patternName = matchingPattern.name;
-            } else {
-                this.patternName = 'Advanced';
-            }
+            return '';
         }
+
+        const matchingPattern = this.settings().patterns.find(x => x.regex === regex);
+        if (matchingPattern) {
+            return matchingPattern.name;
+        }
+
+        return 'Advanced';
+    });
+
+    protected readonly showUnique = computed(() => {
+        const field = this.field();
+
+        return Types.is(field, FieldDto) && !field.isLocalizable && this.schema().type !== 'Component';
+    });
+
+    protected readonly contentTypes = StringContentTypeValues;
+
+    protected readonly patternsModal = new ModalModel();
+
+    constructor() {
+        effect(() => {
+            const form = this.form();
+            if (!form.pattern().value()) {
+                form.patternMessage().value.set('');
+            }
+        });
+    }
+
+    protected setPattern(pattern: PatternDto) {
+        const form = this.form();
+
+        form.pattern().value.set(pattern.regex);
+        form.patternMessage().value.set(pattern.message ?? '');
     }
 }

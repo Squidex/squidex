@@ -13,10 +13,10 @@
     <ng-container content>
         <sqx-form-hint> {{ "api.selectClientDescription" | sqxTranslate }}</sqx-form-hint>
         <sqx-form-row for="client" label="common.client" vertical>
-            <select class="form-control" id="client" [ngModel]="clientSelected" (ngModelChange)="selectClient($event)">
+            <select class="form-control" id="client" [formField]="clientForm">
                 <option [ngValue]="null">{{ "api.noClient" | sqxTranslate }}</option>
 
-                @for (client of clientsState.clients | async; track client) {
+                @for (client of clientsState.clients(); track client) {
                     <option [ngValue]="client">{{ client.id }}</option>
                 }
             </select>

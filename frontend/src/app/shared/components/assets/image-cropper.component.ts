@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, viewChild } from '@angular/core';
 import Cropper from 'cropperjs';
 import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
 
@@ -13,55 +13,56 @@ import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
     selector: 'sqx-image-editor',
     styleUrls: ['./image-cropper.component.scss'],
     templateUrl: './image-cropper.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        TranslatePipe,
         TooltipDirective,
+        TranslatePipe,
     ],
 })
-export class ImageCropperComponent implements AfterViewInit, OnDestroy {
+export class ImageCropperComponent {
+    private readonly destroyRef = inject(DestroyRef);
     private cropper: Cropper | null = null;
     private data?: Cropper.Data;
 
-    @Input()
-    public imageSource = '';
+    /** The URL of the image to edit. */
+    public readonly imageSource = input('');
 
-    @ViewChild('editor', { static: false })
-    public editor!: ElementRef<HTMLCanvasElement>;
+    protected readonly editor = viewChild.required<ElementRef<HTMLCanvasElement>>('editor');
 
-    public ngOnDestroy() {
-        if (this.cropper) {
-            this.cropper.destroy();
-        }
-    }
+    constructor() {
+        const destroyRef = this.destroyRef;
 
-    public ngOnChanges() {
-        if (this.cropper) {
-            this.cropper.replace(this.imageSource);
-        }
-    }
+        effect(() => {
+            const imageSource = this.imageSource();
 
-    public ngAfterViewInit() {
-        this.cropper = new Cropper(this.editor.nativeElement, {
-            ready: () => {
-                if (this.cropper) {
-                    this.data = this.cropper.getData();
-                }
-            },
-            autoCrop: false,
-            background: false,
-            minContainerHeight: 0,
-            minContainerWidth: 0,
-            movable: false,
-            zoomOnTouch: false,
-            zoomOnWheel: false,
-            viewMode: 0,
+            this.cropper?.replace(imageSource);
         });
 
-        this.cropper.replace(this.imageSource);
+        afterNextRender(() => {
+            this.cropper = new Cropper(this.editor().nativeElement, {
+                ready: () => {
+                    if (this.cropper) {
+                        this.data = this.cropper.getData();
+                    }
+                },
+                autoCrop: false,
+                background: false,
+                minContainerHeight: 0,
+                minContainerWidth: 0,
+                movable: false,
+                zoomOnTouch: false,
+                zoomOnWheel: false,
+                viewMode: 0,
+            });
+
+            this.cropper.replace(this.imageSource());
+        });
+
+        destroyRef.onDestroy(() => {
+            this.cropper?.destroy();
+        });
     }
 
-    public rotate(value: number) {
+    protected rotate(value: number) {
         if (this.cropper) {
             this.cropper.rotate(value);
 
@@ -78,7 +79,7 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    public flip(vertically: boolean) {
+    protected flip(vertically: boolean) {
         if (this.cropper) {
             const { rotate, scaleX, scaleY } = this.cropper.getData();
 
@@ -106,7 +107,7 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    public reset() {
+    protected reset() {
         if (this.cropper) {
             this.cropper.reset();
             this.cropper.clear();

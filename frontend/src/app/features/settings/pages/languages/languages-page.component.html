@@ -6,11 +6,11 @@
         </button>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="55rem" [isLoading]="languagesState.isLoading | async">
+        <sqx-list-view innerWidth="55rem" [isLoading]="languagesState.isLoading()">
             <div>
-                @if ((languagesState.isLoaded | async) && (languagesState.languages | async); as languages) {
-                    @if (languagesState.canCreate | async) {
-                        <sqx-language-add-form [newLanguages]="(languagesState.newLanguages | async)!" />
+                @if (languagesState.isLoaded() && languagesState.languages(); as languages) {
+                    @if (languagesState.canCreate()) {
+                        <sqx-language-add-form [newLanguages]="languagesState.newLanguages()" />
                     }
 
                     @for (languageInfo of languages; track languageInfo.language.iso2Code) {

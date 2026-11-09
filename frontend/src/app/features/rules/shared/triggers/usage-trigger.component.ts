@@ -5,21 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormRowComponent, TriggerForm } from '@app/shared';
+import { Component, input } from '@angular/core';
+import { FormField } from '@angular/forms/signals';
+import { FormRowComponent, UsageTriggerForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-usage-trigger',
     styleUrls: ['./usage-trigger.component.scss'],
     templateUrl: './usage-trigger.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
     ],
 })
 export class UsageTriggerComponent {
-    @Input({ required: true })
-    public triggerForm!: TriggerForm;
+    /** The form to edit the trigger settings. */
+    public readonly triggerForm = input.required<UsageTriggerForm>();
 }

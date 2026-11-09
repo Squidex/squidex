@@ -74,6 +74,7 @@ export * from './state/rule-simulator.state';
 export * from './state/rules.forms';
 export * from './state/rules.state';
 export * from './state/schema-tag-source';
+export * from './state/schemas-fields.forms';
 export * from './state/schemas.forms';
 export * from './state/schemas.state';
 export * from './state/script-logs.state';

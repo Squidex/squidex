@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TeamDto, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { TeamDto, TranslatePipe } from '@app/shared';
     selector: 'sqx-settings-menu',
     styleUrls: ['./settings-menu.component.scss'],
     templateUrl: './settings-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         RouterLinkActive,
@@ -22,6 +21,6 @@ import { TeamDto, TranslatePipe } from '@app/shared';
     ],
 })
 export class SettingsMenuComponent {
-    @Input({ required: true })
-    public team!: TeamDto;
+    /** The team to show the settings menu for. */
+    public readonly team = input.required<TeamDto>();
 }

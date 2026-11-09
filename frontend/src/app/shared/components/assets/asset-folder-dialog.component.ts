@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, effect, inject, input, output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { firstValueFrom } from 'rxjs';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
@@ -16,67 +17,51 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
     styleUrls: ['./asset-folder-dialog.component.scss'],
     templateUrl: './asset-folder-dialog.component.html',
     imports: [
-        AsyncPipe,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class AssetFolderDialogComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class AssetFolderDialogComponent {
+    private readonly assetsState = inject(AssetsState);
 
-    @Input()
-    public assetFolder?: AssetFolderDto;
+    /** Emits when the dialog is closed or the folder has been saved. */
+    public readonly dialogClose = output();
 
-    public editForm = new RenameAssetFolderForm();
+    /** The folder to rename. Creates a new folder when not set. */
+    public readonly assetFolder = input<AssetFolderDto>();
 
-    constructor(
-        private readonly assetsState: AssetsState,
-    ) {
+    protected readonly editForm = new RenameAssetFolderForm();
+
+    constructor() {
+        effect(() => {
+            const assetFolder = this.assetFolder();
+            if (assetFolder) {
+                this.editForm.load(assetFolder);
+            }
+        });
     }
 
-    public ngOnInit() {
-        if (this.assetFolder) {
-            this.editForm.load(this.assetFolder);
-        }
-    }
-
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public createAssetFolder() {
-        const value = this.editForm.submit();
-
-        if (value) {
-            if (this.assetFolder) {
-                this.assetsState.updateAssetFolder(this.assetFolder, value)
-                    .subscribe({
-                        next: () => {
-                            this.emitClose();
-                        },
-                        error: error => {
-                            this.editForm.submitFailed(error);
-                        },
-                    });
+    protected createAssetFolder() {
+        this.editForm.submit(async value => {
+            const assetFolder = this.assetFolder();
+            if (assetFolder) {
+                await firstValueFrom(this.assetsState.updateAssetFolder(assetFolder, value));
             } else {
-                this.assetsState.createAssetFolder(value.folderName)
-                    .subscribe({
-                        next: () => {
-                            this.emitClose();
-                        },
-                        error: error => {
-                            this.editForm.submitFailed(error);
-                        },
-                    });
+                await firstValueFrom(this.assetsState.createAssetFolder(value.folderName));
             }
-        }
+
+            this.emitClose();
+        });
     }
 }

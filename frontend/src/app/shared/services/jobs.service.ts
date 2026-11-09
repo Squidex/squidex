@@ -6,22 +6,16 @@
  */
 
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, Resource, Types } from '@app/framework';
 import { JobsDto, RestoreJobDto, RestoreRequestDto } from './../model';
 
-
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class JobsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getJobs(appName: string): Observable<JobsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/jobs`);

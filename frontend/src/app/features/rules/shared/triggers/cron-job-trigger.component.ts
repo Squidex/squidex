@@ -5,34 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
+import { Component, inject, input } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AppsState, CodeComponent, CronJobTriggerForm, FormHintComponent, FormRowComponent, RulesService, SignalSelectDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-cron-job-trigger',
     styleUrls: ['./cron-job-trigger.component.scss'],
     templateUrl: './cron-job-trigger.component.html',
     imports: [
-        AsyncPipe,
         CodeComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class CronJobTriggerComponent {
-    @Input({ required: true })
-    public triggerForm!: TriggerForm;
+    private readonly appsState = inject(AppsState);
+    private readonly rulesService = inject(RulesService);
 
-    public timezones = this.rulesService.getTimezones(this.appsState.appName);
+    /** The form to edit the trigger settings. */
+    public readonly triggerForm = input.required<CronJobTriggerForm>();
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly rulesService: RulesService,
-    ) {
-    }
+    protected readonly timezones = rxResource({
+        stream: () => this.rulesService.getTimezones(this.appsState.appName),
+        defaultValue: [],
+    });
 }

@@ -1,11 +1,11 @@
-<div class="card item" [class.invalid]="isInvalidForm | async">
+<div class="card item" [class.invalid]="isInvalidForm()">
     <div class="card-header drag-handle">
         <div class="row">
             <div class="col-auto pe-1"><ng-content></ng-content></div>
 
             <div class="col">
                 <div class="truncate">
-                    <span class="header-index">#{{ index + 1 }}</span> <span class="header-title">{{ title | async }}</span>
+                    <span class="header-index">#{{ index() + 1 }}</span> <span class="header-title">{{ title() }}</span>
                 </div>
             </div>
 
@@ -14,7 +14,7 @@
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'contents.arrayMoveTop' | sqxTranslate }}"
                     (click)="moveTop()"
-                    [disabled]="isDisabled || isFirst"
+                    [disabled]="isDisabled() || isFirst()"
                     title="i18n:contents.arrayMoveTop"
                     type="button">
                     <i class="icon-caret-top"></i>
@@ -23,7 +23,7 @@
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'contents.arrayMoveUp' | sqxTranslate }}"
                     (click)="moveUp()"
-                    [disabled]="isDisabled || isFirst"
+                    [disabled]="isDisabled() || isFirst()"
                     title="i18n:contents.arrayMoveUp"
                     type="button">
                     <i class="icon-caret-up"></i>
@@ -32,7 +32,7 @@
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'contents.arrayMoveDown' | sqxTranslate }}"
                     (click)="moveDown()"
-                    [disabled]="isDisabled || isLast"
+                    [disabled]="isDisabled() || isLast()"
                     title="i18n:contents.arrayMoveDown"
                     type="button">
                     <i class="icon-caret-down"></i>
@@ -41,7 +41,7 @@
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'contents.arrayMoveBottom' | sqxTranslate }}"
                     (click)="moveBottom()"
-                    [disabled]="isDisabled || isLast"
+                    [disabled]="isDisabled() || isLast()"
                     title="i18n:contents.arrayMoveBottom"
                     type="button">
                     <i class="icon-caret-bottom"></i>
@@ -49,7 +49,7 @@
                 <button
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'contents.arrayExpandItem' | sqxTranslate }}"
-                    [class.hidden]="!(isCollapsed | async)"
+                    [class.hidden]="!isCollapsed()"
                     (click)="expand()"
                     title="i18n:contents.arrayExpandItem"
                     type="button">
@@ -58,7 +58,7 @@
                 <button
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'contents.arrayCollapseItem' | sqxTranslate }}"
-                    [class.hidden]="isCollapsed | async"
+                    [class.hidden]="isCollapsed()"
                     (click)="collapse()"
                     title="i18n:contents.arrayCollapseItem"
                     type="button">
@@ -71,7 +71,7 @@
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'contents.arrayCloneItem' | sqxTranslate }}"
                     (click)="clone.emit()"
-                    [disabled]="isDisabled"
+                    [disabled]="isDisabled()"
                     title="i18n:contents.arrayCloneItem"
                     type="button">
                     <i class="icon-clone"></i>
@@ -80,7 +80,7 @@
                     class="btn btn-text-danger"
                     attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                     (click)="itemRemove.emit()"
-                    [disabled]="isDisabled"
+                    [disabled]="isDisabled()"
                     type="button">
                     <i class="icon-bin3"></i>
                 </button>
@@ -88,23 +88,23 @@
         </div>
     </div>
 
-    <div class="card-body" [class.hidden]="isCollapsed | async" *sqxIfOnce="!(isCollapsed | async)">
-        @for (section of formModel.sectionsChanges | async; track section) {
+    <div class="card-body" [class.hidden]="isCollapsed()" *sqxIfOnce="!isCollapsed()">
+        @for (section of formModel().sections(); track section) {
             <div class="form-group">
                 <sqx-component-section
-                    [form]="form"
-                    [formContext]="formContext"
-                    [formLevel]="formLevel"
+                    [form]="form()"
+                    [formContext]="formContext()"
+                    [formLevel]="formLevel()"
                     [formSection]="$any(section)"
-                    [hasChatBot]="hasChatBot"
-                    [index]="index"
-                    [isComparing]="isComparing"
-                    [language]="language"
-                    [languages]="languages" />
+                    [hasChatBot]="hasChatBot()"
+                    [index]="index()"
+                    [isComparing]="isComparing()"
+                    [language]="language()"
+                    [languages]="languages()" />
             </div>
         }
 
-        @if (isInvalidComponent | async) {
+        @if (isInvalidComponent()) {
             <sqx-form-hint> {{ "contents.componentInvalid" | sqxTranslate }}</sqx-form-hint>
         }
     </div>

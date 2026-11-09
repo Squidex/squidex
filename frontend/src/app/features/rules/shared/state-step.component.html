@@ -1,10 +1,14 @@
+@let state = this.state();
+@let stepInfo = this.stepInfo();
+@let branchItem = this.branchItem();
+@let attemptIndex = this.attemptIndex();
 <sqx-history-step
     [elementInfo]="stepInfo"
     [elementType]="branchItem.step.step.stepType"
-    [isActive]="isNext"
-    [isExpandable]="(!!state && state.attempts.length > 0) || stepInfo.properties.length > 0"
-    [isFirst]="isFirst"
-    [isLast]="isLast">
+    [isActive]="isNext()"
+    [isExpandable]="isExpandable()"
+    [isFirst]="isFirst()"
+    [isLast]="isLast()">
     <ng-container summary>
         <div class="col">
             <span class="badge rounded-pill badge-{{ state?.status | sqxRuleClass }}">{{ state?.status || "Pending" }}</span>
@@ -43,7 +47,7 @@
         @if (attemptIndex === -1) {
             <div class="details">
                 @for (property of stepInfo.properties; track property.name) {
-                    <sqx-state-step-property [property]="property" [value]="$any(stepDefinition)[property.name]" />
+                    <sqx-state-step-property [property]="property" [value]="$any(stepDefinition())[property.name]" />
                 }
             </div>
         } @else if (state && state.attempts[attemptIndex]) {

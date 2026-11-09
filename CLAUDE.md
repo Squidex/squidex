@@ -30,6 +30,38 @@ npm run lint
 - Do not write JsDoc comments.
 - Define colors only in `src/app/theme/_colors.scss`: literal values, the light/dark palettes and computed colors (`shade()`, `fade()`, ...). Everywhere else use the `$color-*` variables. In TypeScript, read theme colors with `ThemeService.getColor()`. Exceptions are semantic data colors (avatar colors, rule icon colors, chart colors).
 - In tests, keep `verify` calls and `expect` calls next to each other, without blank lines between them.
+- Use signals in components: `input()`, `output()`, `computed()`, `linkedSignal()` instead of `@Input`, `@Output` and `ngOnChanges`.
+- Make all signal fields `readonly`.
+- Document component inputs and outputs with a short `/** ... */` comment. Do not add any other comments to components.
+- Use `inject()` in components instead of constructor parameters.
+- Order class members:
+  1. `private readonly` fields, sorted by name.
+  2. Other `private` fields, sorted by name.
+  3. Protected injections (`inject()`).
+  4. Inputs and outputs, including models that are part of the public interface.
+  5. Basic signals (`signal()`, `linkedSignal()`, internal models, view and content queries).
+  6. Computeds.
+  7. Resources.
+  8. Every other protected field.
+- Signals are `protected`, unless they are part of the public interface (inputs, outputs, public models).
+- Always put an empty line after a signal field (inputs, outputs, models, signals, computeds, resources, queries), even if it is a single line.
+- Never inline `inject()` calls into other expressions. Assign every injection to its own field and use that field.
+- Load data from services with resources (`rxResource`, `resource`), never with `toSignal`.
+- Inline small helper functions that are used only once when the surrounding code already makes clear what they do (e.g. the body of a well-named `computed`). Keep a named helper when its name explains logic that is not obvious at the call site.
+- Do not put blank lines between single-line `private readonly` and `private` fields, neither inside a group nor between the two groups. Fields that span multiple lines are separated by blank lines.
+- Pass submit actions to `submit()`/`submitAndUpdate()` as block-body arrows with an explicit `return`.
+- In signal form schemas, sort the rule calls by validator name, then by the field order of the model.
+- Format signal form rules with a `when` option like this, with a blank line between multi-line rules:
+
+```ts
+hidden(path.inlineEditable,
+    {when: ({ valueOf }) => valueOf(path.editor) === 'Radio' }
+);
+```
+
+- Use single quotes in TypeScript whenever possible.
+- Keep each import statement on a single line.
+- Component constructors only contain effects. Initialize everything else (signals, computeds, resources, forms) directly in the field declaration, so fields stay type safe.
 
 ## Backend
 

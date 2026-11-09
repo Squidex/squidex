@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, computed, forwardRef, input, output } from '@angular/core';
 import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, groupFields, SchemaDto } from '@app/shared';
 import { FieldGroupComponent } from './field-group.component';
 
@@ -24,39 +24,39 @@ import { FieldGroupComponent } from './field-group.component';
     ],
 })
 export class SortableFieldListComponent {
-    @Output()
-    public sorted = new EventEmitter<ReadonlyArray<FieldDto>>();
+    /** Emits all fields in the new order after the user has moved a field or group. */
+    public readonly sorted = output<ReadonlyArray<FieldDto>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input()
-    public parent?: FieldDto;
+    /** The parent array field, if the fields are nested fields. */
+    public readonly parent = input<FieldDto>();
 
-    @Input({ required: true })
-    public settings!: AppSettingsDto;
+    /** The settings of the app. */
+    public readonly settings = input.required<AppSettingsDto>();
 
-    @Input()
-    public schema!: SchemaDto;
+    /** The schema the fields belong to. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ transform: booleanAttribute })
-    public sortable = false;
+    /** Allows the user to sort the fields with drag and drop. */
+    public readonly sortable = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public fieldsEmpty = false;
+    /** Hides the drop placeholder of empty groups, if there are no fields at all. */
+    public readonly fieldsEmpty = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public set fields(value: ReadonlyArray<FieldDto>) {
-        this.fieldGroups = groupFields(value, true);
-    }
+    /** The fields to render, grouped by their separators. */
+    public readonly fields = input.required<ReadonlyArray<FieldDto>>();
 
-    public fieldGroups: FieldGroup[] = [];
+    protected readonly fieldGroups = computed(() => {
+        return groupFields(this.fields(), true);
+    });
 
-    public sortGroups(event: CdkDragDrop<FieldGroup[]>) {
+    protected sortGroups(event: CdkDragDrop<FieldGroup[]>) {
         this.onSort(event);
     }
 
-    public sortFields(event: CdkDragDrop<FieldDto[]>) {
+    protected sortFields(event: CdkDragDrop<FieldDto[]>) {
         this.onSort(event);
     }
 
@@ -73,7 +73,7 @@ export class SortableFieldListComponent {
 
         const result: FieldDto[] = [];
 
-        for (const group of this.fieldGroups) {
+        for (const group of this.fieldGroups()) {
             if (group.separator) {
                 result.push(group.separator);
             }

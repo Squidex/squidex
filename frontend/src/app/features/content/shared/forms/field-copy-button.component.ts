@@ -6,9 +6,10 @@
  */
 
 
-import { Component, Input } from '@angular/core';
+import { Component, computed, input, linkedSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { form, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, SignalSelectDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-copy-button',
@@ -17,52 +18,63 @@ import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldFor
     imports: [
         CheckboxGroupComponent,
         DropdownMenuComponent,
+        FormField,
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
+        SignalSelectDirective,
         TooltipDirective,
         TranslatePipe,
     ],
 })
 export class FieldCopyButtonComponent {
-    @Input({ required: true })
-    public formModel!: FieldForm;
+    /** The form model of the field to copy the values for. */
+    public readonly formModel = input.required<FieldForm>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public languageCodes: ReadonlyArray<string> = [];
+    protected readonly copySource = linkedSignal<string | undefined>(() => {
+        return this.languages()[0]?.iso2Code;
+    });
 
-    public copySource = '';
-    public copyTargets?: ReadonlyArray<string>;
+    protected readonly copyTargets = linkedSignal<ReadonlyArray<string>>(() => {
+        this.copySource();
 
-    public dropdown = new ModalModel();
+        return [];
+    });
 
-    public get isLocalized() {
-        return this.formModel.field.isLocalizable && this.languages.length > 1;
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.languages) {
-            this.setCopySource(this.languages[0]?.iso2Code);
+    protected readonly languageCodes = computed(() => {
+        const copySource = this.copySource();
+        const codes = this.languages().map(x => x.iso2Code);
+        if (!copySource) {
+            return codes;
         }
-    }
 
-    public setCopySource(language: string) {
-        this.copySource = language;
-        this.copyTargets = [];
+        return codes.removed(copySource);
+    });
 
-        this.languageCodes = this.languages.map(x => x.iso2Code).removed(language);
-    }
+    protected readonly isLocalized = computed(() => {
+        return this.formModel().field.isLocalizable && this.languages().length > 1;
+    });
 
-    public copy() {
-        if (this.copySource && this.copyTargets && this.copyTargets?.length > 0) {
-            const source = this.formModel.get(this.copySource).form.value;
+    protected readonly copySourceForm = form(this.copySource);
 
-            for (const target of this.copyTargets) {
-                if (target !== this.copySource) {
-                    this.formModel.get(target)?.setValue(source);
-                }
+    protected readonly dropdown = new ModalModel();
+
+    protected copy() {
+        const copySource = this.copySource();
+        const copyTargets = this.copyTargets();
+        if (!copySource || copyTargets.length === 0) {
+            return;
+        }
+
+        const formModel = this.formModel();
+        const source = formModel.get(copySource).value();
+
+        for (const target of copyTargets) {
+            if (target !== copySource) {
+                formModel.get(target)?.setValue(source);
             }
         }
     }

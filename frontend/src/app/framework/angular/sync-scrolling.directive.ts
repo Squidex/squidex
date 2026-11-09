@@ -5,26 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, HostListener, Input, Renderer2 } from '@angular/core';
+import { Directive, inject, input, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxSyncScrolling]',
+    host: {
+        '(scroll)': 'onScroll($event)',
+    },
 })
 export class SyncScollingDirective {
-    @Input('sqxSyncScrolling')
-    public target!: HTMLElement;
+    private readonly renderer = inject(Renderer2);
 
-    constructor(
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    /** The element that is moved horizontally with the scroll position of this element. */
+    public readonly target = input<HTMLElement | null | undefined>(undefined, { alias: 'sqxSyncScrolling' });
 
-    @HostListener('scroll', ['$event'])
-    public onScroll(event: Event) {
-        if (this.target) {
-            const scroll = (<HTMLElement>event.target).scrollLeft;
-
-            this.renderer.setStyle(this.target, 'transform', `translate(-${scroll - this.target.scrollLeft}px, 0px)`);
+    protected onScroll(event: Event) {
+        const target = this.target();
+        if (!target) {
+            return;
         }
+
+        const scroll = (<HTMLElement>event.target).scrollLeft;
+
+        this.renderer.setStyle(target, 'transform', `translate(-${scroll - target.scrollLeft}px, 0px)`);
     }
 }

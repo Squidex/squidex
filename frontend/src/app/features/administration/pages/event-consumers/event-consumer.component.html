@@ -1,21 +1,22 @@
-<tr [class.faulted]="eventConsumer.error && eventConsumer.error && eventConsumer.error.length > 0">
+@let consumer = eventConsumer();
+<tr [class.faulted]="consumer.error && consumer.error.length > 0">
     <td class="cell-auto">
         <span class="truncate">
-            <i class="faulted-icon icon icon-bug" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0" (click)="failure.emit()"></i>
-            {{ eventConsumer.name }}
+            <i class="faulted-icon icon icon-bug" [class.hidden]="!consumer.error || consumer.error.length === 0" (click)="failure.emit()"></i>
+            {{ consumer.name }}
         </span>
     </td>
 
     <td class="cell-auto-right">
-        <span>{{ eventConsumer.count }}</span>
+        <span>{{ consumer.count }}</span>
     </td>
 
     <td class="cell-auto-right">
-        <span>{{ eventConsumer.position }}</span>
+        <span>{{ consumer.position }}</span>
     </td>
 
     <td class="cell-actions-lg">
-        @if (eventConsumer.canReset) {
+        @if (consumer.canReset) {
             <button
                 class="btn btn-text-secondary"
                 attr.aria-label="{{ 'eventConsumers.resetTooltip' | sqxTranslate }}"
@@ -26,7 +27,7 @@
             </button>
         }
 
-        @if (eventConsumer.canStart) {
+        @if (consumer.canStart) {
             <button
                 class="btn btn-text-secondary"
                 attr.aria-label="{{ 'eventConsumers.startTooltip' | sqxTranslate }}"
@@ -37,7 +38,7 @@
             </button>
         }
 
-        @if (eventConsumer.canStop) {
+        @if (consumer.canStop) {
             <button
                 class="btn btn-text-secondary"
                 attr.aria-label="{{ 'eventConsumers.stopTooltip' | sqxTranslate }}"

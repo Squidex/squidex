@@ -5,39 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { combineLatest } from 'rxjs';
-import { ContentsState, defined, LayoutComponent, SchemasState } from '@app/shared';
+import { Component, computed, inject } from '@angular/core';
+import { ContentsState, LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
 @Component({
     selector: 'sqx-sidebar-page',
     styleUrls: ['./sidebar-page.component.scss'],
     templateUrl: './sidebar-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ContentExtensionComponent,
         LayoutComponent,
     ],
 })
 export class SidebarPageComponent {
-    public url = combineLatest([
-        this.schemasState.selectedSchema.pipe(defined()),
-        this.contentsState.selectedContent,
-    ], (schema, content) => {
+    protected readonly contentsState = inject(ContentsState);
+
+    protected readonly schemasState = inject(SchemasState);
+
+    protected readonly url = computed(() => {
+        const schema = this.schemasState.selectedSchema();
+        if (!schema) {
+            return undefined;
+        }
+
         const url =
-            content ?
+            this.contentsState.selectedContent() ?
             schema.properties.contentSidebarUrl :
             schema.properties.contentsSidebarUrl;
 
         return url;
     });
-
-    constructor(
-        public readonly contentsState: ContentsState,
-        public readonly schemasState: SchemasState,
-    ) {
-    }
 }

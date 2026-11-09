@@ -6,19 +6,14 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
+import { Component, computed, input } from '@angular/core';
+import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
-
-interface State {
-    wrapping: boolean;
-}
 
 @Component({
     selector: 'sqx-content-value',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LongHoverDirective,
         ModalDirective,
@@ -28,66 +23,58 @@ interface State {
         TranslatePipe,
     ],
 })
-export class ContentValueComponent extends StatefulComponent<State> {
-    private readonly subscriptions = new Subscriptions();
+export class ContentValueComponent {
+    /** The value to render, either plain or as HTML. */
+    public readonly value = input.required<any>();
 
-    @Input({ required: true })
-    public value!: any;
+    /** The field of the value, to decide how to render it. */
+    public readonly field = input<TableField>();
 
-    @Input()
-    public field?: TableField;
+    /** The table settings, to wrap long text. */
+    public readonly fields = input<TableSettings>();
 
-    @Input()
-    public fields?: TableSettings;
-
-    public previewModal = new ModalModel();
-
-    public get title() {
-        return this.isString && this.isPlain ? this.value : undefined;
-    }
-
-    public get isString() {
-        return this.field?.rootField?.properties.fieldType === 'String';
-    }
-
-    public get isPlain() {
-        return !Types.is(this.value, HtmlValue);
-    }
-
-    constructor() {
-        super({ wrapping: false });
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.fields) {
-            this.subscriptions.unsubscribeAll();
-
-            this.subscriptions.add(this.fields?.fieldWrappings
-                .subscribe(wrappings => {
-                    const wrapping = wrappings[this.field?.name!];
-
-                    this.next({ wrapping });
-                }));
+    protected readonly wrapping = computed(() => {
+        const fieldName = this.field()?.name;
+        if (!fieldName) {
+            return false;
         }
-    }
 
-    public toggle() {
-        if (!this.field) {
+        return this.fields()?.fieldWrappings()[fieldName] === true;
+    });
+
+    protected readonly isString = computed(() => {
+        return this.field()?.rootField?.properties.fieldType === 'String';
+    });
+
+    protected readonly isPlain = computed(() => {
+        return !Types.is(this.value(), HtmlValue);
+    });
+
+    protected readonly title = computed(() => {
+        return this.isString() && this.isPlain() ? this.value() : undefined;
+    });
+
+    protected readonly previewModal = new ModalModel();
+
+    protected toggle() {
+        const field = this.field();
+        if (!field) {
             return;
         }
 
-        this.fields?.toggleWrapping(this.field?.name);
+        this.fields()?.toggleWrapping(field.name);
     }
 
-    public show() {
-        if (!Types.is(this.value, HtmlValue) || !this.value.preview) {
+    protected show() {
+        const value = this.value();
+        if (!Types.is(value, HtmlValue) || !value.preview) {
             return;
         }
 
         this.previewModal.show();
     }
 
-    public hide() {
+    protected hide() {
         this.previewModal.hide();
     }
 }

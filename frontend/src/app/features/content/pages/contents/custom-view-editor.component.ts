@@ -7,14 +7,13 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { TableField, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-custom-view-editor',
     styleUrls: ['./custom-view-editor.component.scss'],
     templateUrl: './custom-view-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDropList,
@@ -22,43 +21,43 @@ import { TableField, TranslatePipe } from '@app/shared';
     ],
 })
 export class CustomViewEditorComponent {
-    @Output()
-    public listFieldsReset = new EventEmitter();
+    /** Emits when the user resets the fields to the default. */
+    public readonly listFieldsReset = output();
 
-    @Output()
-    public listFieldsChange = new EventEmitter<ReadonlyArray<TableField>>();
+    /** Emits the new fields when the user adds, removes or sorts fields. */
+    public readonly listFieldsChange = output<ReadonlyArray<TableField>>();
 
-    @Input({ required: true })
-    public listFields!: TableField[];
+    /** The fields that are shown in the list. */
+    public readonly listFields = input.required<TableField[]>();
 
-    @Input({ required: true })
-    public allFields!: ReadonlyArray<TableField>;
+    /** All fields that can be shown in the list. */
+    public readonly allFields = input.required<ReadonlyArray<TableField>>();
 
-    public fieldsNotAdded!: ReadonlyArray<TableField>;
+    protected readonly fieldsNotAdded = computed(() => {
+        const listFields = this.listFields();
 
-    public ngOnChanges() {
-        this.fieldsNotAdded = this.allFields.filter(lhs => !this.listFields.find(rhs => rhs.name === lhs.name));
-    }
+        return this.allFields().filter(lhs => !listFields.find(rhs => rhs.name === lhs.name));
+    });
 
-    public drop(event: CdkDragDrop<TableField[], any>) {
+    protected drop(event: CdkDragDrop<TableField[], any>) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
 
         this.updateListFields(event.container.data);
     }
 
-    public addField(field: TableField) {
-        this.updateListFields([...this.listFields, field]);
+    protected addField(field: TableField) {
+        this.updateListFields([...this.listFields(), field]);
     }
 
-    public removeField(field: TableField) {
-        this.updateListFields(this.listFields.removed(field));
+    protected removeField(field: TableField) {
+        this.updateListFields(this.listFields().removed(field));
     }
 
     private updateListFields(fields: ReadonlyArray<TableField>) {
         this.listFieldsChange.emit(fields);
     }
 
-    public resetDefault() {
+    protected resetDefault() {
         this.listFieldsReset.emit();
     }
 }

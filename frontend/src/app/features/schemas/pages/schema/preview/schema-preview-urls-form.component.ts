@@ -5,72 +5,60 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, SchemaDto, SchemasService, SchemasState, ScriptCompletions, TranslatePipe } from '@app/shared';
+import { Component, computed, effect, inject, input } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, SchemaDto, SchemasService, SchemasState, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-preview-urls-form',
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html',
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
         FormAlertComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
-export class SchemaPreviewUrlsFormComponent implements OnInit {
-    @Input()
-    public schema!: SchemaDto;
+export class SchemaPreviewUrlsFormComponent {
+    private readonly schemasService = inject(SchemasService);
+    private readonly schemasState = inject(SchemasState);
 
-    public editForm = new ConfigurePreviewUrlsForm();
+    /** The schema to configure the preview URLs for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public fieldCompletions: Observable<ScriptCompletions> = EMPTY;
+    protected readonly isEditable = computed(() => {
+        return this.schema().canUpdateUrls;
+    });
 
-    public isEditable = false;
+    protected readonly fieldCompletions = rxResource({
+        params: () => this.schema().name,
+        stream: ({ params }) => this.schemasService.getFieldRulesCompletion(this.schemasState.appName, params),
+    });
 
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly schemasService: SchemasService,
-    ) {
+    protected readonly editForm = new ConfigurePreviewUrlsForm();
+
+    constructor() {
+        effect(() => {
+            const schema = this.schema();
+
+            this.editForm.load(schema);
+            this.editForm.setEnabled(schema.canUpdateUrls);
+        });
     }
 
-    public ngOnInit() {
-        this.fieldCompletions = this.schemasService.getFieldRulesCompletion(this.schemasState.appName, this.schema.name).pipe(shareReplay(1));
-    }
-
-    public ngOnChanges() {
-        this.isEditable = this.schema.canUpdateUrls;
-
-        this.editForm.load(this.schema);
-        this.editForm.setEnabled(this.isEditable);
-    }
-
-    public saveSchema() {
-        if (!this.isEditable) {
+    protected saveSchema() {
+        if (!this.isEditable()) {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.schemasState.configurePreviewUrls(this.schema, value)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        this.editForm.submit(value => {
+            return this.schemasState.configurePreviewUrls(this.schema(), value);
+        });
     }
 }

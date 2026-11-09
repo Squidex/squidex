@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { combineLatest } from 'rxjs';
-import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
+import { computed, inject, Injector, Service, Signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { combineLatest, Observable } from 'rxjs';
+import { filter, map, take, tap } from 'rxjs/operators';
 import { debug, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
 import { UIService } from '../services/ui.service';
 import { UsersService } from '../services/users.service';
@@ -40,58 +41,79 @@ interface Snapshot {
     appName?: string;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class UIState extends State<Snapshot> {
-    public settings =
+    private readonly uiService = inject(UIService);
+    private readonly usersService = inject(UsersService);
+    private readonly injector = inject(Injector);
+
+    public readonly settings =
         this.project(mergeSettings);
 
-    public settingsCommon =
+    public readonly settingsCommon =
         this.project(x => x.settingsCommon);
 
-    public settingsShared =
-        this.project(x => x.settingsAppShared).pipe(filter(x => !!x));
+    public readonly settingsShared =
+        this.project(x => x.settingsAppShared);
 
-    public settingsUser =
-        this.project(x => x.settingsAppUser).pipe(filter(x => !!x));
+    public readonly settingsUser =
+        this.project(x => x.settingsAppUser);
 
-    public canReadEvents =
+    public readonly canReadEvents =
         this.project(x => x.canReadEvents === true);
 
-    public canReadUsers =
+    public readonly canReadUsers =
         this.project(x => x.canReadUsers === true);
 
-    public canRestore =
+    public readonly canRestore =
         this.project(x => x.canRestore === true);
 
-    public canUseAdminResource =
+    public readonly canUseAdminResource =
         this.project(x => x.canRestore === true || x.canReadUsers === true || x.canReadEvents === true);
 
-    public get<T>(path: string, defaultValue: T) {
-        return this.settings.pipe(map(x => getValue(x, path, defaultValue)),
-            distinctUntilChanged());
+    public get<T>(path: string, defaultValue: T): Signal<T> {
+        return this.getSetting(this.settings, path, defaultValue);
     }
 
-    public getCommon<T>(path: string, defaultValue: T) {
-        return this.settingsCommon.pipe(filter(x => x !== undefined), map(x => getValue(x, path, defaultValue)),
-            distinctUntilChanged());
+    public getCommon<T>(path: string, defaultValue: T): Signal<T> {
+        return this.getSetting(this.settingsCommon, path, defaultValue);
     }
 
-    public getAppShared<T>(path: string, defaultValue: T) {
-        return this.settingsShared.pipe(filter(x => x !== undefined), map(x => getValue(x, path, defaultValue)),
-            distinctUntilChanged());
+    public getAppShared<T>(path: string, defaultValue: T): Signal<T> {
+        return this.getSetting(this.settingsShared, path, defaultValue);
     }
 
-    public getAppUser<T>(path: string, defaultValue: T) {
-        return this.settingsUser.pipe(filter(x => x !== undefined), map(x => getValue(x, path, defaultValue)),
-            distinctUntilChanged());
+    public getAppUser<T>(path: string, defaultValue: T): Signal<T> {
+        return this.getSetting(this.settingsUser, path, defaultValue);
     }
 
-    constructor(
-        private readonly uiService: UIService,
-        private readonly usersService: UsersService,
-    ) {
+    public waitForCommon<T>(path: string, defaultValue: T): Observable<T> {
+        return this.waitForValue(x => x.settingsCommon, path, defaultValue);
+    }
+
+    public waitForAppShared<T>(path: string, defaultValue: T): Observable<T> {
+        return this.waitForValue(x => x.settingsAppShared, path, defaultValue);
+    }
+
+    public waitForAppUser<T>(path: string, defaultValue: T): Observable<T> {
+        return this.waitForValue(x => x.settingsAppUser, path, defaultValue);
+    }
+
+    private getSetting<T>(source: Signal<Settings | null | undefined>, path: string, defaultValue: T): Signal<T> {
+        return computed(() => {
+            return getValue(source(), path, defaultValue);
+        });
+    }
+
+    private waitForValue<T>(select: (snapshot: Snapshot) => Settings | null | undefined, path: string, defaultValue: T): Observable<T> {
+        return toObservable(this.value, { injector: this.injector }).pipe(
+            map(x => select(x)),
+            filter(x => !!x),
+            take(1),
+            map(x => getValue(x, path, defaultValue)));
+    }
+
+    constructor() {
         super({});
 
         debug(this, 'settings');

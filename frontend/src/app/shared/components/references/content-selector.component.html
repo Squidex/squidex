@@ -1,12 +1,16 @@
+@let schemas = this.schemas();
+@let schema = this.schema();
+@let language = languageSelected();
+@let languages = this.languages();
 <sqx-modal-dialog (dialogClose)="emitClose()" flexBody="true" fullHeight="true" hasTabs="false" size="lg">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
                 @if (schemas.length > 1) {
-                    <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
-                        @for (schema of schemas; track schema) {
-                            <option [ngValue]="schema">
-                                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schema.displayName } }}
+                    <select class="form-select" (change)="selectSchema(schemas[$any($event.target).selectedIndex])">
+                        @for (item of schemas; track item) {
+                            <option [selected]="item === schema">
+                                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: item.displayName } }}
                             </option>
                         }
                     </select>
@@ -37,14 +41,14 @@
                         [language]="language"
                         [languages]="languages"
                         placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
-                        [query]="contentsState.query | async"
+                        [query]="contentsState.query()"
                         (queryChange)="search($event)"
-                        [queryModel]="queryModel | async" />
+                        [queryModel]="queryModel.value()" />
                 </div>
 
                 @if (languages.length > 1) {
                     <div class="col-auto">
-                        <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages" />
+                        <sqx-language-selector class="languages-buttons" [(language)]="languageSelected" [languages]="languages" />
                     </div>
                 }
             }
@@ -52,13 +56,13 @@
     </ng-container>
     <ng-container content>
         @if (schema) {
-            <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
+            <sqx-list-view [isLoading]="contentsState.isLoading()" syncedHeader="true" table="true">
                 <ng-container header>
                     <table class="table table-items table-fixed" #header [sqxContentListWidth]="schema.defaultReferenceFields">
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" type="checkbox" />
+                                    <input class="form-check" [checked]="selectedAll()" (change)="selectAll($any($event.target).checked)" type="checkbox" />
                                 </th>
 
                                 <th [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
@@ -70,7 +74,7 @@
                                         <sqx-content-list-header
                                             [field]="field"
                                             [language]="language"
-                                            [query]="(contentsState.query | async)!"
+                                            [query]="contentsState.query()!"
                                             (queryChange)="search($event)" />
                                     </th>
                                 }
@@ -84,7 +88,7 @@
                 </ng-container>
                 <ng-container content>
                     <div class="table-container">
-                        @if (contentsState.contents | async; as contents) {
+                        @if (contentsState.contents(); as contents) {
                             <table class="table table-items table-fixed" [sqxContentListWidth]="schema.defaultReferenceFields" [sqxSyncWidth]="header">
                                 @for (content of contents; track content.id) {
                                     <tbody
@@ -101,7 +105,7 @@
                     </div>
                 </ng-container>
                 <ng-container footer>
-                    <sqx-pager (loadTotal)="reloadTotal()" [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" />
+                    <sqx-pager (loadTotal)="reloadTotal()" [paging]="contentsState.paging()" (pagingChange)="contentsState.page($event)" />
                 </ng-container>
             </sqx-list-view>
         }
@@ -110,7 +114,7 @@
         <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
 
         <div>
-            @if (canClear) {
+            @if (canClear()) {
                 <button class="btn me-2" (click)="emitClear()" type="button">
                     {{ "common.clear" | sqxTranslate: { count: 0 } }}
                 </button>
@@ -119,13 +123,9 @@
             <button
                 class="btn btn-success"
                 (click)="emitSelect()"
-                [disabled]="selectionCount === 0 || selectionCount > maxItems"
-                type="button"
-                type="button"
-                type="button"
-                type="button"
+                [disabled]="selectionCount() === 0 || selectionCount() > maxItems()"
                 type="submit">
-                {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
+                {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount() } }}
             </button>
         </div>
     </ng-container>

@@ -5,50 +5,43 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input, Optional, Renderer2 } from '@angular/core';
-import { map } from 'rxjs';
+import { Component, computed, inject, input } from '@angular/core';
 import { StringColorPipe } from '@app/framework';
-import { CollaborationService, Subscriptions } from '@app/shared/internal';
+import { CollaborationService } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-focus-marker',
     styleUrls: ['./focus-marker.component.scss'],
     templateUrl: './focus-marker.component.html',
+    host: {
+        '(window:click)': 'onWindowClick($event)',
+    },
     imports: [
-        AsyncPipe,
         StringColorPipe,
     ],
 })
 export class FocusMarkerComponent {
-    private readonly subscriptions = new Subscriptions();
+    private readonly collaboration = inject(CollaborationService, { optional: true });
 
-    @Input({ required: true })
-    public controlId!: string;
+    /** The ID of the control, to show which other user has focused it. */
+    public readonly controlId = input.required<string>();
 
-    public focusedUser =
-        this.collaboration?.userChanges.pipe(
-            map(u => u.find(x => x['focusedControl'] === this.controlId)?.user));
+    protected readonly users = computed(() => {
+        return this.collaboration?.users() ?? [];
+    });
 
-    constructor(
-        private readonly renderer: Renderer2,
-        @Optional() private readonly collaboration?: CollaborationService,
-    ) {
+    protected readonly focusedUser = computed(() => {
+        const controlId = this.controlId();
+
+        return this.users().find(x => x['focusedControl'] === controlId)?.user;
+    });
+
+    protected onWindowClick(event: MouseEvent) {
+        this.updateFocusedControl(event, null);
     }
 
-    public ngOnInit() {
-        if (!this.collaboration) {
-            return;
-        }
-
-        this.subscriptions.add(
-            this.renderer.listen('window', 'click', (event: MouseEvent) => {
-                this.updateFocusedControl(event, null);
-            }));
-    }
-
-    public onClick(event: MouseEvent) {
-        this.updateFocusedControl(event, this.controlId);
+    protected onClick(event: MouseEvent) {
+        this.updateFocusedControl(event, this.controlId());
     }
 
     private updateFocusedControl(event: MouseEvent, controlId: string | null) {

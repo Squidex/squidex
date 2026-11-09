@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, input, linkedSignal, output } from '@angular/core';
 import { SortOrder } from 'ngx-inline-filter';
 import { TranslatePipe } from '@app/framework';
 import { AppLanguageDto, Query, Types } from '@app/shared/internal';
@@ -15,68 +14,66 @@ import { AppLanguageDto, Query, Types } from '@app/shared/internal';
     selector: 'sqx-table-header',
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],
 })
 export class TableHeaderComponent {
-    @Output()
-    public queryChange = new EventEmitter<Query>();
+    /** Emits the new query with the new sort order when the header is clicked. */
+    public readonly queryChange = output<Query>();
 
-    @Input()
-    public query: Query | undefined | null;
+    /** The current query, to show the sort order. */
+    public readonly query = input<Query | null>();
 
-    @Input({ required: true })
-    public text = '';
+    /** The text of the header. */
+    public readonly text = input.required<string>();
 
-    @Input()
-    public language!: AppLanguageDto;
+    /** The language for localized fields. */
+    public readonly language = input<AppLanguageDto>();
 
-    @Input()
-    public sortPath?: string | undefined | null;
+    /** The path to sort by, for example "data.name.iv". */
+    public readonly sortPath = input<string | null>();
 
-    @Input({ transform: booleanAttribute })
-    public sortable?: boolean | null;
+    /** Allows sorting by clicking the header. */
+    public readonly sortable = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public sortDefault: SortOrder | undefined | null;
+    /** The sort order to show when the query has no sorting. */
+    public readonly sortDefault = input<SortOrder | null>();
 
-    public order: SortOrder | undefined | null;
-
-    public ngOnChanges() {
-        const { query, sortDefault, sortable, sortPath } = this;
-
-        if (!sortable) {
-            this.order = null;
-        } else if (sortPath && query?.sort?.length === 1 && query.sort[0].path === sortPath) {
-            this.order = query.sort[0].order;
-        } else if (sortDefault && !query?.sort?.length) {
-            this.order = sortDefault;
-        } else {
-            this.order = null;
+    protected readonly order = linkedSignal<SortOrder | null>(() => {
+        if (!this.sortable()) {
+            return null;
         }
-    }
 
-    public sort() {
-        const { order, query, sortable, sortPath } = this;
+        const query = this.query();
+        const sortPath = this.sortPath();
+        if (sortPath && query?.sort?.length === 1 && query.sort[0].path === sortPath) {
+            return query.sort[0].order;
+        }
 
-        if (!sortable || !sortPath) {
+        const sortDefault = this.sortDefault();
+        if (sortDefault && !query?.sort?.length) {
+            return sortDefault;
+        }
+
+        return null;
+    });
+
+    protected sort() {
+        const sortPath = this.sortPath();
+        if (!this.sortable() || !sortPath) {
             return;
         }
 
-        if (!order || order !== 'ascending') {
-            this.order = 'ascending';
-        } else {
-            this.order = 'descending';
-        }
+        const order = this.order() === 'ascending' ? 'descending' : 'ascending';
 
-        const newQuery = Types.clone(query || {});
+        this.order.set(order);
 
-        newQuery.sort = [
-            { path: sortPath, order: this.order! },
+        const query = Types.clone(this.query() || {});
+        query.sort = [
+            { path: sortPath, order },
         ];
 
-        this.queryChange.emit(newQuery);
+        this.queryChange.emit(query);
     }
 }

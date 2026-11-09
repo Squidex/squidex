@@ -5,14 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, inject, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
 import { AddLanguageForm, AutocompleteComponent, AutocompleteSource, FormHintComponent, LanguageDto, LanguagesState, StringHelper, TranslatePipe } from '@app/shared';
 
 class LanguageSource implements AutocompleteSource {
     constructor(
-        private readonly languages: ReadonlyArray<LanguageDto>,
+        protected readonly languages: ReadonlyArray<LanguageDto>,
     ) {
     }
 
@@ -43,43 +44,29 @@ class LanguageSource implements AutocompleteSource {
     selector: 'sqx-language-add-form',
     styleUrls: ['./language-add-form.component.scss'],
     templateUrl: './language-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutocompleteComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class LanguageAddFormComponent {
-    @Input()
-    public set newLanguages(value: ReadonlyArray<LanguageDto>) {
-        this.addLanguagesSource = new LanguageSource(value);
-    }
+    private readonly languagesState = inject(LanguagesState);
 
-    public addLanguagesSource = new LanguageSource([]);
-    public addLanguageForm = new AddLanguageForm();
+    /** The languages that can still be added to the app. */
+    public readonly newLanguages = input<ReadonlyArray<LanguageDto>>([]);
 
-    constructor(
-        private readonly languagesState: LanguagesState,
-    ) {
-    }
+    protected readonly addLanguagesSource = computed(() => {
+        return new LanguageSource(this.newLanguages());
+    });
 
-    public addLanguage() {
-        const value = this.addLanguageForm.submit();
-        if (!value) {
-            return;
-        }
+    protected readonly addLanguageForm = new AddLanguageForm();
 
-        this.languagesState.add(value.language)
-            .subscribe({
-                next: () => {
-                    this.addLanguageForm.submitCompleted();
-                },
-                error: error => {
-                    this.addLanguageForm.submitFailed(error);
-                },
-            });
+    protected addLanguage() {
+        this.addLanguageForm.submit(value => {
+            return this.languagesState.add(value.language);
+        }, { resetAfterSubmit: true });
     }
 }

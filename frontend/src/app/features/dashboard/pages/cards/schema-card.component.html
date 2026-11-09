@@ -2,7 +2,7 @@
     <div class="card-body">
         <div class="card-image"><img src="./images/dashboard-schema.svg" /></div>
 
-        @if (app.canReadSchemas) {
+        @if (app().canReadSchemas) {
             <h4 class="card-title">
                 <a [routerLink]="['schemas', { showDialog: true }]">{{ "dashboard.schemaNewCard" | sqxTranslate }}</a>
             </h4>

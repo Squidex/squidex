@@ -5,29 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirective, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-chat-menu',
     styleUrls: ['./chat-menu.component.scss'],
     templateUrl: './chat-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ChatDialogComponent,
         ModalDirective,
     ],
 })
 export class ChatMenuComponent {
-    public readonly chatDialog = new DialogModel();
+    private readonly uiOptions = inject(UIOptions);
 
-    public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+    protected readonly appsState = inject(AppsState);
 
-    constructor(
-        public readonly appsState: AppsState,
-        public readonly authService: AuthService,
-    ) {
-    }
+    protected readonly authService = inject(AuthService);
+
+    protected readonly chatDialog = new DialogModel();
+
+    protected readonly hasChatBot = this.uiOptions.value.canUseChatBot;
 }

@@ -9,17 +9,17 @@
                 class="form-control"
                 #nameInput
                 (change)="filter(nameInput.value)"
-                [ngModel]="scriptLogsState.name | async"
                 placeholder="{{ 'scriptLogs.filterPlaceholder' | sqxTranslate }}"
                 shortcut="CTRL + I"
-                shortcutAction="focus" />
+                shortcutAction="focus"
+                [value]="scriptLogsState.name() ?? ''" />
         </div>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="55rem" [isLoading]="scriptLogsState.isLoading | async">
+        <sqx-list-view innerWidth="55rem" [isLoading]="scriptLogsState.isLoading()">
             <sqx-form-alert marginTop="0">{{ "scriptLogs.description" | sqxTranslate }}</sqx-form-alert>
 
-            @if ((scriptLogsState.isLoaded | async) && (scriptLogsState.scriptLogs | async); as scriptLogs) {
+            @if (scriptLogsState.isLoaded() && scriptLogsState.scriptLogs(); as scriptLogs) {
                 @if (scriptLogs.length === 0) {
                     <div class="table-items-row table-items-row-summary table-items-row-empty">{{ "scriptLogs.empty" | sqxTranslate }}</div>
                 }

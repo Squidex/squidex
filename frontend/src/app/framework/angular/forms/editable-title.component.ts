@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { booleanAttribute, Component, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { form, FormField, maxLength, required } from '@angular/forms/signals';
 import { Keys } from '@app/framework/internal';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ControlErrorsComponent } from './control-errors.component';
@@ -20,80 +20,76 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
     imports: [
         ControlErrorsComponent,
         FocusOnInitDirective,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class EditableTitleComponent {
-    @Output()
-    public inputTitleChange = new EventEmitter<string>();
+    /** Emits the new title when renamed. */
+    public readonly inputTitleChange = output<string>();
 
-    @Input({ required: true })
-    public inputTitle?: string;
+    /** The title. */
+    public readonly inputTitle = input.required<string | undefined | null>();
 
-    @Input({ transform: numberAttribute })
-    public inputTitleLength = 20;
+    /** The maximum length of the title. No limit when 0. */
+    public readonly inputTitleLength = input(20, { transform: numberAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public inputTitleRequired = true;
+    /** Prevents renaming to an empty title. */
+    public readonly inputTitleRequired = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disabled?: boolean | null;
+    /** Prevents renaming. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public closeButton = true;
+    /** Shows a button to cancel renaming. */
+    public readonly closeButton = input(true, { transform: booleanAttribute });
 
-    @Input()
-    public size: 'sm' | 'md' | 'lg' = 'md';
+    /** The size of the title and the buttons. */
+    public readonly size = input<'sm' | 'md' | 'lg'>('md');
 
-    @Input()
-    public displayFallback = '';
+    /** The text to show when the title is empty. */
+    public readonly displayFallback = input('');
 
-    public renaming = false;
-    public renameForm = new FormControl<string>('');
+    protected readonly renameValue = signal('');
 
-    public onKeyDown(event: KeyboardEvent) {
+    protected readonly inputTitleDisplayed = linkedSignal(() => this.inputTitle());
+
+    protected readonly renaming = signal(false);
+
+    protected readonly renameForm = form(this.renameValue, path => {
+        maxLength(path, () => this.inputTitleLength() || undefined);
+        required(path,
+            {when: () => this.inputTitleRequired() }
+        );
+    });
+
+    protected onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {
             this.toggleRename();
         }
     }
 
-    public toggleRename() {
-        if (this.disabled) {
+    protected toggleRename() {
+        if (this.disabled()) {
             return;
         }
 
-        if (!this.renaming) {
-            let validators: ValidatorFn[] = [];
-
-            if (this.inputTitleLength) {
-                validators.push(Validators.maxLength(this.inputTitleLength));
-            }
-
-            if (this.inputTitleRequired) {
-                validators.push(Validators.required);
-            }
-
-            this.renameForm.setValidators(validators);
-        }
-
-        this.renameForm.setValue(this.inputTitle || '');
-        this.renaming = !this.renaming;
+        this.renameValue.set(this.inputTitleDisplayed() || '');
+        this.renameForm().reset();
+        this.renaming.update(x => !x);
     }
 
-    public rename() {
-        if (this.disabled) {
+    protected rename() {
+        if (this.disabled()) {
             return;
         }
 
-        if (this.renameForm.valid) {
-            const text = this.renameForm.value || '';
+        if (this.renameForm().valid()) {
+            const text = this.renameValue();
 
             this.inputTitleChange.emit(text);
-            this.inputTitle = text;
-
-            this.renaming = false;
+            this.inputTitleDisplayed.set(text);
+            this.renaming.set(false);
         }
     }
 }

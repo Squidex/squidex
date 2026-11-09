@@ -5,17 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, PlansState, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         FileSizePipe,
         FormHintComponent,
@@ -24,19 +21,16 @@ import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, Pl
     ],
 })
 export class PlanComponent {
-    @Input({ required: true })
-    public planInfo!: PlanInfo;
+    protected readonly plansState = inject(PlansState);
 
-    constructor(
-        public readonly plansState: PlansState,
-    ) {
+    /** The plan to show, including whether it is currently selected. */
+    public readonly planInfo = input.required<PlanInfo>();
+
+    protected changeMonthly() {
+        this.plansState.change(this.planInfo().plan.id);
     }
 
-    public changeMonthly() {
-        this.plansState.change(this.planInfo.plan.id);
-    }
-
-    public changeYearly() {
-        this.plansState.change(this.planInfo.plan.yearlyId!);
+    protected changeYearly() {
+        this.plansState.change(this.planInfo().plan.yearlyId!);
     }
 }

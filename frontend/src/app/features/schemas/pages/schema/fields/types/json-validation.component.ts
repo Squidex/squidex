@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
+import { Component, input } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-json-validation',
@@ -15,12 +15,12 @@ import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
     templateUrl: 'json-validation.component.html',
 })
 export class JsonValidationComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: JsonFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<JsonFieldPropertiesDto>();
 }

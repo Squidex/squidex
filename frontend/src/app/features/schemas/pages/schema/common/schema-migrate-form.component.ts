@@ -6,8 +6,8 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, input, signal } from '@angular/core';
+import { form, FormField } from '@angular/forms/signals';
 import { ConfirmClickDirective, FormRowComponent, MarkdownDirective, MigrateContentsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -15,35 +15,39 @@ import { ConfirmClickDirective, FormRowComponent, MarkdownDirective, MigrateCont
     templateUrl: './schema-migrate-form.component.html',
     imports: [
         ConfirmClickDirective,
+        FormField,
         FormRowComponent,
-        FormsModule,
         MarkdownDirective,
         TranslatePipe,
     ],
 })
 export class SchemaMigrateFormComponent {
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    private readonly schemasState = inject(SchemasState);
 
-    public migrateDraft = true;
+    /** The schema to migrate the contents for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public migratePublished = true;
+    protected readonly migrateDraft = form(signal(true));
 
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
+    protected readonly migratePublished = form(signal(true));
 
-    public migrateContents() {
-        if (!this.schema.canContentsMigrate || (!this.migrateDraft && !this.migratePublished)) {
+    protected migrateContents() {
+        const schema = this.schema();
+        if (!schema.canContentsMigrate) {
+            return;
+        }
+
+        const migrateDraft = this.migrateDraft().value();
+        const migratePublished = this.migratePublished().value();
+        if (!migrateDraft && !migratePublished) {
             return;
         }
 
         const request = new MigrateContentsDto({
-            migrateDraft: this.migrateDraft,
-            migratePublished: this.migratePublished,
+            migrateDraft,
+            migratePublished,
         });
 
-        this.schemasState.migrateContents(this.schema, request).subscribe();
+        this.schemasState.migrateContents(schema, request).subscribe();
     }
 }

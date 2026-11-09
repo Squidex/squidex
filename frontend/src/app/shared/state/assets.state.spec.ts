@@ -8,7 +8,8 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
-import { AnnotateAssetDto, AssetFoldersDto, AssetsDto, AssetsService, AssetsState, CreateAssetFolderDto, DialogService, MathHelper, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AnnotateAssetDto, AppsState, AssetFoldersDto, AssetsDto, AssetsService, AssetsState, CreateAssetFolderDto, DialogService, MathHelper, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto, versioned } from '@app/shared/internal';
 import { createAsset, createAssetFolder } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -34,7 +35,11 @@ describe('AssetsState', () => {
         assetsService.setup(x => x.getTags(app))
             .returns(() => of({ tag1: 1, shared: 2, tag2: 1 }));
 
-        assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object);
+        assetsState = createService(AssetsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: AssetsService, useValue: assetsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {

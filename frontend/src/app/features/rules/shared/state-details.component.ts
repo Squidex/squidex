@@ -6,8 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, Component, input } from '@angular/core';
 import { BranchItem, CodeEditorComponent, FlowExecutionStateDto, RuleElementDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from './history-step.component';
 import { StateStepComponent } from './state-step.component';
@@ -16,25 +15,23 @@ import { StateStepComponent } from './state-step.component';
     selector: 'sqx-state-details',
     styleUrls: ['./state-details.component.scss'],
     templateUrl: './state-details.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
         HistoryStepComponent,
         StateStepComponent,
         TranslatePipe,
     ],
 })
 export class StateDetailsComponent {
-    @Input({ required: true })
-    public availableSteps: Record<string, RuleElementDto> = {};
+    /** The available steps by type, to resolve the metadata of each step. */
+    public readonly availableSteps = input.required<Record<string, RuleElementDto>>();
 
-    @Input({ required: true })
-    public branchItems: BranchItem[] = [];
+    /** The flattened steps of the flow to show the state for. */
+    public readonly branchItems = input.required<BranchItem[]>();
 
-    @Input({ required: true })
-    public state!: FlowExecutionStateDto;
+    /** The execution state of the flow. */
+    public readonly state = input.required<FlowExecutionStateDto>();
 
-    @Input({ transform: booleanAttribute })
-    public showEvent = true;
+    /** Shows the event that triggered the flow. */
+    public readonly showEvent = input(true, { transform: booleanAttribute });
 }

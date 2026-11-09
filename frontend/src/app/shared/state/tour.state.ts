@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext } from '@angular/core';
-import { filter, skip, take } from 'rxjs';
+import { computed, effect, EnvironmentInjector, inject, runInInjectionContext, Service, untracked } from '@angular/core';
 import { debug, State, TourService, UIOptions } from '@app/framework';
-import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
+import { TASK_CONFIGURATION, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
 
 export interface TaskSnapshot extends TaskDefinition {
@@ -30,44 +29,46 @@ interface Snapshot {
     status?: 'Ready' | 'Started' | 'Completed';
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TourState extends State<Snapshot> {
+    private readonly definition = inject(TASK_CONFIGURATION);
+    private readonly tourService = inject(TourService);
+    private readonly uiState = inject(UIState);
+    private readonly uiOptions = inject(UIOptions);
     private readonly injector = inject(EnvironmentInjector);
-    private readonly isDisabled = inject(UIOptions).value.hideOnboarding;
+    private readonly isDisabled = this.uiOptions.value.hideOnboarding;
 
-    public completedTasks =
+    public readonly completedTasks =
         this.project(x => x.completedTasks);
 
-    public status =
+    public readonly status =
         this.project(x => x.status);
 
-    public tasks =
-        this.projectFrom(this.completedTasks, x => createTasks(this.definition.tasks, x));
+    public readonly tasks =
+        computed(() => createTasks(this.definition.tasks, this.completedTasks()));
 
-    public pendingTasks =
-        this.projectFrom(this.tasks, x => x.filter(t => !t.isCompleted).length);
+    public readonly pendingTasks =
+        computed(() => this.tasks().filter(t => !t.isCompleted).length);
 
-    constructor(
-        @Inject(TASK_CONFIGURATION) private readonly definition: TaskConfiguration,
-        private readonly tourService: TourService,
-        private readonly uiState: UIState,
-    ) {
+    constructor() {
         super({});
 
         debug(this, 'tour');
 
-        this.changes.pipe(skip(1), filter(c => c.event !== LoadedEvent))
-            .subscribe(change => {
-                this.uiState.setCommon('tour', change.snapshot);
-            });
+        effect(() => {
+            const change = this.lastChange();
+            if (change.event === 'Initial' || change.event === LoadedEvent) {
+                return;
+            }
 
-        this.uiState.getCommon('tour', {} as Snapshot).pipe(take(1))
+            untracked(() => this.uiState.setCommon('tour', change.snapshot));
+        });
+
+        this.uiState.waitForCommon('tour', {} as Snapshot)
             .subscribe(change => {
                 this.next({ ...change, status: change.status || 'Ready' }, LoadedEvent);
 
-                for (const tasks of definition.tasks) {
+                for (const tasks of this.definition.tasks) {
                     runInInjectionContext(this.injector, tasks.onComplete).subscribe(() => {
                         this.next(state => ({
                             ...state,

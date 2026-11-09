@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { computed, Signal } from '@angular/core';
 import { compareStrings, Types } from '@app/framework';
 import { deserializeQuery, equalsQuery, Query } from '../services/query';
 import { UIState } from './ui.state';
@@ -29,11 +28,11 @@ const OLDEST_FIRST: Query = {
 };
 
 export class Queries {
-    public queries: Observable<ReadonlyArray<SavedQuery>>;
-    public queriesShared: Observable<ReadonlyArray<SavedQuery>>;
-    public queriesUser: Observable<ReadonlyArray<SavedQuery>>;
+    public readonly queries: Signal<ReadonlyArray<SavedQuery>>;
+    public readonly queriesShared: Signal<ReadonlyArray<SavedQuery>>;
+    public readonly queriesUser: Signal<ReadonlyArray<SavedQuery>>;
 
-    public defaultQueries: ReadonlyArray<SavedQuery> = [
+    public readonly defaultQueries: ReadonlyArray<SavedQuery> = [
         { name: 'i18n:search.queryAllNewestFirst' },
         { name: 'i18n:search.queryAllOldestFirst', query: OLDEST_FIRST },
     ];
@@ -44,14 +43,9 @@ export class Queries {
     ) {
         const path = `${prefix}.queries`;
 
-        this.queries = this.uiState.get(path, {}).pipe(
-            map(parseQueries), shareReplay(1));
-
-        this.queriesShared = this.uiState.getAppShared(path, {}).pipe(
-            map(parseQueries), shareReplay(1));
-
-        this.queriesUser = this.uiState.getAppUser(path, {}).pipe(
-            map(parseQueries), shareReplay(1));
+        this.queries = parseQueriesFrom(this.uiState.get(path, {}));
+        this.queriesShared = parseQueriesFrom(this.uiState.getAppShared(path, {}));
+        this.queriesUser = parseQueriesFrom(this.uiState.getAppUser(path, {}));
     }
 
     public addUser(key: string, query: Query) {
@@ -86,18 +80,21 @@ export class Queries {
         return `${this.prefix}.queries.${key}`;
     }
 
-    public getSaveKey(query: Query): Observable<string | undefined> {
-        return this.queries.pipe(
-            map(queries => {
-                for (const saved of queries) {
-                    if (equalsQuery(saved.query, query)) {
-                        return saved.name;
-                    }
-                }
+    public getSaveKey(query: Query): string | undefined {
+        for (const saved of this.queries()) {
+            if (equalsQuery(saved.query, query)) {
+                return saved.name;
+            }
+        }
 
-                return undefined;
-            }));
+        return undefined;
     }
+}
+
+function parseQueriesFrom(settings: Signal<{}>) {
+    return computed(() => {
+        return parseQueries(settings());
+    });
 }
 
 function parseQueries(settings: {}) {

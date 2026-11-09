@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { compareStrings, debug, DialogService, LoadingState, Mutable, shareSubscribed, State, VersionTag } from '@app/framework';
@@ -27,23 +27,25 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class WorkflowsState extends State<Snapshot> {
-    public workflows =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly workflowsService = inject(WorkflowsService);
+
+    public readonly workflows =
         this.project(x => x.workflows);
 
-    public errors =
+    public readonly errors =
         this.project(x => x.errors);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {
@@ -54,11 +56,7 @@ export class WorkflowsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly workflowsService: WorkflowsService,
-    ) {
+    constructor() {
         super({ errors: [], workflows: [], version: VersionTag.EMPTY });
 
         debug(this, 'workflows');

@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, PlanChangedDto, PlanDto, PlansDto, PlansService, PlansState, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, DialogService, PlanChangedDto, PlanDto, PlansDto, PlansService, PlansState, versioned } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 describe('PlansState', () => {
@@ -55,7 +56,11 @@ describe('PlansState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         plansService = Mock.ofType<PlansService>();
-        plansState = new PlansState(appsState.object, dialogs.object, plansService.object);
+        plansState = createService(PlansState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: PlansService, useValue: plansService.object },
+        ]);
     });
 
     afterEach(() => {

@@ -6,9 +6,8 @@
  */
 
 
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, TypedSimpleChanges, WorkflowStepValues, WorkflowStepView, WorkflowTransitionView, WorkflowView } from '@app/shared';
+import { booleanAttribute, Component, computed, input, linkedSignal, output } from '@angular/core';
+import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, WorkflowStepValues, WorkflowStepView, WorkflowView } from '@app/shared';
 import { WorkflowTransitionComponent } from './workflow-transition.component';
 
 @Component({
@@ -19,91 +18,84 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
         ColorPickerComponent,
         DropdownComponent,
         EditableTitleComponent,
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
         WorkflowTransitionComponent,
     ],
 })
 export class WorkflowStepComponent {
-    public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
+    /** Emits the updated workflow when the step or one of its transitions is changed. */
+    public readonly update = output<WorkflowView>();
 
-    @Output()
-    public update = new EventEmitter<WorkflowView>();
+    /** The workflow the step belongs to. */
+    public readonly workflow = input.required<WorkflowView>();
 
-    @Input({ required: true })
-    public workflow!: WorkflowView;
+    /** The step to show and edit. */
+    public readonly step = input.required<WorkflowStepView>();
 
-    @Input({ required: true })
-    public step!: WorkflowStepView;
+    /** The roles that can be selected for the step and its transitions. */
+    public readonly roles = input.required<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<string>;
+    /** Prevents the step from being changed. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disabled?: boolean | null;
+    protected readonly openStep = linkedSignal(() => this.openSteps()[0]);
 
-    public openSteps!: ReadonlyArray<WorkflowStepView>;
-    public openStep!: WorkflowStepView;
+    protected readonly openSteps = computed(() => {
+        return this.workflow().getOpenSteps(this.step());
+    });
 
-    public transitions!: ReadonlyArray<WorkflowTransitionView>;
+    protected readonly transitions = computed(() => {
+        return this.workflow().getTransitions(this.step());
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.workflow || changes.step) {
-            this.openSteps = this.workflow.getOpenSteps(this.step);
-            this.openStep = this.openSteps[0];
-
-            this.transitions = this.workflow.getTransitions(this.step);
-        }
-    }
-
-    public changeColor(color: string) {
+    protected changeColor(color: string) {
         this.change({ color });
     }
 
-    public changeValidate(validate: boolean) {
+    protected changeValidate(validate: boolean) {
         this.change({ validate });
     }
 
-    public changeNoUpdate(noUpdate: boolean) {
+    protected changeNoUpdate(noUpdate: boolean) {
         this.change({ noUpdate });
     }
 
-    public changeNoUpdateExpression(noUpdateExpression?: string) {
+    protected changeNoUpdateExpression(noUpdateExpression?: string) {
         this.change({ noUpdateExpression });
     }
 
-    public changeNoUpdateRoles(noUpdateRoles?: string[]) {
+    protected changeNoUpdateRoles(noUpdateRoles?: string[]) {
         this.change({ noUpdateRoles });
     }
 
-    public addTransition(to: string) {
-        const { name } = this.step;
-        this.update.emit(this.workflow.setTransition(name, to));
+    protected addTransition(to: string) {
+        const { name } = this.step();
+        this.update.emit(this.workflow().setTransition(name, to));
     }
 
-    public remove() {
-        const { name } = this.step;
-        this.update.emit(this.workflow.removeStep(name));
+    protected remove() {
+        const { name } = this.step();
+        this.update.emit(this.workflow().removeStep(name));
     }
 
-    public removeTransition(to: string) {
-        const { name } = this.step;
-        this.update.emit(this.workflow.removeTransition(name, to));
+    protected removeTransition(to: string) {
+        const { name } = this.step();
+        this.update.emit(this.workflow().removeTransition(name, to));
     }
 
-    public makeInitial() {
-        const { name } = this.step;
-        this.update.emit(this.workflow.setInitial(name));
+    protected makeInitial() {
+        const { name } = this.step();
+        this.update.emit(this.workflow().setInitial(name));
     }
 
-    public changeName(newName: string) {
-        const { name } = this.step;
-        this.update.emit(this.workflow.renameStep(name, newName));
+    protected changeName(newName: string) {
+        const { name } = this.step();
+        this.update.emit(this.workflow().renameStep(name, newName));
     }
 
     private change(changes: Partial<WorkflowStepValues>) {
-        const { name } = this.step;
-        this.update.emit(this.workflow.setStep(name, changes));
+        const { name } = this.step();
+        this.update.emit(this.workflow().setStep(name, changes));
     }
 }

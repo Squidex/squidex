@@ -1,6 +1,6 @@
-<sqx-form-error bubble="true" closeable="true" [error]="contentError" />
+<sqx-form-error bubble="true" closeable="true" [error]="contentError()" />
 <div class="inner-menu">
-    @if (mode | async; as currentMode) {
+    @if (mode(); as currentMode) {
         <ul class="nav nav-tabs2">
             <li class="nav-item">
                 <button class="nav-link" [class.active]="currentMode === 'Content'" (click)="setMode('Content')" type="button">
@@ -24,5 +24,5 @@
 </div>
 
 <div class="inner-main">
-    <sqx-code-editor borderless="true" [ngModel]="actualData | async" (ngModelChange)="setData($event)" valueMode="Json" />
+    <sqx-code-editor borderless="true" [value]="actualData.value()" (valueChange)="setData($event)" valueMode="Json" />
 </div>

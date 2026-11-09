@@ -1,13 +1,13 @@
 <div #container (sqxResized)="updateContainerWidth($event.width)">
-    @for (value of tagValues; track value.id) {
-        <div class="form-check" [class.form-check-block]="!snapshot.isSingleline" [class.form-check-inline]="snapshot.isSingleline">
+    @for (value of tagValues(); track value.id) {
+        <div class="form-check" [class.form-check-block]="!isSingleline()" [class.form-check-inline]="isSingleline()">
             <input
                 class="form-check-input"
                 id="{{ controlId }}_{{ value }}"
-                (blur)="callTouched()"
+                (blur)="markTouched()"
                 (change)="check($any($event.target!)['checked']!, value)"
-                [checked]="isChecked(value)"
-                [disabled]="snapshot.isDisabled"
+                [checked]="checkedValues().includes(value)"
+                [disabled]="disabled()"
                 type="checkbox" />
             <label class="form-check-label" for="{{ controlId }}_{{ value }}">{{ value.name }}</label>
         </div>

@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { CreateIndexDto, DialogService, IndexesService, IndexesState, IndexFieldDto, SchemasState } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, CreateIndexDto, DialogService, IndexesService, IndexesState, IndexFieldDto, SchemasState } from '@app/shared/internal';
 import { createIndex } from '../services/indexes.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -30,7 +31,12 @@ describe('IndexesState', () => {
         schemasState.setup(x => x.schemaName).returns(() => schema);
 
         indexesService = Mock.ofType<IndexesService>();
-        indexesState = new IndexesState(appsState.object, schemasState.object, indexesService.object, dialogs.object);
+        indexesState = createService(IndexesState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: SchemasState, useValue: schemasState.object },
+            { provide: IndexesService, useValue: indexesService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {

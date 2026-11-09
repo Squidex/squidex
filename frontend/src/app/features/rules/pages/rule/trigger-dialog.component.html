@@ -1,4 +1,6 @@
-<form [formGroup]="currentTrigger?.form!" (ngSubmit)="save()">
+@let currentTrigger = this.currentTrigger();
+@let trigger = this.trigger();
+<form (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
         <ng-container title>
             @if (!trigger) {
@@ -9,7 +11,7 @@
         </ng-container>
         <ng-container content>
             @if (currentTrigger) {
-                <sqx-form-error [error]="currentTrigger.error | async" />
+                <sqx-form-error [error]="currentTrigger.error()" />
 
                 @switch (currentTrigger.triggerType) {
                     @case ("AssetChanged") {
@@ -21,10 +23,7 @@
                     }
 
                     @case ("ContentChanged") {
-                        <sqx-content-changed-trigger
-                            [schemas]="schemasState.schemas | async"
-                            [triggerDto]="currentTrigger.form.value"
-                            [triggerForm]="currentTrigger" />
+                        <sqx-content-changed-trigger [schemas]="schemasState.schemas()" [triggerForm]="currentTrigger" />
                     }
 
                     @case ("CronJob") {
@@ -41,7 +40,7 @@
                 }
             } @else {
                 <div class="row g-0">
-                    @for (availableTrigger of availableTriggers | sqxEntries: "title"; track availableTrigger.key) {
+                    @for (availableTrigger of availableTriggers() | sqxEntries: "title"; track availableTrigger.key) {
                         <div class="col-12 col-md-6">
                             <div class="rule-element" (click)="selectTrigger(availableTrigger.key)">
                                 <sqx-rule-element

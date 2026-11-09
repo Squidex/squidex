@@ -5,20 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Router, RoutesRecognized } from '@angular/router';
 import { filter, pairwise } from 'rxjs/operators';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class PreviousUrl {
+    private readonly router = inject(Router);
     private previousPath = '';
 
-    constructor(
-        private readonly router: Router,
-    ) {
-        this.previousPath = router.url;
+    constructor() {
+        this.previousPath = this.router.url;
 
         this.router.events
             .pipe(filter(e => e instanceof RoutesRecognized), pairwise())

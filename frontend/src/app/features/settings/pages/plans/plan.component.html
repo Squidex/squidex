@@ -1,38 +1,39 @@
-<div class="card plan" [class.border-primary]="planInfo.isSelected || planInfo.isYearlySelected">
+@let plan = planInfo().plan;
+<div class="card plan" [class.border-primary]="planInfo().isSelected || planInfo().isYearlySelected">
     <div class="card-header text-center">
-        <h4 class="card-title">{{ planInfo.plan.name }}</h4>
+        <h4 class="card-title">{{ plan.name }}</h4>
 
-        <h5 class="plan-price">{{ planInfo.plan.costs }}</h5>
+        <h5 class="plan-price">{{ plan.costs }}</h5>
         <sqx-form-hint> {{ "plans.perMonth" | sqxTranslate }}</sqx-form-hint>
     </div>
 
     <div class="card-body">
         <div class="plan-fact text-center">
             <div>
-                <strong>{{ planInfo.plan.maxApiCalls | sqxKNumber }}</strong> {{ "plans.includedCalls" | sqxTranslate }}
+                <strong>{{ plan.maxApiCalls | sqxKNumber }}</strong> {{ "plans.includedCalls" | sqxTranslate }}
             </div>
 
             <div>
-                <strong>{{ planInfo.plan.maxApiBytes | sqxFileSize }}</strong> {{ "plans.includedTraffic" | sqxTranslate }}
+                <strong>{{ plan.maxApiBytes | sqxFileSize }}</strong> {{ "plans.includedTraffic" | sqxTranslate }}
             </div>
 
-            <div>{{ planInfo.plan.maxAssetSize | sqxFileSize }} {{ "plans.includedStorage" | sqxTranslate }}</div>
+            <div>{{ plan.maxAssetSize | sqxFileSize }} {{ "plans.includedStorage" | sqxTranslate }}</div>
 
-            <div>{{ planInfo.plan.maxContributors }} {{ "plans.includedContributors" | sqxTranslate }}</div>
+            <div>{{ plan.maxContributors }} {{ "plans.includedContributors" | sqxTranslate }}</div>
         </div>
 
-        @if (planInfo.isSelected) {
+        @if (planInfo().isSelected) {
             <button class="btn btn-block btn-text-success plan-selected" type="button">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
         }
 
-        @if (!planInfo.isSelected) {
+        @if (!planInfo().isSelected) {
             <button
                 class="btn btn-block btn-success"
                 confirmRememberKey="changePlan"
-                [confirmRequired]="!!planInfo.plan.confirmText"
-                [confirmText]="planInfo.plan.confirmText"
+                [confirmRequired]="!!plan.confirmText"
+                [confirmText]="plan.confirmText"
                 confirmTitle="i18n:plans.changeConfirmTitle"
-                [disabled]="(plansState.locked | async) !== 'None'"
+                [disabled]="plansState.locked() !== 'None'"
                 (sqxConfirmClick)="changeMonthly()"
                 type="button">
                 {{ "plans.change" | sqxTranslate }}
@@ -40,24 +41,24 @@
         }
     </div>
 
-    @if (planInfo.plan.yearlyId) {
+    @if (plan.yearlyId) {
         <div class="card-footer">
             <div class="text-center">
-                <h5 class="plan-price">{{ planInfo.plan.yearlyCosts }}</h5>
+                <h5 class="plan-price">{{ plan.yearlyCosts }}</h5>
                 <sqx-form-hint> {{ "plans.perYear" | sqxTranslate }}</sqx-form-hint>
             </div>
 
-            @if (planInfo.isYearlySelected) {
+            @if (planInfo().isYearlySelected) {
                 <button class="btn btn-block btn-text-success plan-selected" type="button">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
             }
 
-            @if (!planInfo.isYearlySelected) {
+            @if (!planInfo().isYearlySelected) {
                 <button
                     class="btn btn-block btn-success"
-                    [confirmRequired]="!!planInfo.plan.yearlyConfirmText"
-                    [confirmText]="planInfo.plan.yearlyConfirmText!"
+                    [confirmRequired]="!!plan.yearlyConfirmText"
+                    [confirmText]="plan.yearlyConfirmText!"
                     confirmTitle="i18n:plans.changeConfirmTitle"
-                    [disabled]="(plansState.locked | async) !== 'None'"
+                    [disabled]="plansState.locked() !== 'None'"
                     (sqxConfirmClick)="changeYearly()"
                     type="button">
                     {{ "plans.change" | sqxTranslate }}

@@ -5,42 +5,39 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FromNowPipe, ScriptLogDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { Component, computed, input, signal } from '@angular/core';
+import { FromNowPipe, ScriptLogDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-script-log',
     styleUrls: ['./script-log.component.scss'],
     templateUrl: './script-log.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FromNowPipe,
         TranslatePipe,
     ],
 })
 export class ScriptLogComponent {
-    @Input({ required: true })
-    public scriptLog!: ScriptLogDto;
+    /** The script log to show, including its log entries. */
+    public readonly scriptLog = input.required<ScriptLogDto>();
 
-    public lines: ReadonlyArray<{ time: string; level: string; message: string }> = [];
+    protected readonly isExpanded = signal(false);
 
-    public omitted = 0;
+    protected readonly lines = computed(() => {
+        return this.scriptLog().entries.map(x => ({
+            time: x.timestamp?.toStringFormat('yyyy-MM-dd HH:mm:ss.SSS') ?? '',
+            level: x.level,
+            message: x.message,
+        }));
+    });
 
-    public isExpanded = false;
+    protected readonly omitted = computed(() => {
+        const scriptLog = this.scriptLog();
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.scriptLog) {
-            this.lines = this.scriptLog.entries.map(x => ({
-                time: x.timestamp?.toStringFormat('yyyy-MM-dd HH:mm:ss.SSS') ?? '',
-                level: x.level,
-                message: x.message,
-            }));
+        return Math.max(0, scriptLog.totalEntries - scriptLog.entries.length);
+    });
 
-            this.omitted = Math.max(0, this.scriptLog.totalEntries - this.scriptLog.entries.length);
-        }
-    }
-
-    public toggleExpanded() {
-        this.isExpanded = !this.isExpanded;
+    protected toggleExpanded() {
+        this.isExpanded.update(x => !x);
     }
 }

@@ -1,41 +1,42 @@
-<div class="card card-href card-app" [routerLink]="['/app', app.name]">
+@let appDto = app();
+<div class="card card-href card-app" [routerLink]="['/app', appDto.name]">
     <div class="card-body" sqxTourStep="app">
         <div class="row g-4">
-            <div class="col-auto card-left"><sqx-avatar [identifier]="app.name" [image]="app.image" /></div>
+            <div class="col-auto card-left"><sqx-avatar [identifier]="appDto.name" [image]="appDto.image" /></div>
 
             <div class="col card-right">
-                <h3 class="card-title mb-1">{{ app.displayName }}</h3>
+                <h3 class="card-title mb-1">{{ appDto.displayName }}</h3>
 
                 <div class="card-text card-links truncate d-flex gap-2">
-                    <a [routerLink]="['/app', app.name]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
-                    @if (canShowContents || canShowAssets || canShowSettings) {
+                    <a [routerLink]="['/app', appDto.name]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
+                    @if (canShowContents() || canShowAssets() || canShowSettings()) {
                         <span class="deeplinks gap-2">
                             |
-                            @if (canShowContents) {
-                                <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ "common.content" | sqxTranslate }}</a>
+                            @if (canShowContents()) {
+                                <a [routerLink]="['/app', appDto.name, 'content']" sqxStopClick>{{ "common.content" | sqxTranslate }}</a>
                                 <span class="separator">&middot;</span>
                             }
 
-                            @if (canShowAssets) {
-                                <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ "common.assets" | sqxTranslate }}</a>
+                            @if (canShowAssets()) {
+                                <a [routerLink]="['/app', appDto.name, 'assets']" sqxStopClick>{{ "common.assets" | sqxTranslate }}</a>
                                 <span class="separator">&middot;</span>
                             }
 
-                            @if (canShowSettings) {
-                                <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ "common.settings" | sqxTranslate }}</a>
+                            @if (canShowSettings()) {
+                                <a [routerLink]="['/app', appDto.name, 'settings']" sqxStopClick>{{ "common.settings" | sqxTranslate }}</a>
                                 <span class="separator">&middot;</span>
                             }
                         </span>
                     }
                 </div>
 
-                @if (app.description) {
-                    <div class="card-text">{{ app.description }}</div>
+                @if (appDto.description) {
+                    <div class="card-text">{{ appDto.description }}</div>
                 }
             </div>
         </div>
 
-        @if (app.canLeave) {
+        @if (appDto.canLeave) {
             <button
                 class="btn btn-sm btn-text-secondary"
                 #buttonOptions
@@ -51,7 +52,7 @@
                     confirmRememberKey="leaveApp"
                     confirmText="i18n:apps.leaveConfirmText"
                     confirmTitle="i18n:apps.leaveConfirmTitle"
-                    (sqxConfirmClick)="leave.emit(app)"
+                    (sqxConfirmClick)="leave.emit(appDto)"
                     type="button">
                     {{ "apps.leave" | sqxTranslate }}
                 </button>

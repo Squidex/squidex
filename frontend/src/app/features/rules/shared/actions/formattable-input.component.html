@@ -1,10 +1,20 @@
-@if (type === "Text") {
+@let mode = this.mode();
+@let isDisabled = disabled();
+@if (type() === "Text") {
     <div class="input-group">
-        <sqx-code-editor [completion]="editorCompletion" [mode]="editorMode" singleLine="true" [snippets]="mode === 'Script'" />
+        <sqx-code-editor
+            [completion]="editorCompletion()"
+            [disabled]="isDisabled"
+            [mode]="editorMode()"
+            singleLine="true"
+            [snippets]="mode === 'Script'"
+            (touch)="markTouched()"
+            [value]="text()"
+            (valueChange)="setText($event)" />
         <div class="input-group-apppend">
-            <select class="form-select" [disabled]="disabled" [ngModel]="mode" (ngModelChange)="setMode($event)" tabindex="-1">
+            <select class="form-select" (change)="setMode($any($event.target).value)" [disabled]="isDisabled" tabindex="-1">
                 @for (supportedMode of modes; track supportedMode) {
-                    <option [ngValue]="supportedMode">{{ supportedMode }}</option>
+                    <option [selected]="supportedMode === mode" [value]="supportedMode">{{ supportedMode }}</option>
                 }
             </select>
         </div>
@@ -17,5 +27,13 @@
             </button>
         }
     </div>
-    <sqx-code-editor [completion]="editorCompletion" [height]="350" [mode]="editorMode" [snippets]="mode === 'Script'" />
+    <sqx-code-editor
+        [completion]="editorCompletion()"
+        [disabled]="isDisabled"
+        [height]="350"
+        [mode]="editorMode()"
+        [snippets]="mode === 'Script'"
+        (touch)="markTouched()"
+        [value]="text()"
+        (valueChange)="setText($event)" />
 }

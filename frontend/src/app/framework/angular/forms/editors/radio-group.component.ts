@@ -5,133 +5,90 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { AfterViewChecked, AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
+import { booleanAttribute, Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
+import { getTagValues, MathHelper, TagValue, TextMeasurer } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
-
-export const SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroupComponent), multi: true,
-};
-
-interface State {
-    // True when all checkboxes can be shown as single line.
-    isSingleline?: boolean;
-}
+import { FormValueControlBase } from '../form-value-control';
 
 @Component({
     selector: 'sqx-radio-group',
     styleUrls: ['./radio-group.component.scss'],
     templateUrl: './radio-group.component.html',
-    providers: [
-        SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
         ResizedDirective,
     ],
 })
-export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked {
-    private readonly textMeasurer: TextMeasurer;
-    private childrenWidth = 0;
-    private containerWidth = 0;
-    private labelsMeasured = false;
+export class RadioGroupComponent extends FormValueControlBase<any> {
+    private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
 
-    public readonly controlId = MathHelper.guid();
+    /** The value of the selected option. */
+    public readonly value = model<any>(null);
 
-    @ViewChild('container', { static: false })
-    public containerElement!: ElementRef<HTMLDivElement>;
+    /** Renders the options in a single line, in multiple lines or depending on the available space. */
+    public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');
 
-    @Input()
-    public layout: 'Auto' | 'Singleline' | 'Multiline' = 'Auto';
+    /** Keeps the order of the values instead of sorting them by name. */
+    public readonly unsorted = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public unsorted = true;
+    /** The values to choose from. */
+    public readonly values = input<ReadonlyArray<string | number | TagValue>>([]);
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    protected readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
 
-    @Input()
-    public set values(value: ReadonlyArray<string | TagValue>) {
-        this.tagValuesUnsorted = getTagValues(value, false);
-        this.tagValuesSorted = this.tagValuesUnsorted.sortedByString(x => x.lowerCaseName);
-    }
+    protected readonly containerWidth = signal(0);
 
-    public get tagValues() {
-        return !this.unsorted ? this.tagValuesSorted : this.tagValuesUnsorted;
-    }
+    protected readonly tagValuesUnsorted = computed(() => {
+        return getTagValues(this.values(), false);
+    });
 
-    public tagValuesSorted: ReadonlyArray<TagValue> = [];
-    public tagValuesUnsorted: ReadonlyArray<TagValue> = [];
+    protected readonly tagValuesSorted = computed(() => {
+        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
+    });
 
-    public valueModel: any;
-
-    constructor() {
-        super({});
-
-        this.textMeasurer = new TextMeasurer(() => this.containerElement);
-    }
-
-    public ngAfterViewInit() {
-        this.calculateWidth();
-    }
-
-    public ngAfterViewChecked() {
-        this.calculateWidth();
-    }
-
-    public ngOnChanges() {
-        this.labelsMeasured = false;
-
-        this.calculateWidth();
-    }
-
-    public updateContainerWidth(width: number) {
-        this.containerWidth = width;
-
-        this.calculateSingleLine();
-    }
-
-    private calculateWidth() {
-        if (this.labelsMeasured) {
-            this.calculateSingleLine();
-            return;
+    protected readonly tagValuesWidth = computed(() => {
+        // The font can only be read from a rendered element, which is the case when the container has a size.
+        if (this.containerWidth() === 0) {
+            return -1;
         }
 
         let width = 0;
-
-        for (const value of this.tagValuesUnsorted) {
+        for (const value of this.tagValuesUnsorted()) {
             width += 40;
             width += this.textMeasurer.getTextSize(value.name);
         }
 
+        return width;
+    });
+
+    protected readonly tagValues = computed(() => {
+        return this.unsorted() ? this.tagValuesUnsorted() : this.tagValuesSorted();
+    });
+
+    protected readonly isSingleline = computed(() => {
+        const layout = this.layout();
+        if (layout !== 'Auto') {
+            return layout === 'Singleline';
+        }
+
+        const width = this.tagValuesWidth();
         if (width < 0) {
+            return false;
+        }
+
+        return width < this.containerWidth();
+    });
+
+    protected readonly controlId = MathHelper.guid();
+
+    protected updateContainerWidth(width: number) {
+        this.containerWidth.set(width);
+    }
+
+    protected select(value: TagValue) {
+        if (this.disabled()) {
             return;
         }
 
-        this.childrenWidth = width;
-        this.calculateSingleLine();
-
-        this.labelsMeasured = true;
-    }
-
-    private calculateSingleLine() {
-        let isSingleline = false;
-
-        if (this.layout !== 'Auto') {
-            isSingleline = this.layout === 'Singleline';
-        } else {
-            isSingleline = this.childrenWidth < this.containerWidth;
-        }
-
-        this.next({ isSingleline });
-    }
-
-    public writeValue(obj: any) {
-        this.valueModel = obj;
+        this.value.set(value.value);
     }
 }

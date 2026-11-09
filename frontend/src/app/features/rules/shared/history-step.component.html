@@ -1,13 +1,17 @@
-<div class="step row g-0" [class.last]="isLast" [class.small-step]="small">
+@let isExpanded = this.isExpanded();
+@let isExpandable = this.isExpandable();
+@let elementInfo = this.elementInfo();
+@let elementType = this.elementType();
+<div class="step row g-0" [class.last]="isLast()" [class.small-step]="small()">
     <div class="col col-icon icon">
-        @if (isActive) {
+        @if (isActive()) {
             <i class="icon-caret-right active-icon"></i>
         }
 
         @if (elementInfo && elementType) {
             <sqx-rule-element [elementInfo]="elementInfo" [elementType]="elementType" showDescription="false" showName="false" showRemove="false" size="sm" />
         } @else {
-            <div class="circle" [class.sm]="small"></div>
+            <div class="circle" [class.sm]="small()"></div>
         }
     </div>
 

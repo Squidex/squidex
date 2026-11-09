@@ -7,7 +7,7 @@
 
 /* eslint-disable object-curly-newline */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
@@ -25,33 +25,33 @@ interface Snapshot extends ListState<string> {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class UsersState extends State<Snapshot> {
-    public users =
+    private readonly dialogs = inject(DialogService);
+    private readonly usersService = inject(UsersService);
+
+    public readonly users =
         this.project(x => x.users);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.users.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public selectedUser =
+    public readonly selectedUser =
         this.project(x => x.selectedUser);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly usersService: UsersService,
-    ) {
+    constructor() {
         super({
             users: [],
             page: 0,

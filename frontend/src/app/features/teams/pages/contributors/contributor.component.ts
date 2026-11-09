@@ -7,15 +7,14 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AssignContributorDto, ConfirmClickDirective, ContributorDto, HighlightPipe, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
+import { Component, inject, input } from '@angular/core';
+import { ConfirmClickDirective, ContributorDto, HighlightPipe, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 import { TeamContributorsState } from '../../internal';
 
 @Component({
     selector: '[sqxContributor]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         HighlightPipe,
@@ -25,24 +24,15 @@ import { TeamContributorsState } from '../../internal';
     ],
 })
 export class ContributorComponent {
-    @Input()
-    public search?: string | RegExp | null;
+    private readonly contributorsState = inject(TeamContributorsState);
 
-    @Input('sqxContributor')
-    public contributor!: ContributorDto;
+    /** The search term to highlight in the name of the contributor. */
+    public readonly search = input<string | RegExp | null>();
 
-    constructor(
-        private readonly contributorsState: TeamContributorsState,
-    ) {
-    }
+    /** The contributor to show. */
+    public readonly contributor = input.required<ContributorDto>({ alias: 'sqxContributor' });
 
-    public remove() {
-        this.contributorsState.revoke(this.contributor);
-    }
-
-    public changeRole(role: string) {
-        const request = new AssignContributorDto({ contributorId: this.contributor.contributorId, role });
-
-        this.contributorsState.assign(request);
+    protected remove() {
+        this.contributorsState.revoke(this.contributor());
     }
 }

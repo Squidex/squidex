@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { booleanAttribute, Component, computed, inject, input, signal, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AutocompleteComponent, Keys, MessageBus, Subscriptions, TranslatePipe } from '@app/framework';
+import { AutocompleteComponent, Keys, MessageBus, TranslatePipe } from '@app/framework';
 import { AnnotationCreateAfterNavigate, AnnotationsSelectedAfterNavigate, AuthService, CommentsState, ContentDto, FieldSelected, UpsertCommentForm } from '@app/shared/internal';
 import { UserPicturePipe } from '../pipes';
 import { CommentComponent } from './comment.component';
@@ -23,109 +23,96 @@ import { ContributorsDataSource } from './data-source';
         ContributorsDataSource,
     ],
     imports: [
-        AsyncPipe,
         AutocompleteComponent,
         CommentComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
         UserPicturePipe,
     ],
 })
-export class CommentsComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
-    private selection: ReadonlyArray<string> = [];
+export class CommentsComponent {
+    private readonly authService = inject(AuthService);
+    private readonly messageBus = inject(MessageBus);
 
-    @ViewChild('input', { static: false })
-    public input!: AutocompleteComponent;
+    protected readonly commentsState = inject(CommentsState);
 
-    @Input({ transform: booleanAttribute })
-    public resolved = false;
+    protected readonly router = inject(Router);
 
-    @Input()
-    public content?: ContentDto | null;
+    protected readonly contributorsDataSource = inject(ContributorsDataSource);
 
-    @Input()
-    public commentsId = '';
+    /** Shows all comments instead of only the unresolved comments. */
+    public readonly resolved = input(false, { transform: booleanAttribute });
 
-    public commentForm = new UpsertCommentForm();
-    public commentUser: string;
+    /** The content the comments belong to. */
+    public readonly content = input<ContentDto | null>();
 
-    public reference?: AnnotationCreateAfterNavigate;
+    /** The ID of the comments thread. */
+    public readonly commentsId = input<string | null>('');
 
-    public get commentItems() {
-        return this.resolved ?
-            this.commentsState.groupedComments :
-            this.commentsState.groupedUnresolvedComments;
-    }
+    protected readonly input = viewChild<AutocompleteComponent>('input');
 
-    constructor(authService: AuthService,
-        public readonly commentsState: CommentsState,
-        public readonly router: Router,
-        public readonly contributorsDataSource: ContributorsDataSource,
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly messageBus: MessageBus,
-    ) {
-        this.commentUser = authService.user!.token;
-    }
+    protected readonly selection = signal<ReadonlyArray<string>>([]);
 
-    public ngOnInit() {
+    protected readonly reference = signal<AnnotationCreateAfterNavigate | undefined>(undefined);
+
+    protected readonly commentItems = computed(() => {
+        return this.resolved() ?
+            this.commentsState.groupedComments() :
+            this.commentsState.groupedUnresolvedComments();
+    });
+
+    protected readonly commentForm = new UpsertCommentForm();
+
+    protected readonly commentUser = this.authService.user!.token;
+
+    constructor() {
         this.contributorsDataSource.loadIfNotLoaded();
 
-        this.subscriptions.add(
-            this.messageBus.of(FieldSelected)
-                .subscribe(message => {
-                    for (let content of this.commentsState.items) {
-                        if (content.editorId === message.editorId) {
-                            this.selection = [content.id!];
-                        }
-                    }
+        this.messageBus.on(FieldSelected, message => {
+            for (const content of this.commentsState.items()) {
+                if (content.editorId === message.editorId) {
+                    this.selection.set([content.id!]);
+                }
+            }
+        });
 
-                    this.changeDetector.detectChanges();
-                }));
+        this.messageBus.on(AnnotationsSelectedAfterNavigate, message => {
+            this.selection.set(message.commentIds);
+        });
 
-        this.subscriptions.add(
-            this.messageBus.of(AnnotationsSelectedAfterNavigate)
-                .subscribe(message => {
-                    this.selection = message.commentIds;
-                    this.changeDetector.detectChanges();
-                }));
-
-        this.subscriptions.add(
-            this.messageBus.of(AnnotationCreateAfterNavigate)
-                .subscribe(message => {
-                    this.reference = message;
-                    this.input.focus();
-                    this.changeDetector.detectChanges();
-                }));
+        this.messageBus.on(AnnotationCreateAfterNavigate, message => {
+            this.reference.set(message);
+            this.input()?.focus();
+        });
     }
 
-    public comment() {
-        const { text } = this.commentForm.submit() || {};
+    protected comment() {
+        this.commentForm.submit(async ({ text }) => {
+            if (text && text.length > 0) {
+                const reference = this.reference();
 
-        if (text && text.length > 0) {
-            const { from, to } = this.reference?.annotation || {};
+                const { from, to } = reference?.annotation || {};
 
-            this.commentsState.create(this.commentUser, text, this.router.url, { editorId: this.reference?.editorId, from, to });
-        }
-
-        this.commentForm.submitCompleted();
+                this.commentsState.create(this.commentUser, text, this.router.url, { editorId: reference?.editorId, from, to });
+            }
+        }, { resetAfterSubmit: true });
     }
 
-    public onKeyPress(event: KeyboardEvent) {
+    protected onKeyPress(event: KeyboardEvent) {
         if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
             this.comment();
             event.preventDefault();
         }
     }
 
-    public onBlur() {
+    protected onBlur() {
         setTimeout(() => {
-            this.reference = undefined;
+            this.reference.set(undefined);
         }, 100);
     }
 
-    public isSelected(id: string | undefined) {
-        return id && this.selection.includes(id);
+    protected isSelected(id: string | undefined) {
+        return !!id && this.selection().includes(id);
     }
 }

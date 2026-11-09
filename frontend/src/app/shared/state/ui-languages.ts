@@ -7,7 +7,7 @@
 
 type UILanguage = { iso2Code: string; localName: string };
 
-export module UILanguages {
+export namespace UILanguages {
     export const ALL: ReadonlyArray<UILanguage> = [{
         iso2Code: 'en',
         localName: 'English',

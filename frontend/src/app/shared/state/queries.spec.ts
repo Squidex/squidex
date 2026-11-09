@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BehaviorSubject } from 'rxjs';
+import { signal } from '@angular/core';
 import { IMock, Mock, Times } from 'typemoq';
-import { Queries, SavedQuery, UIState } from '@app/shared/internal';
+import { Queries, UIState } from '@app/shared/internal';
 
 describe('Queries', () => {
     const prefix = 'schemas.my-schema';
@@ -19,40 +19,34 @@ describe('Queries', () => {
     beforeEach(() => {
         uiState = Mock.ofType<UIState>();
 
-        const shared$ = new BehaviorSubject({
+        const shared = signal({
             key1: '{ "fullText": "shared1" }',
         });
 
-        const user$ = new BehaviorSubject({
+        const user = signal({
             key1: '{ "fullText": "user1" }',
         });
 
-        const merged$ = new BehaviorSubject({
+        const merged = signal({
             key1: '{ "fullText": "merged1" }',
             key2: 'merged2',
             key3: undefined,
         });
 
         uiState.setup(x => x.get('schemas.my-schema.queries', {}))
-            .returns(() => merged$);
+            .returns(() => merged);
 
         uiState.setup(x => x.getAppShared('schemas.my-schema.queries', {}))
-            .returns(() => shared$);
+            .returns(() => shared);
 
         uiState.setup(x => x.getAppUser('schemas.my-schema.queries', {}))
-            .returns(() => user$);
+            .returns(() => user);
 
         queries = new Queries(uiState.object, prefix);
     });
 
     it('should load merged queries', () => {
-        let converted: ReadonlyArray<SavedQuery>;
-
-        queries.queries.subscribe(x => {
-            converted = x;
-        });
-
-        expect(converted!).toEqual([
+        expect(queries.queries()).toEqual([
             {
                 name: 'key1', query: { fullText: 'merged1' },
             }, {
@@ -64,13 +58,7 @@ describe('Queries', () => {
     });
 
     it('should load shared queries', () => {
-        let converted: ReadonlyArray<SavedQuery>;
-
-        queries.queriesShared.subscribe(x => {
-            converted = x;
-        });
-
-        expect(converted!).toEqual([
+        expect(queries.queriesShared()).toEqual([
             {
                 name: 'key1', query: { fullText: 'shared1' },
             },
@@ -78,13 +66,7 @@ describe('Queries', () => {
     });
 
     it('should load user queries', () => {
-        let converted: ReadonlyArray<SavedQuery>;
-
-        queries.queriesUser.subscribe(x => {
-            converted = x;
-        });
-
-        expect(converted!).toEqual([
+        expect(queries.queriesUser()).toEqual([
             {
                 name: 'key1', query: { fullText: 'user1' },
             },
@@ -92,13 +74,7 @@ describe('Queries', () => {
     });
 
     it('should provide key', () => {
-        let key: string;
-
-        queries.getSaveKey({}).subscribe(x => {
-            key = x!;
-        });
-
-        expect(key!).toEqual('key3');
+        expect(queries.getSaveKey({})).toEqual('key3');
     });
 
     it('should forward add user call to state', () => {

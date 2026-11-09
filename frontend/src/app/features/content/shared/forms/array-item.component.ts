@@ -5,20 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, invalid$, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
+import { booleanAttribute, Component, computed, effect, input, numberAttribute, output, viewChildren } from '@angular/core';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
     selector: 'sqx-array-item',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ComponentSectionComponent,
         FormHintComponent,
         IfOnceDirective,
@@ -27,126 +22,125 @@ import { ComponentSectionComponent } from './component-section.component';
     ],
 })
 export class ArrayItemComponent {
-    @Output()
-    public itemRemove = new EventEmitter();
+    /** Emits when the user removes the item. */
+    public readonly itemRemove = output();
 
-    @Output()
-    public itemMove = new EventEmitter<number>();
+    /** Emits the new index when the user moves the item. */
+    public readonly itemMove = output<number>();
 
-    @Output()
-    public itemExpanded = new EventEmitter<number>();
+    /** Emits when the item has been expanded or collapsed and therefore changed its size. */
+    public readonly itemExpanded = output();
 
-    @Output()
-    public clone = new EventEmitter();
+    /** Emits when the user clones the item. */
+    public readonly clone = output();
 
-    @Input({ required: true })
-    public hasChatBot!: boolean;
+    /** Enables the AI features of the editors. */
+    public readonly hasChatBot = input.required<boolean>();
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** The content form the item belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** The nesting level of the item. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public formModel!: ObjectFormBase;
+    /** The form model of the item. */
+    public readonly formModel = input.required<ObjectFormBase>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isComparing = false;
+    /** Renders the editor next to the editor of another version. */
+    public readonly isComparing = input.required<boolean, unknown>({ transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isCollapsedInitial = false;
+    /** Collapses the item initially, if the user has not expanded or collapsed it before. */
+    public readonly isCollapsedInitial = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isFirst?: boolean | null;
+    /** Disables the buttons to move the item up. */
+    public readonly isFirst = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isLast?: boolean | null;
+    /** Disables the buttons to move the item down. */
+    public readonly isLast = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isDisabled?: boolean | null;
+    /** Disables all buttons of the item. */
+    public readonly isDisabled = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true, transform: numberAttribute })
-    public index!: number;
+    /** The index of the item in the array. */
+    public readonly index = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language of the field values. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @ViewChildren(ComponentSectionComponent)
-    public sections!: QueryList<ComponentSectionComponent>;
+    protected readonly sections = viewChildren(ComponentSectionComponent);
 
-    public isInvalidForm?: Observable<boolean>;
-    public isInvalidComponent?: Observable<boolean>;
+    protected readonly isInvalidForm = computed(() => {
+        return this.formModel().invalid();
+    });
 
-    public title?: Observable<string>;
-
-    public get isCollapsed() {
-        return this.formModel.collapsedChanges;
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formModel) {
-            this.isInvalidForm = invalid$(this.formModel.form);
-
-            if (Types.is(this.formModel, ComponentForm)) {
-                this.isInvalidComponent = this.formModel.schemaChanges.pipe(map(x => !x));
-            } else {
-                this.isInvalidComponent = of(false);
-            }
-
-            this.title = valueProjection$(this.formModel.form, () => getTitle(this.formModel));
+    protected readonly isInvalidComponent = computed(() => {
+        const formModel = this.formModel();
+        if (!Types.is(formModel, ComponentForm)) {
+            return false;
         }
 
-        if (changes.formModel || changes.isCollapsedInitial) {
-            if (this.isCollapsedInitial && this.formModel.collapsed === null) {
+        return !formModel.schema();
+    });
+
+    protected readonly title = computed(() => {
+        return getTitle(this.formModel());
+    });
+
+    protected readonly isCollapsed = computed(() => {
+        return this.formModel().collapsed();
+    });
+
+    constructor() {
+        effect(() => {
+            if (this.isCollapsedInitial() && this.formModel().collapsed() === null) {
                 this.collapse();
             }
-        }
+        });
     }
 
-    public collapse() {
-        this.formModel.collapse();
+    protected collapse() {
+        this.formModel().collapse();
 
         this.itemExpanded.emit();
     }
 
-    public expand() {
-        this.formModel.expand();
+    protected expand() {
+        this.formModel().expand();
 
         this.itemExpanded.emit();
     }
 
-    public moveTop() {
+    protected moveTop() {
         this.itemMove.emit(0);
     }
 
-    public moveUp() {
-        this.itemMove.emit(this.index - 1);
+    protected moveUp() {
+        this.itemMove.emit(this.index() - 1);
     }
 
-    public moveDown() {
-        this.itemMove.emit(this.index + 1);
+    protected moveDown() {
+        this.itemMove.emit(this.index() + 1);
     }
 
-    public moveBottom() {
+    protected moveBottom() {
         this.itemMove.emit(99999);
     }
 
     public reset() {
-        this.sections.forEach(section => {
+        this.sections().forEach(section => {
             section.reset();
         });
     }
 }
 
 function getTitle(formModel: ObjectFormBase) {
-    const value = formModel.form.value;
+    const value = formModel.value();
     const values: string[] = [];
 
     let valueLength = 0;
@@ -170,13 +164,15 @@ function getTitle(formModel: ObjectFormBase) {
         }
     }
 
-    if (Types.is(formModel, ComponentForm) && formModel.schema) {
-        const formatted = formModel.schema.displayName;
+    const schema = Types.is(formModel, ComponentForm) ? formModel.schema() : undefined;
+
+    if (schema) {
+        const formatted = schema.displayName;
 
         values.push(formatted);
         valueLength += formatted.length;
 
-        addFields(formModel.schema.fields);
+        addFields(schema.fields);
     } else if (Types.is(formModel.field, FieldDto) && formModel.field.nested) {
        addFields(formModel.field.nested);
     }

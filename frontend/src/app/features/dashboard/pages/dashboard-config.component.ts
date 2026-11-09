@@ -6,11 +6,9 @@
  */
 
 
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { GridsterItemConfig } from 'angular-gridster2';
-import { take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, UIState } from '@app/shared';
+import { AppDto, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, Types, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-dashboard-config',
@@ -20,7 +18,6 @@ import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirect
         CodeEditorComponent,
         ConfirmClickDirective,
         DropdownMenuComponent,
-        FormsModule,
         ModalDialogComponent,
         ModalDirective,
         ModalPlacementDirective,
@@ -29,99 +26,98 @@ import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirect
     ],
 })
 export class DashboardConfigComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    private readonly dialogs = inject(DialogService);
+    private readonly localizer = inject(LocalizerService);
+    private readonly uiState = inject(UIState);
 
-    @Input({ required: true })
-    public config!: GridsterItemConfig[];
+    /** The app of the dashboard. The stored grid configuration is loaded when it changes. */
+    public readonly app = input.required<AppDto>();
 
-    @Input()
-    public configDefaults!: GridsterItemConfig[];
+    /** The current grid configuration. Selecting or unselecting cards changes it in place. */
+    public readonly config = input.required<GridsterItemConfig[]>();
 
-    @Input()
-    public configAvailable!: GridsterItemConfig[];
+    /** The grid configuration to use when nothing is stored or the user resets it. */
+    public readonly configDefaults = input.required<GridsterItemConfig[]>();
 
-    @Input({ transform: booleanAttribute })
-    public needsAttention?: boolean | null;
+    /** All cards the user can add to the dashboard. */
+    public readonly configAvailable = input.required<GridsterItemConfig[]>();
 
-    @Output()
-    public configChange = new EventEmitter<GridsterItemConfig[]>();
+    /** Highlights the settings button, for example when the dashboard is scrolled. */
+    public readonly needsAttention = input(false, { transform: booleanAttribute });
 
-    public configOptions: ReadonlyArray<GridsterItemConfig> = [];
+    /** Emits the new grid configuration when it is loaded, reset or edited in expert mode. */
+    public readonly configChange = output<GridsterItemConfig[]>();
 
-    public expertDialog = new DialogModel();
-    public expertConfig?: GridsterItemConfig[];
+    protected readonly expertConfig = signal<GridsterItemConfig[] | undefined>(undefined);
 
-    public dropdownModal = new ModalModel();
+    protected readonly configOptions = computed<ReadonlyArray<GridsterItemConfig>>(() => {
+        return this.configAvailable().map(item => {
+            const name = this.localizer.getOrKey(item.name);
 
-    constructor(
-        public readonly appsState: AppsState,
-        public readonly authState: AuthService,
-        private readonly localizer: LocalizerService,
-        private readonly dialogs: DialogService,
-        private readonly uiState: UIState,
-    ) {
-    }
+            return { ...item, name };
+        }).sortByString(x => x.name);
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.configAvailable) {
-            this.configOptions = this.configAvailable.map(item => {
-                const name = this.localizer.getOrKey(item.name);
+    protected readonly expertDialog = new DialogModel();
 
-                return { ...item, name };
-            }).sortByString(x => x.name);
-        }
+    protected readonly dropdownModal = new ModalModel();
 
-        if (changes.app) {
-            this.uiState.getAppShared('dashboard.grid', this.configDefaults).pipe(take(1))
+    constructor() {
+        effect(onCleanup => {
+            this.app();
+
+            const subscription = untracked(() => this.uiState.waitForAppShared('dashboard.grid', this.configDefaults()))
                 .subscribe(dto => {
                     this.setConfig(dto);
                 });
-        }
+
+            onCleanup(() => subscription.unsubscribe());
+        });
     }
 
     private setConfig(config: any) {
         if (!Types.isArrayOfObject(config)) {
-            config = this.configDefaults;
+            config = this.configDefaults();
         }
 
         this.configChange.emit(Types.clone(config));
     }
 
-    public startExpertMode() {
+    protected startExpertMode() {
         this.dropdownModal.hide();
 
-        this.expertConfig = Types.clone(this.config);
+        this.expertConfig.set(Types.clone(this.config()));
         this.expertDialog.show();
     }
 
-    public completeExpertMode() {
-        this.setConfig(this.expertConfig);
+    protected completeExpertMode() {
+        this.setConfig(this.expertConfig());
 
-        this.expertConfig = null!;
+        this.expertConfig.set(undefined);
         this.expertDialog.hide();
     }
 
-    public resetConfig() {
-        this.setConfig(Types.clone(this.configDefaults));
+    protected resetConfig() {
+        this.setConfig(Types.clone(this.configDefaults()));
         this.saveConfig();
     }
 
-    public saveConfig() {
-        this.uiState.setAppShared('dashboard.grid', this.config);
+    protected saveConfig() {
+        this.uiState.setAppShared('dashboard.grid', this.config());
 
         this.dialogs.notifyInfo('i18n:dashboard.configSaved');
     }
 
-    public addOrRemove(item: GridsterItemConfig) {
-        const current = this.config.find(x => x.type === item.type);
+    protected addOrRemove(item: GridsterItemConfig) {
+        const config = this.config();
+        const current = config.find(x => x.type === item.type);
 
         if (current) {
-            this.config.splice(this.config.indexOf(current), 1);
+            config.splice(config.indexOf(current), 1);
         } else {
             let y = 0;
 
-            for (const item of this.config) {
+            for (const item of config) {
                 y = Math.max(item.y, y);
             }
 
@@ -129,11 +125,11 @@ export class DashboardConfigComponent {
             newOption.x = 0;
             newOption.y = y + 1;
 
-            this.config.push(newOption);
+            config.push(newOption);
         }
     }
 
-    public isSelected(item: GridsterItemConfig) {
-        return this.config.find(x => x.type === item.type);
+    protected isSelected(item: GridsterItemConfig) {
+        return this.config().find(x => x.type === item.type);
     }
 }

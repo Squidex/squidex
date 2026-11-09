@@ -1,37 +1,37 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row for="minValue" label="schemas.fieldTypes.dateTime.rangeMin" [prefix]="field.fieldId">
-        <sqx-date-time-editor formControlName="minValue" mode="DateTime" />
+<div>
+    <sqx-form-row [for]="form().minValue" label="schemas.fieldTypes.dateTime.rangeMin" [prefix]="field().fieldId">
+        <sqx-date-time-editor [formField]="form().minValue" mode="DateTime" />
     </sqx-form-row>
 
-    <sqx-form-row for="maxValue" label="schemas.fieldTypes.dateTime.rangeMax" [prefix]="field.fieldId">
-        <sqx-date-time-editor formControlName="maxValue" mode="DateTime" />
+    <sqx-form-row [for]="form().maxValue" label="schemas.fieldTypes.dateTime.rangeMax" [prefix]="field().fieldId">
+        <sqx-date-time-editor [formField]="form().maxValue" mode="DateTime" />
     </sqx-form-row>
 
-    @if (showDefaultValues | async) {
-        <sqx-form-row for="calculatedDefaultValue" label="schemas.fieldTypes.dateTime.defaultMode" [prefix]="field.fieldId">
-            <select class="form-select" formControlName="calculatedDefaultValue">
+    @if (showDefaultValues()) {
+        <sqx-form-row [for]="form().calculatedDefaultValue" label="schemas.fieldTypes.dateTime.defaultMode" [prefix]="field().fieldId">
+            <select class="form-select" [formField]="form().calculatedDefaultValue">
                 <option></option>
 
                 @for (value of calculatedDefaultValues; track value) {
-                    <option [ngValue]="value">{{ value }}</option>
+                    <option [value]="value">{{ value }}</option>
                 }
             </select>
         </sqx-form-row>
 
-        @if (showDefaultValue | async) {
-            <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-                <sqx-date-time-editor [id]="defaultValueRow.fieldName" formControlName="defaultValue" mode="DateTime" />
+        @if (showDefaultValue()) {
+            <sqx-form-row #defaultValueRow [for]="form().defaultValue" label="schemas.field.defaultValue" [prefix]="field().fieldId">
+                <sqx-date-time-editor [id]="defaultValueRow.fieldName()" [formField]="form().defaultValue" mode="DateTime" />
             </sqx-form-row>
         }
 
-        @if (isLocalizable) {
+        @if (isLocalizable()) {
             <sqx-form-row
                 #defaultValueRows
-                for="defaultValues"
+                [for]="form().defaultValues"
                 hint="schemas.field.defaultValuesHint"
                 label="schemas.field.defaultValues"
-                [prefix]="field.fieldId">
-                <sqx-localized-input [id]="defaultValueRows.fieldName" formControlName="defaultValues" [languages]="languages" type="datetime" />
+                [prefix]="field().fieldId">
+                <sqx-localized-input [id]="defaultValueRows.fieldName()" [formField]="form().defaultValues" [languages]="languages()" type="datetime" />
             </sqx-form-row>
         }
     }

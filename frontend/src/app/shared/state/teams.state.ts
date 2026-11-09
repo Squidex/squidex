@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { debug, DialogService, shareSubscribed, State } from '@app/framework';
@@ -19,24 +19,22 @@ interface Snapshot {
     selectedTeam?: TeamDto | null;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TeamsState extends State<Snapshot> {
-    public teams =
+    private readonly dialogs = inject(DialogService);
+    private readonly teamsService = inject(TeamsService);
+
+    public readonly teams =
         this.project(x => x.teams);
 
-    public selectedTeam =
+    public readonly selectedTeam =
         this.project(x => x.selectedTeam);
 
     public get teamId() {
         return this.snapshot.selectedTeam?.id || '';
     }
 
-    constructor(
-        private readonly teamsService: TeamsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ teams: [] });
 
         debug(this, 'teams');

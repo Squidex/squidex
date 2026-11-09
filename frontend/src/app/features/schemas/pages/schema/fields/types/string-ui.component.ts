@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { Component, computed, inject, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldFormModel, StringFieldPropertiesDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui',
@@ -17,69 +15,27 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSour
     templateUrl: 'string-ui.component.html',
     imports: [
         AssetFolderDropdownComponent,
-        AsyncPipe,
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
-export class StringUIComponent  {
-    private readonly subscriptions = new Subscriptions();
+export class StringUIComponent {
+    protected readonly schemasSource = inject(SchemaTagSource);
 
-    public readonly editors = StringFieldEditorValues;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<StringFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public properties!: StringFieldPropertiesDto;
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<StringFieldFormModel>;
+    });
 
-    public hideAllowedValues?: Observable<boolean>;
-    public hideClassNames?: Observable<boolean>;
-    public hideInlineEditable?: Observable<boolean>;
-    public hideSchemaIds?: Observable<boolean>;
-
-    constructor(
-        public readonly schemasSource: SchemaTagSource,
-    ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.fieldForm) {
-            this.subscriptions.unsubscribeAll();
-
-            const editor = this.fieldForm.controls['editor'];
-
-            this.hideAllowedValues =
-                valueProjection$(editor, x => !(x && (x === 'Radio' || x === 'Dropdown')));
-
-            this.hideClassNames =
-                valueProjection$(editor, x => !(x && (x === 'RichText')));
-
-            this.hideInlineEditable =
-                valueProjection$(editor, x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug')));
-
-            this.hideSchemaIds =
-                valueProjection$(this.fieldForm.controls['isEmbeddable'], x => !x);
-
-            this.subscriptions.add(
-                this.hideAllowedValues.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['allowedValues'].setValue(undefined);
-                    }
-                }));
-
-            this.subscriptions.add(
-                this.hideInlineEditable.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['inlineEditable'].setValue(false);
-                    }
-                }));
-        }
-    }
+    protected readonly editors = StringFieldEditorValues;
 }

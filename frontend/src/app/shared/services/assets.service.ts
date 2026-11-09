@@ -6,7 +6,7 @@
  */
 
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
 import { ApiUrlConfig, ErrorDto, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, Types, Versioned, VersionOrTag } from '@app/framework';
@@ -50,15 +50,10 @@ export type AssetsByQuery = Readonly<{
     parentId?: string;
 }>;
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AssetsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public putTag(appName: string, name: string, dto: RenameTagDto): Observable<{ [name: string]: number }> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags/${encodeURIComponent(name)}`);

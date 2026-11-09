@@ -6,17 +6,14 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, ChangePlanDto, HTTP, mapVersioned, PlanChangedDto, PlansDto, pretifyError, Versioned, VersionOrTag } from '@app/shared';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class TeamPlansService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getPlans(teamId: string): Observable<Versioned<PlansDto>> {
         const url = this.apiUrl.buildUrl(`api/teams/${teamId}/plans`);

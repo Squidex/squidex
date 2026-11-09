@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LocalizerService, RootViewComponent, TagEditorComponent } from '@app/framework';
 
@@ -20,11 +19,12 @@ const TRANSLATIONS = {
     imports: [RootViewComponent, TagEditorComponent],
     template: `
         <sqx-root-view>
-            <sqx-tag-editor 
-                [allowOpen]="true" 
+            <sqx-tag-editor
+                [allowOpen]="true"
                 [itemsSource]="itemsSource"
                 [itemsSourceLoading]="itemsSourceLoading"
-                (dropdownOpen)="load()">
+                (dropdownOpen)="load()"
+            >
             </sqx-tag-editor>
         </sqx-root-view>
     `,
@@ -56,10 +56,10 @@ export default {
             control: 'boolean',
         },
         change: {
-            action:'ngModelChange',
+            action: 'valueChange',
         },
     },
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-root-view>
@@ -68,8 +68,8 @@ export default {
                     [disabled]="disabled"
                     [itemsSource]="itemsSource"
                     [itemsSourceLoading]="itemsSourceLoading"
-                    (ngModelChange)="change($event)"
-                    [ngModel]="model"
+                    (valueChange)="change($event)"
+                    [value]="model"
                     [styleScrollable]="styleScrollable"
                     [styleBlank]="styleBlank"
                     [styleDashed]="styleDashed">
@@ -79,11 +79,7 @@ export default {
     }),
     decorators: [
         moduleMetadata({
-            imports: [
-                FormsModule,
-                RootViewComponent,
-                TestComponent,
-            ],
+            imports: [RootViewComponent, TestComponent],
             providers: [
                 {
                     provide: LocalizerService,
@@ -159,19 +155,59 @@ export const StyleBlankValues: Story = {
 export const Multiline: Story = {
     args: {
         styleScrollable: false,
-        model: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
+        model: [
+            'Lorem',
+            'ipsum',
+            'dolor',
+            'sit',
+            'amet',
+            'consectetur',
+            'adipiscing',
+            'elit',
+            'sed',
+            'do',
+            'eiusmod',
+            'tempor',
+            'incididunt',
+            'ut',
+            'labore',
+            'et',
+            'dolore',
+            'magna',
+            'aliqua',
+        ],
     },
 };
 
 export const SingleLine: Story = {
     args: {
         styleScrollable: true,
-        model: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
+        model: [
+            'Lorem',
+            'ipsum',
+            'dolor',
+            'sit',
+            'amet',
+            'consectetur',
+            'adipiscing',
+            'elit',
+            'sed',
+            'do',
+            'eiusmod',
+            'tempor',
+            'incididunt',
+            'ut',
+            'labore',
+            'et',
+            'dolore',
+            'magna',
+            'aliqua',
+        ],
     },
 };
 
 export const Lazy: Story = {
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-tag-editor-test></sqx-tag-editor-test>

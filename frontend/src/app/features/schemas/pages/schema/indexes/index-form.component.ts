@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIndexForm, FormHintComponent, IndexesState, MarkdownDirective, ModalDialogComponent, SchemaDto, TranslatePipe } from '@app/shared';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIndexForm, FormHintComponent, IndexesState, MarkdownDirective, ModalDialogComponent, SchemaDto, SignalSelectDirective, TranslatePipe } from '@app/shared';
 
 
 @Component({
@@ -17,36 +18,33 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
     imports: [
         ConfirmClickDirective,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
         MarkdownDirective,
         ModalDialogComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class IndexFormComponent {
-    @Output()
-    public create = new EventEmitter();
+    private readonly indexesState = inject(IndexesState);
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the index has been created. */
+    public readonly create = output();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    @Input({ required: true })
-    public languages!: AppLanguageDto[];
+    /** The schema to create the index for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public createForm = new CreateIndexForm();
-    public fieldNames: string[] = [];
+    /** The languages of the app, to provide the localized fields. */
+    public readonly languages = input.required<AppLanguageDto[]>();
 
-    constructor(
-        private readonly indexesState: IndexesState,
-    ) {
-    }
+    protected readonly fieldNames = computed(() => {
+        const languages = this.languages();
 
-    public ngOnInit() {
         const metaFields: string[] = [
             'created',
             'createdBy',
@@ -58,10 +56,10 @@ export class IndexFormComponent {
         ];
 
         const dataFields: string[] = [];
-        for (const field of this.schema.fields) {
+        for (const field of this.schema().fields) {
             if (field.properties.isContentField) {
                 if (field.isLocalizable) {
-                    for (const language of this.languages) {
+                    for (const language of languages) {
                         dataFields.push(`data.${field.name}.${language.iso2Code}`);
                     }
                 } else {
@@ -70,31 +68,21 @@ export class IndexFormComponent {
             }
         }
 
-        this.fieldNames = [...metaFields, ...dataFields.sort()];
-    }
+        return [...metaFields, ...dataFields.sort()];
+    });
 
-    public emitCreate() {
+    protected readonly createForm = new CreateIndexForm();
+
+    private emitCreate() {
         this.create.emit();
     }
 
-    public emitClose() {
-        this.dialogClose.emit();
-    }
-
-    public createSchema() {
-        const value = this.createForm.submit();
-        if (!value) {
-            return;
+    protected async createSchema() {
+        const isCreated = await this.createForm.submit(value => {
+            return this.indexesState.create(value);
+        });
+        if (isCreated) {
+            this.emitCreate();
         }
-
-        this.indexesState.create(value)
-            .subscribe({
-                next: () => {
-                    this.emitCreate();
-                },
-                error: error => {
-                    this.createForm.submitFailed(error);
-                },
-            });
     }
 }

@@ -8,7 +8,7 @@
 import { MathHelper } from './math-helper';
 import { StringHelper } from './string-helper';
 
-export module ColorHelper {
+export namespace ColorHelper {
     interface RGBColor {
         r: number;
         g: number;

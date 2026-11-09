@@ -1,4 +1,4 @@
-@if (events) {
+@if (events(); as events) {
     @for (event of events; track event.eventId) {
         <div class="event row g-0">
             <div class="col-auto">

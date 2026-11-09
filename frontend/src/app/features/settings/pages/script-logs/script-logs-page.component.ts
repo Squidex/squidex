@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { FormAlertComponent, LayoutComponent, ListViewComponent, ScriptLogsState, ShortcutDirective, TitleComponent, TranslatePipe } from '@app/shared';
 import { ScriptLogComponent } from './script-log.component';
 
@@ -16,9 +14,7 @@ import { ScriptLogComponent } from './script-log.component';
     styleUrls: ['./script-logs-page.component.scss'],
     templateUrl: './script-logs-page.component.html',
     imports: [
-        AsyncPipe,
         FormAlertComponent,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
         ScriptLogComponent,
@@ -27,21 +23,18 @@ import { ScriptLogComponent } from './script-log.component';
         TranslatePipe,
     ],
 })
-export class ScriptLogsPageComponent implements OnInit {
-    constructor(
-        public readonly scriptLogsState: ScriptLogsState,
-    ) {
-    }
+export class ScriptLogsPageComponent {
+    protected readonly scriptLogsState = inject(ScriptLogsState);
 
-    public ngOnInit() {
+    constructor() {
         this.scriptLogsState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.scriptLogsState.load(true);
     }
 
-    public filter(name: string) {
+    protected filter(name: string) {
         this.scriptLogsState.filter(name);
     }
 }

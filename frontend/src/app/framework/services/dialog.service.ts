@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, ReplaySubject, Subject, throwError } from 'rxjs';
 import { ErrorDto } from '../utils/error';
 import { FloatingPlacement } from '../utils/modal-view';
@@ -14,13 +14,14 @@ import { LocalStoreService } from './local-store.service';
 
 export class DialogRequest {
     private readonly resultStream$ = new ReplaySubject<boolean>();
+    private isFinished = false;
 
     public get result(): Observable<boolean> {
         return this.resultStream$;
     }
 
     public get isCompleted() {
-        return this.resultStream$.isStopped;
+        return this.isFinished;
     }
 
     public get canRemember() {
@@ -41,8 +42,7 @@ export class DialogRequest {
             const isConfirmed = this.localStore.getBoolean(this.rememberKey);
 
             if (isConfirmed) {
-                this.resultStream$.next(true);
-                this.resultStream$.complete();
+                this.finish(true);
             }
         }
     }
@@ -52,6 +52,11 @@ export class DialogRequest {
             this.localStore.setBoolean(this.rememberKey, true);
         }
 
+        this.finish(confirmed);
+    }
+
+    private finish(confirmed: boolean) {
+        this.isFinished = true;
         this.resultStream$.next(confirmed);
         this.resultStream$.complete();
     }
@@ -85,10 +90,9 @@ export class Notification {
     }
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class DialogService {
+    private readonly localStore = inject(LocalStoreService);
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();
     private readonly tooltipStream$ = new Subject<Tooltip>();
@@ -103,11 +107,6 @@ export class DialogService {
 
     public get notifications(): Observable<Notification> {
         return this.notificationsStream$;
-    }
-
-    constructor(
-        private readonly localStore: LocalStoreService,
-    ) {
     }
 
     public notifyError(error: string | ErrorDto) {

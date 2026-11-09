@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject, input, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { AssignContributorDto, ContributorsState, ErrorDto, FormHintComponent, ImportContributorsForm, ModalDialogComponent, RoleDto, StatusIconComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -24,86 +24,70 @@ type ImportStatus = {
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
     imports: [
-        AsyncPipe,
+        FormField,
         FormHintComponent,
         FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         StatusIconComponent,
         TooltipDirective,
         TranslatePipe,
     ],
 })
 export class ImportContributorsDialogComponent {
-    @Output()
-    public dialogClose = new EventEmitter();
+    private readonly contributorsState = inject(ContributorsState);
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<RoleDto>;
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    public importForm = new ImportContributorsForm();
-    public importStatus: ReadonlyArray<ImportStatus> = [];
-    public importStage: 'Start' | 'Change' | 'Wait' = 'Start';
+    /** The roles that can be assigned to the imported contributors. */
+    public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    constructor(
-        private readonly contributorsState: ContributorsState,
-    ) {
-    }
+    protected readonly importStatus = signal<ReadonlyArray<ImportStatus>>([]);
 
-    public detect() {
-        this.importStage = 'Change';
+    protected readonly importStage = signal<'Start' | 'Change' | 'Wait'>('Start');
 
-        const contributors = this.importForm.submit();
+    protected readonly importForm = new ImportContributorsForm();
 
-        if (contributors) {
-            this.importStatus = contributors.map(contributor => ({
+    protected detect() {
+        this.importStage.set('Change');
+
+        this.importForm.submit(async contributors => {
+            this.importStatus.set(contributors.map(contributor => ({
                 email: contributor.contributorId,
                 result: 'Pending',
                 resultText: 'Pending',
                 role: 'Developer',
-            }));
-        }
+            })));
+        });
     }
 
-    public import() {
-        this.importStage = 'Wait';
+    protected import() {
+        this.importStage.set('Wait');
 
-        of(...this.importStatus).pipe(
+        of(...this.importStatus()).pipe(
             mergeMap(s =>
-                this.contributorsState.assign(createRequest(s), { silent: true }).pipe(
+                this.contributorsState.assign(new AssignContributorDto({ contributorId: s.email, role: s.role, invite: true }), { silent: true }).pipe(
                     tap(created => {
-                        const status = this.importStatus.find(x => x.email === s.email);
+                        const resultText = created ?
+                            'i18n:contributors.contributorAssignedInvited' :
+                            'i18n:contributors.contributorAssignedExisting';
 
-                        if (status) {
-                            status.resultText = getSuccess(created);
-                            status.result = 'Success';
-                        }
+                        this.updateStatus(s.email, 'Success', resultText);
                     }),
                     catchError((error: ErrorDto) => {
-                        const status = this.importStatus.find(x => x.email === s.email);
-
-                        if (status) {
-                            status.resultText = getError(error);
-                            status.result = 'Failed';
-                        }
+                        this.updateStatus(s.email, 'Failed', error.details[0].originalMessage);
 
                         return EMPTY;
                     }),
                 ), 1),
         ).subscribe();
     }
-}
 
-function createRequest(status: ImportStatus) {
-    return new AssignContributorDto({ contributorId: status.email, role: status.role, invite: true });
-}
+    protected changeRole(status: ImportStatus, role: string) {
+        this.importStatus.update(statuses => statuses.map(x => x === status ? { ...x, role } : x));
+    }
 
-function getError(error: ErrorDto): string {
-    return error.details[0].originalMessage;
-}
-
-function getSuccess(created: boolean | undefined): string {
-    return created ?
-        'i18n:contributors.contributorAssignedInvited' :
-        'i18n:contributors.contributorAssignedExisting';
+    private updateStatus(email: string, result: ImportStatus['result'], resultText: string) {
+        this.importStatus.update(statuses => statuses.map(x => x.email === email ? { ...x, result, resultText } : x));
+    }
 }

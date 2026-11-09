@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
@@ -23,20 +23,22 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ClientsState extends State<Snapshot> {
-    public clients =
+    private readonly appsState = inject(AppsState);
+    private readonly clientsService = inject(ClientsService);
+    private readonly dialogs = inject(DialogService);
+
+    public readonly clients =
         this.project(x => x.clients);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {
@@ -47,11 +49,7 @@ export class ClientsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly clientsService: ClientsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ clients: [], version: VersionTag.EMPTY });
 
         debug(this, 'clients');

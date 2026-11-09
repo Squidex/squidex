@@ -5,50 +5,46 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { AppLanguageDto, contentTranslationStatus, SchemaDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-translation-status',
     styleUrls: ['./translation-status.component.scss'],
     templateUrl: './translation-status.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TranslationStatusComponent {
-    @Input({ required: true })
-    public data!: any;
+    /** The content data to compute the translation status for. */
+    public readonly data = input.required<any>();
 
-    @Input()
-    public language?: AppLanguageDto | null;
+    /** The language to show the status for. Shows the average of all languages when not set. */
+    public readonly language = input<AppLanguageDto | null>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public schema?: SchemaDto;
+    /** The schema of the content. */
+    public readonly schema = input.required<SchemaDto | undefined>();
 
-    public text = 'N/A';
-
-    public ngOnChanges() {
-        if (!this.schema) {
-            this.text = 'N/A';
-            return;
+    protected readonly text = computed(() => {
+        const schema = this.schema();
+        if (!schema) {
+            return 'N/A';
         }
 
-        const status = contentTranslationStatus(this.data, this.schema, this.languages);
+        const languages = this.languages();
+        const status = contentTranslationStatus(this.data(), schema, languages);
+
+        const language = this.language();
+        if (language) {
+            return `${status[language.iso2Code] || 0} %`;
+        }
 
         let progress = 0;
-
-        if (this.language) {
-            progress = status[this.language.iso2Code];
-        } else {
-            for (const value of Object.values(status)) {
-                progress += value;
-            }
-
-            progress = Math.round(progress / this.languages.length);
+        for (const value of Object.values(status)) {
+            progress += value;
         }
 
-        this.text = `${progress || 0} %`;
-    }
+        return `${Math.round(progress / languages.length) || 0} %`;
+    });
 }

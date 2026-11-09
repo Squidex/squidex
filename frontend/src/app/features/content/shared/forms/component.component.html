@@ -1,45 +1,45 @@
 <div class="component">
-    @if (formModel.schemaChanges | async; as schema) {
+    @if (formModel().schema(); as schema) {
         <div>
             <sqx-form-hint> {{ schema.displayName }} </sqx-form-hint>
-            @for (section of formModel.sectionsChanges | async; track section) {
+            @for (section of formModel().sections(); track section) {
                 <div class="form-group">
                     <sqx-component-section
-                        [form]="form"
-                        [formContext]="formContext"
-                        [formLevel]="formLevel + 1"
+                        [form]="form()"
+                        [formContext]="formContext()"
+                        [formLevel]="formLevel() + 1"
                         [formSection]="$any(section)"
-                        [hasChatBot]="hasChatBot"
-                        [isComparing]="isComparing"
-                        [language]="language"
-                        [languages]="languages" />
+                        [hasChatBot]="hasChatBot()"
+                        [isComparing]="isComparing()"
+                        [language]="language()"
+                        [languages]="languages()" />
                 </div>
             }
         </div>
     } @else {
-        @if (schemasList.length > 1) {
+        @if (schemasList().length > 1) {
             <button
                 class="btn btn-outline-success dropdown-toggle"
                 #buttonSelect
                 (click)="schemasDropdown.show()"
-                [disabled]="isDisabled | async"
+                [disabled]="isDisabled()"
                 type="button">
                 {{ "contents.addComponent" | sqxTranslate }}
             </button>
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
-                @for (schema of schemasList; track schema) {
+                @for (schema of schemasList(); track schema) {
                     <button class="dropdown-item" (click)="setSchema(schema)" type="button">{{ schema.displayName }}</button>
                 }
             </sqx-dropdown-menu>
         }
 
-        @if (schemasList.length === 1) {
-            <button class="btn btn-outline-success" (click)="setSchema(schemasList[0])" [disabled]="isDisabled | async" type="button">
+        @if (schemasList().length === 1) {
+            <button class="btn btn-outline-success" (click)="setSchema(schemasList()[0])" [disabled]="isDisabled()" type="button">
                 {{ "contents.addComponent" | sqxTranslate }}
             </button>
         }
 
-        @if (schemasList.length === 0) {
+        @if (schemasList().length === 0) {
             <sqx-form-hint> {{ "contents.componentNoSchema" | sqxTranslate }}</sqx-form-hint>
         }
     }

@@ -5,94 +5,99 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL } from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, FormRowComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, Subscriptions, ThemeService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { map, of } from 'rxjs';
+import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, FormRowComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, SignalSelectDirective, ThemeService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html',
     imports: [
-        AsyncPipe,
+        FormField,
         FormHintComponent,
-        FormsModule,
         FormRowComponent,
+        FormsModule,
         LayoutComponent,
         ModalDialogComponent,
         ModalDirective,
+        SignalSelectDirective,
         TitleComponent,
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
     ],
 })
-export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
+export class GraphQLPageComponent {
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly appsState = inject(AppsState);
+    private readonly authService = inject(AuthService);
+    private readonly clientsService = inject(ClientsService);
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly messageBus = inject(MessageBus);
+    private readonly themeService = inject(ThemeService);
+    private fetcher?: ReturnType<typeof createGraphiQLFetcher>;
     private reactRoot?: ReactDOM.Root | null;
 
-    @ViewChild('graphiQLContainer', { static: false })
-    public graphiQLContainer!: ElementRef;
+    protected readonly clientsState = inject(ClientsState);
 
-    private readonly subscriptions = new Subscriptions();
-    private fetcher?: ReturnType<typeof createGraphiQLFetcher>;
+    protected readonly graphiQLContainer = viewChild.required<ElementRef<HTMLDivElement>>('graphiQLContainer');
 
-    public clientsReadable = false;
-    public clientsDialog = new DialogModel();
-    public clientSelected: ClientDto | null = null;
+    protected readonly clientSelected = signal<ClientDto | null>(null);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly authService: AuthService,
-        private readonly clientsService: ClientsService,
-        private readonly messageBus: MessageBus,
-        private readonly themeService: ThemeService,
-        public readonly clientsState: ClientsState,
-    ) {
-    }
+    protected readonly accessToken = rxResource({
+        params: () => ({ client: this.clientSelected() }),
+        stream: ({ params: { client } }) => {
+            if (!client) {
+                return of(this.authService.user?.accessToken!);
+            }
 
-    public ngOnDestroy() {
-        this.reactRoot?.unmount();
-        this.reactRoot = null;
-    }
+            return this.clientsService.createToken(this.appsState.appName, client).pipe(map(token => token.accessToken));
+        },
+    });
 
-    public ngOnInit() {
-        this.clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
+    protected readonly clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
 
+    protected readonly clientsDialog = new DialogModel();
+
+    protected readonly clientForm = form(this.clientSelected);
+
+    constructor() {
         if (this.clientsReadable) {
             this.clientsState.load();
         }
-    }
 
-    public ngAfterViewInit() {
-        this.reactRoot = ReactDOM.createRoot(this.graphiQLContainer.nativeElement);
-        this.selectClient(null);
+        afterNextRender(() => {
+            this.reactRoot = ReactDOM.createRoot(this.graphiQLContainer().nativeElement);
+            this.render();
+        });
 
-        this.subscriptions.add(
-            this.themeService.themeChanges
-                .subscribe(() => {
-                    this.render();
-                }));
-    }
+        effect(() => {
+            if (!this.accessToken.hasValue()) {
+                return;
+            }
 
-    public selectClient(client: ClientDto | null) {
-        this.clientSelected = client;
+            const accessToken = this.accessToken.value();
 
-        if (!client) {
-            this.initOrUpdateGraphQL(this.authService.user?.accessToken!);
-        } else {
-            this.clientsService.createToken(this.appsState.appName, client)
-                .subscribe(token => {
-                    if (this.clientSelected === client) {
-                        this.initOrUpdateGraphQL(token.accessToken);
-                    }
-                });
-        }
+            untracked(() => this.initOrUpdateGraphQL(accessToken));
+        });
+
+        effect(() => {
+            this.themeService.theme();
+            this.render();
+        });
+
+        this.destroyRef.onDestroy(() => {
+            this.reactRoot?.unmount();
+            this.reactRoot = null;
+        });
     }
 
     private initOrUpdateGraphQL(accessToken: string) {
@@ -132,7 +137,7 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.reactRoot?.render(
             React.createElement(GraphiQL, {
                 fetcher: this.fetcher,
-                forcedTheme: this.themeService.theme,
+                forcedTheme: this.themeService.theme(),
             }),
         );
     }

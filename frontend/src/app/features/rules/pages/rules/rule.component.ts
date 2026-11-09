@@ -6,22 +6,19 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { BranchItem, ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, FlowView, ModalDirective, ModalModel, ModalPlacementDirective, RuleElementDto, RulesState, RuleTriggerMetadataDto, ToggleComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, FlowView, ModalDirective, ModalModel, ModalPlacementDirective, RuleElementDto, RulesState, RuleTriggerMetadataDto, ToggleComponent, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
     selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         DropdownMenuComponent,
         EditableTitleComponent,
-        FormsModule,
         ModalDirective,
         ModalPlacementDirective,
         RouterLink,
@@ -31,59 +28,54 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     ],
 })
 export class RuleComponent {
-    @Input({ required: true })
-    public availableTriggers: Record<string, RuleTriggerMetadataDto> = {};
+    private readonly rulesState = inject(RulesState);
 
-    @Input({ required: true })
-    public availableSteps: Record<string, RuleElementDto> = {};
+    /** The available triggers by type, to resolve the metadata of the trigger. */
+    public readonly availableTriggers = input.required<Record<string, RuleTriggerMetadataDto>>();
 
-    @Input({ required: true })
-    public rule!: DynamicRuleDto;
+    /** The available steps by type, to resolve the metadata of each step. */
+    public readonly availableSteps = input.required<Record<string, RuleElementDto>>();
 
-    public flow: BranchItem[] = [];
+    /** The rule to show. */
+    public readonly rule = input.required<DynamicRuleDto>();
 
-    public dropdown = new ModalModel();
+    protected readonly flow = computed(() => {
+        return new FlowView(this.rule().flow).getAllItems();
+    });
 
-    constructor(
-        private readonly rulesState: RulesState,
-    ) {
+    protected readonly dropdown = new ModalModel();
+
+    protected delete() {
+        this.rulesState.delete(this.rule());
     }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.rule) {
-            this.flow = new FlowView(this.rule.flow).getAllItems();
-        }
+    protected run() {
+        this.rulesState.run(this.rule());
     }
 
-    public delete() {
-        this.rulesState.delete(this.rule);
+    protected runFromSnapshots() {
+        this.rulesState.runFromSnapshots(this.rule());
     }
 
-    public run() {
-        this.rulesState.run(this.rule);
+    protected rename(name: string) {
+        this.rulesState.update(this.rule(), new DynamicUpdateRuleDto({ name }));
     }
 
-    public runFromSnapshots() {
-        this.rulesState.runFromSnapshots(this.rule);
+    protected disable() {
+        this.rulesState.update(this.rule(), new DynamicUpdateRuleDto({ isEnabled: false }));
     }
 
-    public rename(name: string) {
-        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ name }));
+    protected enable() {
+        this.rulesState.update(this.rule(), new DynamicUpdateRuleDto({ isEnabled: true }));
     }
 
-    public disable() {
-        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ isEnabled: false }));
+    protected toggle() {
+        const rule = this.rule();
+
+        this.rulesState.update(rule, new DynamicUpdateRuleDto({ isEnabled: !rule.isEnabled }));
     }
 
-    public enable() {
-        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ isEnabled: true }));
-    }
-
-    public toggle() {
-        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ isEnabled: !this.rule.isEnabled }));
-    }
-
-    public trigger() {
-        this.rulesState.trigger(this.rule);
+    protected trigger() {
+        this.rulesState.trigger(this.rule());
     }
 }

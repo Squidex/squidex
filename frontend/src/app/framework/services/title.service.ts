@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { inject, Service, signal, untracked } from '@angular/core';
 import { Types } from '../utils/types';
 import { LocalizerService } from './localizer.service';
 
@@ -21,29 +20,22 @@ export class TitlesConfig {
 
 export type Title = { route?: any; localized: string; value: string };
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TitleService {
-    private readonly path$ = new BehaviorSubject<ReadonlyArray<Title>>([]);
+    private readonly localizer = inject(LocalizerService);
+    private readonly titles = inject(TitlesConfig);
+    private readonly pathValue = signal<ReadonlyArray<Title>>([]);
 
-    public get pathChanges(): Observable<ReadonlyArray<Title>> {
-        return this.path$;
-    }
+    public readonly path = this.pathValue.asReadonly();
 
-    constructor(
-        private readonly titles: TitlesConfig,
-        private readonly localizer: LocalizerService,
-    ) {
+    constructor() {
         this.titles = new TitlesConfig(
-            this.localizer.getOrKey(titles.prefix),
-            this.localizer.getOrKey(titles.suffix),
+            this.localizer.getOrKey(this.titles.prefix),
+            this.localizer.getOrKey(this.titles.suffix),
             this.titles.separator,
         );
 
-        this.path$.subscribe(value => {
-            this.updateTitle(value);
-        });
+        this.updateTitle([]);
     }
 
     public push(value: string, index?: number, route?: any) {
@@ -52,7 +44,7 @@ export class TitleService {
             return result;
         }
 
-        const clone = [...this.path$.value];
+        const clone = [...untracked(this.pathValue)];
 
         const lastIndex = clone.length - 1;
         const localized = this.localizer.getOrKey(value);
@@ -69,16 +61,22 @@ export class TitleService {
             result = lastIndex + 1;
         }
 
-        this.path$.next(clone);
+        this.setPath(clone);
         return result;
     }
 
     public pop() {
-        const clone = [...this.path$.value];
+        const clone = [...untracked(this.pathValue)];
 
         clone.pop();
 
-        this.path$.next(clone);
+        this.setPath(clone);
+    }
+
+    private setPath(path: ReadonlyArray<Title>) {
+        this.pathValue.set(path);
+
+        this.updateTitle(path);
     }
 
     private updateTitle(path: ReadonlyArray<Title>) {

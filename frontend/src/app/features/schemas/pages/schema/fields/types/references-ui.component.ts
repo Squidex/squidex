@@ -6,29 +6,32 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, ReferencesFieldEditorValues, ReferencesFieldPropertiesDto } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, ReferencesFieldEditorValues, ReferencesFieldFormModel, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-ui',
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
     ],
 })
 export class ReferencesUIComponent {
-    public readonly editors = ReferencesFieldEditorValues;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<ReferencesFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public properties!: ReferencesFieldPropertiesDto;
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<ReferencesFieldFormModel>;
+    });
+
+    protected readonly editors = ReferencesFieldEditorValues;
 }

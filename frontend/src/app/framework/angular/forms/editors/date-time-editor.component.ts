@@ -5,181 +5,137 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, Output, ViewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
+import { booleanAttribute, Component, computed, ElementRef, inject, input, linkedSignal, model, output, signal, viewChild } from '@angular/core';
+import { DateHelper, DateTime, UIOptions } from '@app/framework/internal';
 import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ResizedDirective } from '../../resized.directive';
+import { FormValueControlBase } from '../form-value-control';
 import { FocusComponent } from '../forms-helper';
-import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
-
-export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true,
-};
-
-interface State {
-    // True when the editor is in local mode.
-    isLocal: boolean;
-
-    // The actual value.
-    value?: DateTime | null;
-
-    // The value for the input.
-    inputValue?: string | null;
-}
 
 @Component({
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
-    providers: [
-        SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
-        ForwardFormClassesDirective,
-        ReactiveFormsModule,
         ResizedDirective,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements FocusComponent {
-    private readonly hideDateButtonsSettings: boolean = !!inject(UIOptions).value.hideDateButtons;
-    private readonly hideDateTimeModeButtonSetting: boolean = !!inject(UIOptions).value.hideDateTimeModeButton;
+export class DateTimeEditorComponent extends FormValueControlBase<string | null> implements FocusComponent {
+    private readonly uiOptions = inject(UIOptions);
+    private readonly hideDateTimeModeButtonSetting = !!this.uiOptions.value.hideDateTimeModeButton;
+    private readonly hideDateButtonsSettings = !!this.uiOptions.value.hideDateButtons;
 
-    @Output()
-    public editorBlur = new EventEmitter();
+    /** The date as ISO string. */
+    public readonly value = model<string | null>(null);
 
-    @Input()
-    public mode: 'DateTime' | 'Date' = 'Date';
+    /** Emits when the editor loses the focus. */
+    public readonly editorBlur = output<boolean>();
 
-    @Input()
-    public id = '';
+    /** Edits only the date or the date and time. */
+    public readonly mode = input<'DateTime' | 'Date'>('Date');
 
-    @Input({ transform: booleanAttribute })
-    public hideClear?: boolean | null;
+    /** The ID of the inner input. */
+    public readonly id = input('');
 
-    @Input({ transform: booleanAttribute })
-    public hideDateButtons?: boolean | null;
+    /** Hides the button to clear the value. */
+    public readonly hideClear = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public hideDateTimeModeButton?: boolean | null;
+    /** Hides the buttons to set the value to today or now. */
+    public readonly hideDateButtons = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public size: 'Normal' | 'Compact' | 'Mini' = 'Normal';
+    /** Hides the button to switch between local time and UTC. */
+    public readonly hideDateTimeModeButton = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** The initial size of the editor. It is adjusted to the available width. */
+    public readonly size = input<'Normal' | 'Compact' | 'Mini'>('Normal');
 
-    @ViewChild('dateInput', { static: false })
-    public dateInput!: ElementRef<HTMLInputElement>;
+    protected readonly dateInput = viewChild.required<ElementRef<HTMLInputElement>>('dateInput');
 
-    public get shouldShowDateButtons() {
-        return !this.hideDateButtonsSettings && !this.hideDateButtons;
-    }
+    protected readonly sizeActual = linkedSignal(() => this.size());
 
-    public get shouldShowDateTimeModeButton() {
-        return !this.hideDateTimeModeButtonSetting && !this.hideDateTimeModeButton;
-    }
+    protected readonly isLocal = signal(true);
 
-    public get isDateTimeMode() {
-        return this.mode === 'DateTime';
-    }
+    protected readonly isDateTimeMode = computed(() => {
+        return this.mode() === 'DateTime';
+    });
 
-    public get hasValue() {
-        return !!this.snapshot.value;
-    }
+    protected readonly shouldShowDateButtons = computed(() => {
+        return !this.hideDateButtonsSettings && !this.hideDateButtons();
+    });
 
-    constructor() {
-        super({ isLocal: true });
-    }
+    protected readonly shouldShowDateTimeModeButton = computed(() => {
+        return !this.hideDateTimeModeButtonSetting && !this.hideDateTimeModeButton();
+    });
 
-    public callTouched() {
-        this.editorBlur.next(true);
+    protected readonly valueParsed = computed(() => {
+        try {
+            return DateTime.parseISO(this.value()!, false);
+        } catch {
+            return null;
+        }
+    });
 
-        super.callTouched();
-    }
+    protected readonly valueInput = computed(() => {
+        const value = this.valueParsed();
+        if (!value) {
+            return null;
+        }
+
+        const format = this.isDateTimeMode() ? 'yyyy-MM-dd\'T\'HH:mm:ss' : 'yyyy-MM-dd';
+
+        return this.isLocal() ? value.toStringFormat(format) : value.toStringFormatUTC(format);
+    });
 
     public focus() {
-        this.dateInput.nativeElement.focus();
+        this.dateInput().nativeElement.focus();
     }
 
-    public writeValue(obj: any) {
-        let value: DateTime | null;
-        try {
-            value = DateTime.parseISO(obj, false);
-        } catch {
-            value = null;
-        }
-
-        this.update(value, this.snapshot.isLocal, false);
+    public override markTouched() {
+        this.editorBlur.emit(true);
+        super.markTouched();
     }
 
-    public writeToday() {
-        this.update(new DateTime(DateHelper.getLocalDate(DateTime.today().raw)), this.snapshot.isLocal, true);
+    protected writeToday() {
+        this.update(new DateTime(DateHelper.getLocalDate(DateTime.today().raw)));
         return false;
     }
 
-    public writeNow() {
-        this.update(DateTime.now(), this.snapshot.isLocal, true);
+    protected writeNow() {
+        this.update(DateTime.now());
         return false;
     }
 
-    public reset() {
-        this.update(null, this.snapshot.isLocal, true);
+    protected reset() {
+        this.update(null);
         return false;
     }
 
-    public setLocalMode(isLocal: boolean) {
-        this.update(this.snapshot.value, isLocal, true);
+    protected setLocalMode(isLocal: boolean) {
+        this.isLocal.set(isLocal);
+        this.markTouched();
         return false;
     }
 
-    public updateValue(source: string) {
-        this.update(DateTime.tryParseISO(source, !this.snapshot.isLocal), this.snapshot.isLocal, true);
+    protected updateValue(source: string) {
+        this.update(DateTime.tryParseISO(source, !this.isLocal()));
         return false;
     }
 
-    private update(value: DateTime | null | undefined, isLocal: boolean, emit: boolean) {
-        let inputValue: string | null = null;
-
-        if (value) {
-            if (this.isDateTimeMode) {
-                if (isLocal) {
-                    inputValue = value.toStringFormat('yyyy-MM-dd\'T\'HH:mm:ss');
-                } else {
-                    inputValue = value.toStringFormatUTC('yyyy-MM-dd\'T\'HH:mm:ss');
-                }
-            } else {
-                if (isLocal) {
-                    inputValue = value.toStringFormat('yyyy-MM-dd');
-                } else {
-                    inputValue = value.toStringFormatUTC('yyyy-MM-dd');
-                }
-            }
-        }
-
-        this.next({ inputValue, value, isLocal });
-
-        if (emit) {
-            this.callChange(value?.toISOString());
-            this.callTouched();
-        }
+    private update(value: DateTime | null) {
+        this.value.set(value?.toISOString() ?? null);
+        this.markTouched();
     }
 
-    public setSize(size: DOMRect) {
+    protected setSize(size: DOMRect) {
         if (size.width < 300) {
-            this.size = 'Mini';
+            this.sizeActual.set('Mini');
         } else if (size.width < 350) {
-            this.size = 'Compact';
+            this.sizeActual.set('Compact');
         } else {
-            this.size = 'Normal';
+            this.sizeActual.set('Normal');
         }
     }
 }

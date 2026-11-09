@@ -1,4 +1,5 @@
-<span class="rounded-full icon d-inline-flex {{ size }}">
+@let elementInfo = this.elementInfo();
+<span class="rounded-full icon d-inline-flex {{ size() }}">
     @if (elementInfo.iconCode) {
         <i class="icon icon-{{ elementInfo.iconCode }}"></i>
     } @else {

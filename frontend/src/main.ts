@@ -7,8 +7,10 @@
 
 import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 import { APP_BASE_HREF } from '@angular/common';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { enableProdMode, ErrorHandler } from '@angular/core';
+import { provideSignalFormsConfig } from '@angular/forms/signals';
+import { NG_STATUS_CLASSES } from '@angular/forms/signals/compat';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, provideRouter, RouteReuseStrategy } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -64,7 +66,9 @@ function configApiUrl() {
     if (baseHref.indexOf('http') === 0) {
         return new ApiUrlConfig(baseHref);
     } else {
-        return new ApiUrlConfig(`${window.location.protocol}//${window.location.host}${baseHref}`);
+        return new ApiUrlConfig(
+            `${window.location.protocol}//${window.location.host}${baseHref}`,
+        );
     }
 }
 
@@ -81,8 +85,15 @@ function configLocalizerService() {
 }
 
 export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
-    public shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot) {
-       return (future.routeConfig === curr.routeConfig) || (future.data['reuseId'] && future.data['reuseId'] === curr.data['reuseId']);
+    public shouldReuseRoute(
+        future: ActivatedRouteSnapshot,
+        curr: ActivatedRouteSnapshot,
+    ) {
+        return (
+            future.routeConfig === curr.routeConfig ||
+            (future.data['reuseId'] &&
+                future.data['reuseId'] === curr.data['reuseId'])
+        );
     }
 }
 
@@ -96,6 +107,7 @@ bootstrapApplication(AppComponent, {
     providers: [
         provideCharts(withDefaultRegisterables()),
         provideHttpClient(
+            withXhr(),
             withInterceptors([
                 loadingInterceptor,
                 cachingInterceptor,
@@ -103,6 +115,7 @@ bootstrapApplication(AppComponent, {
             ]),
         ),
         provideRouter(APP_ROUTES),
+        provideSignalFormsConfig({ classes: NG_STATUS_CLASSES }),
         {
             provide: RouteReuseStrategy,
             useClass: AppRouteReuseStrategy,
@@ -128,12 +141,12 @@ bootstrapApplication(AppComponent, {
             useValue: basePath(),
         },
         {
-          provide: UI_TOUR_OPTIONS,
-          useValue: TASKS.defaults,
+            provide: UI_TOUR_OPTIONS,
+            useValue: TASKS.defaults,
         },
         {
             provide: OVERLAY_DEFAULT_CONFIG,
-            useValue: { usePopover: false }
+            useValue: { usePopover: false },
         },
         {
             provide: BaseTourService,

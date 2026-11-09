@@ -5,60 +5,44 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Component, inject, linkedSignal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map, merge } from 'rxjs';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
-import { StatefulComponent, Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
-
-interface State {
-    // The when the section is collapsed.
-    isCollapsed: boolean;
-}
+import { TaskSnapshot, TourService, TourState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-tour-guide',
     styleUrls: ['./tour-guide.component.scss'],
     templateUrl: './tour-guide.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ScrollActiveDirective,
         TranslatePipe,
     ],
 })
-export class TourGuideComponent extends StatefulComponent<State> implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class TourGuideComponent {
+    private readonly tourService = inject(TourService);
 
-    constructor(
-        public readonly tourState: TourState,
-        public readonly tourService: TourService,
-    ) {
-        super({ isCollapsed: false });
+    protected readonly tourState = inject(TourState);
+
+    protected readonly isCollapsed = linkedSignal(() => this.tourCollapsed());
+
+    protected readonly tourCollapsed = toSignal(
+        merge(
+            this.tourService.stepShow$.pipe(map(() => true)),
+            this.tourService.end$.pipe(map(() => false)),
+        ),
+        { initialValue: false, equal: () => false });
+
+    protected toggle() {
+        this.isCollapsed.update(x => !x);
     }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.tourService.stepShow$
-                .subscribe(() => {
-                    this.next({ isCollapsed: true });
-                }));
-
-        this.subscriptions.add(
-            this.tourService.end$
-                .subscribe(() => {
-                    this.next({ isCollapsed: false });
-                }));
-    }
-
-    public toggle() {
-        this.next(s => ({ isCollapsed: !s.isCollapsed }));
-    }
-
-    public complete() {
+    protected complete() {
         this.tourState.complete();
     }
 
-    public start(task: TaskSnapshot) {
+    protected start(task: TaskSnapshot) {
         this.tourState.runTask(task);
     }
 }

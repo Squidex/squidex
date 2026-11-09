@@ -6,26 +6,20 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { booleanAttribute, Component, computed, effect, input, untracked } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
 import { FromNowPipe, ShortDatePipe, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AppLanguageDto, ContentDto, FieldValue, getContentValue, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
+import { AppLanguageDto, ContentDto, FieldValue, getContentValue, META_FIELDS, SchemaDto, TableField, TableSettings } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { ContentStatusComponent } from './content-status.component';
 import { ContentValueEditorComponent } from './content-value-editor.component';
 import { ContentValueComponent } from './content-value.component';
 import { TranslationStatusComponent } from './translation-status.component';
 
-interface State {
-    // The formatted value.
-    formatted: FieldValue;
-}
-
 @Component({
     selector: 'sqx-content-list-field',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ContentStatusComponent,
         ContentValueComponent,
@@ -39,58 +33,68 @@ interface State {
         UserPictureRefPipe,
     ],
 })
-export class ContentListFieldComponent extends StatefulComponent<State> {
-    public readonly metaFields = META_FIELDS;
+export class ContentListFieldComponent {
+    /** The field or meta field to render. */
+    public readonly field = input.required<TableField>();
 
-    @Input({ required: true })
-    public field!: TableField;
+    /** The table settings, used to render nested values. */
+    public readonly fields = input<TableSettings>();
 
-    @Input()
-    public fields?: TableSettings;
+    /** The content to render the value for. */
+    public readonly content = input.required<ContentDto>();
 
-    @Input({ required: true })
-    public content!: ContentDto;
+    /** Renders an inline editor if the field supports it. */
+    public readonly patchAllowed = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public patchAllowed?: boolean | null;
+    /** The form for inline editing. The value of the field is written to this form. */
+    public readonly patchForm = input<FieldTree<Record<string, any>> | null>();
 
-    @Input()
-    public patchForm?: UntypedFormGroup | null;
+    /** The schema of the content. */
+    public readonly schema = input.required<SchemaDto | undefined>();
 
-    @Input({ required: true })
-    public schema?: SchemaDto;
+    /** The language to render the value for. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    protected readonly isInlineEditable = computed(() => {
+        return this.field().rootField?.isInlineEditable === true;
+    });
 
-    public get isInlineEditable() {
-        return this.field.rootField?.isInlineEditable === true;
-    }
+    protected readonly formatted = computed<FieldValue>(() => {
+        const rootField = this.field().rootField;
+        if (!rootField) {
+            return '';
+        }
+
+        return getContentValue(this.content(), this.language(), rootField).formatted;
+    });
+
+    protected readonly metaFields = META_FIELDS;
 
     constructor() {
-        super({ formatted: '' });
-    }
-
-    public ngOnChanges() {
-        this.reset();
+        effect(() => {
+            this.reset();
+        });
     }
 
     public reset() {
-        if (this.field.rootField) {
-            const { value, formatted } = getContentValue(this.content, this.language, this.field.rootField);
-
-            if (this.patchForm) {
-                const formControl = this.patchForm.controls[this.field.rootField.name];
-
-                if (formControl) {
-                    formControl.setValue(value);
-                }
-            }
-
-            this.next({ formatted });
+        const rootField = this.field().rootField;
+        if (!rootField) {
+            return;
         }
+
+        const formField = this.patchForm()?.[rootField.name];
+        if (!formField) {
+            return;
+        }
+
+        const { value } = getContentValue(this.content(), this.language(), rootField);
+
+        untracked(() => {
+            formField().value.set(value);
+            formField().reset();
+        });
     }
 }

@@ -6,9 +6,8 @@
  */
 
 
-import { AfterViewInit, booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, AppSettingsDto, FieldDto, SchemaDto, TranslatePipe } from '@app/shared';
+import { booleanAttribute, Component, effect, input, output, signal } from '@angular/core';
+import { AppLanguageDto, AppSettingsDto, EditFieldForm, FieldDto, SchemaDto, TranslatePipe } from '@app/shared';
 import { JsonMoreComponent } from '../types/json-more.component';
 import { FieldFormCommonComponent } from './field-form-common.component';
 import { FieldFormUIComponent } from './field-form-ui.component';
@@ -26,45 +25,43 @@ import { FieldFormValidationComponent } from './field-form-validation.component'
         TranslatePipe,
     ],
 })
-export class FieldFormComponent implements AfterViewInit {
-    @Input({ transform: booleanAttribute })
-    public showButtons?: boolean | null;
+export class FieldFormComponent {
+    /** Emits when the user cancels editing. */
+    public readonly dialogClose = output();
 
-    @Input({ transform: booleanAttribute })
-    public isEditable?: boolean | null;
+    /** Shows the cancel and save buttons. */
+    public readonly showButtons = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** Enables the form and the save button, otherwise the form is disabled. */
+    public readonly isEditable = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<EditFieldForm>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public settings!: AppSettingsDto;
+    /** The schema the field belongs to. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The settings of the app. */
+    public readonly settings = input.required<AppSettingsDto>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isLocalizable!: boolean;
+    /** The languages of the app, used to edit localized default values. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Shows the localized default values, if the field is localizable. */
+    public readonly isLocalizable = input(false, { transform: booleanAttribute });
 
-    public selectedTab = 0;
+    protected readonly selectedTab = signal(0);
 
-    public ngAfterViewInit() {
-        if (!this.isEditable) {
-            this.fieldForm.disable();
-        } else {
-            this.fieldForm.enable();
-        }
+    constructor() {
+        effect(() => {
+            this.fieldForm().setEnabled(this.isEditable());
+        });
     }
 
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
+    protected selectTab(tab: number) {
+        this.selectedTab.set(tab);
     }
 }

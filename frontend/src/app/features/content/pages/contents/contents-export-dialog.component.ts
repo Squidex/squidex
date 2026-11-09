@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { form, FormField } from '@angular/forms/signals';
 import { AppLanguageDto, ExportContentsDto, ExportFormat, FormRowComponent, MarkdownDirective, ModalDialogComponent, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 
 type FieldPaths = { label: string; paths: ReadonlyArray<string> };
@@ -16,65 +16,64 @@ type FieldPaths = { label: string; paths: ReadonlyArray<string> };
     styleUrls: ['./contents-export-dialog.component.scss'],
     templateUrl: './contents-export-dialog.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
         MarkdownDirective,
         ModalDialogComponent,
         TranslatePipe,
     ],
 })
-export class ContentsExportDialogComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class ContentsExportDialogComponent {
+    private readonly schemasState = inject(SchemasState);
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** Emits when the dialog is closed or the export has been started. */
+    public readonly dialogClose = output();
 
-    @Input()
-    public languages: ReadonlyArray<AppLanguageDto> = [];
+    /** The schema to export the contents for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public readonly metaPaths = ['id', 'created', 'createdBy', 'lastModified', 'lastModifiedBy', 'status', 'newStatus', 'version'];
+    /** All languages of the app, to build the paths of localized fields. */
+    public readonly languages = input<ReadonlyArray<AppLanguageDto>>([]);
 
-    public fieldPaths: ReadonlyArray<FieldPaths> = [];
+    protected readonly fieldPaths = computed<ReadonlyArray<FieldPaths>>(() => {
+        const languages = this.languages();
 
-    public format: ExportFormat = 'Csv';
-    public fields = '';
-    public unpublished = false;
-
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
-
-    public ngOnInit() {
-        this.fieldPaths = this.schema.fields.filter(x => x.properties.isContentField).map(field => {
+        return this.schema().fields.filter(x => x.properties.isContentField).map(field => {
             const paths =
                 field.isLocalizable ?
-                this.languages.map(x => `data.${field.name}.${x.iso2Code}`) :
+                languages.map(x => `data.${field.name}.${x.iso2Code}`) :
                 [`data.${field.name}`];
 
             return { label: field.displayName, paths };
         });
+    });
+
+    protected readonly metaPaths = ['id', 'created', 'createdBy', 'lastModified', 'lastModifiedBy', 'status', 'newStatus', 'version'];
+
+    protected readonly exportForm = form(signal({ format: 'Csv' as ExportFormat, fields: '', unpublished: false }));
+
+    protected addPath(path: string) {
+        const fields = this.exportForm.fields().value;
+        const fieldsCurrent = fields().trim();
+
+        fields.set(fieldsCurrent ? `${fieldsCurrent}, ${path}` : path);
     }
 
-    public addPath(path: string) {
-        const current = this.fields.trim();
-
-        this.fields = current ? `${current}, ${path}` : path;
-    }
-
-    public export() {
-        if (!this.schema.canContentsExport) {
+    protected export() {
+        const schema = this.schema();
+        if (!schema.canContentsExport) {
             return;
         }
 
+        const { format, fields, unpublished } = this.exportForm().value();
+
         const request = new ExportContentsDto({
-            format: this.format,
-            fields: this.fields.trim() || undefined,
-            unpublished: this.unpublished,
+            format,
+            fields: fields.trim() || undefined,
+            unpublished,
         });
 
-        this.schemasState.exportContents(this.schema, request)
+        this.schemasState.exportContents(schema, request)
             .subscribe(() => {
                 this.dialogClose.emit();
             });

@@ -1,8 +1,9 @@
+@let clientValue = client();
 <div class="card" sqxTourStep="client">
     <div class="card-header">
         <div class="row g-1">
             <div class="col col-name">
-                <sqx-editable-title [disabled]="!client.canUpdate" [inputTitle]="client.name" (inputTitleChange)="rename($event)" inputTitleLength="100" />
+                <sqx-editable-title [disabled]="!clientValue.canUpdate" [inputTitle]="clientValue.name" (inputTitleChange)="rename($event)" inputTitleLength="100" />
             </div>
 
             <div class="col-auto">
@@ -18,7 +19,7 @@
                     confirmRememberKey="revokeClient"
                     confirmText="i18n:clients.deleteConfirmText"
                     confirmTitle="i18n:clients.deleteConfirmTitle"
-                    [disabled]="!client.canRevoke"
+                    [disabled]="!clientValue.canRevoke"
                     (sqxConfirmClick)="revoke()"
                     type="button">
                     <i class="icon-bin3"></i>
@@ -29,9 +30,9 @@
 
     <div class="card-body">
         <div class="container">
-            <sqx-form-row #clientIdRow for="clientId" hideError label="common.clientId" [prefix]="client.id">
+            <sqx-form-row #clientIdRow for="clientId" hideError label="common.clientId" [prefix]="clientValue.id">
                 <div class="input-group">
-                    <input class="form-control" [id]="clientIdRow.fieldName" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
+                    <input class="form-control" [id]="clientIdRow.fieldName()" #clientId readonly value="{{ appsState.appName }}:{{ clientValue.id }}" />
                     <button
                         class="btn btn-outline-secondary"
                         attr.aria-label="{{ 'clients.copyClientId' | sqxTranslate }}"
@@ -43,9 +44,9 @@
                 </div>
             </sqx-form-row>
 
-            <sqx-form-row #clientSecretRow for="clientSecret" hideError label="common.clientSecret" [prefix]="client.id">
+            <sqx-form-row #clientSecretRow for="clientSecret" hideError label="common.clientSecret" [prefix]="clientValue.id">
                 <div class="input-group">
-                    <input class="form-control" [id]="clientSecretRow.fieldName" #inputSecret readonly [value]="client.secret" />
+                    <input class="form-control" [id]="clientSecretRow.fieldName()" #inputSecret readonly [value]="clientValue.secret" />
                     <button
                         class="btn btn-outline-secondary"
                         attr.aria-label="{{ 'clients.copyClientSecret' | sqxTranslate }}"
@@ -54,7 +55,7 @@
                         type="button">
                         <i class="icon-copy"></i>
                     </button>
-                    @if (client.canRegenerateSecret) {
+                    @if (clientValue.canRegenerateSecret) {
                         <button
                             class="btn btn-outline-secondary"
                             attr.aria-label="{{ 'clients.regenerateSecret' | sqxTranslate }}"
@@ -69,44 +70,41 @@
                 </div>
             </sqx-form-row>
 
-            <sqx-form-row #roleRow for="role" hideError label="common.role" [prefix]="client.id">
+            <sqx-form-row #roleRow for="role" hideError label="common.role" [prefix]="clientValue.id">
                 <select
                     class="form-select"
-                    [id]="roleRow.fieldName"
-                    [disabled]="!client.canUpdate"
-                    [ngModel]="client.role"
-                    (ngModelChange)="updateRole($event)">
-                    @for (role of clientRoles; track role.name) {
-                        <option [ngValue]="role.name">{{ role.name }}</option>
+                    (change)="updateRole($any($event.target).value)"
+                    [disabled]="!clientValue.canUpdate"
+                    [id]="roleRow.fieldName()">
+                    @for (role of clientRoles(); track role.name) {
+                        <option [selected]="role.name === clientValue.role" [value]="role.name">{{ role.name }}</option>
                     }
                 </select>
             </sqx-form-row>
 
-            <sqx-form-row #allowAnonymousRow check for="allowAnonymous" hints="clients.allowAnonymousHint" label="clients.allowAnonymous" [prefix]="client.id">
+            <sqx-form-row #allowAnonymousRow check for="allowAnonymous" hints="clients.allowAnonymousHint" label="clients.allowAnonymous" [prefix]="clientValue.id">
                 <input
                     class="form-check-input"
-                    [id]="allowAnonymousRow.fieldName"
-                    [disabled]="!client.canUpdate"
-                    [ngModel]="client.allowAnonymous"
-                    (ngModelChange)="updateAllowAnonymous($event)"
+                    (change)="updateAllowAnonymous($any($event.target).checked)"
+                    [checked]="clientValue.allowAnonymous"
+                    [disabled]="!clientValue.canUpdate"
+                    [id]="allowAnonymousRow.fieldName()"
                     type="checkbox" />
             </sqx-form-row>
 
-            <sqx-form-row #apiCallsLimitRow for="apiCallsLimit" hideError hint="clients.apiCallsLimitHint" label="clients.apiCallsLimit" [prefix]="client.id">
+            <sqx-form-row #apiCallsLimitRow for="apiCallsLimit" hideError hint="clients.apiCallsLimitHint" label="clients.apiCallsLimit" [prefix]="clientValue.id">
                 <div class="row gx-2">
                     <div class="col">
                         <input
                             class="form-control"
-                            [id]="apiCallsLimitRow.fieldName"
-                            [disabled]="!client.canUpdate"
-                            min="0"
-                            [(ngModel)]="apiCallsLimit"
+                            [formField]="apiCallsLimit"
+                            [id]="apiCallsLimitRow.fieldName()"
                             type="number" />
                     </div>
 
-                    @if (client.canUpdate) {
+                    @if (clientValue.canUpdate) {
                         <div class="col-auto">
-                            <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit(apiCallsLimit)" type="button">
+                            <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit(apiCallsLimit().value())" type="button">
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         </div>
@@ -116,4 +114,4 @@
         </div>
     </div>
 </div>
-<sqx-client-connect-form [client]="client" (dialogClose)="connectDialog.hide()" *sqxModal="connectDialog" />
+<sqx-client-connect-form [client]="clientValue" (dialogClose)="connectDialog.hide()" *sqxModal="connectDialog" />

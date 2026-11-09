@@ -1,41 +1,42 @@
-@if (isMultiline) {
+@let scheduledJob = scheduled();
+@if (isMultiline()) {
     <div class="content-status-summary">
-        <span class="content-status default me-1" [style.color]="statusColor" title="{{ tooltipText }}">
+        <span class="content-status default me-1" [style.color]="statusColor()" title="{{ tooltipText() }}">
             <i class="icon-circle icon-sm"></i>
         </span>
-        <span class="label">{{ status }}</span>
+        <span class="label">{{ status() }}</span>
     </div>
 
-    @if (scheduled) {
+    @if (scheduledJob) {
         <div class="content-status-scheduled mt-2">
             <div>
                 <span class="label">{{ "contents.scheduledTo" | sqxTranslate }}&nbsp;</span>
-                <span class="content-status default me-1" [style.color]="scheduled.color" title="{{ tooltipText }}">
+                <span class="content-status default me-1" [style.color]="scheduledJob.color" title="{{ tooltipText() }}">
                     <i class="icon-circle icon-sm"></i>
                 </span>
-                <span>{{ scheduled.status }}</span>
+                <span>{{ scheduledJob.status }}</span>
             </div>
 
             <div class="truncate">
                 <span class="label">{{ "contents.scheduledAt" | sqxTranslate }}&nbsp;</span>
-                <span>{{ scheduled.dueTime | sqxFullDateTime }}</span>
+                <span>{{ scheduledJob.dueTime | sqxFullDateTime }}</span>
             </div>
         </div>
     }
 } @else {
-    <span [class.truncate]="truncate">
-        @if (scheduled) {
-            <span class="content-status pending" attr.aria-label="{{ tooltipText }}" [style.color]="scheduled.color" title="{{ tooltipText }}">
-                <i class="icon-clock" [class.icon-sm]="small"></i>
+    <span [class.truncate]="truncate()">
+        @if (scheduledJob) {
+            <span class="content-status pending" attr.aria-label="{{ tooltipText() }}" [style.color]="scheduledJob.color" title="{{ tooltipText() }}">
+                <i class="icon-clock" [class.icon-sm]="small()"></i>
             </span>
         } @else {
-            <span class="content-status default" attr.aria-label="{{ tooltipText }}" [style.color]="statusColor" title="{{ tooltipText }}">
-                <i class="icon-circle" [class.icon-sm]="small"></i>
+            <span class="content-status default" attr.aria-label="{{ tooltipText() }}" [style.color]="statusColor()" title="{{ tooltipText() }}">
+                <i class="icon-circle" [class.icon-sm]="small()"></i>
             </span>
         }
 
-        @if (isText) {
-            <span class="content-status-label ms-1">{{ status }}</span>
+        @if (isText()) {
+            <span class="content-status-label ms-1">{{ status() }}</span>
         }
     </span>
 }

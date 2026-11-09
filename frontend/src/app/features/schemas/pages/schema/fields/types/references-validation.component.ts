@@ -5,43 +5,41 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { booleanAttribute, Component, computed, inject, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, ReferencesFieldFormModel, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',
     imports: [
-        AsyncPipe,
+        FormField,
         FormRowComponent,
-        FormsModule,
         LocalizedInputComponent,
-        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class ReferencesValidationComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    protected readonly schemasSource = inject(SchemaTagSource);
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public properties!: ReferencesFieldPropertiesDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<ReferencesFieldPropertiesDto>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isLocalizable!: boolean;
+    /** The languages of the app, used to edit localized default values. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    constructor(
-        public readonly schemasSource: SchemaTagSource,
-    ) {
-    }
+    /** Shows the localized default values, if the field is localizable. */
+    public readonly isLocalizable = input(false, { transform: booleanAttribute });
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<ReferencesFieldFormModel>;
+    });
 }

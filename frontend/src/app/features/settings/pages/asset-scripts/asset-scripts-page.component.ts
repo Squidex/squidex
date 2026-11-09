@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, effect, inject, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditAssetScriptsForm, KeysPipe, LayoutComponent, ScriptCompletions, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditAssetScriptsForm, LayoutComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ScriptNamePipe } from '@app/shared/components/pipes';
 
 @Component({
@@ -18,12 +18,10 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
     styleUrls: ['./asset-scripts-page.component.scss'],
     templateUrl: './asset-scripts-page.component.html',
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
+        FormField,
         FormsModule,
-        KeysPipe,
         LayoutComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -36,64 +34,47 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
         TranslatePipe,
     ],
 })
-export class AssetScriptsPageComponent implements OnInit {
-    public assetScript = 'query';
-    public assetCompletions: Observable<ScriptCompletions> = EMPTY;
+export class AssetScriptsPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
 
-    public editForm = new EditAssetScriptsForm();
+    protected readonly assetScriptsState = inject(AssetScriptsState);
 
-    public isEditable = false;
+    protected readonly assetScript = signal('query');
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly assetScriptsState: AssetScriptsState,
-        private readonly assetsService: AssetsService,
-    ) {
-    }
+    protected readonly assetCompletions = rxResource({
+        stream: () => this.assetsService.getCompletions(this.appsState.appName),
+    });
 
-    public ngOnInit() {
-        this.assetCompletions = this.assetsService.getCompletions(this.appsState.appName).pipe(shareReplay(1));
+    protected readonly editForm = new EditAssetScriptsForm();
 
-        this.assetScriptsState.scripts
-            .subscribe(scripts => {
-                this.editForm.load(scripts);
-            });
-        this.assetScriptsState.canUpdate
-            .subscribe(canUpdate => {
-                this.isEditable = canUpdate;
+    constructor() {
+        effect(() => {
+            this.editForm.load(this.assetScriptsState.scripts());
+        });
 
-                this.editForm.setEnabled(this.isEditable);
-            });
+        effect(() => {
+            this.editForm.setEnabled(this.assetScriptsState.canUpdate());
+        });
 
         this.assetScriptsState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.assetScriptsState.load(true);
     }
 
-    public selectField(field: string) {
-        this.assetScript = field;
+    protected selectField(field: string) {
+        this.assetScript.set(field);
     }
 
-    public saveScripts() {
-        if (!this.isEditable) {
+    protected saveScripts() {
+        if (!this.assetScriptsState.canUpdate()) {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.assetScriptsState.update(value)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        this.editForm.submit(value => {
+            return this.assetScriptsState.update(value);
+        });
     }
 }

@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RulesService, SimulatedRuleEventsDto } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, DialogService, RulesService, SimulatedRuleEventsDto } from '@app/shared/internal';
 import { createSimulatedRuleEvent } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { RuleSimulatorState } from './rule-simulator.state';
@@ -33,7 +34,11 @@ describe('RuleSimulatorState', () => {
 
         rulesService = Mock.ofType<RulesService>();
 
-        ruleSimulatorState = new RuleSimulatorState(appsState.object, dialogs.object, rulesService.object);
+        ruleSimulatorState = createService(RuleSimulatorState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: RulesService, useValue: rulesService.object },
+        ]);
     });
 
     it('should load simulated rule events', () => {

@@ -5,51 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-role-add-form',
     styleUrls: ['./role-add-form.component.scss'],
     templateUrl: './role-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class RoleAddFormComponent {
-    public addRoleForm = new AddRoleForm();
+    private readonly rolesState = inject(RolesState);
 
-    constructor(
-        private readonly rolesState: RolesState,
-    ) {
+    protected readonly addRoleForm = new AddRoleForm();
+
+    protected addRole() {
+        this.addRoleForm.submit(value => {
+            return this.rolesState.add(value);
+        }, { resetAfterSubmit: true });
     }
 
-    public addRole() {
-        const value = this.addRoleForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.rolesState.add(value)
-            .subscribe({
-                next: () => {
-                    this.addRoleForm.submitCompleted();
-                },
-                error: error => {
-                    this.addRoleForm.submitFailed(error);
-                },
-            });
-    }
-
-    public cancel() {
-        this.addRoleForm.submitCompleted();
+    protected cancel() {
+        this.addRoleForm.reset();
     }
 }

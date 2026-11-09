@@ -5,36 +5,34 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form } from '@app/framework';
+import { maxLength, required } from '@angular/forms/signals';
+import { SignalForm } from '@app/framework';
 import { CreateTeamDto, TeamDto, UpdateTeamDto } from '../model';
 
-export class CreateTeamForm extends Form<ExtendedFormGroup, CreateTeamDto> {
+export type TeamFormModel = { name: string };
+
+export class CreateTeamForm extends SignalForm<TeamFormModel, CreateTeamDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            name: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(40),
-            ]),
-        }));
+        super({ name: '' }, path => {
+            maxLength(path.name, 40);
+            required(path.name);
+        });
     }
 
-    public transformSubmit(value: any) {
+    protected transformSubmit(value: TeamFormModel) {
         return new CreateTeamDto(value);
     }
 }
 
-export class UpdateTeamForm extends Form<ExtendedFormGroup, UpdateTeamDto, TeamDto> {
+export class UpdateTeamForm extends SignalForm<TeamFormModel, UpdateTeamDto, TeamDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            name: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(40),
-            ]),
-        }));
+        super({ name: '' }, path => {
+            maxLength(path.name, 40);
+            required(path.name);
+        });
     }
 
-    public transformSubmit(value: any) {
+    protected transformSubmit(value: TeamFormModel) {
         return new UpdateTeamDto(value);
     }
 }

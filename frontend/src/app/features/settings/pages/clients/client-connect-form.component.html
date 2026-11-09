@@ -5,7 +5,7 @@
             <ol class="breadcrumb mb-4 steps">
                 <li class="breadcrumb-item done"><i class="icon-checkmark"></i> {{ "clients.connectWizard.step0Title" | sqxTranslate }}</li>
 
-                @if (step === "Start") {
+                @if (step() === "Start") {
                     <li class="breadcrumb-item active">
                         <span> <i class="icon-checkmark"></i> {{ "clients.connectWizard.step1Title" | sqxTranslate }}</span>
                     </li>
@@ -17,13 +17,13 @@
                     </li>
                 }
 
-                <li class="breadcrumb-item" [class.active]="step !== 'Start'">
+                <li class="breadcrumb-item" [class.active]="step() !== 'Start'">
                     <i class="icon-checkmark"></i> {{ "clients.connectWizard.step2Title" | sqxTranslate }}
                 </li>
             </ol>
         </nav>
 
-        @switch (step) {
+        @switch (step()) {
             @case ("Start") {
                 <h3>{{ "clients.connectWizard.step1Title" | sqxTranslate }}</h3>
                 <sqx-form-hint>
@@ -61,7 +61,7 @@
                     <h5><span class="badge rounded-pill bg-dark">1</span> {{ "clients.connectWizard.mcpStep1" | sqxTranslate }}</h5>
 
                     <p>
-                        <sqx-code>{{ mcpUrl }}</sqx-code>
+                        <sqx-code>{{ mcpUrl() }}</sqx-code>
                         <sqx-form-hint> {{ "clients.connectWizard.mcpStep1Hint" | sqxTranslate }}</sqx-form-hint>
                     </p>
                 </div>
@@ -70,7 +70,7 @@
                     <h5><span class="badge rounded-pill bg-dark">2</span> {{ "clients.connectWizard.mcpStep2" | sqxTranslate }}</h5>
 
                     <p>
-                        <sqx-code>{{ mcpCommand }}</sqx-code>
+                        <sqx-code>{{ mcpCommand() }}</sqx-code>
                     </p>
                 </div>
 
@@ -78,7 +78,7 @@
                     <h5><span class="badge rounded-pill bg-dark">3</span> {{ "clients.connectWizard.mcpStep3" | sqxTranslate }}</h5>
 
                     <p>
-                        <sqx-code>{{ mcpConfig }}</sqx-code>
+                        <sqx-code>{{ mcpConfig() }}</sqx-code>
                         <sqx-form-hint>
                             <span [sqxMarkdown]="'clients.connectWizard.mcpStep3Hint' | sqxTranslate"></span>
                         </sqx-form-hint>
@@ -104,9 +104,9 @@
 
                             <div ngPreserveWhitespaces>-d 'grant_type=client_credentials&</div>
 
-                            <div ngPreserveWhitespaces>client_id={{ appName }}:{{ client.id }}</div>
+                            <div ngPreserveWhitespaces>client_id={{ appName }}:{{ client().id }}</div>
 
-                            <div ngPreserveWhitespaces>client_secret={{ client.secret }}</div>
+                            <div ngPreserveWhitespaces>client_secret={{ client().secret }}</div>
 
                             <div ngPreserveWhitespaces>scope=squidex-api'</div>
                         </sqx-code>
@@ -117,7 +117,7 @@
                     <h5><span class="badge rounded-pill bg-dark">2</span> {{ "clients.connectWizard.manuallyStep2" | sqxTranslate }}</h5>
 
                     <p>
-                        <sqx-code>{{ appToken?.accessToken }}</sqx-code>
+                        <sqx-code>{{ appToken.value()?.accessToken }}</sqx-code>
                     </p>
                 </div>
 
@@ -148,7 +148,7 @@
                     <h5><span class="badge rounded-pill bg-dark">3</span> {{ "clients.connectWizard.cliStep3" | sqxTranslate }}</h5>
 
                     <p>
-                        <sqx-code> sq config add {{ appName }} {{ appName }}:{{ client.id }} {{ client.secret }} -u {{ apiUrl.value }} --use </sqx-code>
+                        <sqx-code> sq config add {{ appName }} {{ appName }}:{{ client().id }} {{ client().secret }} -u {{ apiUrl.value }} --use </sqx-code>
                         <sqx-form-hint> {{ "clients.connectWizard.cliStep3Hint" | sqxTranslate }}</sqx-form-hint>
                     </p>
                 </div>
@@ -163,10 +163,10 @@
             }
 
             @case ("SDK") {
-                @if (sdks | async; as sdks) {
+                @if (sdks.value(); as sdks) {
                     <div>
                         @for (availableSDK of sdks | keyvalue; track availableSDK) {
-                            <div class="sdk-header" [class.active]="sdk === availableSDK.value" (click)="select(availableSDK.value)">
+                            <div class="sdk-header" [class.active]="sdk() === availableSDK.value" (click)="select(availableSDK.value)">
                                 <div class="logo d-flex align-items-center justify-content-center" [sqxMarkdown]="availableSDK.value.logo"></div>
                                 {{ availableSDK.value.name }}
                             </div>
@@ -174,7 +174,7 @@
                     </div>
                 }
 
-                @if (sdk) {
+                @if (sdk(); as sdk) {
                     <div class="section markdown">
                         <div>
                             <a [attr.href]="sdk.documentation" sqxExternalLink>{{ "common.documentation" | sqxTranslate }}</a>
@@ -185,7 +185,7 @@
                     </div>
                 }
 
-                @if (sdk) {
+                @if (sdk()) {
                     <div class="section">
                         <sqx-form-hint>
                             {{ "clients.connectWizard.sdkHelp" | sqxTranslate }}
@@ -197,7 +197,7 @@
         }
     </ng-container>
     <ng-container footer>
-        <button class="btn btn-text-secondary" (click)="go('Start')" [disabled]="step === 'Start'" type="button">
+        <button class="btn btn-text-secondary" (click)="go('Start')" [disabled]="step() === 'Start'" type="button">
             {{ "common.back" | sqxTranslate }}
         </button>
     </ng-container>

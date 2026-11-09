@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export module StringHelper {
+export namespace StringHelper {
     export function firstNonEmpty(...values: ReadonlyArray<(string | undefined | null)>) {
         for (const value of values) {
             if (value) {

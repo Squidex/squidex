@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { AppsState, AutocompleteSource, FormHintComponent, LayoutComponent, ListViewComponent, RolesService, RolesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -34,7 +33,6 @@ class PermissionsAutocomplete implements AutocompleteSource {
     styleUrls: ['./roles-page.component.scss'],
     templateUrl: './roles-page.component.html',
     imports: [
-        AsyncPipe,
         FormHintComponent,
         LayoutComponent,
         ListViewComponent,
@@ -51,24 +49,23 @@ class PermissionsAutocomplete implements AutocompleteSource {
         TranslatePipe,
     ],
 })
-export class RolesPageComponent implements OnInit {
-    public allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
+export class RolesPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly rolesService = inject(RolesService);
 
-    constructor(
-        private readonly appsState: AppsState,
-        public readonly rolesService: RolesService,
-        public readonly rolesState: RolesState,
-        public readonly schemasState: SchemasState,
-    ) {
-    }
+    protected readonly rolesState = inject(RolesState);
 
-    public ngOnInit() {
+    protected readonly schemasState = inject(SchemasState);
+
+    protected readonly allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
+
+    constructor() {
         this.schemasState.loadIfNotLoaded();
 
         this.rolesState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.rolesState.load(true);
     }
 }

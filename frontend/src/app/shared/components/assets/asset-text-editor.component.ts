@@ -6,55 +6,47 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent } from '@app/framework';
+import { Component, inject, input, linkedSignal } from '@angular/core';
+import { CodeEditorComponent, safeResource } from '@app/framework';
 
 @Component({
     selector: 'sqx-asset-text-editor',
     styleUrls: ['./asset-text-editor.component.scss'],
     templateUrl: './asset-text-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
     ],
 })
-export class AssetTextEditorComponent implements OnInit {
-    @Input()
-    public fileSource = '';
+export class AssetTextEditorComponent {
+    private readonly httpClient = inject(HttpClient);
 
-    @Input()
-    public fileName = '';
+    /** The URL to load the text from. */
+    public readonly fileSource = input('');
 
-    @Input()
-    public mimeType = '';
+    /** The file name, to choose the syntax highlighting. */
+    public readonly fileName = input('');
 
-    public text = '';
+    /** The mime type of the file that is created from the text. */
+    public readonly mimeType = input('');
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly httpClient: HttpClient,
-    ) {
-    }
+    protected readonly text = linkedSignal(() => this.textLoaded.value());
 
-    public ngOnInit() {
-        this.httpClient.get(this.fileSource, { responseType: 'text' })
-            .subscribe(text => {
-                this.text = text;
-
-                this.changeDetector.detectChanges();
-            });
-    }
+    protected readonly textLoaded = safeResource({
+        params: () => ({ fileSource: this.fileSource() }),
+        stream: ({ params }) => this.httpClient.get(params.fileSource, { responseType: 'text' }),
+        defaultValue: '',
+    });
 
     public toFile(): Promise<File | null> {
         return new Promise<File | null>(resolve => {
-            const blob = new Blob([this.text || ''], {
-                type: this.mimeType,
+            const mimeType = this.mimeType();
+
+            const blob = new Blob([this.text() || ''], {
+                type: mimeType,
             });
 
             const file = new File([blob], 'content.txt', {
-                type: this.mimeType,
+                type: mimeType,
             });
 
             resolve(file);

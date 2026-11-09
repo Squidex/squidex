@@ -3,37 +3,37 @@
 
     <td class="content-field" [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
         <sqx-content-list-field
-            [content]="content"
+            [content]="content()"
             [field]="metaFields.lastModifiedByAvatar"
-            [language]="language"
-            [languages]="languages"
+            [language]="language()"
+            [languages]="languages()"
             [schema]="undefined" />
     </td>
 
-    @for (value of values; track value) {
+    @for (value of values(); track value) {
         <td class="cell-auto cell-content"><sqx-content-value [value]="value" /></td>
     }
 
-    @if (validityVisible) {
+    @if (validityVisible()) {
         <td class="cell-valid">
-            @if (isValid === true) {
+            @if (isValid() === true) {
                 <span class="badge rounded-pill badge-success">VALID</span>
             }
 
-            @if (isValid === false) {
+            @if (isValid() === false) {
                 <span class="badge rounded-pill badge-danger">INVALID</span>
             }
         </td>
     }
 
     <td [field]="metaFields.statusColor" sqxContentListCell>
-        <sqx-content-list-field [content]="content" [field]="metaFields.statusColor" [language]="language" [languages]="languages" [schema]="undefined" />
+        <sqx-content-list-field [content]="content()" [field]="metaFields.statusColor" [language]="language()" [languages]="languages()" [schema]="undefined" />
     </td>
 
-    @if (!isCompact) {
+    @if (!isCompact()) {
         <td class="cell-label">
             <div class="bg-container d-flex align-items-center">
-                <span class="badge badge-primary rounded-pill truncate-inline">{{ content.schemaDisplayName }}</span>
+                <span class="badge badge-primary rounded-pill truncate-inline">{{ content().schemaDisplayName }}</span>
             </div>
         </td>
     }
@@ -52,7 +52,7 @@
                     type="button">
                     <i class="icon-copy"></i>
                 </button>
-                @if (canRemove) {
+                @if (canRemove()) {
                     <button
                         class="btn btn-text-secondary"
                         attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
@@ -67,7 +67,7 @@
                 <a
                     class="btn btn-text-secondary"
                     attr.aria-label="{{ 'common.edit' | sqxTranslate }}"
-                    [routerLink]="['../..', content.schemaName, content.id]"
+                    [routerLink]="['../..', content().schemaName, content().id]"
                     target="_blank">
                     <i class="icon-pencil"></i>
                 </a>

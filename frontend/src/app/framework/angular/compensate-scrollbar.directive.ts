@@ -5,42 +5,45 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, booleanAttribute, Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
-import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
+import { afterNextRender, booleanAttribute, DestroyRef, Directive, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCompensateScrollbar]',
+    host: {
+        '(scroll)': 'onScroll()',
+    },
 })
-export class CompensateScrollbarDirective implements AfterViewInit, ResizeListener {
-    private readonly subscriptions = new Subscriptions();
+export class CompensateScrollbarDirective implements ResizeListener {
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly resizeService = inject(ResizeService);
     private previousScrollbarWidth = -1;
 
-    @Input({ alias: 'sqxCompensateScrollbar', transform: booleanAttribute })
-    public enabled = true;
+    /** Adds a left padding with the width of the scrollbar to keep the content centered. */
+    public readonly enabled = input(true, { alias: 'sqxCompensateScrollbar', transform: booleanAttribute });
 
-    constructor(
-        private readonly renderer: Renderer2,
-        private readonly element: ElementRef<HTMLElement>,
-        private readonly resizeService: ResizeService,
-    ) {
-        this.subscriptions.add(this.resizeService.listen(this.element.nativeElement, this));
-    }
+    constructor() {
+        const unlisten = this.resizeService.listen(this.element.nativeElement, this);
 
-    public ngAfterViewInit() {
-        this.resize();
+        this.destroyRef.onDestroy(unlisten);
+
+        afterNextRender(() => {
+            this.resize();
+        });
     }
 
     public onResize() {
         this.resize();
     }
 
-    @HostListener('scroll')
-    public onScroll() {
+    protected onScroll() {
         this.resize();
     }
 
     private resize() {
-        if (!this.enabled) {
+        if (!this.enabled()) {
             return;
         }
 

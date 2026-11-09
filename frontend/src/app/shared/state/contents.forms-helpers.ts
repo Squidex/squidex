@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, ValidatorFn } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { computed, Signal, signal, WritableSignal } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
 import { AppLanguageDto, FieldDto, fieldInvariant, isValidValue, Language, NestedFieldDto, SchemaDto } from '../internal';
-import { CompiledRules, RuleContext, RulesProvider } from './contents.form-rules';
+import type { ContentValues } from './contents.forms-values';
 
 export type TranslationStatuses = { [language: string]: number };
 
@@ -73,28 +72,6 @@ export function fieldTranslationStatus(data: any) {
     return result;
 }
 
-export abstract class Hidden {
-    private readonly hidden$ = new BehaviorSubject<boolean>(false);
-
-    public get hidden() {
-        return this.hidden$.value;
-    }
-
-    public get hiddenChanges(): Observable<boolean> {
-        return this.hidden$;
-    }
-
-    public get visibleChanges(): Observable<boolean> {
-        return this.hidden$.pipe(map(x => !x));
-    }
-
-    protected setHidden(hidden: boolean) {
-        if (hidden !== this.hidden) {
-            this.hidden$.next(hidden);
-        }
-    }
-}
-
 export type FieldGroup<T = FieldDto> = { separator?: T; fields: T[]; id: string };
 
 export function groupFields<T extends AnyFieldDto>(fields: ReadonlyArray<T>, keepEmpty = false): FieldGroup<T>[] {
@@ -125,22 +102,19 @@ export function groupFields<T extends AnyFieldDto>(fields: ReadonlyArray<T>, kee
     return result;
 }
 
-export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extends Hidden {
+export class FieldSection<TSeparator, TChild extends { hidden: Signal<boolean> }> {
+    public readonly hidden = computed(() => {
+        return this.fields.every(x => x.hidden());
+    });
+
+    public readonly visible = computed(() => {
+        return !this.hidden();
+    });
+
     constructor(
         public readonly separator: TSeparator | undefined,
         public readonly fields: ReadonlyArray<TChild>,
     ) {
-        super();
-    }
-
-    public updateHidden() {
-        let visible = false;
-
-        for (const child of this.fields) {
-            visible = visible || !child.hidden;
-        }
-
-        this.setHidden(!visible);
     }
 }
 
@@ -165,19 +139,17 @@ export class PartitionConfig {
     public getAll(field: FieldDto) {
         return field.isLocalizable ? this.languages : this.invariant;
     }
-}
 
-export type AbstractContentFormState = Readonly<{
-    isDisabled?: boolean;
-    isHidden?: boolean;
-    isRequired?: boolean;
-}>;
+    public isOptional(key: string | undefined) {
+        return this.languages.find(x => x.key === key)?.isOptional === true;
+    }
+}
 
 export type FormGlobals = Readonly<{
     partitions: PartitionConfig;
-    remoteValidator?: ValidatorFn;
     schema: SchemaDto;
     schemas: { [id: string ]: SchemaDto };
+    values: ContentValues;
 }>;
 
 export type ControlArgs<T = AnyFieldDto> = Readonly<{
@@ -186,12 +158,10 @@ export type ControlArgs<T = AnyFieldDto> = Readonly<{
     isOptional: boolean;
     partition: string;
     path: string;
-    rules: RulesProvider;
 }>;
 
-export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends AbstractControl> extends Hidden {
-    private readonly collapsed$ = new BehaviorSubject<boolean | null>(null);
-    private readonly ruleSet: CompiledRules;
+export abstract class AbstractContentForm<T extends AnyFieldDto> {
+    private readonly collapsedState = signal<boolean | null>(null);
 
     public readonly field: T;
     public readonly globals: FormGlobals;
@@ -199,25 +169,41 @@ export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends A
     public readonly partition: string;
     public readonly path: string;
 
-    public get collapsed() {
-        return this.collapsed$.value;
+    public readonly collapsed = this.collapsedState.asReadonly();
+
+    public readonly disabled = computed(() => {
+        return this.form().disabled();
+    });
+
+    public readonly hidden = computed(() => {
+        return this.form().hidden();
+    });
+
+    public readonly visible = computed(() => {
+        return !this.hidden();
+    });
+
+    public readonly invalid = computed(() => {
+        return this.form().invalid();
+    });
+
+    public readonly value = computed<any>(() => {
+        return this.formValue();
+    });
+
+    protected get formValue() {
+        return this.form().value as WritableSignal<any>;
     }
 
-    public get collapsedChanges(): Observable<boolean | null> {
-        return this.collapsed$;
-    }
-
-    protected constructor(
+    constructor(
         public readonly args: ControlArgs<T>,
-        public readonly form: TForm,
+        public readonly form: FieldTree<any>,
     ) {
-        super();
         this.field = args.field;
         this.globals = args.globals;
         this.isOptional = args.isOptional;
         this.partition = args.partition;
         this.path = args.path;
-        this.ruleSet = args.rules.getRules(args);
     }
 
     public relativePath(relative: string) {
@@ -225,54 +211,19 @@ export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends A
     }
 
     public setValue(value: any) {
-        this.form.reset(value);
+        this.formValue.set(this.globals.values.createValue(this.field, value, this.partition, false));
+        this.form().reset();
     }
 
     public unset() {
-        this.form.setValue(undefined);
+        this.formValue.set(null);
     }
 
     public collapse() {
-        this.collapsed$.next(true);
+        this.collapsedState.set(true);
     }
 
     public expand() {
-        this.collapsed$.next(false);
+        this.collapsedState.set(false);
     }
-
-    public updateState(context: RuleContext, itemData: any, parentState: AbstractContentFormState) {
-        const state = {
-            isDisabled: this.field.isDisabled || parentState.isDisabled === true,
-            isHidden: parentState.isHidden === true,
-            isRequired: this.field.properties.isRequired && !this.isOptional,
-        };
-
-        for (const rule of this.ruleSet.rules) {
-            if (rule.eval(context, itemData)) {
-                if (rule.action === 'Disable') {
-                    state.isDisabled = true;
-                } else if (rule.action === 'Hide') {
-                    state.isHidden = true;
-                } else {
-                    state.isRequired = true;
-                }
-            }
-        }
-
-        this.setHidden(state.isHidden);
-
-        if (state.isDisabled !== this.form.disabled) {
-            if (state.isDisabled) {
-                this.form.disable(SELF);
-            } else {
-                this.form.enable(SELF);
-            }
-        }
-
-        this.updateCustomState(context, itemData, state);
-    }
-
-    protected updateCustomState(_context: RuleContext, _itemData: any, _state: AbstractContentFormState): void {}
 }
-
-const SELF = { onlySelf: true };

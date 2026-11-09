@@ -5,153 +5,129 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { switchMap } from 'rxjs';
-import { ApiUrlConfig, AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { Component, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { switchMap, tap } from 'rxjs';
+import { AppsState, CodeEditorComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, SignalSelectDirective, TextInputDirective, TooltipDirective, TranslatePipe, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
     styleUrls: ['./schema-form.component.scss'],
     templateUrl: './schema-form.component.html',
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LoaderComponent,
         ModalDialogComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
+        TextInputDirective,
         TooltipDirective,
-        TransformInputDirective,
         TranslatePipe,
     ],
 })
-export class SchemaFormComponent implements OnInit {
-    public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+export class SchemaFormComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly schemasService = inject(SchemasService);
+    private readonly uiOptions = inject(UIOptions);
 
-    @Output()
-    public create = new EventEmitter<SchemaDto>();
+    protected readonly schemasState = inject(SchemasState);
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits the created schema. */
+    public readonly create = output<SchemaDto>();
 
-    @Input()
-    public source: any;
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    public createForm = new CreateSchemaForm();
-    public generateForm = new GenerateSchemaForm();
-    public generateLog: string = '';
+    /** The exported schema to clone. Creates an empty schema when not set. */
+    public readonly source = input<any>();
 
-    public selectedTab = 0;
+    protected readonly sourceActual = linkedSignal(() => this.source());
 
-    public get actualForm() {
-        return this.selectedTab === 2 ? this.generateForm : this.createForm;
+    protected readonly generateLog = signal('');
+
+    protected readonly selectedTab = linkedSignal<number>(() => {
+        return this.source() ? 1 : 0;
+    });
+
+    protected readonly actualForm = computed(() => {
+        return this.selectedTab() === 2 ? this.generateForm : this.createForm;
+    });
+
+    protected readonly hasChatBot = this.uiOptions.value.canUseChatBot;
+
+    protected readonly createForm = new CreateSchemaForm();
+
+    protected readonly generateForm = new GenerateSchemaForm();
+
+    constructor() {
+        effect(() => {
+            this.createForm.load({ type: 'Default', ...this.source(), name: '' });
+        });
     }
 
-    constructor(
-        public readonly apiUrl: ApiUrlConfig,
-        public readonly appsState: AppsState,
-        public readonly schemasState: SchemasState,
-        private readonly schemasService: SchemasService,
-    ) {
-    }
+    protected selectTab(tab: number) {
+        this.selectedTab.set(tab);
+        this.sourceActual.set(null);
 
-    public ngOnInit() {
-        this.createForm.load({ type: 'Default', ...this.source, name: '' });
-
-        if (this.source) {
-            this.selectedTab = 1;
-        }
-    }
-
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
-        this.source = null;
-
-        const { type, name } = this.createForm.form.value;
+        const { type, name } = this.createForm.model();
         this.createForm.load({ type, name });
     }
 
-    public emitCreate(value: SchemaDto) {
+    private emitCreate(value: SchemaDto) {
         this.create.emit(value);
     }
 
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public createSchema() {
-        if (this.selectedTab === 2) {
+    protected createSchema() {
+        if (this.selectedTab() === 2) {
             this.generateCore();
         } else {
             this.createCore();
         }
     }
 
-    public generatePreview() {
-        const value = this.generateForm.submit();
-        if (!value) {
-            return;
-        }
+    protected generatePreview() {
+        this.generateForm.submit(value => {
+            this.generateLog.set('');
 
-        this.generateLog = '';
+            const request = new GenerateSchemaDto({ ...value, numberOfContentItems: 20, execute: false });
 
-        const dto = new GenerateSchemaDto({ ...value, numberOfContentItems: 20, execute: false });
-        this.schemasService.generateSchema(this.appsState.appName, dto)
-            .subscribe({
-                next: dto => {
-                    this.generateLog = dto.log.join('\n');
-                    this.generateForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.generateForm.submitFailed(error);
-                },
-            });
+            return this.schemasService.generateSchema(this.appsState.appName, request).pipe(
+                tap(dto => this.generateLog.set(dto.log.join('\n'))));
+        });
     }
 
     private generateCore() {
-        const value = this.generateForm.submit();
-        if (!value || !this.generateLog) {
+        if (!this.generateLog()) {
             return;
         }
 
-        const dto = new GenerateSchemaDto({ ...value, numberOfContentItems: 20, execute: true });
-        this.schemasService.generateSchema(this.appsState.appName, dto)
-            .pipe(
+        this.generateForm.submit(value => {
+            const request = new GenerateSchemaDto({ ...value, numberOfContentItems: 20, execute: true });
+
+            return this.schemasService.generateSchema(this.appsState.appName, request).pipe(
                 switchMap(p => this.schemasService.getSchema(this.appsState.appName, p.schemaName!)),
-            )
-            .subscribe({
-                next: dto => {
+                tap(dto => {
                     this.schemasState.add(dto);
                     this.emitCreate(dto);
-                },
-                error: error => {
-                    this.createForm.submitFailed(error);
-                },
-            });
-
+                }));
+        });
     }
 
-    public createCore() {
-        const value = this.createForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.schemasState.create(value)
-            .subscribe({
-                next: dto => {
-                    this.emitCreate(dto);
-                },
-                error: error => {
-                    this.createForm.submitFailed(error);
-                },
-            });
+    private createCore() {
+        this.createForm.submit(value => {
+            return this.schemasState.create(value).pipe(
+                tap(dto => this.emitCreate(dto)));
+        });
     }
 }

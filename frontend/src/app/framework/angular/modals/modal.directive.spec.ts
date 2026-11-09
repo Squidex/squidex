@@ -23,9 +23,7 @@ import { RootViewComponent } from './root-view.component';
             <div></div>
         </ng-container>
     `,
-    imports: [
-        ModalDirective,
-    ],
+    imports: [ModalDirective],
 })
 class TestHostComponent {
     public dialog1 = new DialogModel();
@@ -40,9 +38,7 @@ describe('ModalDirective', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [TestHostComponent],
-            providers: [
-                { provide: RootViewComponent, useValue: {} },
-            ],
+            providers: [{ provide: RootViewComponent, useValue: {} }],
         });
 
         const fixture = TestBed.createComponent(TestHostComponent);
@@ -55,14 +51,16 @@ describe('ModalDirective', () => {
         host.dialog1.show();
         host.dialog2.show();
         host.dropdown.show();
+
+        fixture.detectChanges();
     });
 
     it('should hide all open modals', () => {
         modalService.hideAll();
 
-        expect(host.dialog1.isOpen).toBeFalsy();
-        expect(host.dialog2.isOpen).toBeFalsy();
-        expect(host.dropdown.isOpen).toBeFalsy();
+        expect(host.dialog1.isOpen()).toBeFalsy();
+        expect(host.dialog2.isOpen()).toBeFalsy();
+        expect(host.dropdown.isOpen()).toBeFalsy();
     });
 
     it('should not hide modal that contains the element', () => {
@@ -70,8 +68,8 @@ describe('ModalDirective', () => {
 
         modalService.hideAll(anchor);
 
-        expect(host.dialog1.isOpen).toBeTruthy();
-        expect(host.dialog2.isOpen).toBeFalsy();
-        expect(host.dropdown.isOpen).toBeFalsy();
+        expect(host.dialog1.isOpen()).toBeTruthy();
+        expect(host.dialog2.isOpen()).toBeFalsy();
+        expect(host.dropdown.isOpen()).toBeFalsy();
     });
 });

@@ -6,9 +6,10 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { ArrayFieldPropertiesDto, FieldDto, FormRowComponent } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { ArrayFieldFormModel, ArrayFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, SignalSelectDirective } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
@@ -17,20 +18,25 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     styleUrls: ['array-ui.component.scss'],
     templateUrl: 'array-ui.component.html',
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
     ],
 })
 export class ArrayUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: ArrayFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<ArrayFieldPropertiesDto>();
 
-    public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<ArrayFieldFormModel>;
+    });
+
+    protected readonly calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

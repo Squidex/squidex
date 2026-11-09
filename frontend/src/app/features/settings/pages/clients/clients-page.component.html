@@ -6,13 +6,13 @@
         </button>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="clientsState.isLoading | async">
-            @if ((clientsState.isLoaded | async) && (clientsState.clients | async); as clients) {
-                @if (clientsState.canCreate | async) {
+        <sqx-list-view innerWidth="50rem" [isLoading]="clientsState.isLoading()">
+            @if (clientsState.isLoaded() && clientsState.clients(); as clients) {
+                @if (clientsState.canCreate()) {
                     <sqx-client-add-form />
                 }
 
-                @if (rolesState.roles | async; as roles) {
+                @if (rolesState.roles(); as roles) {
                     @for (client of clients; track client.id) {
                         <sqx-client [client]="client" [clientRoles]="roles" />
                     } @empty {

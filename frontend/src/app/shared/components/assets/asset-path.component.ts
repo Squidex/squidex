@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
 import { AssetPathItem } from '@app/shared/internal';
 
@@ -14,18 +14,17 @@ import { AssetPathItem } from '@app/shared/internal';
     selector: 'sqx-asset-path',
     styleUrls: ['./asset-path.component.scss'],
     templateUrl: './asset-path.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],
 })
 export class AssetPathComponent {
-    @Output()
-    public navigate = new EventEmitter<AssetPathItem>();
+    /** Emits the folder to navigate to. */
+    public readonly navigate = output<AssetPathItem>();
 
-    @Input()
-    public path?: ReadonlyArray<AssetPathItem> | null;
+    /** The folders from the root to the current folder. */
+    public readonly path = input<ReadonlyArray<AssetPathItem> | null>();
 
-    @Input({ transform: booleanAttribute })
-    public all?: boolean | null;
+    /** Highlights all folders, including the current folder. */
+    public readonly all = input(false, { transform: booleanAttribute });
 }

@@ -1,9 +1,10 @@
-<div class="form-horizontal" [formGroup]="triggerForm.form">
-    <sqx-form-row for="limit" hint="rules.conditions.usageLimitHint" label="rules.conditions.usageLimit">
-        <input class="form-control" id="limit" formControlName="limit" step="1" type="number" />
+@let form = triggerForm().form;
+<div class="form-horizontal">
+    <sqx-form-row [for]="form.limit" hint="rules.conditions.usageLimitHint" label="rules.conditions.usageLimit">
+        <input class="form-control" id="limit" [formField]="form.limit" step="1" type="number" />
     </sqx-form-row>
 
-    <sqx-form-row for="numDays" hint="rules.conditions.usageDaysHint" label="rules.conditions.usageDays">
-        <input class="form-control" id="condition" formControlName="numDays" step="1" type="number" />
+    <sqx-form-row [for]="form.numDays" hint="rules.conditions.usageDaysHint" label="rules.conditions.usageDays">
+        <input class="form-control" id="numDays" [formField]="form.numDays" step="1" type="number" />
     </sqx-form-row>
 </div>

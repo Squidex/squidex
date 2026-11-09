@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, ConfirmClickDirective, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ConfirmClickDirective, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { JobComponent } from './job.component';
 
 @Component({
@@ -18,7 +18,6 @@ import { JobComponent } from './job.component';
     styleUrls: ['./jobs-page.component.scss'],
     templateUrl: './jobs-page.component.html',
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         JobComponent,
         LayoutComponent,
@@ -34,32 +33,27 @@ import { JobComponent } from './job.component';
         TranslatePipe,
     ],
 })
-export class JobsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class JobsPageComponent {
+    protected readonly jobsState = inject(JobsState);
 
-    constructor(
-        public readonly apiUrl: ApiUrlConfig,
-        public readonly jobsState: JobsState,
-    ) {
-    }
-
-    public ngOnInit() {
+    constructor() {
         this.jobsState.load();
 
-        this.subscriptions.add(
-            timer(3000, 3000).pipe(
-                switchMap(() => this.jobsState.load(false, true))));
+        timer(3000, 3000).pipe(
+            switchMap(() => this.jobsState.load(false, true)),
+            takeUntilDestroyed())
+            .subscribe();
     }
 
-    public reload() {
+    protected reload() {
         this.jobsState.load(true, false);
     }
 
-    public startBackup() {
+    protected startBackup() {
         this.jobsState.startBackup();
     }
 
-    public rebuildTextIndex() {
+    protected rebuildTextIndex() {
         this.jobsState.rebuildTextIndex();
     }
 }

@@ -8,18 +8,18 @@
         <div class="form-inline">
             <input
                 class="form-control"
-                [ngModel]="contributorsState.query | async"
-                (ngModelChange)="search($event)"
+                (input)="search($any($event.target).value)"
                 placeholder="{{ 'contributors.search' | sqxTranslate }}"
                 shortcut="CTRL + I"
-                shortcutAction="focus" />
+                shortcutAction="focus"
+                [value]="contributorsState.query() ?? ''" />
         </div>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading | async">
+        <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading()">
             <ng-container>
-                @if (rolesState.roles | async; as roles) {
-                    @if (contributorsState.maxContributors | async; as maxContributors) {
+                @if (rolesState.roles(); as roles) {
+                    @if (contributorsState.maxContributors(); as maxContributors) {
                         @if (maxContributors > 0) {
                             <div class="alert alert-success mb-4">
                                 {{ "contributors.planHint" | sqxTranslate: { maxContributors: maxContributors } }}
@@ -27,13 +27,13 @@
                         }
                     }
 
-                    @if (contributorsState.canCreate | async) {
+                    @if (contributorsState.canCreate()) {
                         <sqx-contributor-add-form [roles]="roles" />
                     }
                 }
 
-                @if ((contributorsState.isLoaded | async) && (contributorsState.contributorsFiltered | async); as contributors) {
-                    @if (rolesState.roles | async; as roles) {
+                @if (contributorsState.isLoaded() && contributorsState.contributorsFiltered(); as contributors) {
+                    @if (rolesState.roles(); as roles) {
                         @if (contributors.length === 0) {
                             <div class="table-items-row table-items-row-summary table-items-row-empty">
                                 {{ "contributors.empty" | sqxTranslate }}
@@ -42,14 +42,14 @@
 
                         <table class="table table-items table-fixed">
                             @for (contributor of contributors; track contributor.contributorId) {
-                                <tbody [roles]="roles" [search]="contributorsState.queryRegex | async" [sqxContributor]="contributor"></tbody>
+                                <tbody [roles]="roles" [search]="contributorsState.queryRegex()" [sqxContributor]="contributor"></tbody>
                             }
                         </table>
                     }
                 }
             </ng-container>
             <ng-container footer>
-                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)" />
+                <sqx-pager [paging]="contributorsState.paging()" (pagingChange)="contributorsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

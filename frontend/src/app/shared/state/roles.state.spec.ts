@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AddRoleDto, DialogService, RolesDto, RolesService, RolesState, UpdateRoleDto, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AddRoleDto, AppsState, DialogService, RolesDto, RolesService, RolesState, UpdateRoleDto, versioned } from '@app/shared/internal';
 import { createRoles } from '../services/roles.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -24,7 +25,11 @@ describe('RolesState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         rolesService = Mock.ofType<RolesService>();
-        rolesState = new RolesState(appsState.object, dialogs.object, rolesService.object);
+        rolesState = createService(RolesState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: RolesService, useValue: rolesService.object },
+        ]);
     });
 
     describe('Loading', () => {

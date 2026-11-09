@@ -1,10 +1,10 @@
 <ul class="nav navbar-nav align-items-center flex-nowrap">
     <li class="nav-item dropdown">
         <span class="form-select" id="app-name" #button (click)="appsMenu.toggle()">
-            @if (appsState.selectedApp | async; as app) {
+            @if (appsState.selectedApp(); as app) {
                 {{ app.displayName }}
             } @else {
-                @if (teamsState.selectedTeam | async; as team) {
+                @if (teamsState.selectedTeam(); as team) {
                     {{ team.name }}
                 } @else {
                     {{ "apps.appsButtonFallbackTitle" | sqxTranslate }}
@@ -17,7 +17,7 @@
             scrollY="true"
             [sqxAnchoredTo]="button"
             *sqxModal="appsMenu; closeAlways: true; onRoot: false">
-            @if (appsState.apps | async; as apps) {
+            @if (appsState.apps(); as apps) {
                 @if (apps.length > 0) {
                     <a class="dropdown-item dropdown-header" routerLink="/app">
                         <div class="row g-0 align-items-center">
@@ -36,7 +36,7 @@
                 }
             }
 
-            @if (teamsState.teams | async; as teams) {
+            @if (teamsState.teams(); as teams) {
                 @if (teams.length > 0) {
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item dropdown-header" routerLink="/app">
@@ -56,7 +56,8 @@
                 }
             }
 
-            @if ((uiState.settings | async)?.canCreateApps || (uiState.settings | async)?.canCreateApps) {
+            @let settings = uiState.settings();
+            @if (settings.canCreateApps) {
                 <div class="dropdown-divider"></div>
 
                 <div class="dropdown-header">
@@ -65,7 +66,7 @@
                     </button>
                 </div>
 
-                @if ((uiState.settings | async)?.canCreateTeams) {
+                @if (settings.canCreateTeams) {
                     <div class="dropdown-header">
                         <button class="btn btn-block btn-sm btn-text-success" (click)="addTeamDialog.show()" type="button">
                             {{ "apps.appsButtonCreateTeam" | sqxTranslate }}
@@ -76,7 +77,7 @@
         </sqx-dropdown-menu>
     </li>
 
-    @if (appPath | async; as path) {
+    @if (appPath(); as path) {
         <nav aria-label="breadcrumb">
             @if (path.length > 0) {
                 <ol class="breadcrumb ms-2">
@@ -93,7 +94,7 @@
     }
 </ul>
 
-@if (starters | async; as templates) {
+@if (templatesState.starters(); as templates) {
     <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [templates]="templates" />
 }
 

@@ -7,114 +7,110 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, HostBinding, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, sorted, StatefulControlComponent, TranslatePipe, Types } from '@app/shared';
+import { booleanAttribute, Component, effect, forwardRef, inject, input, model, signal, untracked } from '@angular/core';
+import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, FormValueControlBase, ModalDirective, ResizedDirective, ResolveContents, sorted, TranslatePipe, Types } from '@app/shared';
 import { ContentCreatorComponent } from './content-creator.component';
 import { ReferenceItemComponent } from './reference-item.component';
-
-export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true,
-};
-
-interface State {
-    // The content items to show.
-    contentItems: ReadonlyArray<ContentDto>;
-
-    // True, when width less than 600 pixels.
-    isCompact?: boolean;
-}
 
 @Component({
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
-    providers: [
-        SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
         CdkDragHandle,
         CdkDropList,
-        ContentSelectorComponent,
+        forwardRef(() => ContentCreatorComponent),
         ContentsColumnsPipe,
+        ContentSelectorComponent,
         ModalDirective,
         ReferenceItemComponent,
         ResizedDirective,
         TranslatePipe,
-        forwardRef(() => ContentCreatorComponent),
     ],
+    host: {
+        '[class.expanded]': 'isExpanded()',
+    },
 })
-export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
-    @Input({ transform: booleanAttribute })
-    @HostBinding('class.expanded')
-    public isExpanded = false;
+export class ReferencesEditorComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
+    private readonly contentsResolver = inject(ResolveContents);
 
-    @Input({ required: true })
-    public schemaIds!: ReadonlyArray<string>;
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
 
-    @Input({ required: true })
-    public query?: string;
+    /** Renders the references in fullscreen mode. */
+    public readonly isExpanded = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The IDs of the schemas to select or create contents from. */
+    public readonly schemaIds = input.required<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The initial full text query of the content selector. */
+    public readonly query = input.required<string | undefined>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** The language to render the references in. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ transform: booleanAttribute })
-    public allowDuplicates?: boolean | null = true;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
+    /** Additional context information that is passed to custom editors when creating contents. */
+    public readonly formContext = input.required<any>();
+
+    /** Allows to select the same content multiple times. */
+    public readonly allowDuplicates = input(true, { transform: booleanAttribute });
+
+    protected readonly contentItems = signal<ReadonlyArray<ContentDto>>([]);
+
+    protected readonly contentCloned = signal<ContentDto | undefined>(undefined);
+
+    protected readonly isCompact = signal(false);
+
+    protected readonly contentCreatorDialog = new DialogModel();
+
+    protected readonly contentSelectorDialog = new DialogModel();
+
+    constructor() {
+        super();
+
+        effect(onCleanup => {
+            const contentIds = this.value();
+
+            untracked(() => {
+                if (!Types.isArrayOfString(contentIds)) {
+                    this.setContentItems([]);
+                    return;
+                }
+
+                if (Types.equals(contentIds, this.contentItems().map(x => x.id))) {
+                    return;
+                }
+
+                const subscription =
+                    this.contentsResolver.resolveMany(contentIds)
+                        .subscribe({
+                            next: ({ items }) => {
+                                this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
+
+                                if (this.contentItems().length !== contentIds.length) {
+                                    this.updateValue();
+                                }
+                            },
+                            error: () => {
+                                this.setContentItems([]);
+                            },
+                        });
+
+                onCleanup(() => subscription.unsubscribe());
+            });
+        });
     }
 
-    public clonedContent?: ContentDto;
-
-    public contentCreatorDialog = new DialogModel();
-    public contentSelectorDialog = new DialogModel();
-
-    constructor(
-        private readonly contentsResolver: ResolveContents,
-    ) {
-        super({ contentItems: [] });
+    private setContentItems(contentItems: ReadonlyArray<ContentDto>) {
+        this.contentItems.set(contentItems);
     }
 
-    public writeValue(obj: any) {
-        if (Types.isArrayOfString(obj)) {
-            if (!Types.equals(obj, this.snapshot.contentItems.map(x => x.id))) {
-                const contentIds: string[] = obj;
-
-                this.contentsResolver.resolveMany(contentIds)
-                    .subscribe({
-                        next: ({ items }) => {
-                            this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
-
-                            if (this.snapshot.contentItems.length !== contentIds.length) {
-                                this.updateValue();
-                            }
-                        },
-                        error: () => {
-                            this.setContentItems([]);
-                        },
-                    });
-            }
-        } else {
-            this.setContentItems([]);
-        }
-    }
-
-    public setContentItems(contentItems: ReadonlyArray<ContentDto>) {
-        this.next({ contentItems });
-    }
-
-    public select(contents: ReadonlyArray<ContentDto>) {
-        this.setContentItems([...this.snapshot.contentItems, ...contents]);
+    protected select(contents: ReadonlyArray<ContentDto>) {
+        this.setContentItems([...this.contentItems(), ...contents]);
 
         if (contents.length > 0) {
             this.updateValue();
@@ -124,41 +120,45 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
         this.contentCreatorDialog.hide();
     }
 
-    public remove(content: ContentDto) {
-        if (content && !this.snapshot.isDisabled) {
-            this.setContentItems(this.snapshot.contentItems.removedBy('id', content));
-
-            this.updateValue();
+    protected remove(content: ContentDto) {
+        if (!content || this.disabled()) {
+            return;
         }
+
+        this.setContentItems(this.contentItems().removedBy('id', content));
+
+        this.updateValue();
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
-        if (event && !this.snapshot.isDisabled) {
-            this.setContentItems(sorted(event));
-
-            this.updateValue();
+    protected sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
+        if (!event || this.disabled()) {
+            return;
         }
+
+        this.setContentItems(sorted(event));
+
+        this.updateValue();
     }
 
-    public createContent(clone?: ContentDto) {
-        this.clonedContent = clone;
+    protected createContent(clone?: ContentDto) {
+        this.contentCloned.set(clone);
 
         this.contentCreatorDialog.show();
     }
 
     private updateValue() {
-        const ids = this.snapshot.contentItems.map(x => x.id);
+        const ids = this.contentItems().map(x => x.id);
 
         if (ids.length === 0) {
-            this.callChange(null);
+            this.value.set(null);
         } else {
-            this.callChange(ids);
+            this.value.set(ids);
         }
 
-        this.callTouched();
+        this.markTouched();
     }
 
-    public setCompact(isCompact: boolean) {
-        this.next({ isCompact });
+    protected setCompact(isCompact: boolean) {
+        this.isCompact.set(isCompact);
     }
 }

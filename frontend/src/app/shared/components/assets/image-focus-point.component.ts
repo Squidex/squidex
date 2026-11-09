@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, linkedSignal, viewChild } from '@angular/core';
 import { FocusedImage, FocusPicker } from 'image-focus';
 import { TranslatePipe, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
@@ -14,82 +14,71 @@ import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
     selector: 'sqx-image-focus-point',
     styleUrls: ['./image-focus-point.component.scss'],
     templateUrl: './image-focus-point.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],
 })
-export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
-    private readonly previewImages: FocusedImage[] = [];
-    private focusPicker: FocusPicker | null = null;
-    private x = 0;
-    private y = 0;
+export class ImageFocusPointComponent {
+    private readonly destroyRef = inject(DestroyRef);
 
-    @Input()
-    public imageSource = '';
+    /** The URL of the image. */
+    public readonly imageSource = input('');
 
-    @Input()
-    public focusPoint: any;
+    /** The asset metadata with the initial focus point (focusX and focusY). */
+    public readonly focusPoint = input<any>();
 
-    @ViewChild('image', { static: false })
-    public image!: ElementRef<HTMLImageElement>;
+    protected readonly image = viewChild.required<ElementRef<HTMLImageElement>>('image');
 
-    @ViewChild('previewWide', { static: false })
-    public previewWide!: ElementRef<HTMLImageElement>;
+    protected readonly previewWide = viewChild.required<ElementRef<HTMLImageElement>>('previewWide');
 
-    @ViewChild('previewSmall', { static: false })
-    public previewSmall!: ElementRef<HTMLImageElement>;
+    protected readonly previewSmall = viewChild.required<ElementRef<HTMLImageElement>>('previewSmall');
 
-    @ViewChild('previewNormal', { static: false })
-    public previewNormal!: ElementRef<HTMLImageElement>;
+    protected readonly previewNormal = viewChild.required<ElementRef<HTMLImageElement>>('previewNormal');
 
-    public ngOnDestroy() {
-        if (this.focusPicker) {
-            this.focusPicker.stopListening();
-        }
-    }
+    protected readonly focus = linkedSignal(() => getFocusPoint(this.focusPoint()));
 
-    public ngOnChanges() {
-        const { x, y } = getFocusPoint(this.focusPoint);
+    constructor() {
+        const destroyRef = this.destroyRef;
 
-        this.x = x;
-        this.y = y;
-    }
+        afterNextRender(() => {
+            const properties = { focus: this.focus(), debounceTime: 50 };
 
-    public ngAfterViewInit() {
-        const focus = { x: this.x, y: this.y };
+            const previewImages = [
+                new FocusedImage(this.previewWide().nativeElement, properties),
+                new FocusedImage(this.previewSmall().nativeElement, properties),
+                new FocusedImage(this.previewNormal().nativeElement, properties),
+            ];
 
-        const properties = { focus, debounceTime: 50 };
+            const focusPicker = new FocusPicker(this.image().nativeElement, {
+                focus: properties.focus,
+                onChange: newFocus => {
+                    this.focus.set({ x: newFocus.x, y: newFocus.y });
 
-        this.previewImages.push(new FocusedImage(this.previewWide.nativeElement, properties));
-        this.previewImages.push(new FocusedImage(this.previewSmall.nativeElement, properties));
-        this.previewImages.push(new FocusedImage(this.previewNormal.nativeElement, properties));
+                    for (const preview of previewImages) {
+                        preview.setFocus(newFocus);
+                    }
+                },
+            });
 
-        this.focusPicker = new FocusPicker(this.image.nativeElement, {
-            focus,
-            onChange: newFocus => {
-                this.x = newFocus.x;
-                this.y = newFocus.y;
-
-                for (const preview of this.previewImages) {
-                    preview.setFocus(newFocus);
-                }
-            },
+            destroyRef.onDestroy(() => {
+                focusPicker.stopListening();
+            });
         });
     }
 
-    public submit(asset: AssetDto): AnnotateAssetDto | null {
+    public getChanges(asset: AssetDto): AnnotateAssetDto | null {
         const previous = getFocusPoint(asset.metadata);
 
-        if (previous.x === this.x && previous.y === this.y) {
+        const focus = this.focus();
+        if (previous.x === focus.x && previous.y === focus.y) {
             return null;
         }
 
         return new AnnotateAssetDto({
             metadata: {
                 ...asset.metadata,
-                focusX: this.x,
-                focusY: this.y,
+                focusX: focus.x,
+                focusY: focus.y,
             },
         });
     }

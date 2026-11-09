@@ -1,4 +1,4 @@
-@if (selectedTeam | async; as team) {
+@if (teamsState.selectedTeam(); as team) {
     <sqx-title [message]="team.name" />
     <div class="sidebar"><sqx-left-menu [team]="team" /></div>
 

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleElementDto, RuleEventDto, RuleEventsState, RulesService, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, RulesState, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleEventComponent } from './rule-event.component';
 
 @Component({
@@ -19,7 +19,6 @@ import { RuleEventComponent } from './rule-event.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         LayoutComponent,
         ListViewComponent,
@@ -31,61 +30,48 @@ import { RuleEventComponent } from './rule-event.component';
         TranslatePipe,
     ],
 })
-export class RuleEventsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class RuleEventsPageComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly ruleEventsRoute = inject(Router2State);
 
-    public availableSteps: Record<string, RuleElementDto> = {};
+    protected readonly rulesState = inject(RulesState);
 
-    public selectedEventId: string | null = null;
+    protected readonly ruleEventsState = inject(RuleEventsState);
 
-    constructor(
-        public readonly ruleEventsRoute: Router2State,
-        public readonly ruleEventsState: RuleEventsState,
-        private readonly route: ActivatedRoute,
-        private readonly rulesService: RulesService,
-    ) {
+    protected readonly selectedEventId = signal<string | null>(null);
+
+    constructor() {
+        this.route.queryParams
+            .pipe(takeUntilDestroyed())
+            .subscribe(() => {
+                const initial =
+                    this.ruleEventsRoute.mapTo(this.ruleEventsState)
+                        .withPaging('rules', 30)
+                        .withString('ruleId')
+                        .withString('query')
+                        .getInitial();
+
+                this.ruleEventsState.load(false, initial);
+            });
     }
 
-    public ngOnInit() {
-        this.rulesService.getSteps().subscribe((steps) => {
-            this.availableSteps = steps;
-        });
-
-        this.subscriptions.add(
-            this.route.queryParams
-                .subscribe(() => {
-                    const initial =
-                        this.ruleEventsRoute.mapTo(this.ruleEventsState)
-                            .withPaging('rules', 30)
-                            .withString('ruleId')
-                            .withString('query')
-                            .getInitial();
-
-                    this.ruleEventsState.load(false, initial);
-                }));
-    }
-
-    public reload() {
+    protected reload() {
         this.ruleEventsState.load(true);
     }
 
-    public enqueue(event: RuleEventDto) {
+    protected enqueue(event: RuleEventDto) {
         this.ruleEventsState.enqueue(event);
     }
 
-    public cancelAll() {
+    protected cancelAll() {
         this.ruleEventsState.cancelAll();
     }
 
-    public cancel(event: RuleEventDto) {
+    protected cancel(event: RuleEventDto) {
         this.ruleEventsState.cancel(event);
     }
 
-    public selectEvent(id: string) {
-        if (this.selectedEventId === id) {
-            this.selectedEventId = null;
-        } else {
-            this.selectedEventId = id;
-        }
+    protected selectEvent(id: string) {
+        this.selectedEventId.update(x => x === id ? null : id);
     }
 }

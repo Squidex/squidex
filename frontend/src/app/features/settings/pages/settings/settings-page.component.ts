@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, inject } from '@angular/core';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-settings-page',
@@ -18,11 +17,10 @@ import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponen
     imports: [
         ConfirmClickDirective,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -34,58 +32,45 @@ import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponen
         TranslatePipe,
     ],
 })
-export class SettingsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class SettingsPageComponent {
+    protected readonly appsState = inject(AppsState);
 
-    public isEditable = false;
+    protected readonly isEditable = computed(() => {
+        return this.appsState.selectedSettings()?.canUpdate === true;
+    });
 
-    public editForm = new EditAppSettingsForm();
-    public editingSettings?: AppSettingsDto;
+    protected readonly editForm = new EditAppSettingsForm();
 
-    constructor(
-        private readonly appsState: AppsState,
-    ) {
-    }
-
-    public ngOnInit() {
+    constructor() {
         this.appsState.loadSettings();
 
-        this.subscriptions.add(
-            this.appsState.selectedSettings
-                .subscribe(settings => {
-                    if (settings) {
-                        this.isEditable = settings.canUpdate;
+        effect(() => {
+            const settings = this.appsState.selectedSettings();
+            if (!settings) {
+                return;
+            }
 
-                        this.editForm.load(settings);
-                        this.editForm.setEnabled(settings.canUpdate);
-
-                        this.editingSettings = settings;
-                    }
-                }));
+            this.editForm.load(settings);
+            this.editForm.setEnabled(settings.canUpdate);
+        });
     }
 
-    public reload() {
+    protected reload() {
         this.appsState.loadSettings(true);
     }
 
-    public save() {
-        if (!this.isEditable || !this.editingSettings) {
+    protected save() {
+        const settings = this.appsState.selectedSettings();
+        if (!settings) {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
+        if (!this.isEditable()) {
             return;
         }
 
-        this.appsState.updateSettings(this.editingSettings, value)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        this.editForm.submit(value => {
+            return this.appsState.updateSettings(settings, value);
+        });
     }
 }

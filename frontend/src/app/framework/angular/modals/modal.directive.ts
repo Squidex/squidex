@@ -7,8 +7,8 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { booleanAttribute, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, RendererFactory2, TemplateRef, ViewContainerRef } from '@angular/core';
-import { DialogModel, ModalModel, ModalService, OpenModal, Subscriptions, Types } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectorRef, DestroyRef, Directive, effect, EmbeddedViewRef, inject, input, Renderer2, RendererFactory2, TemplateRef, untracked, ViewContainerRef } from '@angular/core';
+import { DialogModel, ModalModel, ModalService, OpenModal, Types } from '@app/framework/internal';
 import { RootViewComponent } from './root-view.component';
 
 declare type Model = DialogModel | ModalModel | any;
@@ -16,56 +16,77 @@ declare type Model = DialogModel | ModalModel | any;
 @Directive({
     selector: '[sqxModal]',
 })
-export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
-    private readonly eventsView = new Subscriptions();
-    private readonly eventsModel = new Subscriptions();
+export class ModalDirective<T = unknown> implements OpenModal {
     private static backdrop: any;
-    private currentModel: DialogModel | ModalModel | null = null;
-    private currentContext: ModalContext<T> = new ModalContext<T>();
+
+    private readonly backdropListener = (event: MouseEvent) => {
+        if (!this.isClickedInside(event)) {
+            this.hideModal(this.model());
+        }
+    };
+
+    private readonly changeDetector = inject(ChangeDetectorRef);
+    private readonly currentContext: ModalContext<T> = new ModalContext<T>();
+    private readonly destroyRef = inject(DestroyRef);
+
+    private readonly elementListener = (event: MouseEvent) => {
+        if (this.isClickedInside(event)) {
+            this.hideModal(this.model());
+        }
+    };
+
+    private readonly modalService = inject(ModalService);
+    private readonly renderer = inject(Renderer2);
+    private readonly rendererFactory = inject(RendererFactory2);
+    private readonly rootView = inject(RootViewComponent);
+    private readonly templateRef = inject<TemplateRef<ModalContext<T>>>(TemplateRef);
+    private readonly viewContainer = inject(ViewContainerRef);
+    private isOpen = false;
     private renderedView: EmbeddedViewRef<ModalContext<T>> | null = null;
     private renderRoots: ReadonlyArray<HTMLElement> | null = null;
-    private isOpen = false;
+    private viewListeners: (() => void)[] = [];
 
-    @Input('sqxModal')
-    public set model(value: Model) {
-        if (this.currentModel !== value) {
-            this.currentModel = value;
+    /** The modal or dialog model that controls the visibility, or any value that renders the template when truthy. */
+    public readonly model = input<Model>(undefined, { alias: 'sqxModal' });
 
-            this.eventsModel.unsubscribeAll();
-            this.subscribeToModel(value);
-        }
-    }
+    /** Renders the modal in the root view instead of in place. */
+    public readonly placeOnRoot = input(true, { alias: 'sqxModalOnRoot', transform: booleanAttribute });
 
-    @Input({ alias: 'sqxModalOnRoot', transform: booleanAttribute })
-    public placeOnRoot = true;
+    /** Closes the modal when the user clicks outside of it. */
+    public readonly closeAuto = input(true, { alias: 'sqxModalCloseAuto', transform: booleanAttribute });
 
-    @Input({ alias: 'sqxModalCloseAuto', transform: booleanAttribute })
-    public closeAuto = true;
+    /** Closes the modal when the user clicks inside of it. */
+    public readonly closeAlways = input(false, { alias: 'sqxModalCloseAlways', transform: booleanAttribute });
 
-    @Input({ alias: 'sqxModalCloseAlways', transform: booleanAttribute })
-    public closeAlways = false;
+    /** Treats the modal as a dialog, which is not closed by clicks. */
+    public readonly isDialog = input(false, { alias: 'sqxModalIsDialog', transform: booleanAttribute });
 
-    @Input({ alias: 'sqxModalIsDialog', transform: booleanAttribute })
-    public isDialog = false;
+    constructor() {
+        this.destroyRef.onDestroy(() => {
+            this.hideModal(this.model());
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly modalService: ModalService,
-        private readonly renderer: Renderer2,
-        private readonly rendererFactory: RendererFactory2,
-        private readonly rootView: RootViewComponent,
-        private readonly templateRef: TemplateRef<ModalContext<T>>,
-        private readonly viewContainer: ViewContainerRef,
-    ) {
-    }
+            // Effects do not run after the directive is destroyed, so the view in the root container must be removed directly.
+            this.update(false);
 
-    public ngOnDestroy() {
-        this.hideModal(this.currentModel);
+            this.modalService.remove(this);
+            this.unlistenView();
+        });
 
-        this.modalService.remove(this);
+        effect(() => {
+            const model = this.model();
+            if (isModel(model)) {
+                const isOpen = model.isOpen();
 
-        this.eventsView.unsubscribeAll();
-        this.eventsModel.unsubscribeAll();
+                untracked(() => this.update(isOpen));
+                return;
+            }
+
+            untracked(() => {
+                this.currentContext.$implicit = model;
+
+                this.update(!!model);
+            });
+        });
     }
 
     public contains(element: Element) {
@@ -73,7 +94,7 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
     }
 
     public hide() {
-        this.hideModal(this.currentModel);
+        this.hideModal(this.model());
     }
 
     private update(isOpen: boolean) {
@@ -81,7 +102,7 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
             return;
         }
 
-        this.eventsView.unsubscribeAll();
+        this.unlistenView();
 
         if (isOpen) {
             if (!this.renderedView) {
@@ -105,7 +126,11 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
                 this.rendererFactory.end?.();
             }
 
-            remove(this.renderer, ModalDirective.backdrop);
+            const backdrop = ModalDirective.backdrop;
+            const backdropParent = backdrop ? this.renderer.parentNode(backdrop) : null;
+            if (backdropParent) {
+                this.renderer.removeChild(backdropParent, backdrop);
+            }
         }
 
         this.isOpen = isOpen;
@@ -118,7 +143,7 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
     }
 
     private getContainer() {
-        return this.placeOnRoot ? this.rootView.viewContainer : this.viewContainer;
+        return this.placeOnRoot() ? this.rootView.viewContainer() : this.viewContainer;
     }
 
     private setupStyles() {
@@ -130,24 +155,12 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
         }
     }
 
-    private subscribeToModel(value: Model) {
-        if (isModel(value)) {
-            this.currentModel = value;
-
-            this.eventsModel.add(value.isOpenChanges.subscribe(isOpen => this.update(isOpen)));
-        } else {
-            this.currentContext.$implicit = value;
-
-            this.update(!!value);
-        }
-    }
-
     private subscribeToView() {
-        if (Types.is(this.currentModel, DialogModel) || this.isDialog) {
+        if (Types.is(this.model(), DialogModel) || this.isDialog()) {
             return;
         }
 
-        if (this.closeAuto && this.renderRoots && this.renderRoots.length > 0) {
+        if (this.closeAuto() && this.renderRoots && this.renderRoots.length > 0) {
             let backdrop = ModalDirective.backdrop;
 
             if (!backdrop) {
@@ -163,29 +176,29 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
                 ModalDirective.backdrop = backdrop;
             }
 
-            insertBefore(this.renderer, this.renderRoots[0], backdrop);
+            const rootNode = this.renderRoots[0];
+            const rootParent = rootNode ? this.renderer.parentNode(rootNode) : null;
+            if (backdrop && rootParent) {
+                this.renderer.insertBefore(rootParent, backdrop, rootNode);
+            }
 
-            this.eventsView.add(this.renderer.listen(backdrop, 'click', this.backdropListener));
+            this.viewListeners.push(this.renderer.listen(backdrop, 'click', this.backdropListener));
         }
 
-        if (this.closeAlways && this.renderRoots) {
+        if (this.closeAlways() && this.renderRoots) {
             for (const node of this.renderRoots) {
-                this.eventsView.add(this.renderer.listen(node, 'click', this.elementListener));
+                this.viewListeners.push(this.renderer.listen(node, 'click', this.elementListener));
             }
         }
     }
 
-    private elementListener = (event: MouseEvent) => {
-        if (this.isClickedInside(event)) {
-            this.hideModal(this.currentModel);
+    private unlistenView() {
+        for (const unlisten of this.viewListeners) {
+            unlisten();
         }
-    };
 
-    private backdropListener = (event: MouseEvent) => {
-        if (!this.isClickedInside(event)) {
-            this.hideModal(this.currentModel);
-        }
-    };
+        this.viewListeners = [];
+    }
 
     private isClickedInside(event: MouseEvent) {
         try {
@@ -209,33 +222,13 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
         if (model && isModel(model)) {
             model.hide();
 
-            this.eventsView.unsubscribeAll();
+            this.unlistenView();
         }
     }
 }
+
 export class ModalContext<T = unknown> {
     public $implicit: T = null!;
-  }
-
-
-function insertBefore(renderer: Renderer2, refElement: any, element: any) {
-    if (element && refElement) {
-        const parent = renderer.parentNode(refElement);
-
-        if (parent) {
-            renderer.insertBefore(parent, element, refElement);
-        }
-    }
-}
-
-function remove(renderer: Renderer2, element: any) {
-    if (element) {
-        const parent = renderer.parentNode(element);
-
-        if (parent) {
-            renderer.removeChild(parent, element);
-        }
-    }
 }
 
 function isModel(model: Model): model is DialogModel | ModalModel {

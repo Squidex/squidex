@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of, shareReplay, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { debug, DialogService, HTTP, MathHelper, State, Types } from '@app/framework';
 import { AssetDto } from '../model';
@@ -36,11 +36,13 @@ interface Snapshot {
 
 export class UploadCanceled {}
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AssetUploaderState extends State<Snapshot> {
-    public uploads =
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
+    private readonly dialogs = inject(DialogService);
+
+    public readonly uploads =
         this.project(x => x.uploads);
 
     public get appId() {
@@ -51,11 +53,7 @@ export class AssetUploaderState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ uploads: [] });
 
         debug(this, 'assetUploader');

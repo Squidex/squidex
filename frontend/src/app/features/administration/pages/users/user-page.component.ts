@@ -5,11 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, effect, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormErrorComponent, FormRowComponent, LayoutComponent, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
+import { tap } from 'rxjs';
+import { FormErrorComponent, FormRowComponent, LayoutComponent, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
 import { UserDto, UserForm, UsersState } from '../../internal';
 
 @Component({
@@ -17,80 +18,57 @@ import { UserDto, UserForm, UsersState } from '../../internal';
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html',
     imports: [
-        AsyncPipe,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
-        ReactiveFormsModule,
         ShortcutDirective,
         TitleComponent,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class UserPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class UserPageComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private user?: UserDto | null;
 
-    public isEditable = false;
+    protected readonly usersState = inject(UsersState);
 
-    public user?: UserDto | null;
-    public userForm = new UserForm();
+    protected readonly isEditable = signal(false);
 
-    constructor(
-        public readonly usersState: UsersState,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-    ) {
+    protected readonly userForm = new UserForm();
+
+    constructor() {
+        effect(() => {
+            const user = this.usersState.selectedUser();
+            this.user = user;
+
+            const isEditable = !user || user.canUpdate;
+            this.isEditable.set(isEditable);
+
+            const permissions: string[] = [];
+
+            this.userForm.load(user || { permissions });
+            this.userForm.setEnabled(isEditable);
+        });
     }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.usersState.selectedUser
-                .subscribe(user => {
-                    this.user = user;
-
-                    this.isEditable = !user || user.canUpdate;
-
-                    const permissions: string[] = [];
-
-                    this.userForm.load(user || { permissions });
-                    this.userForm.setEnabled(this.isEditable);
-                }));
-    }
-
-    public save() {
-        if (!this.isEditable) {
+    protected save() {
+        if (!this.isEditable()) {
             return;
         }
 
-        const value = this.userForm.submit();
-        if (!value) {
-            return;
-        }
-
-        if (this.user) {
-            const request = new UpdateUserDto({ ...value });
-
-            this.usersState.update(this.user, request)
-                .subscribe({
-                    next: user => {
-                        this.userForm.submitCompleted({ newValue: user });
-                    },
-                    error: error => {
-                        this.userForm.submitFailed(error);
-                    },
-                });
+        const user = this.user;
+        if (user) {
+            this.userForm.submitAndUpdate(value => {
+                return this.usersState.update(user, new UpdateUserDto({ ...value }));
+            }, { resetAfterSubmit: true });
         } else {
-            this.usersState.create(value)
-                .subscribe({
-                    next: () => {
-                        this.back();
-                    },
-                    error: error => {
-                        this.userForm.submitFailed(error);
-                    },
-                });
+            this.userForm.submit(value => {
+                return this.usersState.create(value).pipe(tap(() => this.back()));
+            });
         }
     }
 

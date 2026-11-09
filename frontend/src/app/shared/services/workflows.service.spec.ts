@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, Resource, Versioned, VersionTag, WorkflowDto, WorkflowsDto, WorkflowsService } from '@app/shared/internal';
@@ -18,120 +18,179 @@ describe('WorkflowsService', () => {
         TestBed.configureTestingModule({
             imports: [],
             providers: [
-                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClient(withXhr(), withInterceptorsFromDi()),
                 provideHttpClientTesting(),
                 WorkflowsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+                {
+                    provide: ApiUrlConfig,
+                    useValue: new ApiUrlConfig('http://service/p/'),
+                },
             ],
         });
     });
 
-    afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
-        httpMock.verify();
-    }));
+    afterEach(inject(
+        [HttpTestingController],
+        (httpMock: HttpTestingController) => {
+            httpMock.verify();
+        },
+    ));
 
-    it('should make a get request to get app workflows', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-        let workflows: Versioned<WorkflowsDto>;
-        workflowsService.getWorkflows('my-app').subscribe(result => {
-            workflows = result;
-        });
+    it('should make a get request to get app workflows', inject(
+        [WorkflowsService, HttpTestingController],
+        (
+            workflowsService: WorkflowsService,
+            httpMock: HttpTestingController,
+        ) => {
+            let workflows: Versioned<WorkflowsDto>;
+            workflowsService.getWorkflows('my-app').subscribe((result) => {
+                workflows = result;
+            });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+            const req = httpMock.expectOne(
+                'http://service/p/api/apps/my-app/workflows',
+            );
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(workflowsResponse('1', '2'), {
-            headers: {
-                etag: '2',
-            },
-        });
+            req.flush(workflowsResponse('1', '2'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-    }));
+            expect(workflows!).toEqual({
+                payload: createWorkflows('1', '2'),
+                version: new VersionTag('2'),
+            });
+        },
+    ));
 
-    it('should make a post request to create a workflow', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-        const dto = new AddWorkflowDto({ name: 'New' });
+    it('should make a post request to create a workflow', inject(
+        [WorkflowsService, HttpTestingController],
+        (
+            workflowsService: WorkflowsService,
+            httpMock: HttpTestingController,
+        ) => {
+            const dto = new AddWorkflowDto({ name: 'New' });
 
-        let workflows: Versioned<WorkflowsDto>;
-        workflowsService.postWorkflow('my-app', dto, version).subscribe(result => {
-            workflows = result;
-        });
+            let workflows: Versioned<WorkflowsDto>;
+            workflowsService
+                .postWorkflow('my-app', dto, version)
+                .subscribe((result) => {
+                    workflows = result;
+                });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+            const req = httpMock.expectOne(
+                'http://service/p/api/apps/my-app/workflows',
+            );
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush(workflowsResponse('1', '2'), {
-            headers: {
-                etag: '2',
-            },
-        });
+            req.flush(workflowsResponse('1', '2'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-    }));
+            expect(workflows!).toEqual({
+                payload: createWorkflows('1', '2'),
+                version: new VersionTag('2'),
+            });
+        },
+    ));
 
-    it('should make a put request to update a workflow', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-        const dto = new UpdateWorkflowDto({ initial: 'A', steps: {} });
+    it('should make a put request to update a workflow', inject(
+        [WorkflowsService, HttpTestingController],
+        (
+            workflowsService: WorkflowsService,
+            httpMock: HttpTestingController,
+        ) => {
+            const dto = new UpdateWorkflowDto({ initial: 'A', steps: {} });
 
-        const resource: Resource = {
-            _links: {
-                update: { method: 'PUT', href: '/api/apps/my-app/workflows/123' },
-            },
-        };
+            const resource: Resource = {
+                _links: {
+                    update: {
+                        method: 'PUT',
+                        href: '/api/apps/my-app/workflows/123',
+                    },
+                },
+            };
 
-        let workflows: Versioned<WorkflowsDto>;
-        workflowsService.putWorkflow('my-app', resource, dto, version).subscribe(result => {
-            workflows = result;
-        });
+            let workflows: Versioned<WorkflowsDto>;
+            workflowsService
+                .putWorkflow('my-app', resource, dto, version)
+                .subscribe((result) => {
+                    workflows = result;
+                });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
+            const req = httpMock.expectOne(
+                'http://service/p/api/apps/my-app/workflows/123',
+            );
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush(workflowsResponse('1', '2'), {
-            headers: {
-                etag: '2',
-            },
-        });
+            req.flush(workflowsResponse('1', '2'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-    }));
+            expect(workflows!).toEqual({
+                payload: createWorkflows('1', '2'),
+                version: new VersionTag('2'),
+            });
+        },
+    ));
 
-    it('should make a delete request to delete a workflow', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: '/api/apps/my-app/workflows/123' },
-            },
-        };
+    it('should make a delete request to delete a workflow', inject(
+        [WorkflowsService, HttpTestingController],
+        (
+            workflowsService: WorkflowsService,
+            httpMock: HttpTestingController,
+        ) => {
+            const resource: Resource = {
+                _links: {
+                    delete: {
+                        method: 'DELETE',
+                        href: '/api/apps/my-app/workflows/123',
+                    },
+                },
+            };
 
-        let workflows: Versioned<WorkflowsDto>;
-        workflowsService.deleteWorkflow('my-app', resource, version).subscribe(result => {
-            workflows = result;
-        });
+            let workflows: Versioned<WorkflowsDto>;
+            workflowsService
+                .deleteWorkflow('my-app', resource, version)
+                .subscribe((result) => {
+                    workflows = result;
+                });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
+            const req = httpMock.expectOne(
+                'http://service/p/api/apps/my-app/workflows/123',
+            );
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush(workflowsResponse('1', '2'), {
-            headers: {
-                etag: '2',
-            },
-        });
+            req.flush(workflowsResponse('1', '2'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-    }));
+            expect(workflows!).toEqual({
+                payload: createWorkflows('1', '2'),
+                version: new VersionTag('2'),
+            });
+        },
+    ));
 
     function workflowsResponse(...names: string[]) {
         return {
-            errors: [
-                'Error1',
-                'Error2',
-            ],
+            errors: ['Error1', 'Error2'],
             items: names.map(workflowResponse),
             _links: {
                 create: { method: 'POST', href: '/workflows' },
@@ -149,18 +208,22 @@ describe('WorkflowsService', () => {
                 [`${name}1`]: {
                     transitions: {
                         [`${name}2`]: {
-                            expression: 'Expression1', roles: ['Role1'],
+                            expression: 'Expression1',
+                            roles: ['Role1'],
                         },
                     },
-                    color: `${name}1`, noUpdate: true,
+                    color: `${name}1`,
+                    noUpdate: true,
                 },
                 [`${name}2`]: {
                     transitions: {
                         [`${name}1`]: {
-                            expression: 'Expression2', roles: ['Role2'],
+                            expression: 'Expression2',
+                            roles: ['Role2'],
                         },
                     },
-                    color: `${name}2`, noUpdate: true,
+                    color: `${name}2`,
+                    noUpdate: true,
                 },
             },
             _links: {
@@ -172,10 +235,7 @@ describe('WorkflowsService', () => {
 
 export function createWorkflows(...names: ReadonlyArray<string>) {
     return new WorkflowsDto({
-        errors: [
-            'Error1',
-            'Error2',
-        ],
+        errors: ['Error1', 'Error2'],
         items: names.map(createWorkflow),
         _links: {
             create: new ResourceLinkDto({ method: 'POST', href: '/workflows' }),
@@ -193,22 +253,29 @@ export function createWorkflow(name: string) {
             [`${name}1`]: new WorkflowStepDto({
                 transitions: {
                     [`${name}2`]: new WorkflowTransitionDto({
-                        expression: 'Expression1', roles: ['Role1'],
+                        expression: 'Expression1',
+                        roles: ['Role1'],
                     }),
                 },
-                color: `${name}1`, noUpdate: true,
+                color: `${name}1`,
+                noUpdate: true,
             }),
             [`${name}2`]: new WorkflowStepDto({
                 transitions: {
                     [`${name}1`]: new WorkflowTransitionDto({
-                        expression: 'Expression2', roles: ['Role2'],
+                        expression: 'Expression2',
+                        roles: ['Role2'],
                     }),
                 },
-                color: `${name}2`, noUpdate: true,
+                color: `${name}2`,
+                noUpdate: true,
             }),
         },
         _links: {
-            update: new ResourceLinkDto({ method: 'PUT', href: `/workflows/${name}` }),
+            update: new ResourceLinkDto({
+                method: 'PUT',
+                href: `/workflows/${name}`,
+            }),
         },
     });
 }

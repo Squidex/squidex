@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map } from 'rxjs/operators';
-import { CommentsComponent, ContentsState, LayoutComponent, TranslatePipe } from '@app/shared';
+import { CommentsComponent, ContentsState, LayoutComponent, queryParam, routeParam, TranslatePipe } from '@app/shared';
 
 type Tab = 'unresolved' | 'all';
 
@@ -18,7 +16,6 @@ type Tab = 'unresolved' | 'all';
     styleUrls: ['./comments-page.component.scss'],
     templateUrl: './comments-page.component.html',
     imports: [
-        AsyncPipe,
         CommentsComponent,
         LayoutComponent,
         RouterLink,
@@ -26,14 +23,12 @@ type Tab = 'unresolved' | 'all';
     ],
 })
 export class CommentsPageComponent {
-    public commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));
-    public commentsTab = this.route.queryParams.pipe(map(x => x['commentsTab'] as Tab || 'unresolved'));
+    private readonly route = inject(ActivatedRoute);
 
-    public readonly content = this.contentStates.selectedContent;
+    protected readonly contentStates = inject(ContentsState);
 
-    constructor(
-        private readonly route: ActivatedRoute,
-        private readonly contentStates: ContentsState,
-    ) {
-    }
+    protected readonly commentsId = routeParam('contentId', this.route.parent!);
+
+    protected readonly commentsTab = queryParam<Tab>('commentsTab', 'unresolved');
+
 }

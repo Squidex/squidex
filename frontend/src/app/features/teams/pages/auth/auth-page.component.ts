@@ -5,11 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ApiUrlConfig, CopyDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { map } from 'rxjs';
+import { ApiUrlConfig, CopyDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
 
 @Component({
@@ -17,15 +18,14 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     styleUrls: ['./auth-page.component.scss'],
     templateUrl: './auth-page.component.html',
     imports: [
-        AsyncPipe,
         CopyDirective,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -36,76 +36,61 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
         TranslatePipe,
     ],
 })
-export class AuthPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class AuthPageComponent {
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly authState = inject(TeamAuthState);
+    private readonly teamsState = inject(TeamsState);
 
-    public urlToRedirect!: string;
-    public urlToTest!: string;
+    protected readonly isEditable = signal(false);
 
-    public isEditable = false;
-    public isEditing = false;
+    protected readonly isEditing = signal(false);
 
-    public updateForm = new UpdateTeamAuthForm();
+    protected readonly urlToRedirect = computed(() => {
+        const team = this.teamsState.selectedTeam();
+        if (!team) {
+            return '';
+        }
 
-    constructor(
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly authState: TeamAuthState,
-        private readonly teamsState: TeamsState,
-    ) {
-    }
+        return this.apiUrl.buildUrl(`/identity-server/signin-${team.id}`);
+    });
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.teamsState.selectedTeam.pipe(defined())
-                .subscribe(team => {
-                    this.urlToTest = this.apiUrl.buildUrl('/identity-server/test');
-                    this.urlToRedirect = this.apiUrl.buildUrl(`/identity-server/signin-${team.id}`);
-                }));
+    protected readonly urlToTest = this.apiUrl.buildUrl('/identity-server/test');
 
-        this.subscriptions.add(
-            this.authState.changes.pipe(defined())
-                .subscribe(state => {
-                    const scheme = state.snapshot.scheme;
+    protected readonly updateForm = new UpdateTeamAuthForm();
 
-                    this.isEditable = !!state.snapshot.canUpdate;
-                    this.isEditing = !!scheme;
+    constructor() {
+        effect(() => {
+            const scheme = this.authState.scheme();
+            const isEditable = this.authState.canUpdate();
 
-                    this.updateForm.load(scheme || {});
-                    this.updateForm.setEnabled(this.isEditable);
-                }));
+            this.isEditable.set(isEditable);
+            this.isEditing.set(!!scheme);
+
+            this.updateForm.load(scheme || {});
+            this.updateForm.setEnabled(isEditable);
+        });
 
         this.authState.load();
     }
 
-    public toggle(isEditing: boolean) {
-        if (!this.isEditable) {
+    protected toggle(isEditing: boolean) {
+        if (!this.isEditable()) {
             return;
         }
 
-        this.isEditing = isEditing;
+        this.isEditing.set(isEditing);
         if (!isEditing) {
             this.authState.update(undefined);
         }
     }
 
-    public save() {
-        if (!this.isEditable) {
+    protected save() {
+        if (!this.isEditable()) {
             return;
         }
 
-        const value = this.updateForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.authState.update(value)
-            .subscribe({
-                next: scheme => {
-                    this.updateForm.submitCompleted({ newValue: scheme || {} });
-                },
-                error: error => {
-                    this.updateForm.submitFailed(error);
-                },
-            });
+        this.updateForm.submitAndUpdate(value => {
+            return this.authState.update(value).pipe(map(scheme => scheme || {}));
+        }, { resetAfterSubmit: true });
     }
 }

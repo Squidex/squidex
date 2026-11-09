@@ -1,18 +1,18 @@
 {
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./out-tsc/app",
-  },
-  "files": [
-    "src/main.ts"
-  ],
-  "include": [
-    "**/*.stories.*",
-    "src/**/*.ts",
-    "src/**/*.d.ts"
-  ],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/*.spec.tsx",
-  ]
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "./out-tsc/app",
+        "types": ["ace"]
+    },
+    "files": ["src/main.ts"],
+    "include": ["**/*.stories.*", "src/**/*.ts", "src/**/*.d.ts"],
+    "exclude": ["src/**/*.spec.ts", "src/**/*.spec.tsx"],
+    "angularCompilerOptions": {
+        "extendedDiagnostics": {
+            "checks": {
+                "nullishCoalescingNotNullable": "suppress",
+                "optionalChainNotNullable": "suppress"
+            }
+        }
+    }
 }

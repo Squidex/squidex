@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, StringHelper, Types, VersionTag } from '@app/framework';
@@ -27,35 +27,37 @@ interface Snapshot extends ListState<string> {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ContributorsState extends State<Snapshot> {
-    public contributors =
+    private readonly appsState = inject(AppsState);
+    private readonly contributorsService = inject(ContributorsService);
+    private readonly dialogs = inject(DialogService);
+
+    public readonly contributors =
         this.project(x => x.contributors);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.contributors.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public queryRegex =
-        this.projectFrom(this.query, x => getRegex(x));
+    public readonly queryRegex =
+        computed(() => getRegex(this.query()));
 
-    public maxContributors =
+    public readonly maxContributors =
         this.project(x => x.maxContributors);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public contributorsFiltered =
+    public readonly contributorsFiltered =
         this.project(getFilteredContributors);
 
     public get appId() {
@@ -66,11 +68,7 @@ export class ContributorsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly contributorsService: ContributorsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({
             contributors: [],
             maxContributors: -1,

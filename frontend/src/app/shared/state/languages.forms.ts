@@ -5,59 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, value$ } from '@app/framework';
+import { effect } from '@angular/core';
+import { required } from '@angular/forms/signals';
+import { SignalForm } from '@app/framework';
 import { AddLanguageDto, AppLanguageDto, UpdateLanguageDto } from '../model';
 
-export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateLanguageDto, AppLanguageDto> {
-    public get isMaster() {
-        return this.form.controls['isMaster'];
-    }
+type EditLanguageFormModel = { isMaster: boolean; isOptional: boolean };
 
-    public get isOptional() {
-        return this.form.controls['isOptional'];
-    }
-
+export class EditLanguageForm extends SignalForm<EditLanguageFormModel, UpdateLanguageDto, AppLanguageDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            isMaster: new UntypedFormControl(false,
-                Validators.nullValidator,
-            ),
-            isOptional: new UntypedFormControl(false,
-                Validators.nullValidator,
-            ),
-        }));
+        super({ isMaster: false, isOptional: false });
 
-        value$(this.isMaster)
-            .subscribe(value => {
-                if (value) {
-                    this.isOptional.setValue(false);
-                }
-            });
+        effect(() => {
+            const model = this.model();
+            if (!model.isMaster || !model.isOptional) {
+                return;
+            }
 
-        value$(this.isMaster)
-            .subscribe(value => {
-                if (value) {
-                    this.isOptional.setValue(false);
-                }
-            });
+            this.model.set({ ...model, isOptional: false });
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: EditLanguageFormModel) {
         return new UpdateLanguageDto(value);
     }
 }
 
-export class AddLanguageForm extends Form<ExtendedFormGroup, AddLanguageDto> {
+export class AddLanguageForm extends SignalForm<{ language: string | null }, AddLanguageDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            language: new UntypedFormControl(null,
-                Validators.required,
-            ),
-        }));
+        super({ language: null }, path => {
+            required(path.language);
+        });
     }
 
-    protected transformSubmit(value: any) {
-        return new AddLanguageDto(value);
+    protected transformSubmit(value: { language: string | null }) {
+        return new AddLanguageDto({ language: value.language! });
     }
 }

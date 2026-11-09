@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, Resource, shareSubscribed, State } from '@app/framework';
@@ -24,26 +24,28 @@ interface Snapshot extends LoadingState {
     textIndexResource?: Resource;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class JobsState extends State<Snapshot> {
-    public jobs =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly jobsService = inject(JobsService);
+
+    public readonly jobs =
         this.project(x => x.jobs);
 
-    public maxBackupsReached =
-        this.projectFrom(this.jobs, x => x.filter(j => j.taskName === 'backup').length >= 10);
+    public readonly maxBackupsReached =
+        computed(() => this.jobs().filter(j => j.taskName === 'backup').length >= 10);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreateBackup =
+    public readonly canCreateBackup =
         this.project(x => x.canCreateBackup === true);
 
-    public canRebuildTextIndex =
+    public readonly canRebuildTextIndex =
         this.project(x => !!x.textIndexResource);
 
     public get appId() {
@@ -54,11 +56,7 @@ export class JobsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly jobsService: JobsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ jobs: [] });
 
         debug(this, 'jobs');

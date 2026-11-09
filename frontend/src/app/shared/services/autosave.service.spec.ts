@@ -4,8 +4,8 @@
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
 import { IMock, It, Mock, Times } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { AutoSaveService, LocalStoreService } from '@app/shared/internal';
 
 describe('AutoSaveService', () => {
@@ -16,7 +16,9 @@ describe('AutoSaveService', () => {
     beforeEach(() => {
         localStore = Mock.ofType<LocalStoreService>();
 
-        autoSaveService = new AutoSaveService(localStore.object);
+        autoSaveService = createService(AutoSaveService, [
+            { provide: LocalStoreService, useValue: localStore.object },
+        ]);
     });
 
     it('should remove unsaved created content', () => {

@@ -5,32 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, inject, input, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxHoverBackground]',
+    host: {
+        '(mouseenter)': 'onEnter()',
+        '(mouseleave)': 'onLeave()',
+    },
 })
 export class HoverBackgroundDirective {
+    private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
     private previousBackground?: string | null;
 
-    @Input('sqxHoverBackground')
-    public background!: string;
+    /** The background to apply while the mouse is over the element. */
+    public readonly background = input.required<string>({ alias: 'sqxHoverBackground' });
 
-    constructor(
-        private readonly element: ElementRef<HTMLElement>,
-        private readonly renderer: Renderer2,
-    ) {
-    }
-
-    @HostListener('mouseenter')
-    public onEnter() {
+    protected onEnter() {
         this.previousBackground = this.element.nativeElement.style.background;
 
-        this.renderer.setStyle(this.element.nativeElement, 'background', this.background);
+        this.renderer.setStyle(this.element.nativeElement, 'background', this.background());
     }
 
-    @HostListener('mouseleave')
-    public onLEave() {
+    protected onLeave() {
         this.renderer.setStyle(this.element.nativeElement, 'background', this.previousBackground);
     }
 }

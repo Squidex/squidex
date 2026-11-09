@@ -5,112 +5,76 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MathHelper, StatefulControlComponent } from '@app/framework/internal';
+import { Component, computed, ElementRef, input, model, viewChild } from '@angular/core';
+import { MathHelper } from '@app/framework/internal';
+import { FormValueControlBase } from '../form-value-control';
 import { FocusComponent } from '../forms-helper';
 
-export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ColorPickerComponent), multi: true,
-};
-
-interface State {
-    // The current value.
-    value: string;
-
-    // The hex color.
-    parsed: string;
-
-    // The foreground color.
-    foreground: string;
-}
+let canvas: HTMLCanvasElement;
 
 @Component({
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
-    providers: [
-        SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        FormsModule,
-    ],
 })
-export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
-    @Input()
-    public placeholder = '';
+export class ColorPickerComponent extends FormValueControlBase<string | null> implements FocusComponent {
+    /** The color value. */
+    public readonly value = model<string | null>(null);
 
-    @Input()
-    public mode: 'Input' | 'Circle' = 'Input';
+    /** The placeholder of the text input. */
+    public readonly placeholder = input('');
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** Renders a text input or only a colored circle. */
+    public readonly mode = input<'Input' | 'Circle'>('Input');
 
-    @ViewChild('input')
-    public input?: ElementRef<HTMLInputElement>;
+    protected readonly inputElement = viewChild<ElementRef<HTMLElement>>('input');
 
-    constructor() {
-        super({ foreground: 'black', value: 'black', parsed: '#000000' });
-    }
-
-    public writeValue(value: any) {
-        const previousColor = this.snapshot.value;
-        const parsedColor = parseColor(value);
-
-        if (previousColor !== parsedColor) {
-            let foreground = 'black';
-
-            if (MathHelper.toLuminance(MathHelper.parseColor(parsedColor)!) < 0.5) {
-                foreground = 'white';
-            }
-
-            this.next({ value, parsed: parsedColor, foreground });
+    protected readonly valueParsed = computed(() => {
+        const color = this.value();
+        if (!canvas) {
+            canvas = document.createElement('canvas');
         }
-    }
+
+        const ctx = canvas.getContext('2d')!;
+        if (!ctx) {
+            return color || '';
+        }
+
+        ctx.fillStyle = color || '';
+        return ctx.fillStyle;
+    });
+
+    protected readonly valueForeground = computed(() => {
+        if (MathHelper.toLuminance(MathHelper.parseColor(this.valueParsed())!) < 0.5) {
+            return 'white';
+        }
+
+        return 'black';
+    });
 
     public focus() {
-        if (this.snapshot.isDisabled) {
+        if (this.disabled()) {
             return;
         }
 
-        this.input?.nativeElement?.focus();
+        this.inputElement()?.nativeElement?.focus();
     }
 
-    public blur() {
-        if (this.snapshot.isDisabled) {
+    protected blur() {
+        if (this.disabled()) {
             return;
         }
 
-        this.callTouched();
+        this.markTouched();
     }
 
-    public updateValue(value: string) {
-        if (this.snapshot.isDisabled) {
+    protected updateValue(value: string) {
+        if (this.disabled()) {
             return;
         }
 
-        if (this.snapshot.value !== value) {
-            this.callChange(value);
-            this.writeValue(value);
+        if (this.value() !== value) {
+            this.value.set(value);
         }
     }
-}
-
-let canvas: HTMLCanvasElement;
-function parseColor(color: string) {
-    if (!canvas) {
-        canvas = document.createElement('canvas');
-    }
-
-    const ctx = canvas.getContext('2d')!;
-    if (!ctx) {
-        return color;
-    }
-
-    ctx.fillStyle = color;
-    return ctx.fillStyle;
 }

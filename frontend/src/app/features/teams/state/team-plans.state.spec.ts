@@ -6,9 +6,10 @@
  */
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
-import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, PlanChangedDto, PlanDto, PlansDto, versioned } from '@app/shared';
+import { createService } from '@app/framework/testing';
+import { DialogService, PlanChangedDto, PlanDto, PlansDto, TeamsState, versioned } from '@app/shared';
+import { TestValues } from '../../../shared/state/_test-helpers';
 import { TeamPlansService, TeamPlansState } from '../internal';
 
 describe('TeamPlansState', () => {
@@ -56,7 +57,11 @@ describe('TeamPlansState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         plansService = Mock.ofType<TeamPlansService>();
-        plansState = new TeamPlansState(teamsState.object, dialogs.object, plansService.object);
+        plansState = createService(TeamPlansState, [
+            { provide: TeamsState, useValue: teamsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: TeamPlansService, useValue: plansService.object },
+        ]);
     });
 
     afterEach(() => {

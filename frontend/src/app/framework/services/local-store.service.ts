@@ -5,12 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { Types } from '../utils/types';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class LocalStoreService {
     private readonly fallback: { [key: string]: string } = {};
     private store = localStorage;
@@ -23,7 +21,7 @@ export class LocalStoreService {
         try {
             return this.store.getItem(key);
         } catch {
-            return this.fallback[key];
+            return this.fallback[key] ?? null;
         }
     }
 
@@ -58,15 +56,11 @@ export class LocalStoreService {
     }
 
     public setBoolean(key: string, value: boolean) {
-        const converted = value ? 'true' : 'false';
-
-        this.store.setItem(key, converted);
+        this.set(key, value ? 'true' : 'false');
     }
 
     public setInt(key: string, value: number) {
-        const converted = `${value}`;
-
-        this.store.setItem(key, converted);
+        this.set(key, `${value}`);
     }
 
     public remove(key: string) {

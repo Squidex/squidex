@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-auto">
-                                <sqx-toggle [disabled]="!isEditable" [ngModel]="isEditing" (ngModelChange)="toggle($event)" />
+                                <sqx-toggle [disabled]="!isEditable()" [value]="isEditing()" (valueChange)="toggle(!!$event)" />
                             </div>
 
                             <div class="col">
@@ -16,43 +16,43 @@
                         </div>
                     </div>
 
-                    @if (isEditing) {
-                        <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+                    @if (isEditing()) {
+                        <form (ngSubmit)="save()">
                             <div class="card-body">
-                                <sqx-form-error [error]="updateForm.error | async" />
+                                <sqx-form-error [error]="updateForm.error()" />
 
-                                <sqx-form-row for="domain" label="teams.auth.domain">
-                                    <input class="form-control" id="domain" formControlName="domain" />
+                                <sqx-form-row [for]="updateForm.form.domain" label="teams.auth.domain">
+                                    <input class="form-control" id="domain" [formField]="updateForm.form.domain" />
                                     <sqx-form-hint> {{ "teams.auth.domainHint" | sqxTranslate }}</sqx-form-hint>
                                     <sqx-form-hint>
                                         {{ "teams.auth.domainHintEmail" | sqxTranslate }}:
-                                        <strong>user&commat;{{ updateForm.domainValue$ | async }}</strong>
+                                        <strong>user&commat;{{ updateForm.domainValue() }}</strong>
                                     </sqx-form-hint>
                                 </sqx-form-row>
 
-                                <sqx-form-row for="displayName" hint="teams.auth.displayNameHint" label="teams.auth.displayName">
-                                    <input class="form-control" id="displayName" formControlName="displayName" />
+                                <sqx-form-row [for]="updateForm.form.displayName" hint="teams.auth.displayNameHint" label="teams.auth.displayName">
+                                    <input class="form-control" id="displayName" [formField]="updateForm.form.displayName" />
                                 </sqx-form-row>
 
-                                <sqx-form-row for="displayName" label="teams.auth.clientId">
-                                    <input class="form-control" id="clientId" formControlName="clientId" />
+                                <sqx-form-row [for]="updateForm.form.clientId" label="teams.auth.clientId">
+                                    <input class="form-control" id="clientId" [formField]="updateForm.form.clientId" />
                                 </sqx-form-row>
 
-                                <sqx-form-row for="displayName" label="teams.auth.clientSecret">
-                                    <input class="form-control" id="clientSecret" formControlName="clientSecret" />
+                                <sqx-form-row [for]="updateForm.form.clientSecret" label="teams.auth.clientSecret">
+                                    <input class="form-control" id="clientSecret" [formField]="updateForm.form.clientSecret" />
                                 </sqx-form-row>
 
-                                <sqx-form-row for="displayName" hint="teams.auth.authorityHint" label="teams.auth.authority">
-                                    <input class="form-control" id="authority" formControlName="authority" />
+                                <sqx-form-row [for]="updateForm.form.authority" hint="teams.auth.authorityHint" label="teams.auth.authority">
+                                    <input class="form-control" id="authority" [formField]="updateForm.form.authority" />
                                 </sqx-form-row>
 
-                                <sqx-form-row for="signoutRedirectUrl" label="teams.auth.signoutRedirectUrl">
-                                    <input class="form-control" id="signoutRedirectUrl" formControlName="signoutRedirectUrl" />
+                                <sqx-form-row [for]="updateForm.form.signoutRedirectUrl" label="teams.auth.signoutRedirectUrl">
+                                    <input class="form-control" id="signoutRedirectUrl" [formField]="updateForm.form.signoutRedirectUrl" />
                                 </sqx-form-row>
 
                                 <sqx-form-row for="redirectUrl" label="teams.auth.redirectUrl">
                                     <div class="input-group">
-                                        <input class="form-control" #redirectUri readonly value="{{ urlToRedirect }}" />
+                                        <input class="form-control" #redirectUri readonly value="{{ urlToRedirect() }}" />
                                         <button
                                             class="btn btn-outline-secondary"
                                             attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
@@ -66,10 +66,10 @@
 
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between">
-                                    <a class="float-end btn btn-success" href="{{ urlToTest }}?{{ updateForm.url | async }}" target="_blank" type="type">
+                                    <a class="float-end btn btn-success" href="{{ urlToTest }}?{{ updateForm.url() }}" target="_blank" type="type">
                                         {{ "teams.auth.testLogin" | sqxTranslate }}
                                     </a>
-                                    <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
+                                    <button class="float-end btn btn-primary" [disabled]="!isEditable()" type="submit">
                                         {{ "common.save" | sqxTranslate }}
                                     </button>
                                 </div>

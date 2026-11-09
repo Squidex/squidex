@@ -7,83 +7,86 @@
 
 /* eslint-disable @angular-eslint/directive-selector */
 
-import { Directive, ElementRef, HostListener, Input, numberAttribute, OnDestroy, Renderer2 } from '@angular/core';
+import { DestroyRef, Directive, effect, ElementRef, inject, input, numberAttribute, Renderer2 } from '@angular/core';
 import { DialogService, FloatingPlacement, Tooltip } from '@app/framework/internal';
 
 @Directive({
     selector: '[title]:not(sqx-layout),[shortcut]',
+    host: {
+        '(mouseenter)': 'onMouseEnter()',
+        '(mouseleave)': 'onMouseLeave()',
+        '(click)': 'onClick()',
+    },
 })
-export class TooltipDirective implements OnDestroy {
-    private titleText: string | undefined | null;
-    private timer: any;
+export class TooltipDirective {
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly dialogs = inject(DialogService);
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
     private shortcutTimer: any;
+    private timer: any;
 
-    @Input()
-    public shortcutPosition: FloatingPlacement = 'bottom-start';
+    /** The placement of the shortcut hint relative to the element. */
+    public readonly shortcutPosition = input<FloatingPlacement>('bottom-start');
 
-    @Input()
-    public shortcut?: string | undefined;
+    /** The keyboard shortcut that is shown in the tooltip. */
+    public readonly shortcut = input<string | undefined>();
 
-    @Input({ transform: numberAttribute })
-    public shortcutDelay = 2000;
+    /** The delay in milliseconds before the shortcut hint is shown. */
+    public readonly shortcutDelay = input(2000, { transform: numberAttribute });
 
-    @Input()
-    public titlePosition: FloatingPlacement = 'top-end';
+    /** The placement of the tooltip relative to the element. */
+    public readonly titlePosition = input<FloatingPlacement>('top-end');
 
-    @Input({ transform: numberAttribute })
-    public titleDelay = 1000;
+    /** The delay in milliseconds before the tooltip is shown. */
+    public readonly titleDelay = input(1000, { transform: numberAttribute });
 
-    @Input()
-    public set title(value: string | undefined | null) {
-        this.titleText = value;
-
-        this.unsetAttribute();
-    }
+    /** The text of the tooltip, which replaces the native title. */
+    public readonly title = input<string | undefined | null>();
 
     private get target() {
         return this.element.nativeElement;
     }
 
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
+    constructor() {
+        effect(() => {
+            this.title();
+            this.unsetAttribute();
+        });
+
+        this.destroyRef.onDestroy(() => {
+            this.hide();
+            this.hideShortcut();
+        });
     }
 
-    public ngOnDestroy() {
-        this.hide();
-        this.hideShortcut();
-    }
-
-    @HostListener('mouseenter')
-    public onMouseEnter() {
+    protected onMouseEnter() {
         this.hide();
 
-        if (this.titleText) {
-            if (this.titleDelay > 0) {
+        if (this.title()) {
+            const delay = this.titleDelay();
+
+            if (delay > 0) {
                 this.timer = setTimeout(() => {
                     this.show();
-                }, this.titleDelay);
+                }, delay);
             } else {
                 this.show();
             }
         }
     }
 
-    @HostListener('mouseleave')
-    public onMouseLeave() {
+    protected onMouseLeave() {
         this.hide();
     }
 
-    @HostListener('click')
-    public onClick() {
+    protected onClick() {
         this.hide();
     }
 
     private hide() {
-        if (this.titleText) {
-            this.dialogs.tooltip(new Tooltip(this.target, null, this.titlePosition));
+        if (this.title()) {
+            this.dialogs.tooltip(new Tooltip(this.target, null, this.titlePosition()));
         }
 
         if (this.timer) {
@@ -94,8 +97,8 @@ export class TooltipDirective implements OnDestroy {
     }
 
     private hideShortcut() {
-        if (this.shortcut) {
-            this.dialogs.tooltip(new Tooltip(this.target, null, this.titlePosition));
+        if (this.shortcut()) {
+            this.dialogs.tooltip(new Tooltip(this.target, null, this.titlePosition()));
         }
 
         if (this.shortcutTimer) {
@@ -106,7 +109,7 @@ export class TooltipDirective implements OnDestroy {
     }
 
     private show() {
-        this.dialogs.tooltip(new Tooltip(this.target, this.titleText!, this.titlePosition, false, this.shortcut));
+        this.dialogs.tooltip(new Tooltip(this.target, this.title()!, this.titlePosition(), false, this.shortcut()));
     }
 
     private unsetAttribute() {

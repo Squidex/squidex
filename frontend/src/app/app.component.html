@@ -1,7 +1,7 @@
 <main sqxCopyGlobal>
     <sqx-root-view>
-        <router-outlet (activate)="isLoaded = true">
-            @if (!isLoaded) {
+        <router-outlet (activate)="isLoaded.set(true)">
+            @if (!isLoaded()) {
                 <div class="loading">
                     <img alt="Loading" src="./images/loader.svg" />
                     <div>{{ "common.loading" | sqxTranslate }}</div>

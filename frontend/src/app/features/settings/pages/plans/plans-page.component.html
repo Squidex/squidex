@@ -7,20 +7,20 @@
         </button>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="63rem" [isLoading]="plansState.isLoading | async">
-            @if ((plansState.isLoaded | async) && (plansState.plans | async); as plans) {
-                @if ((plansState.locked | async) === "NotOwner") {
+        <sqx-list-view innerWidth="63rem" [isLoading]="plansState.isLoading()">
+            @if (plansState.isLoaded() && plansState.plans(); as plans) {
+                @if (plansState.locked() === "NotOwner") {
                     <div class="alert alert-danger">
                         {{ "plans.notPlanOwner" | sqxTranslate }}{{ "plans.planOwner" | sqxTranslate }}:
-                        <strong className="no-wrap">{{ plansState.planOwner | async | sqxUserName }}</strong>
+                        <strong className="no-wrap">{{ plansState.planOwner() | sqxUserName }}</strong>
                     </div>
                 }
 
-                @if ((plansState.locked | async) === "ManagedByTeam") {
+                @if (plansState.locked() === "ManagedByTeam") {
                     <div class="alert alert-danger">{{ "plans.managedByTeam" | sqxTranslate }}</div>
                 }
 
-                @if (plansState.referral | async; as referral) {
+                @if (plansState.referral(); as referral) {
                     <div class="card card-body mb-4">
                         <h5 class="card-title">Squidex Referal Program</h5>
                         <sqx-form-hint>
@@ -42,7 +42,7 @@
                         <div class="text-muted text-center empty">{{ "plans.noPlanConfigured" | sqxTranslate }}</div>
                     }
 
-                    @if (plansState.portalLink | async; as portalLink) {
+                    @if (plansState.portalLink(); as portalLink) {
                         <div class="billing-portal-link">
                             {{ "plans.billingPortalHint" | sqxTranslate }}
                             <a [href]="portalLink" sqxExternalLink>{{ "plans.billingPortal" | sqxTranslate }}</a>

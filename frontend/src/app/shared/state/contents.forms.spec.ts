@@ -7,11 +7,12 @@
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { AbstractControl, UntypedFormArray } from '@angular/forms';
-import { MathHelper } from '@app/framework';
+import { TestBed } from '@angular/core/testing';
+import { of, throwError } from 'rxjs';
+import { ErrorDto, MathHelper } from '@app/framework';
 import { AppLanguageDto, createProperties, EditContentForm, FieldDto, FieldRuleDto, getContentValue, HtmlValue, SchemaDto } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
-import { ComponentForm, FieldArrayForm } from './contents.forms';
+import { ComponentForm, FieldArrayForm, PatchContentForm } from './contents.forms';
 import { contentsTranslationStatus, contentTranslationStatus, fieldTranslationStatus, PartitionConfig } from './contents.forms-helpers';
 
 const { createField, createNestedField, createSchema } = TestValues;
@@ -528,7 +529,7 @@ describe('ContentForm', () => {
 
             },
             {
-                value: undefined,
+                value: null,
                 defaultValue: 'Null',
             },
         ];
@@ -539,8 +540,8 @@ describe('ContentForm', () => {
                 createField({ id: 2, properties: createProperties('String'), isDisabled: true }),
             ]);
 
-            expectForm(contentForm.form, 'field1', { disabled: false });
-            expectForm(contentForm.form, 'field2', { disabled: true });
+            expect(contentForm.get('field1')!.disabled()).toBeFalsy();
+            expect(contentForm.get('field2')!.disabled()).toBeTruthy();
         });
 
         it('should not create required validator for optional language', () => {
@@ -548,8 +549,8 @@ describe('ContentForm', () => {
                 createField({ id: 3, properties: createProperties('String', { isRequired: true }) }),
             ]);
 
-            expectForm(contentForm.form, 'field3.en', { invalid: true });
-            expectForm(contentForm.form, 'field3.de', { invalid: false });
+            expect(contentForm.get('field3')!.get('en')!.invalid()).toBeTruthy();
+            expect(contentForm.get('field3')!.get('de')!.invalid()).toBeFalsy();
         });
 
         arraySetup.forEach(test => {
@@ -561,7 +562,7 @@ describe('ContentForm', () => {
                     }),
                 ]);
 
-                expect(contentForm.value.field4.en).toEqual(test.value);
+                expect(contentForm.value().field4.en).toEqual(test.value);
             });
         });
 
@@ -574,7 +575,7 @@ describe('ContentForm', () => {
                     }),
                 ]);
 
-                expect(contentForm.value.field4.en).toEqual(test.value);
+                expect(contentForm.value().field4.en).toEqual(test.value);
             });
         });
 
@@ -590,11 +591,11 @@ describe('ContentForm', () => {
 
             const field1 = contentForm.get('field1')!.get('iv');
 
-            expect(field1!.form.valid).toBeFalsy();
+            expect(field1!.form().valid()).toBeFalsy();
 
             contentForm.setContext({ value: 120 });
 
-            expect(field1!.form.valid).toBeTruthy();
+            expect(field1!.form().valid()).toBeTruthy();
         });
 
         it('should require field based on condition', () => {
@@ -608,7 +609,7 @@ describe('ContentForm', () => {
             const field1 = contentForm.get('field1')!.get('iv');
             const field2 = contentForm.get('field2');
 
-            expect(field1!.form.valid).toBeFalsy();
+            expect(field1!.form().valid()).toBeFalsy();
 
             contentForm.load({
                 field2: {
@@ -616,11 +617,11 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(field1!.form.valid).toBeTruthy();
+            expect(field1!.form().valid()).toBeTruthy();
 
-            field2?.get('iv')!.form.setValue(99);
+            field2?.get('iv')!.setValue(99);
 
-            expect(field1!.form.valid).toBeFalsy();
+            expect(field1!.form().valid()).toBeFalsy();
         });
 
         it('should disable field based on condition', () => {
@@ -636,7 +637,7 @@ describe('ContentForm', () => {
 
             const field2 = contentForm.get('field2');
 
-            expect(field1!.form.disabled).toBeFalsy();
+            expect(field1!.disabled()).toBeFalsy();
 
             contentForm.load({
                 field1: {
@@ -647,13 +648,13 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(field1!.form.disabled).toBeTruthy();
-            expect(field1_iv!.form.disabled).toBeTruthy();
+            expect(field1!.disabled()).toBeTruthy();
+            expect(field1_iv!.disabled()).toBeTruthy();
 
-            field2?.get('iv')!.form.setValue(99);
+            field2?.get('iv')!.setValue(99);
 
-            expect(field1!.form.disabled).toBeFalsy();
-            expect(field1_iv!.form.disabled).toBeFalsy();
+            expect(field1!.disabled()).toBeFalsy();
+            expect(field1_iv!.disabled()).toBeFalsy();
         });
 
         it('should hide field based on condition', () => {
@@ -669,7 +670,7 @@ describe('ContentForm', () => {
 
             const field2 = contentForm.get('field2');
 
-            expect(field1!.hidden).toBeFalsy();
+            expect(field1!.hidden()).toBeFalsy();
 
             contentForm.load({
                 field1: {
@@ -680,13 +681,23 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(field1!.hidden).toBeTruthy();
-            expect(field1_iv!.hidden).toBeTruthy();
+            expect(field1!.hidden()).toBeTruthy();
+            expect(field1_iv!.hidden()).toBeTruthy();
 
-            field2?.get('iv')!.form.setValue(99);
+            field2?.get('iv')!.setValue(99);
 
-            expect(field1!.hidden).toBeFalsy();
-            expect(field1_iv!.hidden).toBeFalsy();
+            expect(field1!.hidden()).toBeFalsy();
+            expect(field1_iv!.hidden()).toBeFalsy();
+        });
+
+        it('should hide section if all fields are hidden', () => {
+            const contentForm = createForm([
+                createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
+            ], [
+                new FieldRuleDto({ field: 'field1', action: 'Hide' }),
+            ]);
+
+            expect(contentForm.sections[0].hidden()).toBeTruthy();
         });
 
         it('should disable nested fields based on condition', () => {
@@ -718,8 +729,8 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(array.get(0)!.get('nested42')!.form.disabled).toBeTruthy();
-            expect(array.get(1)!.get('nested42')!.form.disabled).toBeFalsy();
+            expect(array.get(0)!.get('nested42')!.disabled()).toBeTruthy();
+            expect(array.get(1)!.get('nested42')!.disabled()).toBeFalsy();
         });
 
         it('should hide nested fields based on condition', () => {
@@ -751,8 +762,8 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(array.get(0)!.get('nested42')!.hidden).toBeTruthy();
-            expect(array.get(1)!.get('nested42')!.hidden).toBeFalsy();
+            expect(array.get(0)!.get('nested42')!.hidden()).toBeTruthy();
+            expect(array.get(1)!.get('nested42')!.hidden()).toBeFalsy();
         });
 
         it('should hide nested localized fields based on condition', () => {
@@ -784,8 +795,8 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(array.get(0)!.get('nested42')!.hidden).toBeTruthy();
-            expect(array.get(1)!.get('nested42')!.hidden).toBeFalsy();
+            expect(array.get(0)!.get('nested42')!.hidden()).toBeTruthy();
+            expect(array.get(1)!.get('nested42')!.hidden()).toBeFalsy();
         });
 
         it('should hide components fields based on condition', () => {
@@ -824,8 +835,43 @@ describe('ContentForm', () => {
                 },
             });
 
-            expect(array.get(0)!.get('field1')!.hidden).toBeTruthy();
-            expect(array.get(1)!.get('field1')!.hidden).toBeFalsy();
+            expect(array.get(0)!.get('field1')!.hidden()).toBeTruthy();
+            expect(array.get(1)!.get('field1')!.hidden()).toBeFalsy();
+        });
+
+        it('should support recursive components', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                id: 2,
+                fields: [
+                    createField({ id: 1, properties: createProperties('String', { isRequired: true }), partitioning: 'invariant' }),
+                    createField({ id: 2, properties: createProperties('Component'), partitioning: 'invariant' }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({ id: 4, properties: createProperties('Component'), partitioning: 'invariant' }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            contentForm.load({
+                field4: {
+                    iv: {
+                        schemaId: componentId,
+                        field1: 'Text',
+                        field2: {
+                            schemaId: componentId,
+                        },
+                    },
+                },
+            });
+
+            const outer = contentForm.get('field4')!.get('iv') as ComponentForm;
+            const inner = outer.get('field2') as ComponentForm;
+
+            expect(outer.get('field1')!.invalid()).toBeFalsy();
+            expect(inner.get('field1')!.invalid()).toBeTruthy();
         });
 
         it('should hide field based on tags', () => {
@@ -840,9 +886,9 @@ describe('ContentForm', () => {
             const field1_iv = contentForm.get('field1')!.get('iv');
             const field2 = contentForm.get('field2');
 
-            expect(field1!.hidden).toBeTruthy();
-            expect(field2!.hidden).toBeFalsy();
-            expect(field1_iv!.hidden).toBeTruthy();
+            expect(field1!.hidden()).toBeTruthy();
+            expect(field2!.hidden()).toBeFalsy();
+            expect(field1_iv!.hidden()).toBeTruthy();
         });
 
         it('should add component with default values', () => {
@@ -879,17 +925,17 @@ describe('ContentForm', () => {
 
             contentForm.load({});
 
-            // Should be undefined by default.
-            expect(contentForm.value).toEqual({
+            // Should be null by default.
+            expect(contentForm.value()).toEqual({
                 field4: {
-                    iv: undefined,
+                    iv: null,
                 },
             });
 
             (contentForm.get('field4')?.get('iv') as ComponentForm).selectSchema(componentId);
 
             // Should add field from component.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {
                         schemaId: componentId,
@@ -898,6 +944,60 @@ describe('ContentForm', () => {
                     },
                 },
             });
+        });
+
+        it('should provide schema and sections of component', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                id: 1,
+                fields: [
+                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({ id: 4, properties: createProperties('Component'), partitioning: 'invariant' }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            const componentForm = contentForm.get('field4')!.get('iv') as ComponentForm;
+
+            expect(componentForm.schema()).toBeUndefined();
+            expect(componentForm.sections()).toEqual([]);
+
+            componentForm.selectSchema(componentId);
+
+            expect(componentForm.schema()).toBe(component);
+            expect(componentForm.sections().length).toBe(1);
+            expect(componentForm.fields()['field11']).toBeDefined();
+        });
+
+        it('should keep field forms of component when value changes', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                id: 1,
+                fields: [
+                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({ id: 4, properties: createProperties('Component'), partitioning: 'invariant' }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            const componentForm = contentForm.get('field4')!.get('iv') as ComponentForm;
+
+            componentForm.selectSchema(componentId);
+
+            const field11 = componentForm.get('field11')!;
+
+            field11.setValue('Text');
+
+            expect(componentForm.get('field11')).toBe(field11);
+            expect(componentForm.value().field11).toEqual('Text');
         });
 
         it('should add components with default values', () => {
@@ -930,17 +1030,17 @@ describe('ContentForm', () => {
 
             contentForm.load({});
 
-            // Should be undefined by default.
-            expect(contentForm.value).toEqual({
+            // Should be null by default.
+            expect(contentForm.value()).toEqual({
                 field4: {
-                    iv: undefined,
+                    iv: null,
                 },
             });
 
             (contentForm.get('field4')?.get('iv') as FieldArrayForm).addComponent(componentId);
 
             // Should add field from component.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toMatchObject({
                 field4: {
                     iv: [{
                             schemaId: componentId,
@@ -977,10 +1077,10 @@ describe('ContentForm', () => {
 
             contentForm.load({});
 
-            // Should be undefined by default.
-            expect(contentForm.value).toEqual({
+            // Should be null by default.
+            expect(contentForm.value()).toEqual({
                 field4: {
-                    iv: undefined,
+                    iv: null,
                 },
             });
 
@@ -993,7 +1093,7 @@ describe('ContentForm', () => {
             });
 
             // Should add field from component1.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {
                         schemaId: component1Id,
@@ -1011,7 +1111,7 @@ describe('ContentForm', () => {
             });
 
             // Should add field from component1.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {
                         schemaId: component2Id,
@@ -1045,7 +1145,7 @@ describe('ContentForm', () => {
             });
 
             // Should ignore invalid id.
-            expect(contentForm.value).toEqual({
+            expect(contentForm.value()).toEqual({
                 field4: {
                     iv: {},
                 },
@@ -1063,11 +1163,13 @@ describe('ContentForm', () => {
                 },
             });
 
-            const nestedItem = array.form.get([0])!;
+            const nestedItem = array.get(0);
 
-            expectLength(array, 1);
-            expectForm(nestedItem, 'nested41', { disabled: false, value: 'Text' });
-            expectForm(nestedItem, 'nested42', { disabled: true, value: null });
+            expect(array.items().length).toBe(1);
+            expect(nestedItem.get('nested41')!.disabled()).toBeFalsy();
+            expect(nestedItem.get('nested41')!.value()).toEqual('Text');
+            expect(nestedItem.get('nested42')!.disabled()).toBeTruthy();
+            expect(nestedItem.get('nested42')!.value()).toBeNull();
         });
 
         it('should add array item', () => {
@@ -1075,20 +1177,36 @@ describe('ContentForm', () => {
 
             array.addItem();
 
-            const nestedItem = array.form.get([2])!;
+            const nestedItem = array.get(2);
 
-            expectLength(array, 3);
-            expectForm(nestedItem, 'nested41', { disabled: false, value: null });
-            expectForm(nestedItem, 'nested42', { disabled: true, value: 'Default' });
+            expect(array.items().length).toBe(3);
+            expect(nestedItem.get('nested41')!.disabled()).toBeFalsy();
+            expect(nestedItem.get('nested41')!.value()).toBeNull();
+            expect(nestedItem.get('nested42')!.disabled()).toBeTruthy();
+            expect(nestedItem.get('nested42')!.value()).toEqual('Default');
         });
 
         it('should sort array item', () => {
             const { array } = createArrayFormWith2Items();
 
-            array.sort([array.get(1), array.get(0)]);
+            const item0 = array.get(0);
+            const item1 = array.get(1);
 
-            expectLength(array, 2);
-            expect(array.form.value).toEqual([{ nested41: 'Text2', nested42: null }, { nested41: 'Text1', nested42: null }]);
+            array.sort([item1, item0]);
+
+            expect(array.items()).toEqual([item1, item0]);
+            expect(array.value()).toMatchObject([{ nested41: 'Text2', nested42: null }, { nested41: 'Text1', nested42: null }]);
+        });
+
+        it('should move array item', () => {
+            const { array } = createArrayFormWith2Items();
+
+            const item0 = array.get(0);
+            const item1 = array.get(1);
+
+            array.move(0, item1);
+
+            expect(array.items()).toEqual([item1, item0]);
         });
 
         it('should remove array item', () => {
@@ -1096,8 +1214,8 @@ describe('ContentForm', () => {
 
             array.removeItemAt(0);
 
-            expectLength(array, 1);
-            expect(array.form.value).toEqual([{ nested41: 'Text2', nested42: null }]);
+            expect(array.items().length).toBe(1);
+            expect(array.value()).toMatchObject([{ nested41: 'Text2', nested42: null }]);
         });
 
         it('should reset array item', () => {
@@ -1105,8 +1223,8 @@ describe('ContentForm', () => {
 
             array.setValue([]);
 
-            expectLength(array, 0);
-            expect(array.form.value).toEqual([]);
+            expect(array.items().length).toBe(0);
+            expect(array.value()).toEqual([]);
         });
 
         it('should unset array item', () => {
@@ -1114,8 +1232,8 @@ describe('ContentForm', () => {
 
             array.unset();
 
-            expectLength(array, 0);
-            expect(array.form.value).toEqual(undefined);
+            expect(array.items().length).toBe(0);
+            expect(array.value()).toBeNull();
         });
 
         it('should not array item if field has no nested fields', () => {
@@ -1123,9 +1241,9 @@ describe('ContentForm', () => {
                 createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant' }),
             ]);
 
-            const nestedForm = contentForm.form.get('field4.iv') as UntypedFormArray;
+            const array = contentForm.get('field4')!.get('iv') as FieldArrayForm;
 
-            expect(nestedForm.controls.length).toBe(0);
+            expect(array.items().length).toBe(0);
         });
 
         function createArrayFormWith2Items() {
@@ -1155,32 +1273,6 @@ describe('ContentForm', () => {
 
             return { contentForm, array };
         }
-
-        function expectLength(array: FieldArrayForm, length: number) {
-            expect(array.form.controls.length).toBe(length);
-            expect(array.items.length).toBe(length);
-        }
-
-        function expectForm(parent: AbstractControl, path: string, test: {
-            invalid?: boolean;
-            disabled?: boolean;
-            value?: any;
-        } & Record<string, any>) {
-            const form = parent.get(path) as Record<string, any>;
-
-            if (form) {
-                for (const key in test) {
-                    if (test.hasOwnProperty(key)) {
-                        const valueActual = form[key];
-                        const valueExpected = test[key];
-
-                        expect(valueActual, `Expected ${key} of ${path} to be <${valueExpected}>, but found <${valueActual}>.`).toEqual(valueExpected);
-                    }
-                }
-            } else {
-                expect(form, `Expected to find form ${path}, but form not found.`).not.toBeNull();
-            }
-        }
     });
 
     it('should return true if new value is not equal to current value', () => {
@@ -1203,6 +1295,36 @@ describe('ContentForm', () => {
         expect(hasChanged).toBeFalsy();
     });
 
+    it('should keep field when value is set to undefined', () => {
+        const simpleForm = createForm([
+            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
+        ]);
+
+        const field1 = simpleForm.get('field1')!.get('iv')!;
+
+        field1.form().value.set(undefined);
+
+        expect(simpleForm.value()).toEqual({ field1: { iv: null } });
+        expect(field1.invalid()).toBeFalsy();
+    });
+
+    it('should replace NaN with null when submitting', async () => {
+        const simpleForm = createForm([
+            createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
+        ]);
+
+        simpleForm.get('field1')!.get('iv')!.setValue(NaN);
+
+        let submitted: any;
+
+        await simpleForm.submit(value => {
+            submitted = value;
+            return of(value);
+        });
+
+        expect(submitted).toEqual({ field1: { iv: null } });
+    });
+
     describe('for new content', () => {
         let simpleForm: EditContentForm;
 
@@ -1217,29 +1339,23 @@ describe('ContentForm', () => {
         });
 
         it('should be an unsaved change if value has changed but not saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' } });
+            simpleForm.model.set({ field1: { iv: 'Change' } });
 
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
 
-        it('should not be an unsaved change if value has changed and saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' } });
-            simpleForm.submit();
-            simpleForm.submitCompleted();
+        it('should not be an unsaved change if value has changed and saved', async () => {
+            simpleForm.model.set({ field1: { iv: 'Change' } });
+
+            await simpleForm.submit(() => of(true));
 
             expect(simpleForm.hasChanged()).toBeFalsy();
         });
 
-        it('should subscribe to values', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' } });
+        it('should provide current value', () => {
+            simpleForm.model.set({ field1: { iv: 'Change' } });
 
-            let value: any;
-
-            simpleForm.valueChanges.subscribe(result => {
-                value = result;
-            });
-
-            expect(value).toEqual({ field1: { iv: 'Change' } });
+            expect(simpleForm.value()).toEqual({ field1: { iv: 'Change' } });
         });
     });
 
@@ -1260,7 +1376,7 @@ describe('ContentForm', () => {
         });
 
         it('should be an unsaved change if value has changed but not saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' } });
+            simpleForm.model.set({ field1: { iv: 'Change' } });
 
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
@@ -1271,26 +1387,117 @@ describe('ContentForm', () => {
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
 
-        it('should not be an unsaved change if value has changed and saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' } });
-            simpleForm.submit();
-            simpleForm.submitCompleted();
+        it('should not be an unsaved change if value has changed and saved', async () => {
+            simpleForm.model.set({ field1: { iv: 'Change' } });
+
+            await simpleForm.submit(() => of(true));
 
             expect(simpleForm.hasChanged()).toBeFalsy();
         });
 
-        it('should not be an unsaved change if value has been loaded but not saved', () => {
+        it('should not be an unsaved change if value has been loaded but not saved', async () => {
             simpleForm.load({ field1: { iv: 'Prev' } });
-            simpleForm.submit();
-            simpleForm.submitCompleted();
+
+            await simpleForm.submit(() => of(true));
 
             expect(simpleForm.hasChanged()).toBeFalsy();
+        });
+
+        it('should not mark field as changed if nothing has changed', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            expect(field1.hasChanges()).toBe(false);
+        });
+
+        it('should mark field as changed if value has changed', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            simpleForm.model.set({ field1: { iv: 'Change' } });
+
+            expect(field1.hasChanges()).toBe(true);
+        });
+
+        it('should not mark field as changed if value has changed and saved', async () => {
+            const field1 = simpleForm.get('field1')!;
+
+            simpleForm.model.set({ field1: { iv: 'Change' } });
+
+            await simpleForm.submit(() => of(true));
+
+            expect(field1.hasChanges()).toBe(false);
+        });
+
+        it('should provide field value and translation status', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            simpleForm.model.set({ field1: { iv: null } });
+
+            expect(field1.value()).toEqual({ iv: null });
+            expect(field1.translationStatus()).toEqual({ iv: false });
+        });
+
+        it('should provide disabled state of field', () => {
+            const field1_iv = simpleForm.get('field1')!.get('iv')!;
+
+            simpleForm.setEnabled(false);
+
+            expect(field1_iv.disabled()).toBe(true);
+
+            simpleForm.setEnabled(true);
+
+            expect(field1_iv.disabled()).toBe(false);
+        });
+
+        it('should provide invalid state of field', async () => {
+            const field1_iv = simpleForm.get('field1')!.get('iv')!;
+
+            await simpleForm.submit(() => throwError(() => new ErrorDto(400, 'Error', null, ['field1.iv: Invalid'])));
+
+            expect(field1_iv.invalid()).toBe(true);
+        });
+
+        it('should collapse and expand field', () => {
+            const field1 = simpleForm.get('field1')!;
+
+            expect(field1.collapsed()).toBeNull();
+
+            field1.collapse();
+
+            expect(field1.collapsed()).toBe(true);
+
+            field1.expand();
+
+            expect(field1.collapsed()).toBe(false);
+        });
+    });
+
+    describe('for patching content', () => {
+        it('should provide dirty state', () => {
+            const field = createField({ id: 1, properties: createProperties('String', { inlineEditable: true }), partitioning: 'invariant' });
+
+            const patchForm = TestBed.runInInjectionContext(() => new PatchContentForm([{ name: field.name, label: field.name, rootField: field }], languages[0]));
+
+            expect(patchForm.dirty()).toBe(false);
+
+            (patchForm.form as any)[field.name]().markAsDirty();
+
+            expect(patchForm.dirty()).toBe(true);
+        });
+
+        it('should create request for localized field', async () => {
+            const field = createField({ id: 1, properties: createProperties('String', { inlineEditable: true }) });
+
+            const patchForm = TestBed.runInInjectionContext(() => new PatchContentForm([{ name: field.name, label: field.name, rootField: field }], languages[0]));
+
+            patchForm.load({ [field.name]: 'Text' });
+
+            expect(patchForm.getValue()).toEqual({ [field.name]: { en: 'Text' } });
         });
     });
 
     function createForm(fields: FieldDto[], fieldRules: FieldRuleDto[] = [], schemas: {
         [id: string]: SchemaDto;
     } = {}) {
-        return new EditContentForm(languages, createSchema({ fields, fieldRules }), schemas, {}, 0);
+        return TestBed.runInInjectionContext(() => new EditContentForm(languages, createSchema({ fields, fieldRules }), schemas, {}));
     }
 });

@@ -1,14 +1,14 @@
-<div class="d-flex root gap-1" [class.compact]="size === 'Compact'" [class.mini]="size === 'Mini'" (sqxResized)="setSize($event)">
+<div class="d-flex root gap-1" [class.compact]="sizeActual() === 'Compact'" [class.mini]="sizeActual() === 'Mini'" (sqxResized)="setSize($event)">
     <div class="form-container flex-grow">
-        @if (isDateTimeMode && shouldShowDateTimeModeButton) {
+        @if (isDateTimeMode() && shouldShowDateTimeModeButton()) {
             <div>
-                @if (snapshot.isLocal) {
+                @if (isLocal()) {
                     <button class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)" type="button">
                         {{ "common.dateTimeEditor.local" | sqxTranslate }}
                     </button>
                 }
 
-                @if (!snapshot.isLocal) {
+                @if (!isLocal()) {
                     <button class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(true)" type="button">
                         {{ "common.dateTimeEditor.utc" | sqxTranslate }}
                     </button>
@@ -19,49 +19,49 @@
         <input
             class="form-control form-date"
             #dateInput
-            [attr.id]="id"
-            (blur)="callTouched()"
-            [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton"
-            [class.with-clear]="!hideClear"
-            [disabled]="snapshot.isDisabled"
-            [ngModel]="snapshot.inputValue"
-            (ngModelChange)="updateValue($event)"
-            [ngModelOptions]="{ standalone: true }"
+            [attr.id]="id()"
+            (blur)="markTouched()"
+            [class.ng-invalid]="invalid()"
+            [class.ng-touched]="touched()"
+            [class.with-buttons]="isDateTimeMode() && shouldShowDateTimeModeButton()"
+            [class.with-clear]="!hideClear()"
+            [disabled]="disabled()"
+            (input)="updateValue($any($event.target).value)"
             placeholder="{{ 'common.date' | sqxTranslate }}"
             step="1"
-            sqxForwardFormClasses
-            [type]="isDateTimeMode ? 'datetime-local' : 'date'" />
+            [type]="isDateTimeMode() ? 'datetime-local' : 'date'"
+            [value]="valueInput() ?? ''" />
     </div>
 
-    @if (isDateTimeMode && shouldShowDateButtons) {
+    @if (isDateTimeMode() && shouldShowDateButtons()) {
         <button
             class="btn btn-text-secondary btn-quick"
             (click)="writeNow()"
-            [disabled]="snapshot.isDisabled"
+            [disabled]="disabled()"
             title="i18n:common.dateTimeEditor.nowTooltip"
             type="button">
             {{ "common.dateTimeEditor.now" | sqxTranslate }}
         </button>
     }
 
-    @if (!isDateTimeMode && shouldShowDateButtons) {
+    @if (!isDateTimeMode() && shouldShowDateButtons()) {
         <button
             class="btn btn-text-secondary btn-quick"
             (click)="writeToday()"
-            [disabled]="snapshot.isDisabled"
+            [disabled]="disabled()"
             title="i18n:common.dateTimeEditor.todayTooltip"
             type="button">
             {{ "common.dateTimeEditor.today" | sqxTranslate }}
         </button>
     }
 
-    @if (!hideClear) {
+    @if (!hideClear()) {
         <button
             class="btn btn-text-secondary btn-clear"
             attr.aria-label="{{ 'common.clear' | sqxTranslate }}"
-            [class.invisible]="!hasValue"
+            [class.invisible]="!valueParsed()"
             (click)="reset()"
-            [disabled]="snapshot.isDisabled"
+            [disabled]="disabled()"
             type="button">
             <i class="icon-close"></i>
         </button>

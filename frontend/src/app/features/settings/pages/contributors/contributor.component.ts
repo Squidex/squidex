@@ -8,18 +8,15 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, input } from '@angular/core';
 import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 
 @Component({
     selector: '[sqxContributor][roles]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
-        FormsModule,
         HighlightPipe,
         TooltipDirective,
         TranslatePipe,
@@ -27,26 +24,23 @@ import { AssignContributorDto, ConfirmClickDirective, ContributorDto, Contributo
     ],
 })
 export class ContributorComponent {
-    @Input()
-    public roles!: ReadonlyArray<RoleDto>;
+    private readonly contributorsState = inject(ContributorsState);
 
-    @Input()
-    public search?: string | RegExp | null;
+    /** The roles that can be assigned to the contributor. */
+    public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    @Input('sqxContributor')
-    public contributor!: ContributorDto;
+    /** The search term to highlight in the contributor name. */
+    public readonly search = input<string | RegExp | null>();
 
-    constructor(
-        private readonly contributorsState: ContributorsState,
-    ) {
+    /** The contributor to show. */
+    public readonly contributor = input.required<ContributorDto>({ alias: 'sqxContributor' });
+
+    protected remove() {
+        this.contributorsState.revoke(this.contributor());
     }
 
-    public remove() {
-        this.contributorsState.revoke(this.contributor);
-    }
-
-    public changeRole(role: string) {
-        const request = new AssignContributorDto({ contributorId: this.contributor.contributorId, role });
+    protected changeRole(role: string) {
+        const request = new AssignContributorDto({ contributorId: this.contributor().contributorId, role });
 
         this.contributorsState.assign(request);
     }

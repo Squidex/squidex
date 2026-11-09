@@ -50,7 +50,7 @@ describe('AuthInterceptor', () => {
     });
 
     bit('should append headers to request', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(<any>{ authorization: 'token1' }));
 
         const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
@@ -74,7 +74,7 @@ describe('AuthInterceptor', () => {
     });
 
     bit('should not append headers for no auth headers', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(<any>{ authToauthorizationken: 'token1' }));
 
         const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
@@ -98,7 +98,7 @@ describe('AuthInterceptor', () => {
     });
 
     bit('should not append headers for other requests', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(<any>{ authorization: 'token1' }));
 
         const initialRequest = new HttpRequest('GET', 'http://cloud/p/apps', {
@@ -122,7 +122,7 @@ describe('AuthInterceptor', () => {
     });
 
     bit('should logout for 401 status code after retry', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(<any>{ authorization: 'token1' }));
 
         authService.setup(x => x.loginSilent())
@@ -151,7 +151,7 @@ describe('AuthInterceptor', () => {
 
     AUTH_ERRORS.forEach(status => {
         bit(`should redirect for ${status} status code`, async () => {
-            authService.setup(x => x.userChanges)
+            authService.setup(x => x.userLoaded)
                 .returns(() => of(<any>{ authorization: 'token1' }));
 
             const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
@@ -173,7 +173,7 @@ describe('AuthInterceptor', () => {
 
     SERVER_ERRORS.forEach(status => {
         bit(`should not logout for ${status} status code`, async () => {
-            authService.setup(x => x.userChanges)
+            authService.setup(x => x.userLoaded)
                 .returns(() => of(<any>{ authorization: 'token1' }));
 
             const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {

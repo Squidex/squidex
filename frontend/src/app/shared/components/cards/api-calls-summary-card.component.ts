@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { KNumberPipe, TranslatePipe } from '@app/framework';
 import { CallsUsageDto } from '@app/shared';
 
@@ -14,23 +13,20 @@ import { CallsUsageDto } from '@app/shared';
     selector: 'sqx-api-calls-summary-card',
     styleUrls: ['./api-calls-summary-card.component.scss'],
     templateUrl: './api-calls-summary-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         KNumberPipe,
         TranslatePipe,
     ],
 })
 export class ApiCallsSummaryCardComponent {
-    @Input({ required: true })
-    public usage?: CallsUsageDto;
+    /** The API usage of the app. */
+    public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    public callsMonth = 0;
-    public callsAllowed = 0;
+    protected readonly callsMonth = computed(() => {
+        return this.usage()?.monthCalls ?? 0;
+    });
 
-    public ngOnChanges() {
-        if (this.usage) {
-            this.callsMonth = this.usage.monthCalls;
-            this.callsAllowed = this.usage.allowedCalls;
-        }
-    }
+    protected readonly callsAllowed = computed(() => {
+        return this.usage()?.allowedCalls ?? 0;
+    });
 }

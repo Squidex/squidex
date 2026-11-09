@@ -6,31 +6,31 @@
         </button>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="55rem" [isLoading]="rolesState.isLoading | async">
-            @if (rolesState.isLoaded | async) {
-                @if (rolesState.canCreate | async) {
+        <sqx-list-view innerWidth="55rem" [isLoading]="rolesState.isLoading()">
+            @if (rolesState.isLoaded()) {
+                @if (rolesState.canCreate()) {
                     <sqx-role-add-form />
                 }
 
-                @if (rolesState.defaultRoles | async; as defaultRoles) {
+                @if (rolesState.defaultRoles(); as defaultRoles) {
                     @if (defaultRoles.length > 0) {
                         <div>
                             <h5>{{ "roles.defaultRoles" | sqxTranslate }}</h5>
                             <sqx-form-hint> {{ "roles.defaultRoles.hint" | sqxTranslate }}</sqx-form-hint>
                             @for (role of defaultRoles; track role.name) {
-                                <sqx-role [allPermissions]="allPermissions" [role]="role" [schemas]="(schemasState.schemas | async)!" />
+                                <sqx-role [allPermissions]="allPermissions" [role]="role" [schemas]="schemasState.schemas()" />
                             }
                         </div>
                     }
                 }
 
-                @if (rolesState.customRoles | async; as customRoles) {
+                @if (rolesState.customRoles(); as customRoles) {
                     @if (customRoles.length > 0) {
                         <div>
                             <h5 class="mt-4">{{ "roles.customRoles" | sqxTranslate }}</h5>
 
                             @for (role of customRoles; track role.name) {
-                                <sqx-role [allPermissions]="allPermissions" [role]="role" [schemas]="(schemasState.schemas | async)!" />
+                                <sqx-role [allPermissions]="allPermissions" [role]="role" [schemas]="schemasState.schemas()" />
                             }
                         </div>
                     }

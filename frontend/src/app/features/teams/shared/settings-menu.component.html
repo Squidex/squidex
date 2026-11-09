@@ -1,9 +1,9 @@
 <ul class="nav nav-light flex-column">
-    @if (team.canReadContributors) {
+    @if (team().canReadContributors) {
         <li class="nav-item nav-heading">{{ "common.security" | sqxTranslate }}</li>
     }
 
-    @if (team.canReadContributors) {
+    @if (team().canReadContributors) {
         <li class="nav-item">
             <a class="nav-link" routerLink="contributors" routerLinkActive="active">
                 <i class="icon-contributors"></i> {{ "common.contributors" | sqxTranslate }}
@@ -11,7 +11,7 @@
         </li>
     }
 
-    @if (team.canReadAuth) {
+    @if (team().canReadAuth) {
         <li class="nav-item">
             <a class="nav-link" routerLink="auth" routerLinkActive="active"> <i class="nav-icon icon-shield"></i> {{ "common.auth" | sqxTranslate }}</a>
         </li>
@@ -19,7 +19,7 @@
 
     <li class="nav-item nav-heading">{{ "common.more" | sqxTranslate }}</li>
 
-    @if (team.canReadPlans) {
+    @if (team().canReadPlans) {
         <li class="nav-item">
             <a class="nav-link" routerLink="plans" routerLinkActive="active"> <i class="icon-subscription"></i> {{ "common.subscription" | sqxTranslate }}</a>
         </li>

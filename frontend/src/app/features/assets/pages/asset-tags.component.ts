@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/no-output-native */
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, output, signal } from '@angular/core';
 import { DialogModel, ModalDirective, StopClickDirective, TagItem, TagsSelected, TranslatePipe } from '@app/shared';
 import { AssetTagDialogComponent } from './asset-tag-dialog.component';
 
@@ -16,7 +16,6 @@ import { AssetTagDialogComponent } from './asset-tag-dialog.component';
     selector: 'sqx-asset-tags',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetTagDialogComponent,
         ModalDirective,
@@ -25,34 +24,35 @@ import { AssetTagDialogComponent } from './asset-tag-dialog.component';
     ],
 })
 export class AssetTagsComponent {
-    @Output()
-    public tagsReset = new EventEmitter();
+    /** Emits when the user clicks the "all tags" item to clear the tag selection. */
+    public readonly tagsReset = output();
 
-    @Output()
-    public toggle = new EventEmitter<string>();
+    /** Emits the name of a tag when the user clicks it to select or unselect it. */
+    public readonly toggle = output<string>();
 
-    @Input({ required: true })
-    public tags!: ReadonlyArray<TagItem>;
+    /** The tags to list, with their usage count. */
+    public readonly tags = input.required<ReadonlyArray<TagItem>>();
 
-    @Input({ required: true })
-    public tagsSelected!: TagsSelected;
+    /** The currently selected tags, highlighted in the list. */
+    public readonly tagsSelected = input.required<TagsSelected>();
 
-    @Input({ transform: booleanAttribute })
-    public canRename = false;
+    /** Shows a button to rename each tag. */
+    public readonly canRename = input(false, { transform: booleanAttribute });
 
-    public tagRenaming?: TagItem;
-    public tagRenameDialog = new DialogModel();
+    protected readonly tagRenaming = signal<TagItem | undefined>(undefined);
 
-    public isEmpty() {
-        return Object.keys(this.tagsSelected).length === 0;
+    protected readonly isEmpty = computed(() => {
+        return Object.keys(this.tagsSelected()).length === 0;
+    });
+
+    protected readonly tagRenameDialog = new DialogModel();
+
+    protected isSelected(tag: TagItem) {
+        return this.tagsSelected()[tag.name] === true;
     }
 
-    public isSelected(tag: TagItem) {
-        return this.tagsSelected[tag.name] === true;
-    }
-
-    public renameTag(tag: TagItem) {
-        this.tagRenaming = tag;
+    protected renameTag(tag: TagItem) {
+        this.tagRenaming.set(tag);
         this.tagRenameDialog.show();
     }
 }

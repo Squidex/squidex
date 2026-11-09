@@ -1,4 +1,4 @@
-@if (collaboration.userChanges | async; as currentUsers) {
+@if (collaboration.users(); as currentUsers) {
     @if (currentUsers.length > 0) {
         @for (state of currentUsers | slice: 0 : 5; track state.user.id; let i = $index) {
             <div class="user-item" [style]="{ zIndex: i }">

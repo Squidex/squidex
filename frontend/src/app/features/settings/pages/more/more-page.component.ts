@@ -5,170 +5,154 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, defined, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, Subscriptions, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
+import { tap } from 'rxjs';
+import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, SignalSelectDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
     imports: [
-        AsyncPipe,
         AvatarComponent,
         ConfirmClickDirective,
         FileDropDirective,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
         ProgressBarComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
         SidebarMenuDirective,
+        SignalSelectDirective,
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
     ],
 })
-export class MorePageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class MorePageComponent {
+    private readonly dialogs = inject(DialogService);
 
-    public app!: AppDto;
+    protected readonly appsState = inject(AppsState);
 
-    public teams: { id: string | null; name: string }[] = [];
+    protected readonly router = inject(Router);
 
-    public isEditable = false;
-    public isEditableImage = false;
-    public isDeletable = false;
-    public isTransferable = false;
+    protected readonly teamsState = inject(TeamsState);
 
-    public uploading = false;
-    public uploadProgress = 10;
+    protected readonly uploading = signal(false);
 
-    public transferForm = new TransferAppForm();
+    protected readonly uploadProgress = signal(10);
 
-    public updateForm = new UpdateAppForm();
+    protected readonly isEditable = computed(() => {
+        return this.appsState.selectedApp()?.canUpdateGeneral === true;
+    });
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly router: Router,
-        public readonly teamsState: TeamsState,
-    ) {
-    }
+    protected readonly isEditableImage = computed(() => {
+        return this.appsState.selectedApp()?.canUpdateImage === true;
+    });
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.appsState.selectedApp.pipe(defined())
-                .subscribe(app => {
-                    this.app = app;
+    protected readonly isDeletable = computed(() => {
+        return this.appsState.selectedApp()?.canDelete === true;
+    });
 
-                    this.isDeletable = app.canDelete;
-                    this.isEditable = app.canUpdateGeneral;
-                    this.isEditableImage = app.canUpdateImage;
-                    this.isTransferable = app.canUpdateTeam;
+    protected readonly isTransferable = computed(() => {
+        return this.appsState.selectedApp()?.canUpdateTeam === true;
+    });
 
-                    this.updateForm.load(app);
-                    this.updateForm.setEnabled(this.isEditable);
+    protected readonly transferForm = new TransferAppForm();
 
-                    this.transferForm.load(app);
-                    this.transferForm.setEnabled(this.isTransferable);
-                }));
+    protected readonly updateForm = new UpdateAppForm();
+
+    constructor() {
+        effect(() => {
+            const app = this.appsState.selectedApp();
+            if (!app) {
+                return;
+            }
+
+            this.updateForm.load(app);
+            this.updateForm.setEnabled(this.isEditable());
+
+            this.transferForm.load(app);
+            this.transferForm.setEnabled(this.isTransferable());
+        });
 
         this.appsState.reloadApps();
     }
 
-    public save() {
-        if (!this.isEditable) {
+    protected save() {
+        const app = this.appsState.selectedApp();
+        if (!app || !this.isEditable()) {
             return;
         }
 
-        const value = this.updateForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.appsState.update(this.app, value)
-            .subscribe({
-                next: app => {
-                    this.updateForm.submitCompleted({ newValue: app });
-                },
-                error: error => {
-                    this.dialogs.notifyError(error);
-
-                    this.updateForm.submitFailed(error);
-                },
-            });
+        this.updateForm.submitAndUpdate(value => {
+            return this.appsState.update(app, value).pipe(
+                tap({ error: error => this.dialogs.notifyError(error) }));
+        }, { resetAfterSubmit: true });
     }
 
-    public transfer() {
-        if (!this.isTransferable) {
+    protected transfer() {
+        const app = this.appsState.selectedApp();
+        if (!app || !this.isTransferable()) {
             return;
         }
 
-        const value = this.transferForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.appsState.transfer(this.app, value)
-            .subscribe({
-                next: app => {
-                    this.transferForm.submitCompleted({ newValue: app });
-                },
-                error: error => {
-                    this.dialogs.notifyError(error);
-
-                    this.transferForm.submitFailed(error);
-                },
-            });
+        this.transferForm.submitAndUpdate(value => {
+            return this.appsState.transfer(app, value).pipe(
+                tap({ error: error => this.dialogs.notifyError(error) }));
+        }, { resetAfterSubmit: true });
     }
 
-    public uploadImage(file: ReadonlyArray<File>) {
-        if (!this.isEditableImage) {
+    protected uploadImage(file: ReadonlyArray<File>) {
+        const app = this.appsState.selectedApp();
+        if (!app || !this.isEditableImage()) {
             return;
         }
 
-        this.uploading = true;
-        this.uploadProgress = 0;
+        this.uploading.set(true);
+        this.uploadProgress.set(0);
 
-        this.appsState.uploadImage(this.app, file[0])
+        this.appsState.uploadImage(app, file[0])
             .subscribe({
                 next: value => {
-                if (Types.isNumber(value)) {
-                        this.uploadProgress = value;
+                    if (Types.isNumber(value)) {
+                        this.uploadProgress.set(value);
                     }
                 },
                 error: () => {
-                    this.uploading = false;
+                    this.uploading.set(false);
                 },
                 complete: () => {
-                    this.uploading = false;
+                    this.uploading.set(false);
                 },
             });
     }
 
-    public removeImage() {
-        if (!this.isEditableImage) {
+    protected removeImage() {
+        const app = this.appsState.selectedApp();
+        if (!app || !this.isEditableImage()) {
             return;
         }
 
-        this.appsState.removeImage(this.app);
+        this.appsState.removeImage(app);
     }
 
-    public deleteApp() {
-        if (!this.isDeletable) {
+    protected deleteApp() {
+        const app = this.appsState.selectedApp();
+        if (!app || !this.isDeletable()) {
             return;
         }
 
-        this.appsState.delete(this.app)
+        this.appsState.delete(app)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             });

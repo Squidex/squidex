@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
-import { DialogService, LoadingService, Notification, Subscriptions, UIOptions } from '@app/shared';
+import { DialogService, LoadingService, Notification, UIOptions } from '@app/shared';
 import { AssetUploaderComponent } from '@app/shared/components/assets/asset-uploader.component';
 import { AppsMenuComponent } from './apps-menu.component';
 import { ChatMenuComponent } from './chat-menu.component';
@@ -24,7 +24,6 @@ import { SearchMenuComponent } from './search-menu.component';
     imports: [
         AppsMenuComponent,
         AssetUploaderComponent,
-        AsyncPipe,
         ChatMenuComponent,
         LogoComponent,
         NotificationsMenuComponent,
@@ -34,21 +33,18 @@ import { SearchMenuComponent } from './search-menu.component';
         SearchMenuComponent,
     ],
 })
-export class InternalAreaComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class InternalAreaComponent {
+    private readonly dialogs = inject(DialogService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly uiOptions = inject(UIOptions);
 
-    public readonly isEmbedded = inject(UIOptions).value.embedded;
+    protected readonly loadingService = inject(LoadingService);
 
-    constructor(
-        public readonly loadingService: LoadingService,
-        private readonly dialogs: DialogService,
-        private readonly route: ActivatedRoute,
-    ) {
-    }
+    protected readonly isEmbedded = this.uiOptions.value.embedded;
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.route.queryParams.subscribe(params => {
+    constructor() {
+        this.route.queryParams.pipe(takeUntilDestroyed())
+            .subscribe(params => {
                 const successMessage = params['successMessage'];
 
                 if (successMessage) {
@@ -60,6 +56,6 @@ export class InternalAreaComponent implements OnInit {
                 if (errorMessage) {
                     this.dialogs.notify(Notification.error(errorMessage));
                 }
-            }));
+            });
     }
 }

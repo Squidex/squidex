@@ -1,3 +1,9 @@
+@let availableSteps = this.availableSteps();
+@let branchItems = this.branchItems();
+@let isEditable = this.isEditable();
+@let flow = this.flow();
+@let branchTitle = this.branchTitle();
+@let branchLabel = this.branchLabel();
 <div class="branch">
     @if (branchTitle) {
         <div class="centered">
@@ -34,7 +40,7 @@
                         [showDescription]="false"
                         [showName]="false"
                         [showRemove]="isEditable" />
-                    @if (!parentId) {
+                    @if (!parentId()) {
                         <div class="step-title white-label">{{ item.step.name || availableSteps[item.step.step.stepType].title }}</div>
                     } @else {
                         <div class="hover-step-title white-label">

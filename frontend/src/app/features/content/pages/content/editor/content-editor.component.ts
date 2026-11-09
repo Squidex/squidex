@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FormErrorComponent, ListViewComponent, MarkdownDirective, SchemaDto, TranslatePipe, Version } from '@app/shared';
 import { ContentSectionComponent } from '../../../shared/forms/content-section.component';
 
@@ -16,57 +14,55 @@ import { ContentSectionComponent } from '../../../shared/forms/content-section.c
     styleUrls: ['./content-editor.component.scss'],
     templateUrl: './content-editor.component.html',
     imports: [
-        AsyncPipe,
         ContentSectionComponent,
         CursorsComponent,
         CursorsDirective,
         FormErrorComponent,
-        FormsModule,
         ListViewComponent,
         MarkdownDirective,
         TranslatePipe,
     ],
 })
 export class ContentEditorComponent {
-    @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
+    /** Emits when the user selects another language. */
+    public readonly languageChange = output<AppLanguageDto>();
 
-    @Output()
-    public loadLatest = new EventEmitter<any>();
+    /** Emits when the user wants to view the latest version instead of an older version. */
+    public readonly loadLatest = output();
 
-    @Output()
-    public contentIdChange = new EventEmitter<string>();
+    /** Emits when the user changes the ID of a new content. */
+    public readonly contentIdChange = output<string>();
 
-    @Input({ transform: booleanAttribute })
-    public isNew = false;
+    /** Indicates that a new content is created. */
+    public readonly isNew = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isDeleted?: boolean;
+    /** Indicates that the content has been deleted. */
+    public readonly isDeleted = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public showIdInput = false;
+    /** Shows the input for a custom ID when a new content is created. */
+    public readonly showIdInput = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public contentId!: string;
+    /** The ID of the content. */
+    public readonly contentId = input.required<string>();
 
-    @Input({ required: true })
-    public contentForm!: EditContentForm;
+    /** The form of the content. */
+    public readonly contentForm = input.required<EditContentForm>();
 
-    @Input()
-    public contentVersion?: Version | null;
+    /** The version of the content, when an older version is shown. */
+    public readonly contentVersion = input<Version | null>();
 
-    @Input()
-    public contentFormCompare?: EditContentForm | null;
+    /** The form of the other version, when comparing two versions. */
+    public readonly contentFormCompare = input<EditContentForm | null>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema of the content. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The selected language. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 }

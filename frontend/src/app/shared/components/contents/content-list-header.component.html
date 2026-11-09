@@ -1,8 +1,8 @@
 <sqx-table-header
-    [language]="language"
-    [query]="query"
+    [language]="language()"
+    [query]="query()"
     (queryChange)="queryChange.emit($event)"
-    [sortable]="!!sortPath"
-    [sortDefault]="sortDefault"
-    [sortPath]="sortPath"
-    [text]="field.label" />
+    [sortable]="!!sortPath()"
+    [sortDefault]="sortDefault()"
+    [sortPath]="sortPath()"
+    [text]="field().label" />

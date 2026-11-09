@@ -6,8 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ErrorDto, TypedSimpleChanges } from '@app/framework/internal';
+import { booleanAttribute, Component, input, linkedSignal } from '@angular/core';
+import { ErrorDto } from '@app/framework/internal';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
 
@@ -15,31 +15,24 @@ import { TranslatePipe } from '../pipes/translate.pipe';
     selector: 'sqx-form-error',
     styleUrls: ['./form-error.component.scss'],
     templateUrl: './form-error.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MarkdownDirective,
         TranslatePipe,
     ],
 })
 export class FormErrorComponent {
-    @Input({ required: true })
-    public error?: ErrorDto | null;
+    /** The error to render. Nothing is rendered when not defined. */
+    public readonly error = input.required<ErrorDto | undefined | null>();
 
-    @Input({ transform: booleanAttribute })
-    public bubble?: boolean | null;
+    /** Renders the error as a bubble on top of the content. */
+    public readonly bubble = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public closeable?: boolean | null;
+    /** Shows a button to close the error. */
+    public readonly closeable = input(false, { transform: booleanAttribute });
 
-    public show = false;
+    protected readonly show = linkedSignal(() => !!this.error());
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.error) {
-            this.show = !!this.error;
-        }
-    }
-
-    public close() {
-        this.show = false;
+    protected close() {
+        this.show.set(false);
     }
 }

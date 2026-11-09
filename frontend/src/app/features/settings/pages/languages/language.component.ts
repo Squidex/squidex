@@ -7,9 +7,10 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
+import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, SignalSelectDirective, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-language',
@@ -20,89 +21,82 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowCompone
         CdkDragHandle,
         CdkDropList,
         ConfirmClickDirective,
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class LanguageComponent {
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    private readonly languagesState = inject(LanguagesState);
 
-    @Input({ required: true })
-    public fallbackLanguages!: ReadonlyArray<LanguageDto>;
+    /** The app language to show and edit. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public fallbackLanguagesNew!: ReadonlyArray<LanguageDto>;
+    /** The configured fallback languages of the language, in order. */
+    public readonly fallbackLanguages = input.required<ReadonlyArray<LanguageDto>>();
 
-    public otherLanguage!: LanguageDto;
+    /** The languages that can still be added as fallback languages. */
+    public readonly fallbackLanguagesNew = input.required<ReadonlyArray<LanguageDto>>();
 
-    public isEditing?: boolean | null;
-    public isEditable = false;
+    protected readonly fallbackLanguagesLocal = linkedSignal(() => this.fallbackLanguages());
 
-    public editForm = new EditLanguageForm();
+    protected readonly fallbackLanguagesNewLocal = linkedSignal(() => this.fallbackLanguagesNew());
 
-    constructor(
-        private readonly languagesState: LanguagesState,
-    ) {
+    protected readonly isEditing = signal(false);
+
+    protected readonly isEditable = computed(() => {
+        return this.language().canUpdate;
+    });
+
+    protected readonly otherLanguageSelected = form(linkedSignal<LanguageDto | undefined>(() => this.fallbackLanguagesNewLocal()[0]));
+
+    protected readonly editForm = new EditLanguageForm();
+
+    constructor() {
+        effect(() => {
+            this.editForm.load(this.language());
+            this.editForm.setEnabled(this.isEditable());
+        });
     }
 
-    public ngOnChanges() {
-        this.isEditable = this.language.canUpdate;
-
-        this.editForm.load(this.language);
-        this.editForm.setEnabled(this.isEditable);
-
-        this.otherLanguage = this.fallbackLanguagesNew[0];
+    protected toggleEditing() {
+        this.isEditing.update(x => !x);
     }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
+    protected remove() {
+        this.languagesState.remove(this.language());
     }
 
-    public remove() {
-        this.languagesState.remove(this.language);
+    protected sort(event: CdkDragDrop<ReadonlyArray<AppLanguageDto>>) {
+        this.fallbackLanguagesLocal.set(sorted(event) as any);
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<AppLanguageDto>>) {
-        this.fallbackLanguages = sorted(event) as any;
-    }
-
-    public save() {
-        if (!this.isEditable) {
+    protected save() {
+        if (!this.isEditable()) {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
+        this.editForm.submit(value => {
+            const request = new UpdateLanguageDto({ ...value, fallback: this.fallbackLanguagesLocal().map(x => x.iso2Code) });
+
+            return this.languagesState.update(this.language(), request);
+        });
+    }
+
+    protected removeFallbackLanguage(language: LanguageDto) {
+        this.fallbackLanguagesLocal.update(x => x.removed(language));
+        this.fallbackLanguagesNewLocal.update(x => [...x, language].sortByString(l => l.iso2Code));
+    }
+
+    protected addFallbackLanguage() {
+        const otherLanguage = this.otherLanguageSelected().value();
+        if (!otherLanguage) {
             return;
         }
 
-        const request = new UpdateLanguageDto({ ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code) });
-
-        this.languagesState.update(this.language, request)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
-    }
-
-    public removeFallbackLanguage(language: LanguageDto) {
-        this.fallbackLanguages = this.fallbackLanguages.removed(language);
-        this.fallbackLanguagesNew = [...this.fallbackLanguagesNew, language].sortByString(x => x.iso2Code);
-
-        this.otherLanguage = this.fallbackLanguagesNew[0];
-    }
-
-    public addFallbackLanguage() {
-        this.fallbackLanguages = [...this.fallbackLanguages, this.otherLanguage].sortByString(x => x.iso2Code);
-        this.fallbackLanguagesNew = this.fallbackLanguagesNew.removed(this.otherLanguage);
-
-        this.otherLanguage = this.fallbackLanguagesNew[0];
+        this.fallbackLanguagesLocal.update(x => [...x, otherLanguage].sortByString(l => l.iso2Code));
+        this.fallbackLanguagesNewLocal.update(x => x.removed(otherLanguage));
     }
 }

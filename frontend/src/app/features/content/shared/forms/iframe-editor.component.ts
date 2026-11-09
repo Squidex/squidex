@@ -5,258 +5,251 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { booleanAttribute, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, untracked, viewChild } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, StatefulComponent, Subscriptions, ThemeService, TypedSimpleChanges, Types, value$ } from '@app/shared';
-
-interface State {
-    // True, when the editor is shown as fullscreen.
-    isFullscreen: boolean;
-}
+import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, ModalDirective, SafeResourceUrlPipe, ThemeService, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-iframe-editor',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetSelectorComponent,
         ContentSelectorComponent,
         ModalDirective,
         SafeResourceUrlPipe,
     ],
+    host: {
+        '(window:message)': 'onWindowMessage($event)',
+    },
 })
-export class IFrameEditorComponent extends StatefulComponent<State> implements OnDestroy {
-    private readonly subscriptions = new Subscriptions();
-    private readonly themeSubscriptions = new Subscriptions();
-    private value: any;
+export class IFrameEditorComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly dialogs = inject(DialogService);
+    private readonly renderer = inject(Renderer2);
+    private readonly router = inject(Router);
+    private readonly themeService = inject(ThemeService);
+    private assetsCorrelationId: any;
+    private contentsCorrelationId: any;
     private isInitialized = false;
-    private isDisabled = false;
+    private value: any;
 
-    @ViewChild('iframe', { static: false })
-    public iframe!: ElementRef<HTMLIFrameElement>;
+    /** Emits when the editor wants to toggle the expanded mode. */
+    public readonly isExpandedChange = output();
 
-    @ViewChild('container', { static: false })
-    public container!: ElementRef<HTMLElement>;
+    /** Renders the editor in expanded mode. */
+    public readonly isExpanded = input(false, { transform: booleanAttribute });
 
-    @ViewChild('inner', { static: false })
-    public inner!: ElementRef<HTMLElement>;
+    /** The schemas to pick contents from, if the editor does not define them. */
+    public readonly schemaIds = input.required<ReadonlyArray<string> | undefined>();
 
-    @Output()
-    public isExpandedChange = new EventEmitter();
+    /** Additional context information that is passed to the editor. */
+    public readonly context = input.required<any>();
 
-    @Input({ transform: booleanAttribute })
-    public isExpanded = false;
+    /** The value of the whole content form. */
+    public readonly formValue = input.required<any>();
 
-    @Input({ required: true })
-    public schemaIds?: ReadonlyArray<string>;
+    /** The name of the field. */
+    public readonly fieldName = input.required<string>();
 
-    @Input({ required: true })
-    public context: any = {};
+    /** The index of the field when it is part of an array. */
+    public readonly formIndex = input.required<number | null | undefined, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public formValue!: any;
+    /** The language of the field value. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public formField = '';
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formIndex?: number | null;
+    /** The form control with the value of the field. */
+    public readonly formControlBinding = input.required<FieldTree<any>>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** Disables the editor, in addition to the disabled state of the form control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The URL of the editor. */
+    public readonly url = input<string | null>();
 
-    @Input({ required: true })
-    public formControlBinding!: AbstractControl;
+    protected readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.updatedisabled(value === true);
-    }
+    protected readonly container = viewChild.required<ElementRef<HTMLElement>>('container');
 
-    @Input()
-    public set url(value: string | undefined | null) {
-        this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
-    }
+    protected readonly inner = viewChild.required<ElementRef<HTMLElement>>('inner');
 
-    public computedUrl = '';
+    protected readonly isDisabledByControl = signal(false);
 
-    public assetsCorrelationId: any;
-    public assetsDialog = new DialogModel();
+    protected readonly isFullscreen = signal(false);
 
-    public contentsQuery?: string = undefined;
-    public contentsCorrelationId: any;
-    public contentsSchemas?: ReadonlyArray<string>;
-    public contentsDialog = new DialogModel();
-    public contentsSelectedIds?: ReadonlyArray<string>;
+    protected readonly contentsQuery = signal<string | undefined>(undefined);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly renderer: Renderer2,
-        private readonly router: Router,
-        private readonly themeService: ThemeService,
-    ) {
-        super({ isFullscreen: false });
+    protected readonly contentsSchemas = signal<ReadonlyArray<string> | undefined>(undefined);
 
-        this.themeSubscriptions.add(
-            this.themeService.themeChanges
-                .subscribe(() => {
-                    this.sendTheme();
-                }));
-    }
+    protected readonly contentsSelectedIds = signal<ReadonlyArray<string> | undefined>(undefined);
 
-    public ngOnDestroy() {
-        super.ngOnDestroy();
+    protected readonly isDisabled = computed(() => {
+        return this.disabled() || this.isDisabledByControl();
+    });
 
-        this.toggleFullscreen(false);
-    }
+    protected readonly computedUrl = computed(() => {
+        return computeEditorUrl(this.url(), this.appsState.snapshot.selectedSettings);
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formValue) {
+    protected readonly assetsDialog = new DialogModel();
+
+    protected readonly contentsDialog = new DialogModel();
+
+    constructor() {
+        effect(() => {
+            this.sendMessage('themeChanged', { theme: this.themeService.theme() });
+        });
+
+        effect(() => {
             this.sendFormValue();
-        }
+        });
 
-        if (changes.formIndex) {
+        effect(() => {
             this.sendMoved();
-        }
+        });
 
-        if (changes.isExpanded) {
+        effect(() => {
             this.sendExpanded();
-        }
+        });
 
-        if (changes.language) {
+        effect(() => {
             this.sendLanguage();
-        }
+        });
 
-        if (changes.context) {
+        effect(() => {
             this.sendContext();
+        });
+
+        effect(() => {
+            this.sendDisabled();
+        });
+
+        effect(() => {
+            const state = this.formControlBinding()();
+            const value = state.value();
+
+            untracked(() => this.updateValue(value));
+        });
+
+        effect(() => {
+            const isDisabled = this.formControlBinding()().disabled();
+
+            untracked(() => this.isDisabledByControl.set(isDisabled));
+        });
+
+        this.destroyRef.onDestroy(() => {
+            this.toggleFullscreen(false);
+        });
+    }
+
+    protected onWindowMessage(event: MessageEvent) {
+        const iframe = this.iframe()?.nativeElement;
+        if (!iframe || event.source !== iframe.contentWindow) {
+            return;
         }
 
-        if (changes.formControlBinding) {
-            this.subscriptions.unsubscribeAll();
+        const { type } = event.data;
 
-            const control = this.formControlBinding;
+        if (type === 'started') {
+            this.isInitialized = true;
 
-            if (control) {
-                this.subscriptions.add(value$(control)
-                    .subscribe(value => {
-                        this.updateValue(value);
-                    }));
+            this.sendTheme();
+            this.sendInit();
+            this.sendFullscreen();
+            this.sendExpanded();
+            this.sendFormValue();
+            this.sendLanguage();
+            this.sendDisabled();
+            this.sendMoved();
+            this.sendValue();
+        } else if (type === 'resize') {
+            const { height } = event.data;
 
-                this.subscriptions.add(disabled$(control)
-                    .subscribe(isDisabled => {
-                        this.updatedisabled(isDisabled);
-                    }));
+            this.renderer.setStyle(iframe, 'height', `${height}px`);
+        } else if (type === 'navigate') {
+            const { url } = event.data;
+
+            this.router.navigateByUrl(url);
+        } else if (type === 'fullscreen') {
+            const { mode } = event.data;
+
+            if (mode !== this.isFullscreen()) {
+                this.toggleFullscreen(mode);
+            }
+        } else if (type === 'expanded') {
+            const { mode } = event.data;
+
+            if (mode !== this.isExpanded()) {
+                this.isExpandedChange.emit();
+            }
+        } else if (type === 'valueChanged') {
+            const { value } = event.data;
+
+            if (!Types.equals(this.value, value)) {
+                this.value = value;
+
+                this.formControlBinding()().value.set(value);
+                this.formControlBinding()().markAsDirty();
+            }
+        } else if (type === 'touched') {
+            this.formControlBinding()().markAsTouched();
+        } else if (type === 'notifyInfo') {
+            const { text } = event.data;
+
+            if (Types.isString(text)) {
+                this.dialogs.notifyInfo(text);
+            }
+        } else if (type === 'notifyError') {
+            const { text } = event.data;
+
+            if (Types.isString(text)) {
+                this.dialogs.notifyError(text);
+            }
+        } else if (type === 'confirm') {
+            const { text, title, correlationId } = event.data;
+
+            if (Types.isString(text) && Types.isString(title) && correlationId) {
+                this.dialogs.confirm(title, text).subscribe(result => {
+                    this.sendMessage('confirmResult', { correlationId, result });
+                });
+            }
+        } else if (type === 'pickAssets') {
+            const { correlationId } = event.data;
+
+            if (correlationId) {
+                this.assetsCorrelationId = correlationId;
+                this.assetsDialog.show();
+            }
+        } else if (type === 'pickContents') {
+            const { correlationId, schemas, query, selectedIds } = event.data;
+
+            if (correlationId) {
+                let schemaIds: ReadonlyArray<string> | undefined = undefined;
+
+                if (Types.isArrayOfString(schemas) && schemas.length > 0) {
+                    schemaIds = schemas;
+                }
+
+                const schemaIdsField = this.schemaIds();
+                if (schemaIdsField && schemaIdsField.length > 0) {
+                    schemaIds = schemaIdsField;
+                }
+
+                this.contentsCorrelationId = correlationId;
+                this.contentsQuery.set(query);
+                this.contentsSelectedIds.set(Types.isArrayOfString(selectedIds) ? selectedIds : undefined);
+                this.contentsSchemas.set(schemaIds);
+                this.contentsDialog.show();
             }
         }
     }
 
-    @HostListener('window:message', ['$event'])
-    public onWindowMessage(event: MessageEvent) {
-        if (event.source === this.iframe.nativeElement.contentWindow) {
-            const { type } = event.data;
-
-            if (type === 'started') {
-                this.isInitialized = true;
-
-                this.sendTheme();
-                this.sendInit();
-                this.sendFullscreen();
-                this.sendExpanded();
-                this.sendFormValue();
-                this.sendLanguage();
-                this.sendDisabled();
-                this.sendMoved();
-                this.sendValue();
-            } else if (type === 'resize') {
-                const { height } = event.data;
-
-                this.renderer.setStyle(this.iframe.nativeElement, 'height', `${height}px`);
-            } else if (type === 'navigate') {
-                const { url } = event.data;
-
-                this.router.navigateByUrl(url);
-            } else if (type === 'fullscreen') {
-                const { mode } = event.data;
-
-                if (mode !== this.snapshot.isFullscreen) {
-                    this.toggleFullscreen(mode);
-                }
-            } else if (type === 'expanded') {
-                const { mode } = event.data;
-
-                if (mode !== this.isExpanded) {
-                    this.isExpandedChange.emit();
-                }
-            } else if (type === 'valueChanged') {
-                const { value } = event.data;
-
-                if (!Types.equals(this.value, value)) {
-                    this.value = value;
-
-                    this.formControlBinding?.reset(value);
-                }
-            } else if (type === 'touched') {
-                this.formControlBinding?.markAsTouched();
-            } else if (type === 'notifyInfo') {
-                const { text } = event.data;
-
-                if (Types.isString(text)) {
-                    this.dialogs.notifyInfo(text);
-                }
-            } else if (type === 'notifyError') {
-                const { text } = event.data;
-
-                if (Types.isString(text)) {
-                    this.dialogs.notifyError(text);
-                }
-            } else if (type === 'confirm') {
-                const { text, title, correlationId } = event.data;
-
-                if (Types.isString(text) && Types.isString(title) && correlationId) {
-                    this.dialogs.confirm(title, text).subscribe(result => {
-                        this.sendMessage('confirmResult', { correlationId, result });
-                    });
-                }
-            } else if (type === 'pickAssets') {
-                const { correlationId } = event.data;
-
-                if (correlationId) {
-                    this.assetsCorrelationId = correlationId;
-                    this.assetsDialog.show();
-                    this.detectChanges();
-                }
-            } else if (type === 'pickContents') {
-                const { correlationId, schemas, query, selectedIds } = event.data;
-
-                if (correlationId) {
-                    let schemaIds: ReadonlyArray<string> | undefined = undefined;
-
-                    if (Types.isArrayOfString(schemas) && schemas.length > 0) {
-                        schemaIds = schemas;
-                    } if (this.schemaIds && this.schemaIds.length > 0) {
-                        schemaIds = this.schemaIds;
-                    }
-
-                    this.contentsQuery = query;
-                    this.contentsCorrelationId = correlationId;
-                    this.contentsSelectedIds = Types.isArrayOfString(selectedIds) ? selectedIds : undefined;
-                    this.contentsSchemas = schemaIds;
-                    this.contentsDialog.show();
-                    this.detectChanges();
-                }
-            }
-
-            this.detectChanges();
-        }
-    }
-
-    public pickAssets(assets: ReadonlyArray<AssetDto>) {
+    protected pickAssets(assets: ReadonlyArray<AssetDto>) {
         if (this.assetsCorrelationId) {
             this.sendMessage('pickAssetsResult', { correlationId: this.assetsCorrelationId, result: assets });
 
@@ -266,7 +259,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         this.assetsDialog.hide();
     }
 
-    public pickContents(contents: ReadonlyArray<ContentDto>) {
+    protected pickContents(contents: ReadonlyArray<ContentDto>) {
         if (this.contentsCorrelationId) {
             this.sendMessage('pickContentsResult', { correlationId: this.contentsCorrelationId, result: contents });
 
@@ -276,19 +269,11 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         this.contentsDialog.hide();
     }
 
-    public updateValue(obj: any) {
+    private updateValue(obj: any) {
         if (!Types.equals(obj, this.value)) {
             this.value = obj;
 
             this.sendValue();
-        }
-    }
-
-    public updatedisabled(isDisabled: boolean) {
-        if (this.isDisabled !== isDisabled) {
-            this.isDisabled = isDisabled;
-
-            this.sendDisabled();
         }
     }
 
@@ -297,11 +282,11 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     }
 
     private sendInit() {
-        this.sendMessage('init', { context: { ...this.context || {}, field: this.formField } });
+        this.sendMessage('init', { context: { ...this.context() || {}, field: this.fieldName() } });
     }
 
     private sendTheme() {
-        this.sendMessage('themeChanged', { theme: this.themeService.theme });
+        this.sendMessage('themeChanged', { theme: this.themeService.theme() });
     }
 
     private sendValue() {
@@ -309,59 +294,61 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     }
 
     private sendFullscreen() {
-        this.sendMessage('fullscreenChanged', { fullscreen: this.snapshot.isFullscreen });
+        this.sendMessage('fullscreenChanged', { fullscreen: this.isFullscreen() });
     }
 
     private sendExpanded() {
-        this.sendMessage('expandedChanged', { expanded: this.isExpanded });
+        this.sendMessage('expandedChanged', { expanded: this.isExpanded() });
     }
 
     private sendContext() {
-        this.sendMessage('contextChanged', { context: this.context });
+        this.sendMessage('contextChanged', { context: this.context() });
     }
 
     private sendDisabled() {
-        this.sendMessage('disabled', { isDisabled: this.isDisabled });
+        this.sendMessage('disabled', { isDisabled: this.isDisabled() });
     }
 
     private sendFormValue() {
-        if (this.formValue) {
-            this.sendMessage('formValueChanged', { formValue: this.formValue });
+        const formValue = this.formValue();
+        if (formValue) {
+            this.sendMessage('formValueChanged', { formValue });
         }
     }
 
     private sendLanguage() {
-        if (this.language) {
-            this.sendMessage('languageChanged', { language: this.language });
+        const language = this.language();
+        if (language) {
+            this.sendMessage('languageChanged', { language });
         }
     }
 
     private sendMoved() {
-        if (Types.isNumber(this.formIndex)) {
-            this.sendMessage('moved', { index: this.formIndex });
+        const formIndex = this.formIndex();
+        if (Types.isNumber(formIndex)) {
+            this.sendMessage('moved', { index: formIndex });
         }
     }
 
     private toggleFullscreen(isFullscreen: boolean) {
-        this.next({ isFullscreen });
+        this.isFullscreen.set(isFullscreen);
 
-        let target = this.container.nativeElement;
+        let target = this.container().nativeElement;
 
         if (isFullscreen) {
             target = document.body;
         }
 
-        this.renderer.appendChild(target, this.inner.nativeElement);
+        this.renderer.appendChild(target, this.inner().nativeElement);
 
         this.sendFullscreen();
     }
 
     private sendMessage(type: string, payload: any) {
-        if (!this.iframe?.nativeElement) {
+        const iframe = this.iframe()?.nativeElement;
+        if (!iframe) {
             return;
         }
-
-        const iframe = this.iframe.nativeElement;
 
         if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
             const message = { type, ...payload };

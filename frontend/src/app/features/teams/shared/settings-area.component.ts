@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { defined, LayoutComponent, TeamsState, TitleComponent } from '@app/shared';
+import { LayoutComponent, TeamsState, TitleComponent } from '@app/shared';
 import { SettingsMenuComponent } from './settings-menu.component';
 
 @Component({
@@ -16,7 +15,6 @@ import { SettingsMenuComponent } from './settings-menu.component';
     styleUrls: ['./settings-area.component.scss'],
     templateUrl: './settings-area.component.html',
     imports: [
-        AsyncPipe,
         LayoutComponent,
         RouterOutlet,
         SettingsMenuComponent,
@@ -24,10 +22,5 @@ import { SettingsMenuComponent } from './settings-menu.component';
     ],
 })
 export class SettingsAreaComponent {
-    public selectedTeam = this.teamsState.selectedTeam.pipe(defined());
-
-    constructor(
-        private readonly teamsState: TeamsState,
-    ) {
-    }
+    protected readonly teamsState = inject(TeamsState);
 }

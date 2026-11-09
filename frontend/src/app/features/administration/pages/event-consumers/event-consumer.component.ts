@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { EventConsumerDto, TooltipDirective, TranslatePipe } from '@app/shared';
 import { EventConsumersState } from '../../internal';
 
@@ -16,33 +16,29 @@ import { EventConsumersState } from '../../internal';
     selector: '[sqxEventConsumer]',
     styleUrls: ['./event-consumer.component.scss'],
     templateUrl: './event-consumer.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        TranslatePipe,
         TooltipDirective,
+        TranslatePipe,
     ],
 })
 export class EventConsumerComponent {
-    @Output()
-    public failure = new EventEmitter();
+    private readonly eventConsumersState = inject(EventConsumersState);
 
-    @Input('sqxEventConsumer')
-    public eventConsumer!: EventConsumerDto;
+    /** Emits when the user clicks the error icon to see the failure details. */
+    public readonly failure = output();
 
-    constructor(
-        private readonly eventConsumersState: EventConsumersState,
-    ) {
+    /** The event consumer to show in the row. */
+    public readonly eventConsumer = input.required<EventConsumerDto>({ alias: 'sqxEventConsumer' });
+
+    protected start() {
+        this.eventConsumersState.start(this.eventConsumer());
     }
 
-    public start() {
-        this.eventConsumersState.start(this.eventConsumer);
+    protected stop() {
+        this.eventConsumersState.stop(this.eventConsumer());
     }
 
-    public stop() {
-        this.eventConsumersState.stop(this.eventConsumer);
-    }
-
-    public reset() {
-        this.eventConsumersState.reset(this.eventConsumer);
+    protected reset() {
+        this.eventConsumersState.reset(this.eventConsumer());
     }
 }

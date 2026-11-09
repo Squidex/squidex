@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
@@ -44,29 +44,31 @@ interface Snapshot extends LoadingState {
     version: VersionTag;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class PlansState extends State<Snapshot> {
-    public plans =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly plansService = inject(PlansService);
+
+    public readonly plans =
         this.project(x => x.plans);
 
-    public planOwner =
+    public readonly planOwner =
         this.project(x => x.planOwner);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public locked =
+    public readonly locked =
         this.project(x => x.locked);
 
-    public referral =
+    public readonly referral =
         this.project(x => x.referral);
 
-    public portalLink =
+    public readonly portalLink =
         this.project(x => x.portalLink);
 
     public get appId() {
@@ -79,11 +81,7 @@ export class PlansState extends State<Snapshot> {
 
     public window = window;
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly plansService: PlansService,
-    ) {
+    constructor() {
         super({ plans: [], version: VersionTag.EMPTY });
 
         debug(this, 'plans');

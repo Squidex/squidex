@@ -1,1 +1,1 @@
-<sqx-checkbox-group [formControl]="control" [values]="snapshot.converter.tags" />
+<sqx-checkbox-group [disabled]="isGroupDisabled()" [value]="value()" (valueChange)="updateValue($event)" [values]="converter().tags" />

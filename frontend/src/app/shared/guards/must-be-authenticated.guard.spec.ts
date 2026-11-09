@@ -49,7 +49,7 @@ describe('MustBeAuthenticatedGuard', () => {
     });
 
     bit('should navigate to default page if not authenticated', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(null));
 
         const result = await firstValueFrom(mustBeAuthenticatedGuard());
@@ -59,7 +59,7 @@ describe('MustBeAuthenticatedGuard', () => {
     });
 
     bit('should return true if authenticated', async () => {
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(<any>{}));
 
         const result = await firstValueFrom(mustBeAuthenticatedGuard());
@@ -71,7 +71,7 @@ describe('MustBeAuthenticatedGuard', () => {
     bit('should login redirect if redirect enabled', async () => {
         uiOptions.value.redirectToLogin = true;
 
-        authService.setup(x => x.userChanges)
+        authService.setup(x => x.userLoaded)
             .returns(() => of(null));
 
         const result = await firstValueFrom(mustBeAuthenticatedGuard());

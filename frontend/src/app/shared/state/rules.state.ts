@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, MathHelper, Mutable, shareSubscribed, State, Types } from '@app/framework';
+import { debug, DialogService, LoadingState, MathHelper, Mutable, safeResource, shareSubscribed, State, Types } from '@app/framework';
 import { DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, IDynamicFlowStepDefinitionDto } from '../model';
-import { RulesService } from '../services/rules.service';
+import { RulesService, StepsDto } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -33,36 +33,49 @@ interface Snapshot extends LoadingState {
     canReadEvents?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class RulesState extends State<Snapshot> {
-    public selectedRule =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly rulesService = inject(RulesService);
+
+    private readonly stepsResource = safeResource<StepsDto | undefined>({
+        stream: () => this.rulesService.getSteps(),
+        defaultValue: undefined,
+    });
+
+    public readonly steps =
+        computed<StepsDto>(() => this.stepsResource.value() ?? {});
+
+    public readonly isStepsLoaded =
+        computed(() => this.stepsResource.value() !== undefined);
+
+    public readonly selectedRule =
         this.project(x => x.selectedRule);
 
-    public rules =
+    public readonly rules =
         this.project(x => x.rules);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public canCancelRun =
+    public readonly canCancelRun =
         this.project(x => x.canCancelRun === true);
 
-    public canReadEvents =
+    public readonly canReadEvents =
         this.project(x => x.canReadEvents === true);
 
-    public runningRuleId =
+    public readonly runningRuleId =
         this.project(x => x.runningRuleId);
 
-    public runningRule =
-        this.projectFrom2(this.rules, this.runningRuleId, (r, id) => r.find(x => x.id === id));
+    public readonly runningRule =
+        computed(() => this.rules().find(x => x.id === this.runningRuleId()));
 
     public get appId() {
         return this.appsState.appId;
@@ -72,11 +85,7 @@ export class RulesState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService,
-    ) {
+    constructor() {
         super({ rules: [] });
 
         debug(this, 'rules');

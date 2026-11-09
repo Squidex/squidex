@@ -5,15 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, inject, input, linkedSignal, output, signal, viewChild } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormRowComponent, HTTP, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
-import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetPathItem, AssetsService, AssetsState, AssetUploaderState, AuthService, MoveAssetDto, MoveAssetForm, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
+import { EMPTY, lastValueFrom } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormRowComponent, HTTP, ModalDialogComponent, ProgressBarComponent, TagEditorComponent, TextInputDirective, TooltipDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
+import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsService, AssetsState, AssetUploaderState, MoveAssetForm, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
 import { AssetFolderDropdownComponent } from './asset-folder-dropdown.component';
 import { AssetHistoryComponent } from './asset-history.component';
 import { AssetPathComponent } from './asset-path.component';
@@ -33,11 +34,11 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
         AssetPreviewUrlPipe,
         AssetTextEditorComponent,
         AssetUrlPipe,
-        AsyncPipe,
         ConfirmClickDirective,
         ControlErrorsComponent,
         CopyDirective,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         ImageCropperComponent,
@@ -46,242 +47,222 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
         NgxDocViewerModule,
         PreviewableType,
         ProgressBarComponent,
-        ReactiveFormsModule,
         RouterLink,
         TagEditorComponent,
+        TextInputDirective,
         TooltipDirective,
-        TransformInputDirective,
         TranslatePipe,
         VideoPlayerComponent,
     ],
 })
-export class AssetDialogComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class AssetDialogComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
+    private readonly assetsState = inject(AssetsState);
+    private readonly assetUploader = inject(AssetUploaderState);
+    private readonly dialogs = inject(DialogService);
 
-    @Output()
-    public assetReplaced = new EventEmitter<AssetDto>();
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    @Output()
-    public assetUpdated = new EventEmitter<AssetDto>();
+    /** Emits when the file of the asset has been replaced. */
+    public readonly assetReplaced = output<AssetDto>();
 
-    @Input({ required: true })
-    public asset!: AssetDto;
+    /** Emits when the metadata of the asset has been updated or the asset has been moved. */
+    public readonly assetUpdated = output<AssetDto>();
 
-    @ViewChildren(ImageCropperComponent)
-    public imageCropper!: QueryList<ImageCropperComponent>;
+    /** The asset to edit. */
+    public readonly asset = input.required<AssetDto>();
 
-    @ViewChildren(ImageFocusPointComponent)
-    public imageFocus!: QueryList<ImageFocusPointComponent>;
+    protected readonly imageCropper = viewChild(ImageCropperComponent);
 
-    @ViewChildren(AssetTextEditorComponent)
-    public textEditor!: QueryList<AssetTextEditorComponent>;
+    protected readonly imageFocus = viewChild(ImageFocusPointComponent);
 
-    public pathSource = new BehaviorSubject<string>('');
-    public pathItems!: Observable<ReadonlyArray<AssetPathItem>>;
+    protected readonly textEditor = viewChild(AssetTextEditorComponent);
 
-    public progress = 0;
+    protected readonly assetActual = linkedSignal(() => this.asset());
 
-    public selectedTab = 0;
-    public isEditable = false;
-    public isEditableAny = false;
-    public isUploadable = false;
-    public isMoving = false;
-    public isMoveable = false;
+    protected readonly progress = signal(0);
 
-    public moveForm = new MoveAssetForm();
+    protected readonly selectedTab = signal(0);
 
-    public annotateTags!: Observable<string[]>;
-    public annotateForm = new AnnotateAssetForm();
+    protected readonly isMoving = signal(false);
 
-    public get isImage() {
-        return this.asset.type === 'Image';
-    }
+    protected readonly isEditable = computed(() => {
+        return this.assetActual().canUpdate;
+    });
 
-    public get isVideo() {
-        return this.asset.type === 'Video';
-    }
+    protected readonly isUploadable = computed(() => {
+        return this.assetActual().canUpload;
+    });
 
-    public get isDocumentLikely() {
-        return this.asset.type === 'Unknown' && this.asset.fileSize < 100_000;
-    }
+    protected readonly isMoveable = computed(() => {
+        return this.assetActual().canMove;
+    });
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly assetsState: AssetsState,
-        private readonly assetUploader: AssetUploaderState,
-        private readonly assetsService: AssetsService,
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly dialogs: DialogService,
-        public readonly authService: AuthService,
-    ) {
-    }
+    protected readonly isImage = computed(() => {
+        return this.assetActual().type === 'Image';
+    });
 
-    public ngOnInit() {
-        this.annotateTags =
-            this.assetsService.getTags(this.appsState.appName).pipe(
-                map(tags => Object.keys(tags)));
+    protected readonly isVideo = computed(() => {
+        return this.assetActual().type === 'Video';
+    });
 
-        this.pathItems =
-            this.pathSource.pipe(
-                switchMapCached(x => this.assetsService.getAssetFolders(this.appsState.appName, x, 'Path')), map(({ path }) => [ROOT_ITEM, ...path]));
+    protected readonly isDocumentLikely = computed(() => {
+        const asset = this.assetActual();
 
-        this.selectTab(0);
+        return asset.type === 'Unknown' && asset.fileSize < 100_000;
+    });
 
-        this.assetchanged(this.asset);
-    }
+    protected readonly assetPath = rxResource({
+        params: () => this.assetActual().parentId,
+        stream: ({ params }) => this.assetsService.getAssetFolders(this.appsState.appName, params, 'Path').pipe(
+            map(({ path }) => [ROOT_ITEM, ...path])),
+        defaultValue: [],
+    });
 
-    private assetchanged(asset: AssetDto) {
-        this.pathSource.next(asset.parentId);
+    protected readonly assetTags = rxResource({
+        stream: () => this.assetsService.getTags(this.appsState.appName).pipe(
+            map(tags => Object.keys(tags))),
+    });
 
-        this.isEditable = asset.canUpdate;
-        this.isUploadable = asset.canUpload;
-        this.isMoveable = asset.canMove;
+    protected readonly moveForm = new MoveAssetForm();
 
-        this.annotateForm.load(asset);
-        this.annotateForm.setEnabled(this.isEditable);
+    protected readonly annotateForm = new AnnotateAssetForm();
 
-        this.moveForm.load(asset);
-        this.moveForm.setEnabled(this.isMoveable);
+    constructor() {
+        effect(() => {
+            const asset = this.assetActual();
 
-        this.asset = asset;
-    }
+            this.annotateForm.load(asset);
+            this.annotateForm.setEnabled(asset.canUpdate);
 
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
-    }
-
-    public navigate(id: string) {
-        this.assetsState.navigate(id);
-    }
-
-    public generateSlug() {
-        this.annotateForm.generateSlug(this.asset);
-    }
-
-    public startMoving() {
-        this.isMoving = true;
-    }
-
-    public cropImage() {
-        if (!this.isUploadable) {
-            return;
-        }
-
-        this.uploadEdited(this.imageCropper.first.toFile());
-    }
-
-    public saveText() {
-        if (!this.isUploadable) {
-            return;
-        }
-
-        this.uploadEdited(this.textEditor.first.toFile());
-    }
-
-    public uploadEdited(fileChange: Promise<HTTP.UploadFile | null>) {
-        fileChange.then(file => {
-            if (file) {
-                this.setProgress(0);
-
-                this.assetUploader.uploadAsset(this.asset, file)
-                    .subscribe({
-                        next: dto => {
-                            if (Types.isNumber(dto)) {
-                                this.setProgress(dto);
-                            } else {
-                                this.assetReplaced.emit(dto);
-                                this.assetchanged(dto);
-
-                                this.dialogs.notifyInfo('i18n:assets.updated');
-                            }
-                        },
-                        error: error => {
-                            if (!Types.is(error, UploadCanceled)) {
-                                this.dialogs.notifyError(error);
-                            }
-                        },
-                        complete: () => {
-                            this.setProgress(0);
-                        },
-                    });
-            } else {
-                this.dialogs.notifyInfo('i18n:common.nothingChanged');
-            }
+            this.moveForm.load(asset);
+            this.moveForm.setEnabled(asset.canMove);
         });
     }
 
-    public setFocusPoint() {
-        if (!this.isEditable) {
-            return;
-        }
-
-        this.annotateInternal(this.imageFocus.first.submit(this.asset));
+    protected selectTab(tab: number) {
+        this.selectedTab.set(tab);
     }
 
-    public annotateAsset() {
-        if (!this.isEditable) {
-            return;
-        }
-
-        this.annotateInternal(this.annotateForm.submit(this.asset));
+    protected navigate(id: string) {
+        this.assetsState.navigate(id);
     }
 
-    public moveAsset() {
-        if (!this.isMoveable) {
-            return;
-        }
-
-        this.moveInternal(this.moveForm.submit());
+    protected generateSlug() {
+        this.annotateForm.generateSlug(this.assetActual());
     }
 
-    private annotateInternal(value: AnnotateAssetDto | null) {
-        if (!value) {
-            this.dialogs.notifyInfo('i18n:common.nothingChanged');
+    protected startMoving() {
+        this.isMoving.set(true);
+    }
+
+    protected cropImage() {
+        const imageCropper = this.imageCropper();
+        if (!imageCropper || !this.isUploadable()) {
             return;
         }
 
-        this.assetsState.updateAsset(this.asset, value)
+        this.uploadEdited(imageCropper.toFile());
+    }
+
+    protected saveText() {
+        const textEditor = this.textEditor();
+        if (!textEditor || !this.isUploadable()) {
+            return;
+        }
+
+        this.uploadEdited(textEditor.toFile());
+    }
+
+    private uploadEdited(fileChange: Promise<HTTP.UploadFile | null>) {
+        fileChange.then(file => {
+            if (!file) {
+                this.dialogs.notifyInfo('i18n:common.nothingChanged');
+                return;
+            }
+
+            this.progress.set(0);
+
+            this.assetUploader.uploadAsset(this.assetActual(), file)
+                .subscribe({
+                    next: dto => {
+                        if (Types.isNumber(dto)) {
+                            this.progress.set(dto);
+                        } else {
+                            this.assetReplaced.emit(dto);
+                            this.assetActual.set(dto);
+
+                            this.dialogs.notifyInfo('i18n:assets.updated');
+                        }
+                    },
+                    error: error => {
+                        if (!Types.is(error, UploadCanceled)) {
+                            this.dialogs.notifyError(error);
+                        }
+                    },
+                    complete: () => {
+                        this.progress.set(0);
+                    },
+                });
+        });
+    }
+
+    protected setFocusPoint() {
+        const imageFocus = this.imageFocus();
+        if (!imageFocus || !this.isEditable()) {
+            return;
+        }
+
+        this.annotateInternal(imageFocus.getChanges(this.assetActual()))
             .subscribe({
-                next: dto => {
-                    this.assetUpdated.emit(dto);
-                    this.assetchanged(dto);
-
-                    this.annotateForm.submitCompleted({ noReset: true });
-
-                    this.dialogs.notifyInfo('i18n:assets.updated');
-                },
                 error: error => {
-                    this.annotateForm.submitFailed(error);
+                    this.dialogs.notifyError(error);
                 },
             });
     }
 
-    private moveInternal(values: MoveAssetDto | null) {
-        if (!values) {
-            this.isMoving = false;
+    protected annotateAsset() {
+        if (!this.isEditable()) {
             return;
         }
 
-        this.assetsState.moveAsset(this.asset, values.parentId)
-            .subscribe({
-                next: (dto) => {
-                    this.assetUpdated.emit(dto);
-                    this.assetchanged(dto);
-
-                    this.annotateForm.submitCompleted({ noReset: true });
-
-                    this.dialogs.notifyInfo('i18n:assets.moved');
-                },
-                complete: () => {
-                    this.isMoving = false;
-                },
-            });
+        this.annotateForm.submitChanges(this.assetActual(), request => {
+            return this.annotateInternal(request);
+        });
     }
 
-    public setProgress(progress: number) {
-        this.progress = progress;
+    protected moveAsset() {
+        if (!this.isMoveable()) {
+            return;
+        }
 
-        this.changeDetector.markForCheck();
+        this.moveForm.submit(async value => {
+            const dto = await lastValueFrom(this.assetsState.moveAsset(this.assetActual(), value.parentId), { defaultValue: undefined });
+            if (dto) {
+                this.assetUpdated.emit(dto);
+                this.assetActual.set(dto);
+
+                this.dialogs.notifyInfo('i18n:assets.moved');
+            }
+
+            this.isMoving.set(false);
+        });
+    }
+
+    private annotateInternal(request: AnnotateAssetDto | null) {
+        if (!request) {
+            this.dialogs.notifyInfo('i18n:common.nothingChanged');
+            return EMPTY;
+        }
+
+        return this.assetsState.updateAsset(this.assetActual(), request).pipe(
+            tap(dto => {
+                this.assetUpdated.emit(dto);
+                this.assetActual.set(dto);
+
+                this.dialogs.notifyInfo('i18n:assets.updated');
+            }));
     }
 }

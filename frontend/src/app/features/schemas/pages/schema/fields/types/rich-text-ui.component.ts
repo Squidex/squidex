@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, RichTextFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { Component, computed, inject, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AssetFolderDropdownComponent, FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, RichTextFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-rich-text-ui',
@@ -16,26 +15,25 @@ import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, RichTextField
     templateUrl: 'rich-text-ui.component.html',
     imports: [
         AssetFolderDropdownComponent,
-        AsyncPipe,
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
-export class RichTextUIComponent  {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+export class RichTextUIComponent {
+    protected readonly schemasSource = inject(SchemaTagSource);
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public properties!: RichTextFieldPropertiesDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    constructor(
-        public readonly schemasSource: SchemaTagSource,
-    ) {
-    }
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<RichTextFieldPropertiesDto>();
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<RichTextFieldFormModel>;
+    });
 }

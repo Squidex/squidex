@@ -1,13 +1,13 @@
 <ng-content />
 <ng-container *sqxModal="dialogView">
-    @if (snapshot.dialogRequest; as request) {
+    @if (dialogRequest(); as request) {
         <sqx-modal-dialog (dialogClose)="cancel()" [showClose]="false">
             <ng-container title> {{ request.title | sqxTranslate }}</ng-container>
             <ng-container content>
                 <span [sqxMarkdown]="request.text | sqxTranslate"></span>
                 @if (request.canRemember) {
                     <div class="form-check mt-4">
-                        <input class="form-check-input" id="remember" [(ngModel)]="request.remember" type="checkbox" />
+                        <input class="form-check-input" id="remember" [checked]="request.remember" (change)="request.remember = $any($event.target).checked" type="checkbox" />
                         <label class="form-check-label" for="remember"> {{ "common.remember" | sqxTranslate }}</label>
                     </div>
                 }
@@ -21,7 +21,7 @@
 </ng-container>
 
 <div class="notification-container notification-container-bottom-right">
-    @for (notification of snapshot.notifications; track notification) {
+    @for (notification of notifications(); track notification) {
         <div
             class="alert alert-light alert-dismissible border shadow-sm timed"
             animate.enter="fade-in"
@@ -35,7 +35,7 @@
     }
 </div>
 
-@for (tooltip of snapshot.tooltips; track tooltip) {
+@for (tooltip of tooltips(); track tooltip) {
     <div class="tooltip2 tooltip2-{{ tooltip.textPosition }}" [offset]="6" [position]="tooltip.textPosition" [sqxAnchoredTo]="tooltip.target">
         {{ tooltip.text | sqxTranslate }}
         @if (tooltip.shortcut) {

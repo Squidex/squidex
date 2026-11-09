@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { CodeEditorComponent, ColorPickerComponent, RootViewComponent } from '@app/framework';
 
@@ -17,7 +16,7 @@ export default {
             control: 'boolean',
         },
         change: {
-            action: 'ngModelChange',
+            action: 'valueChange',
         },
     },
     args: {
@@ -30,8 +29,8 @@ export default {
                 <sqx-color-picker 
                     [disabled]="disabled"
                     [mode]="mode"
-                    (ngModelChange)="change($event)"
-                    [ngModel]="ngModel">
+                    (valueChange)="change($event)"
+                    [value]="value">
                 </sqx-color-picker>
             </sqx-root-view>
         `,
@@ -39,7 +38,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                FormsModule,
                 RootViewComponent,
             ],
         }),
@@ -50,19 +48,19 @@ type Story = StoryObj<CodeEditorComponent>;
 
 export const Default: Story = {
     args: {
-        ngModel: '#ff0000',
+        value: '#ff0000',
     } as any,
 };
 
 export const Name: Story = {
     args: {
-        ngModel: 'red',
+        value: 'red',
     } as any,
 };
 
 export const Circle: Story = {
     args: {
-        ngModel: 'red',
+        value: 'red',
         mode: 'Circle',
     } as any,
 };

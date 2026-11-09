@@ -6,40 +6,29 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { AppDto, AppsService, StatefulComponent, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
-
-interface State {
-    // The apps for this team.
-    apps?: ReadonlyArray<AppDto>;
-}
+import { AppsService, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-card',
     styleUrls: ['./apps-card.component.scss'],
     templateUrl: './apps-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         StopClickDirective,
         TranslatePipe,
     ],
 })
-export class AppsCardComponent extends StatefulComponent<State> implements OnInit {
-    @Input({ required: true })
-    public team!: TeamDto;
+export class AppsCardComponent {
+    private readonly appsService = inject(AppsService);
 
-    constructor(
-        private readonly appsService: AppsService,
-    ) {
-        super({});
-    }
+    /** The team to show the apps for. */
+    public readonly team = input.required<TeamDto>();
 
-    public ngOnInit() {
-        this.appsService.getTeamApps(this.team.id)
-            .subscribe(apps => {
-                this.next({ apps });
-            });
-    }
+    protected readonly apps = rxResource({
+        params: () => ({ team: this.team() }),
+        stream: ({ params }) => this.appsService.getTeamApps(params.team.id),
+    });
 }

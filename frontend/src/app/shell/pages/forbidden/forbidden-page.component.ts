@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TitleComponent, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -19,12 +19,10 @@ import { TitleComponent, TranslatePipe } from '@app/shared';
     ],
 })
 export class ForbiddenPageComponent {
-    constructor(
-        private readonly location: Location,
-    ) {
-    }
+    private readonly location = inject(Location);
 
-    public back() {
+
+    protected back() {
         this.location.back();
     }
 }

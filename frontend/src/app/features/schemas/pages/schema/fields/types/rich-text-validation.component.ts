@@ -5,28 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, RichTextFieldFormModel, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-rich-text-validation',
     styleUrls: ['rich-text-validation.component.scss'],
     templateUrl: 'rich-text-validation.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
-export class RichTextValidationComponent  {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+export class RichTextValidationComponent {
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: RichTextFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<RichTextFieldPropertiesDto>();
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<RichTextFieldFormModel>;
+    });
 }

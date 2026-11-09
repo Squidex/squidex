@@ -5,7 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { inject, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ActivatedRouteSnapshot, Data, Params, RouterStateSnapshot } from '@angular/router';
+import { distinctUntilChanged, map } from 'rxjs';
+
+export function routeParam(name: string, route = inject(ActivatedRoute)): Signal<string | null> {
+    const values = route.paramMap.pipe(map(x => x.get(name)), distinctUntilChanged());
+
+    return toSignal(values, { initialValue: null });
+}
+
+export function queryParam<T extends string = string>(name: string, defaultValue: NoInfer<T>, route = inject(ActivatedRoute)): Signal<T> {
+    const values = route.queryParamMap.pipe(map(x => (x.get(name) || defaultValue) as T), distinctUntilChanged());
+
+    return toSignal(values, { initialValue: defaultValue });
+}
 
 export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
     let snapshot: ActivatedRouteSnapshot | null = (value as any)['snapshot'] || value;

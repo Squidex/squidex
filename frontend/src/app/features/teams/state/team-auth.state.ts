@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
 import { AuthSchemeDto, AuthSchemeValueDto, debug, DialogService, LoadingState, shareSubscribed, State, TeamsService, TeamsState, VersionTag } from '@app/shared';
@@ -21,26 +21,29 @@ interface Snapshot extends LoadingState {
     version: VersionTag;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class TeamAuthState extends State<Snapshot> {
-    public scheme =
+    private readonly dialogs = inject(DialogService);
+    private readonly teamService = inject(TeamsService);
+    private readonly teamsState = inject(TeamsState);
+
+    public readonly scheme =
         this.project(x => x.scheme);
 
-    public isLoaded =
+    public readonly canUpdate =
+        this.project(x => x.canUpdate === true);
+
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     public get teamId() {
         return this.teamsState.teamId;
     }
 
-    constructor(
-        private readonly teamsState: TeamsState,
-        private readonly dialogs: DialogService,
-        private readonly teamService: TeamsService,
-    ) {
+    constructor() {
         super({ version: VersionTag.EMPTY });
 
         debug(this, 'teamAuth');

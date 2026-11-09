@@ -5,21 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamFormComponent, TeamsState, TemplatesState, Title, TitleService, TranslatePipe, UIState } from '@app/shared';
+import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamFormComponent, TeamsState, TemplatesState, TitleService, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-menu',
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AppFormComponent,
-        AsyncPipe,
         DropdownMenuComponent,
         ModalDirective,
         ModalPlacementDirective,
@@ -30,21 +25,25 @@ import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalD
     ],
 })
 export class AppsMenuComponent {
-    public addAppDialog = new DialogModel();
-    public addTeamDialog = new DialogModel();
+    private readonly titleService = inject(TitleService);
 
-    public appsMenu = new ModalModel();
-    public appPath: Observable<ReadonlyArray<Title>>;
+    protected readonly templatesState = inject(TemplatesState);
 
-    public starters = this.templatesState.starters;
+    protected readonly appsState = inject(AppsState);
 
-    constructor(titleService: TitleService,
-        public readonly appsState: AppsState,
-        public readonly route: ActivatedRoute,
-        public readonly teamsState: TeamsState,
-        public readonly uiState: UIState,
-        private readonly templatesState: TemplatesState,
-    ) {
-        this.appPath = titleService.pathChanges.pipe(map(x => x.slice(1)));
-    }
+    protected readonly route = inject(ActivatedRoute);
+
+    protected readonly teamsState = inject(TeamsState);
+
+    protected readonly uiState = inject(UIState);
+
+    protected readonly appPath = computed(() => {
+        return this.titleService.path().slice(1);
+    });
+
+    protected readonly addAppDialog = new DialogModel();
+
+    protected readonly addTeamDialog = new DialogModel();
+
+    protected readonly appsMenu = new ModalModel();
 }

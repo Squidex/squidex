@@ -5,34 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AppDto, HistoryEventDto, HistoryListComponent, HistoryService, TranslatePipe } from '@app/shared';
+import { Component, inject, input } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { AppDto, HistoryListComponent, HistoryService, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-history-card',
     styleUrls: ['./history-card.component.scss'],
     templateUrl: './history-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         HistoryListComponent,
         TranslatePipe,
     ],
 })
 export class HistoryCardComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    private readonly historyService = inject(HistoryService);
 
-    public history?: Observable<ReadonlyArray<HistoryEventDto>>;
+    /** The app to show the latest history events for. */
+    public readonly app = input.required<AppDto>();
 
-    constructor(
-        private readonly historyService: HistoryService,
-    ) {
-    }
-
-    public ngOnChanges() {
-        this.history = this.historyService.getHistory(this.app.name, '');
-    }
+    protected readonly history = rxResource({
+        params: () => ({ app: this.app() }),
+        stream: ({ params }) => this.historyService.getHistory(params.app.name, ''),
+    });
 }

@@ -1,5 +1,5 @@
 <div class="comments-header">
-    @if (reference) {
+    @if (reference(); as reference) {
         <div class="reference text-sm">
             {{ 'comments.reference' | sqxTranslate }}:
 
@@ -10,7 +10,7 @@
         </div>
     }
 
-    <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
+    <form (ngSubmit)="comment()">
         <sqx-autocomplete
             #input
             autoFocus="true"
@@ -18,7 +18,7 @@
             displayProperty="contributorEmail"
             (editorBlur)="onBlur()"
             (editorKeyPress)="onKeyPress($event)"
-            formControlName="text"
+            [formField]="commentForm.form.text"
             [itemsSource]="contributorsDataSource"
             placeholder="{{ 'comments.create' | sqxTranslate }}"
             startCharacter="@"
@@ -34,7 +34,7 @@
 </div>
 
 <div class="comments-list" #scrollContainer>
-    @for (comment of commentItems | async; track comment.index) {
+    @for (comment of commentItems(); track comment.index) {
         <sqx-comment
             canAnswer="true"
             canEdit="true"

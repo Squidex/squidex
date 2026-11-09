@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { compareStrings, debug, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
@@ -60,55 +60,59 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class AssetsStateBase extends State<Snapshot> {
-    public tagsUnsorted =
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
+    private readonly dialogs = inject(DialogService);
+
+    public readonly tagsUnsorted =
         this.project(x => x.tagsAvailable);
 
-    public tagsSelected =
+    public readonly tagsSelected =
         this.project(x => x.tagsSelected);
 
-    public tags =
-        this.projectFrom(this.tagsUnsorted, getTagsSorted);
+    public readonly tags =
+        computed(() => getTagsSorted(this.tagsUnsorted()));
 
-    public tagsNames =
-        this.projectFrom(this.tagsUnsorted, getTagNames);
+    public readonly tagsNames =
+        computed(() => getTagNames(this.tagsUnsorted()));
 
-    public selectedTagNames =
-        this.projectFrom(this.tagsSelected, getTagNames);
+    public readonly selectedTagNames =
+        computed(() => getTagNames(this.tagsSelected()));
 
-    public assets =
+    public readonly assets =
         this.project(x => x.assets);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.assets.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public folders =
+    public readonly folders =
         this.project(x => x.folders);
 
-    public hasFolders =
+    public readonly hasFolders =
         this.project(x => x.folders.length > 0);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public path =
+    public readonly path =
         this.project(x => x.path);
 
-    public parentFolder =
+    public readonly parentFolder =
         this.project(x => getParent(x.path));
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public canCreateFolders =
+    public readonly canCreateFolders =
         this.project(x => x.canCreateFolders === true);
 
-    public canRenameTag =
+    public readonly canRenameTag =
         this.project(x => x.canRenameTag === true);
 
     public get parentId() {
@@ -123,11 +127,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    protected constructor(name: string,
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService,
-    ) {
+    protected constructor(name: string) {
         super({
             folders: [],
             assets: [],
@@ -587,22 +587,16 @@ function getParent(path: ReadonlyArray<AssetPathItem>) {
     }
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AssetsState extends AssetsStateBase {
-    constructor(
-        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
-    ) {
-        super('assets', appsState, assetsService, dialogs);
+    constructor() {
+        super('assets');
     }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ComponentAssetsState extends AssetsStateBase {
-    constructor(
-        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
-    ) {
-        super('componentAssets', appsState, assetsService, dialogs);
+    constructor() {
+        super('componentAssets');
     }
 }

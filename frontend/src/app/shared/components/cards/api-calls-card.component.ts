@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
 import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
@@ -15,46 +15,42 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     selector: 'sqx-api-calls-card',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         BaseChartDirective,
         TranslatePipe,
     ],
 })
 export class ApiCallsCardComponent {
-    @Input()
-    public app: AppDto | undefined | null;
+    private readonly usagesService = inject(UsagesService);
 
-    @Input({ required: true })
-    public usage?: CallsUsageDto;
+    /** The app to download the usage log for. Hides the download link when not set. */
+    public readonly app = input<AppDto | null>();
 
-    public chartOptions = ChartOptions.Stacked;
-    public chartData: any;
+    /** The API usage of the app or team. */
+    public readonly usage = input.required<CallsUsageDto | undefined>();
 
-    constructor(
-        private readonly usagesService: UsagesService,
-    ) {
-    }
-
-    public ngOnChanges() {
-        if (this.usage) {
-            const labels = ChartHelpers.createLabelsFromSet(this.usage.details);
-
-            this.chartData = {
-                labels,
-                datasets: Object.entries(this.usage.details).map(([key, value], i) => (
-                    {
-                        label: ChartHelpers.label(key),
-                        backgroundColor: ChartHelpers.getBackgroundColor(i),
-                        borderColor: ChartHelpers.getBorderColor(i),
-                        borderWidth: 1,
-                        data: value.map(x => x.totalCalls),
-                    })),
-            };
+    protected readonly chartData = computed<ChartData | undefined>(() => {
+        const usage = this.usage();
+        if (!usage) {
+            return undefined;
         }
-    }
 
-    public downloadLog(app: AppDto) {
+        return {
+            labels: [...ChartHelpers.createLabelsFromSet(usage.details)],
+            datasets: Object.entries(usage.details).map(([key, value], i) => (
+                {
+                    label: ChartHelpers.label(key),
+                    backgroundColor: ChartHelpers.getBackgroundColor(i),
+                    borderColor: ChartHelpers.getBorderColor(i),
+                    borderWidth: 1,
+                    data: value.map(x => x.totalCalls),
+                })),
+        };
+    });
+
+    protected readonly chartOptions = ChartOptions.Stacked;
+
+    protected downloadLog(app: AppDto) {
         this.usagesService.getLog(app.name)
             .subscribe(url => {
                 window.open(url, '_blank');

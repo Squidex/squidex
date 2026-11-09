@@ -1,8 +1,8 @@
 <div class="selection">
     <div class="form-select" #input (click)="dropdown.show()">
         <div class="truncate">
-            {{ selection.item.folderName | sqxTranslate }}
-            @if (selectionPath) {
+            {{ selection().item.folderName | sqxTranslate }}
+            @if (selectionPath(); as selectionPath) {
                 <span>{{ "common.in" | sqxTranslate }}&nbsp;./{{ selectionPath }}</span>
             }
         </div>

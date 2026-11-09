@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, ListState, shareSubscribed, State } from '@app/framework';
@@ -27,20 +27,22 @@ interface Snapshot extends ListState {
     flow?: any;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class RuleSimulatorState extends State<Snapshot> {
-    public simulatedRuleEvents =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly rulesService = inject(RulesService);
+
+    public readonly simulatedRuleEvents =
         this.project(x => x.simulatedRuleEvents);
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     public get appId() {
@@ -51,11 +53,7 @@ export class RuleSimulatorState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService,
-    ) {
+    constructor() {
         super({
             simulatedRuleEvents: [],
             page: 0,

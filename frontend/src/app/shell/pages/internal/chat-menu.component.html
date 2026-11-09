@@ -1,4 +1,4 @@
-@if ((appsState.selectedApp | async) && hasChatBot) {
+@if (appsState.selectedApp() && hasChatBot) {
     <ul class="nav navbar-nav align-items-center">
         <li class="nav-item nav-icon" (click)="chatDialog.show()"><span class="nav-link">AI</span></li>
     </ul>

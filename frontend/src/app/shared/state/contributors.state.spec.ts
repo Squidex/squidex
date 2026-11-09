@@ -8,7 +8,8 @@
 import { catchError, EMPTY, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
-import { AssignContributorDto, ContributorDto, ContributorsDto, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, AssignContributorDto, ContributorsDto, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
 import { createContributors } from '../services/contributors.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -34,7 +35,11 @@ describe('ContributorsState', () => {
         contributorsService.setup(x => x.getContributors(app))
             .returns(() => of(versioned(version, oldContributors))).verifiable(Times.atLeastOnce());
 
-        contributorsState = new ContributorsState(appsState.object, contributorsService.object, dialogs.object);
+        contributorsState = createService(ContributorsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: ContributorsService, useValue: contributorsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {
@@ -71,11 +76,7 @@ describe('ContributorsState', () => {
         it('should only show current page of contributors', () => {
             contributorsState.load().subscribe();
 
-            let contributors: ReadonlyArray<ContributorDto>;
-
-            contributorsState.contributorsFiltered.subscribe(result => {
-                contributors = result;
-            });
+            const contributors = contributorsState.contributorsFiltered();
 
             expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
             expect(contributorsState.snapshot.page).toEqual(0);
@@ -86,11 +87,7 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
             contributorsState.page({ page: 1, pageSize: 10 });
 
-            let contributors: ReadonlyArray<ContributorDto>;
-
-            contributorsState.contributorsFiltered.subscribe(result => {
-                contributors = result;
-            });
+            const contributors = contributorsState.contributorsFiltered();
 
             expect(contributors!).toEqual(oldContributors.items.slice(10, 20));
             expect(contributorsState.snapshot.page).toEqual(1);
@@ -101,11 +98,7 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
             contributorsState.search('4');
 
-            let contributors: ReadonlyArray<ContributorDto>;
-
-            contributorsState.contributorsFiltered.subscribe(result => {
-                contributors = result;
-            });
+            const contributors = contributorsState.contributorsFiltered();
 
             expect(contributors!).toEqual(createContributors(4, 14).items);
             expect(contributorsState.snapshot.page).toEqual(0);
@@ -116,11 +109,7 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
             contributorsState.search('(4');
 
-            let contributors: ReadonlyArray<ContributorDto>;
-
-            contributorsState.contributorsFiltered.subscribe(result => {
-                contributors = result;
-            });
+            const contributors = contributorsState.contributorsFiltered();
 
             expect(contributors!).toEqual([]);
         });

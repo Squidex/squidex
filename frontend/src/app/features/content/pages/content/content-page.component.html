@@ -1,5 +1,14 @@
+@let schema = this.schema();
+@let content = this.content();
+@let contentForm = this.contentForm();
+@let contentFormCompare = this.contentFormCompare();
+@let contentVersion = this.contentVersion();
+@let formContext = this.formContext();
+@let language = this.language();
+@let languages = this.languages();
+@let showIdInput = this.showIdInput();
 <sqx-title [message]="schema.displayName" [url]="['..']" />
-<form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish('Edit')">
+<form (ngSubmit)="saveAndPublish('Edit')">
     <sqx-layout [hideSidebar]="!content" layout="main">
         <ng-container title>
             <div class="d-flex align-items-center">
@@ -16,7 +25,7 @@
                     <sqx-title message="i18n:contents.createPageTitle" />
                 }
 
-                @if (content && contentTab | async; as tab) {
+                @if (content && contentTab(); as tab) {
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
                             <a
@@ -88,7 +97,7 @@
                         [language]="language"
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
-                        [percents]="contentForm.translationStatus | async" />
+                        [percents]="contentForm.translationStatus()" />
                     @if (content.canDelete || content.canClone) {
                         <button
                             class="btn btn-outline-secondary ms-2"
@@ -119,7 +128,7 @@
                         </sqx-dropdown-menu>
                     }
 
-                    @if (contentTab | async; as tab) {
+                    @if (contentTab(); as tab) {
                         <sqx-toolbar />
                         @if (tab === "editor") {
                             <sqx-preview-button [confirm]="confirmPreview" [content]="content" [schema]="schema" />
@@ -139,9 +148,9 @@
                         [language]="language"
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
-                        [percents]="contentForm.translationStatus | async" />
+                        [percents]="contentForm.translationStatus()" />
                     <div sqxTourStep="saveContent">
-                        @if (contentsState.canCreate | async) {
+                        @if (contentsState.canCreate()) {
                             <div class="btn-group ms-2" attr.aria-label="{{ 'common.save' | sqxTranslate }}" role="group">
                                 <button class="btn btn-primary" (click)="saveAsDraft('Edit')" type="button">
                                     {{ "common.save" | sqxTranslate }}
@@ -165,7 +174,7 @@
                             </div>
                         }
 
-                        @if (contentsState.canCreateAndPublish | async) {
+                        @if (contentsState.canCreateAndPublish()) {
                             <div class="btn-group ms-2" attr.aria-label="{{ 'contents.saveAndPublish' | sqxTranslate }}" role="group">
                                 <button class="btn btn-success" shortcut="CTRL + SHIFT + S" type="submit">
                                     {{ "contents.saveAndPublish" | sqxTranslate }}
@@ -198,7 +207,7 @@
         </ng-container>
         <ng-container>
             @if (content) {
-                @switch (contentTab | async) {
+                @switch (contentTab()) {
                     @case ("references") {
                         <sqx-content-references [content]="content" [language]="language" [languages]="languages" mode="references" />
                     }
@@ -223,7 +232,7 @@
                 }
             }
 
-            @if (!content || (contentTab | async) === "editor") {
+            @if (!content || contentTab() === "editor") {
                 <sqx-content-editor
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
@@ -233,7 +242,7 @@
                     [isDeleted]="content?.isDeleted"
                     [isNew]="!content"
                     [language]="language"
-                    (languageChange)="language = $event"
+                    (languageChange)="this.language.set($event)"
                     [languages]="languages"
                     (loadLatest)="loadLatest()"
                     [schema]="schema"

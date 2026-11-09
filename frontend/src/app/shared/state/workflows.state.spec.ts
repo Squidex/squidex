@@ -7,7 +7,8 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AddWorkflowDto, DialogService, versioned, WorkflowDto, WorkflowsDto, WorkflowsService, WorkflowsState, WorkflowView } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AddWorkflowDto, AppsState, DialogService, versioned, WorkflowDto, WorkflowsDto, WorkflowsService, WorkflowsState, WorkflowView } from '@app/shared/internal';
 import { createWorkflows } from '../services/workflows.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -24,7 +25,11 @@ describe('WorkflowsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         workflowsService = Mock.ofType<WorkflowsService>();
-        workflowsState = new WorkflowsState(appsState.object, dialogs.object, workflowsService.object);
+        workflowsState = createService(WorkflowsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: WorkflowsService, useValue: workflowsService.object },
+        ]);
     });
 
     afterEach(() => {

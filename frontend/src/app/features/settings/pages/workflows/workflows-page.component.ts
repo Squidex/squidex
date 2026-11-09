@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
+import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
 import { WorkflowAddFormComponent } from './workflow-add-form.component';
 import { WorkflowComponent } from './workflow.component';
 
@@ -17,7 +16,6 @@ import { WorkflowComponent } from './workflow.component';
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',
     imports: [
-        AsyncPipe,
         LayoutComponent,
         ListViewComponent,
         RouterLink,
@@ -33,31 +31,24 @@ import { WorkflowComponent } from './workflow.component';
         WorkflowComponent,
     ],
 })
-export class WorkflowsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class WorkflowsPageComponent {
+    private readonly rolesState = inject(RolesState);
 
-    public roles: ReadonlyArray<string> = [];
+    protected readonly schemasSource = inject(SchemaTagSource);
 
-    constructor(
-        public readonly rolesState: RolesState,
-        public readonly schemasSource: SchemaTagSource,
-        public readonly workflowsState: WorkflowsState,
-    ) {
-    }
+    protected readonly workflowsState = inject(WorkflowsState);
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.rolesState.roles
-                .subscribe(roles => {
-                    this.roles = roles.map(x => x.name);
-                }));
+    protected readonly roles = computed(() => {
+        return this.rolesState.roles().map(x => x.name);
+    });
 
+    constructor() {
         this.rolesState.load();
 
         this.workflowsState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.workflowsState.load(true);
     }
 }

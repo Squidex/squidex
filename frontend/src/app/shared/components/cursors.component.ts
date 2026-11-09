@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { map } from 'rxjs';
+import { Component, computed, inject } from '@angular/core';
 import { StringColorPipe } from '@app/framework';
 import { CollaborationService, Profile } from '@app/shared/internal';
 
@@ -17,23 +15,18 @@ type CursorState = { user: Profile; cursor: { x: number; y: number } };
     selector: 'sqx-cursors',
     styleUrls: ['./cursors.component.scss'],
     templateUrl: './cursors.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         StringColorPipe,
     ],
 })
-export class CursorsComponent  {
-    public otherCursor =
-        this.collaboration.userChanges
-            .pipe(map(x => x.filter(s => !!s['cursor']) as CursorState[]));
+export class CursorsComponent {
+    private readonly collaboration = inject(CollaborationService);
 
-    constructor(
-        public readonly collaboration: CollaborationService,
-    ) {
-    }
+    protected readonly otherCursor = computed(() => {
+        return this.collaboration.users().filter(s => !!s['cursor']) as CursorState[];
+    });
 
-    public sizeInPx(value: number) {
+    protected sizeInPx(value: number) {
         return `${value}px`;
     }
 }

@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { effect } from '@angular/core';
 import { Chart, ChartOptions as IChartOptions } from 'chart.js';
 import { DateTime, ThemeService } from '@app/framework';
 
@@ -22,7 +23,7 @@ const ColorSchema: ReadonlyArray<string> = [
     '211,  50, 131',
 ];
 
-export module ChartHelpers {
+export namespace ChartHelpers {
     export function label(category: string) {
         return category === '*' ? 'anonymous' : category;
     }
@@ -45,7 +46,9 @@ export module ChartHelpers {
 }
 
 export function syncChartTheme(themeService: ThemeService) {
-    return themeService.themeChanges.subscribe(() => {
+    return effect(() => {
+        themeService.theme();
+
         const text = themeService.getColor('chart-text');
         const grid = themeService.getColor('chart-grid');
 
@@ -63,7 +66,7 @@ export function syncChartTheme(themeService: ThemeService) {
     });
 }
 
-export module ChartOptions {
+export namespace ChartOptions {
     export const Default: IChartOptions = {
         responsive: true,
         scales: {

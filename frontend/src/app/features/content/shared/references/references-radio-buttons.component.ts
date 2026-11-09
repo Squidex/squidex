@@ -5,130 +5,76 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, Input } from '@angular/core';
-import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, LocalizerService, RadioGroupComponent, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { Component, computed, inject, input, model } from '@angular/core';
+import { map } from 'rxjs';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, FormValueControlBase, LocalizerService, RadioGroupComponent, safeResource, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
-
-export const SQX_REFERENCES_RADIO_BUTTONS_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesRadioButtonsComponent), multi: true,
-};
-
-interface State {
-    // The tags converter.
-    converter: ReferencesTagsConverter;
-}
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-references-radio-buttons',
     styleUrls: ['./references-radio-buttons.component.scss'],
     templateUrl: './references-radio-buttons.component.html',
-    providers: [
-        SQX_REFERENCES_RADIO_BUTTONS_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
         RadioGroupComponent,
-        ReactiveFormsModule,
     ],
 })
-export class ReferencesRadioButtonsComponent extends StatefulControlComponent<State, ReadonlyArray<string> | null | undefined> {
-    private readonly subscriptions = new Subscriptions();
-    private readonly itemCount: number = inject(UIOptions).value.referencesDropdownItemCount;
-    private contentItems: ReadonlyArray<ContentDto> | null = null;
+export class ReferencesRadioButtonsComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly localizer = inject(LocalizerService);
+    private readonly uiOptions = inject(UIOptions);
+    private readonly itemCount: number = this.uiOptions.value.referencesDropdownItemCount;
 
-    @Input({ required: true })
-    public schemaId: string | undefined | null;
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The ID of the schema to select the contents from. */
+    public readonly schemaId = input.required<string | undefined | null>();
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** The language to build the names of the contents. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    public control = new FormControl<string | null | undefined>(undefined);
+    protected readonly isValid = computed(() => {
+        return !!this.schemaId() && !!this.language();
+    });
 
-    public get isValid() {
-        return !!this.schemaId && !!this.language;
-    }
+    protected readonly isSuccess = computed(() => {
+        const contentItems = this.contentItems.value();
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly localizer: LocalizerService,
-    ) {
-        super({ converter: new ReferencesTagsConverter(null!, [], localizer) });
+        return this.isValid() && !!contentItems && contentItems.length > 0;
+    });
 
-        this.subscriptions.add(
-            this.control.valueChanges
-                .subscribe(value => {
-                    if (value) {
-                        this.callTouched();
-                        this.callChange([value]);
-                    } else {
-                        this.callTouched();
-                        this.callChange(null);
-                    }
-                }));
-    }
+    protected readonly isGroupDisabled = computed(() => {
+        return this.disabled() || !this.isSuccess();
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.schemaId) {
-            this.resetState();
+    protected readonly selectedId = computed(() => {
+        return this.value()?.[0] ?? null;
+    });
 
-            if (this.isValid) {
-                this.contentsService.getContents(this.appsState.appName, this.schemaId!, { take: this.itemCount })
-                    .subscribe({
-                        next: contents => {
-                            this.contentItems = contents.items;
+    protected readonly converter = computed(() => {
+        const contentItems = this.contentItems.value();
+        if (!this.isSuccess() || !contentItems) {
+            return new ReferencesTagsConverter(null!, [], this.localizer);
+        }
 
-                            this.resetConverterState();
-                        },
-                        error: () => {
-                            this.contentItems = null;
+        return new ReferencesTagsConverter(this.language(), contentItems, this.localizer);
+    });
 
-                            this.resetConverterState();
-                        },
-                    });
-            } else {
-                this.contentItems = null;
+    protected readonly contentItems = safeResource({
+        params: () => this.schemaId() || undefined,
+        stream: ({ params: schemaId }) => this.contentsService.getContents(this.appsState.appName, schemaId, { take: this.itemCount }).pipe(
+            map(contents => contents.items as ReadonlyArray<ContentDto> | null)),
+        defaultValue: null,
+    });
 
-                this.resetConverterState();
-            }
+    protected updateValue(value: string | null | undefined) {
+        this.markTouched();
+
+        if (value) {
+            this.value.set([value]);
         } else {
-            this.resetConverterState();
+            this.value.set(null);
         }
-    }
-
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.control.disable(NO_EMIT);
-        } else if (this.isValid) {
-            this.control.enable(NO_EMIT);
-        }
-    }
-
-    public writeValue(obj: ReadonlyArray<string> | null | undefined) {
-        this.control.setValue(obj?.[0], NO_EMIT);
-    }
-
-    private resetConverterState() {
-        const success = this.isValid && this.contentItems && this.contentItems.length > 0;
-
-        this.onDisabled(!success || this.snapshot.isDisabled);
-
-        let converter: ReferencesTagsConverter;
-        if (success) {
-            converter = new ReferencesTagsConverter(this.language, this.contentItems!, this.localizer);
-        } else {
-            converter = new ReferencesTagsConverter(null!, [], this.localizer);
-        }
-
-        this.next({ converter });
     }
 }

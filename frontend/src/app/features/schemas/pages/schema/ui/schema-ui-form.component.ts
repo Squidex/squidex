@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfigureUIFieldsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 import { FieldListComponent } from './field-list.component';
@@ -21,50 +21,47 @@ import { FieldListComponent } from './field-list.component';
     ],
 })
 export class SchemaUIFormComponent {
-    @Input()
-    public schema!: SchemaDto;
+    private readonly schemasState = inject(SchemasState);
 
-    public selectedTab = 0;
+    /** The schema to configure the list and reference fields for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public isEditable = false;
+    protected readonly selectedTab = signal(0);
 
-    public fieldsInLists: string[] = [];
-    public fieldsInReferences: string[] = [];
+    protected readonly fieldsInLists = linkedSignal<string[]>(() => {
+        return this.schema().fieldsInLists;
+    });
 
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
+    protected readonly fieldsInReferences = linkedSignal<string[]>(() => {
+        return this.schema().fieldsInReferences;
+    });
+
+    protected readonly isEditable = computed(() => {
+        return this.schema().canUpdate;
+    });
+
+    protected setFieldsInLists(names: string[]) {
+        this.fieldsInLists.set(names);
     }
 
-    public ngOnChanges() {
-        this.isEditable = this.schema.canUpdate;
-
-        this.fieldsInLists = this.schema.fieldsInLists;
-        this.fieldsInReferences = this.schema.fieldsInReferences;
+    protected setFieldsInReferences(names: string[]) {
+        this.fieldsInReferences.set(names);
     }
 
-    public setFieldsInLists(names: string[]) {
-        this.fieldsInLists = names;
+    protected selectTab(tab: number) {
+        this.selectedTab.set(tab);
     }
 
-    public setFieldsInReferences(names: string[]) {
-        this.fieldsInReferences = names;
-    }
-
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
-    }
-
-    public saveSchema() {
-        if (!this.isEditable) {
+    protected saveSchema() {
+        if (!this.isEditable()) {
             return;
         }
 
         const request = new ConfigureUIFieldsDto({
-            fieldsInLists: this.fieldsInLists,
-            fieldsInReferences: this.fieldsInReferences,
+            fieldsInLists: this.fieldsInLists(),
+            fieldsInReferences: this.fieldsInReferences(),
         });
 
-        this.schemasState.configureUIFields(this.schema, request);
+        this.schemasState.configureUIFields(this.schema(), request);
     }
 }

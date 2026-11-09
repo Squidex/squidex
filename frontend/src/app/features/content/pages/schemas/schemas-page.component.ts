@@ -5,23 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+import { form, FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
+import { AppDto, AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, SchemaDto, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
     imports: [
-        AsyncPipe,
-        FormsModule,
+        FormField,
         LayoutComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -31,33 +26,33 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, S
     ],
 })
 export class SchemasPageComponent {
-    public schemasFilter = new UntypedFormControl();
+    private readonly appsState = inject(AppsState);
+    private readonly schemasState = inject(SchemasState);
+    private readonly uiOptions = inject(UIOptions);
 
-    public readonly isEmbedded = inject(UIOptions).value.embedded;
+    protected readonly schemas = computed(() => {
+        const app = this.appsState.snapshot.selectedApp!;
 
-    public schemas =
-        this.schemasState.schemas.pipe(
-            map(schemas => {
-                const app = this.appsState.snapshot.selectedApp!;
+        return this.schemasState.schemas().filter(schema => isVisible(schema, app));
+    });
 
-                return schemas.filter(schema =>
-                    schema.canReadContents &&
-                    schema.isPublished &&
-                    schema.type !== 'Component' &&
-                    !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(schema.name)],
-                );
-            }));
+    protected readonly categories = computed(() => {
+        return getCategoryTree(this.schemas(), this.schemasState.addedCategories(), this.schemasFilter().value());
+    });
 
-    public categories =
-        combineLatest([
-            this.schemas,
-            this.schemasState.addedCategories,
-            value$(this.schemasFilter),
-        ], getCategoryTree);
+    protected readonly schemasFilter = form(signal(''));
 
-    constructor(
-        public readonly schemasState: SchemasState,
-        private readonly appsState: AppsState,
-    ) {
+    protected readonly isEmbedded = this.uiOptions.value.embedded;
+}
+
+function isVisible(schema: SchemaDto, app: AppDto) {
+    if (!schema.canReadContents || !schema.isPublished) {
+        return false;
     }
+
+    if (schema.type === 'Component') {
+        return false;
+    }
+
+    return !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(schema.name)];
 }

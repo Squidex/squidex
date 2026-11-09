@@ -5,41 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
+import { computed } from '@angular/core';
+import { maxLength, required } from '@angular/forms/signals';
+import { SignalForm, SignalValidators } from '@app/framework';
 import { ClientDto, CreateClientDto, UpdateClientDto } from '../model';
 
-export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, ClientDto> {
+export class RenameClientForm extends SignalForm<{ name: string }, UpdateClientDto, ClientDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ name: '' }, path => {
+            required(path.name);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { name: string }) {
         return new UpdateClientDto(value);
     }
 }
 
-export class AddClientForm extends Form<ExtendedFormGroup, CreateClientDto> {
-    public get id() {
-        return this.form.controls['id'];
-    }
-
-    public hasNoId = hasNoValue$(this.id);
+export class AddClientForm extends SignalForm<{ id: string }, CreateClientDto> {
+    public readonly hasNoId = computed(() => {
+        return !this.model().id;
+    });
 
     constructor() {
-        super(new ExtendedFormGroup({
-            id: new UntypedFormControl('', [
-                Validators.maxLength(40),
-                ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:clients.clientIdValidationMessage'),
-            ]),
-        }));
+        super({ id: '' }, path => {
+            maxLength(path.id, 40);
+            SignalValidators.patternWithMessage(path.id, '[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:clients.clientIdValidationMessage');
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { id: string }) {
         return new CreateClientDto(value);
     }
 }

@@ -12,20 +12,9 @@ import { Types } from '@app/framework';
 import { FieldDto, FieldRuleDto, NestedFieldDto, SchemaDto } from './../model';
 
 export type RuleContext = { data: any; user?: any };
-export type RuleForm = { path: string; field: FieldDto | NestedFieldDto };
+export type RuleAction = FieldRuleDto['action'];
 
-export interface CompiledRules {
-    get rules(): ReadonlyArray<CompiledRule>;
-}
-
-export interface RulesProvider {
-    compileRules(schema: SchemaDto): ReadonlyArray<CompiledRule>;
-
-    getRules(form: RuleForm): CompiledRules;
-}
-
-const EMPTY_RULES_ARRAY: CompiledRule[] = [];
-const EMPTY_RULES_STATIC = { rules: EMPTY_RULES_ARRAY };
+const EMPTY_RULES: ReadonlyArray<CompiledRule> = [];
 const TAG_PREFIX = 'tag:';
 
 export class CompiledRule {
@@ -80,103 +69,80 @@ export class CompiledRule {
     }
 }
 
-class ComponentRules implements CompiledRules {
-    private previousSchema?: SchemaDto;
-    private compiledRules: ReadonlyArray<CompiledRule> = [];
+type RuleScope = { schema: SchemaDto; start: number };
 
-    public get rules() {
-        const schema = this.schema();
+export class ContentRules {
+    private readonly compiledBySchema: { [id: string]: ReadonlyArray<CompiledRule> } = {};
+    private readonly rulesByPath = new Map<string, ReadonlyArray<CompiledRule>>();
 
-        if (schema !== this.previousSchema) {
-            if (schema) {
-                this.compiledRules = fastMerge(this.parentRules.getRules(this.form).rules, this.getRelativeRules(this.form, schema));
-            } else {
-                this.compiledRules = EMPTY_RULES_ARRAY;
+    constructor(
+        private readonly schema: SchemaDto,
+        private readonly schemas: { [id: string]: SchemaDto },
+    ) {
+    }
+
+    public getRules(keys: ReadonlyArray<string>, root: any, field: FieldDto | NestedFieldDto): ReadonlyArray<CompiledRule> {
+        const scopes = getScopes(keys, root, this.schemas);
+
+        const cacheKey = `${field.fieldId}|${keys.filter(x => !isIndex(x)).join('.')}|${scopes.map(x => `${x.schema.id}@${x.start}`).join(',')}`;
+
+        let result = this.rulesByPath.get(cacheKey);
+        if (!result) {
+            result = this.findRules(this.schema, keys, field);
+
+            for (const scope of scopes) {
+                result = fastMerge(result, this.findRules(scope.schema, keys.slice(scope.start), field));
             }
 
-            this.previousSchema = schema;
-        }
-
-        return this.compiledRules;
-    }
-
-    constructor(
-        private readonly form: RuleForm,
-        private readonly parentPath: string,
-        private readonly parentRules: RulesProvider,
-        private readonly schema: () => SchemaDto | undefined,
-    ) {
-    }
-
-    private getRelativeRules(form: RuleForm, schema: SchemaDto) {
-        const rules = this.parentRules.compileRules(schema);
-
-        if (rules.length === 0) {
-            return EMPTY_RULES_ARRAY;
-        }
-
-        const pathNormal = form.path.substring(this.parentPath.length + 1);
-        const pathSimple = getSimplePath(pathNormal);
-
-        return rules.filter(x => x.isApplied(pathNormal, form.field) || x.isApplied(pathSimple, form.field));
-    }
-}
-
-export class ComponentRulesProvider implements RulesProvider {
-    constructor(
-        private readonly parentPath: string,
-        private readonly parentRules: RulesProvider,
-        private readonly schema: () => SchemaDto | undefined,
-    ) {
-    }
-
-    public compileRules(schema: SchemaDto) {
-        return this.parentRules.compileRules(schema);
-    }
-
-    public getRules(form: RuleForm) {
-        return new ComponentRules(form, this.parentPath, this.parentRules, this.schema);
-    }
-}
-
-export class RootRulesProvider implements RulesProvider {
-    private readonly rulesCache: { [id: string]: ReadonlyArray<CompiledRule> } = {};
-    private readonly rulesRoot: ReadonlyArray<CompiledRule>;
-
-    constructor(schema: SchemaDto) {
-        this.rulesRoot = this.compileRules(schema);
-    }
-
-    public compileRules(schema: SchemaDto) {
-        if (!schema) {
-            return EMPTY_RULES_ARRAY;
-        }
-
-        let result = this.rulesCache[schema.id];
-
-        if (!result) {
-            result = schema.fieldRules.map(x => new CompiledRule(x, true));
-
-            this.rulesCache[schema.id] = result;
+            this.rulesByPath.set(cacheKey, result);
         }
 
         return result;
     }
 
-    public getRules(form: RuleForm) {
-        const allRules = this.rulesRoot;
-
-        if (allRules.length === 0) {
-            return EMPTY_RULES_STATIC;
+    private findRules(schema: SchemaDto, keys: ReadonlyArray<string>, field: FieldDto | NestedFieldDto) {
+        const rules = this.compileRules(schema);
+        if (rules.length === 0) {
+            return EMPTY_RULES;
         }
 
-        const pathNormal = form.path;
+        const pathNormal = keys.filter(x => !isIndex(x)).join('.');
         const pathSimple = getSimplePath(pathNormal);
 
-        const rules = allRules.filter(x => x.isApplied(pathNormal, form.field) || x.isApplied(pathSimple, form.field));
-
-        return { rules };
+        return rules.filter(x => x.isApplied(pathNormal, field) || x.isApplied(pathSimple, field));
     }
+
+    private compileRules(schema: SchemaDto) {
+        let result = this.compiledBySchema[schema.id];
+        if (!result) {
+            result = schema.fieldRules.map(x => new CompiledRule(x, true));
+
+            this.compiledBySchema[schema.id] = result;
+        }
+
+        return result;
+    }
+}
+
+function getScopes(keys: ReadonlyArray<string>, root: any, schemas: { [id: string]: SchemaDto }) {
+    const result: RuleScope[] = [];
+
+    let current = root;
+
+    for (let i = 0; i < keys.length - 1; i++) {
+        current = current?.[keys[i]];
+
+        const schema = schemas[current?.schemaId];
+        if (schema) {
+            result.push({ schema, start: i + 1 });
+        }
+    }
+
+    return result;
+}
+
+function isIndex(key: string) {
+    return /^\d+$/.test(key);
 }
 
 function getSimplePath(path: string) {

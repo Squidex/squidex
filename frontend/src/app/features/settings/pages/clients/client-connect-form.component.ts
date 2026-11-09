@@ -5,16 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, KeyValuePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
+import { KeyValuePipe } from '@angular/common';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
+import { ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
     templateUrl: './client-connect-form.component.html',
     imports: [
-        AsyncPipe,
         CodeComponent,
         ExternalLinkDirective,
         FormHintComponent,
@@ -25,93 +26,92 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
         TranslatePipe,
     ],
 })
-export class ClientConnectFormComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class ClientConnectFormComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly clientsService = inject(ClientsService);
+    private readonly dialogs = inject(DialogService);
+    private readonly helpService = inject(HelpService);
+    private readonly messageBus = inject(MessageBus);
 
-    @Input({ required: true })
-    public client!: ClientDto;
+    protected readonly apiUrl = inject(ApiUrlConfig);
 
-    public sdks = this.helpService.getSDKs();
-    public sdk?: SDKEntry;
+    /** Emits when the dialog is closed. */
+    public readonly dialogClose = output();
 
-    public appName!: string;
-    public appToken?: AccessTokenDto;
+    /** The client to show the connection instructions for. */
+    public readonly client = input.required<ClientDto>();
 
-    public step = 'Start';
+    protected readonly sdk = signal<SDKEntry | undefined>(undefined);
 
-    public get mcpUrl() {
-        return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
-    }
+    protected readonly step = signal('Start');
 
-    public get mcpServerName() {
+    protected readonly mcpServerName = computed(() => {
         return `squidex-${this.appName}`;
-    }
+    });
 
-    public get mcpCommand() {
-        return `claude mcp add --transport http ${this.mcpServerName} ${this.mcpUrl} --header "Authorization: ${this.mcpAuthorization}"`;
-    }
+    protected readonly mcpAuthorization = computed(() => {
+        const client = this.client();
 
-    public get mcpConfig() {
+        // The client secret does not expire, unlike the access token.
+        return `Basic ${btoa(`${this.appName}:${client.id}:${client.secret}`)}`;
+    });
+
+    protected readonly mcpUrl = computed(() => {
+        return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
+    });
+
+    protected readonly mcpCommand = computed(() => {
+        return `claude mcp add --transport http ${this.mcpServerName()} ${this.mcpUrl()} --header "Authorization: ${this.mcpAuthorization()}"`;
+    });
+
+    protected readonly mcpConfig = computed(() => {
         const config = {
             mcpServers: {
-                [this.mcpServerName]: {
+                [this.mcpServerName()]: {
                     type: 'http',
-                    url: this.mcpUrl,
+                    url: this.mcpUrl(),
                     headers: {
-                        Authorization: this.mcpAuthorization,
+                        Authorization: this.mcpAuthorization(),
                     },
                 },
             },
         };
 
         return JSON.stringify(config, undefined, 4);
-    }
+    });
 
-    private get mcpAuthorization() {
-        // The client secret does not expire, unlike the access token.
-        return `Basic ${btoa(`${this.appName}:${this.client.id}:${this.client.secret}`)}`;
-    }
+    protected readonly appToken = rxResource({
+        params: () => this.client(),
+        stream: ({ params }) => this.clientsService.createToken(this.appName, params).pipe(
+            catchError(error => {
+                this.dialogs.notifyError(error);
 
-    constructor(
-        public readonly appsState: AppsState,
-        public readonly apiUrl: ApiUrlConfig,
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly clientsService: ClientsService,
-        private readonly dialogs: DialogService,
-        private readonly helpService: HelpService,
-        private readonly messageBus: MessageBus,
-    ) {
-    }
+                return of(undefined);
+            })),
+    });
 
-    public ngOnInit() {
-        this.appName = this.appsState.appName;
+    protected readonly sdks = rxResource({
+        stream: () => this.helpService.getSDKs(),
+    });
 
-        this.clientsService.createToken(this.appsState.appName, this.client)
-            .subscribe({
-                next: dto => {
-                    this.appToken = dto;
+    protected readonly appName = this.appsState.appName;
 
-                    this.changeDetector.detectChanges();
-                },
-                error: error => {
-                    this.dialogs.notifyError(error);
-                },
-            });
-
+    constructor() {
         this.messageBus.emit(new ClientTourStated());
     }
 
-    public select(sdk: SDKEntry) {
+    protected select(sdk: SDKEntry) {
+        const client = this.client();
+
         sdk.instructions = sdk.instructions.replace(/<APP_NAME>/g, this.appName);
-        sdk.instructions = sdk.instructions.replace(/<CLIENT_ID>/g, `${this.appName}:${this.client.id}`);
-        sdk.instructions = sdk.instructions.replace(/<CLIENT_SECRET>/g, this.client.secret);
+        sdk.instructions = sdk.instructions.replace(/<CLIENT_ID>/g, `${this.appName}:${client.id}`);
+        sdk.instructions = sdk.instructions.replace(/<CLIENT_SECRET>/g, client.secret);
         sdk.instructions = sdk.instructions.replace(/<URL>/g, this.apiUrl.value);
 
-        this.sdk = sdk;
+        this.sdk.set(sdk);
     }
 
-    public go(step: string) {
-        this.step = step;
+    protected go(step: string) {
+        this.step.set(step);
     }
 }

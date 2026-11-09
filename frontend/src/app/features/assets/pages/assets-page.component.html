@@ -13,12 +13,12 @@
                     <div class="col-6">
                         <sqx-tag-editor
                             class="tags"
-                            [itemsSource]="assetsState.tagsNames | async"
-                            [ngModel]="assetsState.selectedTagNames | async"
-                            (ngModelChange)="selectTags($event)"
+                            [itemsSource]="assetsState.tagsNames()"
+                            nullWhenEmpty="false"
                             placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             styleScrollable="true"
-                            undefinedWhenEmpty="false" />
+                            [value]="assetsState.selectedTagNames()"
+                            (valueChange)="selectTags($event)" />
                     </div>
 
                     <div class="col-6">
@@ -29,7 +29,7 @@
                             placeholder="{{ 'assets.searchByName' | sqxTranslate }}"
                             [queries]="listQueries"
                             [queriesTypes]="'common.assets' | sqxTranslate"
-                            [query]="assetsState.query | async"
+                            [query]="assetsState.query()"
                             (queryChange)="search($event)" />
                     </div>
                 </div>
@@ -40,18 +40,18 @@
                     <button
                         class="btn btn-secondary btn-toggle"
                         attr.aria-label="{{ 'assets.listView' | sqxTranslate }}"
-                        [class.btn-primary]="listMode"
+                        [class.btn-primary]="listMode()"
                         (click)="changeView(true)"
-                        [disabled]="listMode"
+                        [disabled]="listMode()"
                         type="button">
                         <i class="icon-list"></i>
                     </button>
                     <button
                         class="btn btn-secondary btn-toggle"
                         attr.aria-label="{{ 'assets.gridView' | sqxTranslate }}"
-                        [class.btn-primary]="!listMode"
+                        [class.btn-primary]="!listMode()"
                         (click)="changeView(false)"
-                        [disabled]="!listMode"
+                        [disabled]="!listMode()"
                         type="button">
                         <i class="icon-grid"></i>
                     </button>
@@ -72,22 +72,22 @@
         </div>
     </ng-container>
     <ng-container>
-        <sqx-list-view [isLoading]="assetsState.isLoading | async">
+        <sqx-list-view [isLoading]="assetsState.isLoading()">
             <ng-container header>
-                <sqx-asset-path (navigate)="assetsState.navigate($event.id)" [path]="assetsState.path | async" />
+                <sqx-asset-path (navigate)="assetsState.navigate($event.id)" [path]="assetsState.path()" />
             </ng-container>
-            @if (assetsState.path | async; as path) {
+            @if (assetsState.path(); as path) {
                 <div>
                     <sqx-assets-list
                         [assetsState]="assetsState"
                         (edit)="editStart($event)"
                         [isDisabled]="false"
-                        [isListView]="listMode"
+                        [isListView]="listMode()"
                         [showFolderIcon]="path.length === 0" />
                 </div>
             }
             <ng-container footer>
-                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging | async" (pagingChange)="assetsState.page($event)" />
+                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging()" (pagingChange)="assetsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>
@@ -111,8 +111,8 @@
 <router-outlet />
 <sqx-asset-folder-dialog (dialogClose)="addAssetFolderDialog.hide()" *sqxModal="addAssetFolderDialog" />
 <sqx-asset-dialog
-    [asset]="editAsset!"
+    [asset]="editAsset()!"
     (assetReplaced)="replaceAsset($event)"
     (assetUpdated)="replaceAsset($event)"
     (dialogClose)="editDone()"
-    *sqxModal="editAsset; isDialog: true" />
+    *sqxModal="editAsset(); isDialog: true" />

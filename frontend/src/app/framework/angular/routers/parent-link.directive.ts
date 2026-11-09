@@ -5,49 +5,53 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
-import { Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxParentLink]',
+    host: {
+        '(click)': 'onClick()',
+    },
 })
-export class ParentLinkDirective implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ParentLinkDirective {
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
     private url?: string;
 
-    @Input({ transform: booleanAttribute })
-    public isLazyLoaded?: boolean | null;
+    /** Navigates one level further up, because the current route is a lazy loaded module. */
+    public readonly isLazyLoaded = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public queryParamsHandling?: QueryParamsHandling;
+    /** Defines how the query parameters are handled for the parent URL. */
+    public readonly queryParamsHandling = input<QueryParamsHandling>();
 
-    constructor(
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    constructor() {
+        effect(onCleanup => {
+            const isLazyLoaded = this.isLazyLoaded();
+            const queryParamsHandling = this.queryParamsHandling();
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.route.url
+            const subscriptionUrl = this.route.url
                 .subscribe(() => {
-                    this.updateUrl();
-                }));
+                    this.updateUrl(isLazyLoaded, queryParamsHandling);
+                });
 
-        this.subscriptions.add(
-            this.router.events
+            const subscriptionEvents = this.router.events
                 .subscribe(event => {
                     if (event instanceof NavigationEnd) {
-                        this.updateUrl();
+                        this.updateUrl(isLazyLoaded, queryParamsHandling);
                     }
-                }));
+                });
+
+            onCleanup(() => {
+                subscriptionUrl.unsubscribe();
+                subscriptionEvents.unsubscribe();
+            });
+        });
     }
 
-    @HostListener('click')
-    public onClick(): boolean {
+    protected onClick(): boolean {
         if (this.url) {
             this.router.navigateByUrl(this.url);
         }
@@ -55,10 +59,8 @@ export class ParentLinkDirective implements OnInit {
         return false;
     }
 
-    private updateUrl() {
-        const queryParamsHandling = this.queryParamsHandling;
-
-        this.url = this.isLazyLoaded ?
+    private updateUrl(isLazyLoaded: boolean, queryParamsHandling: QueryParamsHandling | undefined) {
+        this.url = isLazyLoaded ?
             this.router.createUrlTree(['.'], { queryParamsHandling, relativeTo: this.route.parent!.parent }).toString() :
             this.router.createUrlTree(['.'], { queryParamsHandling, relativeTo: this.route.parent }).toString();
 

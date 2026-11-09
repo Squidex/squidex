@@ -1,23 +1,23 @@
-<form class="inner-form" [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
+<form class="inner-form" (ngSubmit)="saveSchema()">
     <div class="inner-header">
         <ul class="nav nav-tabs2">
-            @for (script of editForm.form.controls | sqxKeys; track script) {
+            @for (script of editForm.scripts; track script) {
                 <li class="nav-item">
-                    <button class="nav-link" [class.active]="schemaScript === script" (click)="selectField(script)" type="button">
+                    <button class="nav-link" [class.active]="schemaScript() === script" (click)="selectField(script)" type="button">
                         {{ script | sqxScriptName }}
                     </button>
                 </li>
             }
         </ul>
-        <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
+        <button class="float-end btn btn-primary" [class.invisible]="!isEditable()" type="submit">
             {{ "common.save" | sqxTranslate }}
         </button>
     </div>
 
     <div class="inner-main">
-        @for (script of editForm.form.controls | sqxKeys; track script) {
-            @if (schemaScript === script) {
-                <sqx-code-editor borderless="true" [completion]="schemaCompletions | async" [formControlName]="script" />
+        @for (script of editForm.scripts; track script) {
+            @if (schemaScript() === script) {
+                <sqx-code-editor borderless="true" [completion]="schemaCompletions.value()" [formField]="editForm.form[script]" />
             }
         }
     </div>

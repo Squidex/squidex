@@ -5,26 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, hasNoValue$ } from '@app/framework';
+import { computed } from '@angular/core';
+import { maxLength, required } from '@angular/forms/signals';
+import { SignalForm } from '@app/framework';
 import { AddWorkflowDto } from '../model';
 
-export class AddWorkflowForm extends Form<ExtendedFormGroup, AddWorkflowDto> {
-    public get name() {
-        return this.form.controls['name'];
-    }
+export interface AddWorkflowFormModel {
+    name: string;
+}
 
-    public hasNoName = hasNoValue$(this.name);
+export class AddWorkflowForm extends SignalForm<AddWorkflowFormModel, AddWorkflowDto> {
+    public readonly hasNoName = computed(() => {
+        return !this.model().name;
+    });
 
     constructor() {
-        super(new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ name: '' }, path => {
+            maxLength(path.name, 40);
+            required(path.name);
+        });
     }
 
-    public transformSubmit(value: any) {
+    protected transformSubmit(value: AddWorkflowFormModel) {
         return new AddWorkflowDto(value);
     }
 }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { EditableTitleComponent, LocalizerService } from '@app/framework';
 
@@ -68,7 +68,6 @@ export default {
         moduleMetadata({
             imports: [
                 FormsModule,
-                ReactiveFormsModule,
             ],
             providers: [
                 {

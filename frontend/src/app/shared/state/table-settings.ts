@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { map, take } from 'rxjs/operators';
+import { computed } from '@angular/core';
 import { State, Types } from '@app/framework';
 import { META_FIELDS, SchemaDto, TableField } from '../model';
 import { UIState } from './ui.state';
@@ -32,17 +32,17 @@ export class TableSettings extends State<Snapshot> {
     public readonly schemaFields: ReadonlyArray<TableField>;
     public readonly schemaDefaults: ReadonlyArray<TableField>;
 
-    public fieldSizes =
+    public readonly fieldSizes =
         this.project(x => x.sizes);
 
-    public fieldWrappings =
+    public readonly fieldWrappings =
         this.project(x => x.wrappings);
 
-    public fields =
+    public readonly fields =
         this.project(x => x.fields);
 
-    public listFields =
-        this.projectFrom(this.fields, x => x.length > 0 ? x : this.schemaDefaults);
+    public readonly listFields =
+        computed(() => this.fields().length > 0 ? this.fields() : this.schemaDefaults);
 
     constructor(
         public readonly uiState: UIState,
@@ -55,7 +55,7 @@ export class TableSettings extends State<Snapshot> {
 
         this.settingsKey = `schemas.${this.schema.name}.config`;
 
-        this.uiState.getAppUser<any>(this.settingsKey, {}).pipe(take(1))
+        this.uiState.waitForAppUser<any>(this.settingsKey, {})
             .subscribe(settings => {
                 if (!Types.isArrayOfString(settings.fields)) {
                     settings.fields = [];
@@ -158,7 +158,7 @@ export function getTableConfig(source: TableSettings) {
         return result;
     }
 
-    return source.listFields.pipe(
-        map(fields => sortedTableFields(fields)),
-        map(fields => ({ fieldNames: fields, schema: source.schema })));
+    return computed(() => {
+        return { fieldNames: sortedTableFields(source.listFields()), schema: source.schema };
+    });
 }

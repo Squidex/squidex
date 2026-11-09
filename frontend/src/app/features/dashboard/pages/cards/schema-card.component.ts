@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppDto, TranslatePipe } from '@app/shared';
 
@@ -14,13 +14,12 @@ import { AppDto, TranslatePipe } from '@app/shared';
     selector: 'sqx-schema-card',
     styleUrls: ['./schema-card.component.scss'],
     templateUrl: './schema-card.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         TranslatePipe,
     ],
 })
 export class SchemaCardComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    /** The app of the dashboard. */
+    public readonly app = input.required<AppDto>();
 }

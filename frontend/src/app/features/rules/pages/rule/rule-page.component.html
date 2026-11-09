@@ -1,3 +1,4 @@
+@let rule = this.rule();
 <sqx-title message="i18n:rules.listPageTitle" [url]="['..']" />
 <sqx-layout layout="main" overflow="true" padding="true" white="true">
     <ng-container title>
@@ -11,7 +12,7 @@
     <ng-container menu>
         @if (rule) {}
 
-        @if (isManual) {
+        @if (isManual()) {
             <button
                 class="btn btn-outline-secondary btn-run ms-2"
                 attr.aria-label="{{ 'rules.trigger' | sqxTranslate }}"
@@ -27,23 +28,23 @@
         <button class="btn btn-primary ms-2" (click)="save()" type="button">{{ "common.save" | sqxTranslate }}</button>
     </ng-container>
     <ng-container>
-        @if (availableTriggers && availableTriggers && editableRule | async; as rule) {
-            @if (rule.isEditable) {
+        @if (availableTriggers && editableRule(); as snapshot) {
+            @if (snapshot.isEditable) {
                 <div>
                     <div class="btn btn-outline-secondary btn-enabled">
-                        @if (rule.isEnabled) {
+                        @if (snapshot.isEnabled) {
                             <span class="me-2"> {{ "common.enabled" | sqxTranslate }}</span>
                         } @else {
                             <span class="me-2"> {{ "common.disabled" | sqxTranslate }}</span>
                         }
 
-                        <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="changeEnabled($event)" />
+                        <sqx-toggle [value]="snapshot.isEnabled" (valueChange)="changeEnabled(!!$event)" />
                     </div>
                     <input
                         class="input-name form-control"
-                        [ngModel]="rule.name"
-                        (ngModelChange)="rename($event)"
-                        placeholder="{{ 'common.name' | sqxTranslate }}" />
+                        (input)="rename($any($event.target).value)"
+                        placeholder="{{ 'common.name' | sqxTranslate }}"
+                        [value]="snapshot.name ?? ''" />
                 </div>
             }
 
@@ -55,16 +56,16 @@
 
                     <div class="centered">
                         <div class="foreground">
-                            @if (rule.trigger) {
+                            @if (snapshot.trigger) {
                                 <sqx-rule-element
-                                    [elementInfo]="availableTriggers[rule.trigger.triggerType]"
-                                    [elementType]="rule.trigger.triggerType"
-                                    (iconClick)="startUpdateTrigger(rule.trigger)"
+                                    [elementInfo]="availableTriggers[snapshot.trigger.triggerType]"
+                                    [elementType]="snapshot.trigger.triggerType"
+                                    (iconClick)="startUpdateTrigger(snapshot.trigger)"
                                     (remove)="removeTrigger()"
                                     [showDescription]="false"
                                     [showName]="false"
-                                    [showRemove]="rule.isEditable" />
-                                <div class="trigger-title">{{ availableTriggers[rule.trigger.triggerType].title }}</div>
+                                    [showRemove]="snapshot.isEditable" />
+                                <div class="trigger-title">{{ availableTriggers[snapshot.trigger.triggerType].title }}</div>
                             } @else {
                                 <button
                                     class="btn btn-outline-secondary btn-circle"
@@ -78,11 +79,11 @@
                     </div>
                 </div>
                 <sqx-branch
-                    [availableSteps]="availableSteps"
-                    [branchItems]="rule.flow.getBranches()[0].items"
+                    [availableSteps]="rulesState.steps()"
+                    [branchItems]="snapshot.flow.getBranches()[0].items"
                     [branchTitle]="'rules.ruleSyntax.then' | sqxTranslate | lowercase"
-                    [flow]="rule.flow"
-                    [isEditable]="rule.isEditable"
+                    [flow]="snapshot.flow"
+                    [isEditable]="snapshot.isEditable"
                     [parentBranch]="0"
                     [parentId]="undefined"
                     (stepAdd)="startAddStep($event)"
@@ -93,7 +94,7 @@
     </ng-container>
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            @if (rule && (rulesState.canReadEvents | async)) {
+            @if (rule && rulesState.canReadEvents()) {
                 <a
                     class="panel-link panel-link-gray"
                     attr.aria-label="{{ 'common.history' | sqxTranslate }}"
@@ -139,15 +140,15 @@
     [availableTriggers]="availableTriggers"
     (dialogClose)="cancel()"
     (dialogSave)="changeTrigger($event)"
-    [isEditable]="editableRule.value.isEditable"
+    [isEditable]="editableRule().isEditable"
     *sqxModal="triggerDialog"
-    [trigger]="triggerToEdit" />
+    [trigger]="triggerToEdit()" />
 <sqx-step-dialog
-    [availableSteps]="availableSteps"
+    [availableSteps]="rulesState.steps()"
     (dialogClose)="cancel()"
     (dialogSave)="changeStep($event)"
-    [isEditable]="editableRule.value.isEditable"
-    [scriptCompletions]="scriptCompletions | async"
+    [isEditable]="editableRule().isEditable"
+    [scriptCompletions]="scriptCompletions.value()"
     *sqxModal="stepDialog"
-    [stepDefinition]="stepToUpsert?.step" />
+    [stepDefinition]="stepToUpsert()?.step" />
 <router-outlet />

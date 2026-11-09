@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
@@ -21,31 +21,29 @@ interface Snapshot extends LoadingState {
     name?: string;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ScriptLogsState extends State<Snapshot> {
-    public scriptLogs =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly scriptLogsService = inject(ScriptLogsService);
+
+    public readonly scriptLogs =
         this.project(x => x.scriptLogs);
 
-    public name =
+    public readonly name =
         this.project(x => x.name);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
     public get appName() {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly scriptLogsService: ScriptLogsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ scriptLogs: [] });
 
         debug(this, 'scriptLogs');

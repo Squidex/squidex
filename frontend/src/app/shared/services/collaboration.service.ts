@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { computed, inject, Service, Signal, signal, untracked, WritableSignal } from '@angular/core';
 import { Awareness } from 'y-protocols/awareness';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
@@ -17,59 +16,23 @@ type AwarenessState = { user: Profile; [key: string]: any };
 
 export type CollaborationProvider = { awareness: Awareness; doc: Y.Doc; destroy: () => void };
 
-@Injectable()
+@Service({ autoProvided: false })
 export class CollaborationService {
-    private readonly provider = new BehaviorSubject<CollaborationProvider | null>(null);
-    private readonly basePath = inject(UIOptions).value.collaborationService;
+    private readonly authService = inject(AuthService);
+    private readonly provider = signal<CollaborationProvider | null>(null);
+    private readonly uiOptions = inject(UIOptions);
+    private readonly basePath = this.uiOptions.value.collaborationService;
     private readonly profile: Profile;
+    private readonly usersState = signal<AwarenessState[]>([], { equal: Types.equals });
     private previousName?: string | null;
+    private unlistenAwareness?: () => void;
 
-    public awarenessChanges =
-        this.provider.pipe(map(p => p?.awareness));
-
-    public userChanges =
-        this.awarenessChanges.pipe(
-            switchMap(awareness => {
-                if (!awareness) {
-                    return of([]);
-                }
-
-                return new Observable<AwarenessState[]>(observer => {
-                    const getStates = () => {
-                        const byUser: { [userId: string]: AwarenessState } = {};
-
-                        awareness!.getStates().forEach((state, clientId) => {
-                            if (clientId == awareness.clientID) {
-                                return;
-                            }
-
-                            if (!state.user || state.user.id === this.profile.id) {
-                                return;
-                            }
-
-                            byUser[state.user.id] = state as any;
-                        });
-
-                        const sorted = Object.values(byUser).sortByString(x => x.user.displayName);
-
-                        observer.next(sorted);
-                    };
-
-                    getStates();
-                    awareness.on('change', getStates);
-
-                    return () => {
-                        awareness.off('change', getStates);
-                    };
-                });
-            }),
-            distinctUntilChanged<AwarenessState[]>(Types.equals),
-            shareReplay());
+    public readonly users = this.usersState.asReadonly();
 
     public providerFactory: (name: string, doc: Y.Doc) => CollaborationProvider;
 
-    constructor(authService: AuthService) {
-        this.profile = authService.user!;
+    constructor() {
+        this.profile = this.authService.user!;
 
         this.providerFactory = (name, doc) => {
             const websocket = new WebsocketProvider(this.basePath, `api/${name}?access_token=${this.profile.accessToken}`, doc);
@@ -97,46 +60,85 @@ export class CollaborationService {
 
         yProvider.awareness?.setLocalStateField('user', { id, email, displayName });
 
-        this.provider.next(yProvider);
+        this.provider.set(yProvider);
+        this.listenAwareness(yProvider.awareness);
     }
 
     private cleanup() {
-        this.provider.value?.destroy();
-        this.provider.next(null);
+        this.unlistenAwareness?.();
+        this.unlistenAwareness = undefined;
+
+        untracked(this.provider)?.destroy();
+        this.provider.set(null);
+        this.usersState.set([]);
     }
 
-    public getArray<T>(name: string) {
-        return this.provider.pipe(map(p => new SharedArray<T>(p?.doc, p?.doc.getArray(name))));
+    private listenAwareness(awareness: Awareness | undefined) {
+        if (!awareness) {
+            return;
+        }
+
+        const updateUsers = () => {
+            const byUser: { [userId: string]: AwarenessState } = {};
+
+            awareness.getStates().forEach((state, clientId) => {
+                if (clientId == awareness.clientID) {
+                    return;
+                }
+
+                if (!state.user || state.user.id === this.profile.id) {
+                    return;
+                }
+
+                byUser[state.user.id] = state as any;
+            });
+
+            const sorted = Object.values(byUser).sortByString(x => x.user.displayName);
+
+            this.usersState.set(sorted);
+        };
+
+        updateUsers();
+        awareness.on('change', updateUsers);
+
+        this.unlistenAwareness = () => awareness.off('change', updateUsers);
     }
 
-    public getMap<T>(name: string) {
-        return this.provider.pipe(map(p => new SharedMap<T>(p?.doc, p?.doc.getMap(name))));
+    public getArray<T>(name: string): Signal<SharedArray<T>> {
+        return computed(() => {
+            const provider = this.provider();
+
+            return new SharedArray<T>(provider?.doc, provider?.doc.getArray(name));
+        });
+    }
+
+    public getMap<T>(name: string): Signal<SharedMap<T>> {
+        return computed(() => {
+            const provider = this.provider();
+
+            return new SharedMap<T>(provider?.doc, provider?.doc.getMap(name));
+        });
     }
 
     public updateAwareness(key: string, value: any) {
-        this.provider.value?.awareness.setLocalStateField(key, value);
+        untracked(this.provider)?.awareness.setLocalStateField(key, value);
     }
 }
 
 export class SharedMap<T> {
-    private readonly value$: BehaviorSubject<Readonly<Record<string, T>>>;
+    private readonly valueState: WritableSignal<Readonly<Record<string, T>>>;
 
-    public get valueChanges(): Observable<Readonly<Record<string, T>>> {
-        return this.value$;
-    }
-
-    public get state() {
-        return this.value$.value;
-    }
+    public readonly value: Signal<Readonly<Record<string, T>>>;
 
     constructor(
         public readonly doc: Y.Doc | undefined,
         public readonly source: Y.Map<T> | undefined,
     ) {
-        this.value$ = new BehaviorSubject(source?.toJSON() || {});
+        this.valueState = signal(source?.toJSON() || {});
+        this.value = this.valueState.asReadonly();
 
         source?.observeDeep(() => {
-            this.value$.next(source.toJSON());
+            this.valueState.set(source.toJSON());
         });
     }
 
@@ -150,24 +152,19 @@ export class SharedMap<T> {
 }
 
 export class SharedArray<T> {
-    private readonly items$: BehaviorSubject<ReadonlyArray<T>>;
+    private readonly itemsState: WritableSignal<ReadonlyArray<T>>;
 
-    public get itemsChanges(): Observable<ReadonlyArray<T>> {
-        return this.items$;
-    }
-
-    public get items() {
-        return this.items$.value;
-    }
+    public readonly items: Signal<ReadonlyArray<T>>;
 
     constructor(
         public readonly doc: Y.Doc | undefined,
         public readonly source: Y.Array<T> | undefined,
     ) {
-        this.items$ = new BehaviorSubject<ReadonlyArray<T>>(source?.toJSON() || []);
+        this.itemsState = signal(source?.toJSON() || []);
+        this.items = this.itemsState.asReadonly();
 
         source?.observeDeep(() => {
-            this.items$.next(source.toJSON() || []);
+            this.itemsState.set(source.toJSON() || []);
         });
     }
 

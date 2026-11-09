@@ -1,51 +1,51 @@
-<form [formGroup]="schemaForm.form" (ngSubmit)="saveSchema()">
+<form (ngSubmit)="saveSchema()">
     <h5>{{ "common.generalSettings" | sqxTranslate }}</h5>
 
     <div class="card">
         <div class="card-body">
             <sqx-form-row for="name" label="common.name" vertical>
-                <input class="form-control" id="name" [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }" readonly />
+                <input class="form-control" id="name" readonly [value]="schema().name" />
             </sqx-form-row>
 
-            <sqx-form-row for="label" hint="schemas.schemaLabelHint" label="common.label" vertical>
-                <input class="form-control" id="label" formControlName="label" />
+            <sqx-form-row [for]="schemaForm.form.label" hint="schemas.schemaLabelHint" label="common.label" vertical>
+                <input class="form-control" id="label" [formField]="schemaForm.form.label" />
             </sqx-form-row>
 
-            <sqx-form-row for="hints" hint="schemas.schemaHintsHint" label="common.hints" vertical>
-                <textarea class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
+            <sqx-form-row [for]="schemaForm.form.hints" hint="schemas.schemaHintsHint" label="common.hints" vertical>
+                <textarea class="form-control" id="hints" [formField]="schemaForm.form.hints" rows="4"></textarea>
             </sqx-form-row>
 
-            <sqx-form-row for="contentsSidebarUrl" hint="schemas.contentsSidebarUrlHint" label="schemas.contentsSidebarUrl" vertical>
-                <input class="form-control" id="contentsSidebarUrl" formControlName="contentsSidebarUrl" type="url" />
+            <sqx-form-row [for]="schemaForm.form.contentsSidebarUrl" hint="schemas.contentsSidebarUrlHint" label="schemas.contentsSidebarUrl" vertical>
+                <input class="form-control" id="contentsSidebarUrl" [formField]="schemaForm.form.contentsSidebarUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row for="contentSidebarUrl" hint="schemas.contentSidebarUrlHint" label="schemas.contentSidebarUrl" vertical>
-                <input class="form-control" id="contentSidebarUrl" formControlName="contentSidebarUrl" type="url" />
+            <sqx-form-row [for]="schemaForm.form.contentSidebarUrl" hint="schemas.contentSidebarUrlHint" label="schemas.contentSidebarUrl" vertical>
+                <input class="form-control" id="contentSidebarUrl" [formField]="schemaForm.form.contentSidebarUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row for="contentEditorUrl" hint="schemas.contentEditorUrlHint" label="schemas.contentEditorUrl" vertical>
-                <input class="form-control" id="contentEditorUrl" formControlName="contentEditorUrl" type="url" />
+            <sqx-form-row [for]="schemaForm.form.contentEditorUrl" hint="schemas.contentEditorUrlHint" label="schemas.contentEditorUrl" vertical>
+                <input class="form-control" id="contentEditorUrl" [formField]="schemaForm.form.contentEditorUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row for="contentsListUrl" hint="schemas.contentsListUrlHint" label="schemas.contentsListUrl" vertical>
-                <input class="form-control" id="contentsListUrl" formControlName="contentsListUrl" type="url" />
+            <sqx-form-row [for]="schemaForm.form.contentsListUrl" hint="schemas.contentsListUrlHint" label="schemas.contentsListUrl" vertical>
+                <input class="form-control" id="contentsListUrl" [formField]="schemaForm.form.contentsListUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row alert="schemas.searchFieldsHelp" for="searchFields" hint="schemas.searchFieldsHint" label="schemas.searchFields" vertical>
-                <sqx-tag-editor id="searchFields" allowOpen="true" formControlName="searchFields" [itemsSource]="fieldNames" />
+            <sqx-form-row alert="schemas.searchFieldsHelp" [for]="schemaForm.form.searchFields" hint="schemas.searchFieldsHint" label="schemas.searchFields" vertical>
+                <sqx-tag-editor id="searchFields" allowOpen="true" [formField]="schemaForm.form.searchFields" [itemsSource]="fieldNames()" />
             </sqx-form-row>
 
-            <sqx-form-row for="tags" hint="schemas.schemaTagsHint" label="common.tags" vertical>
-                <sqx-tag-editor id="tags" formControlName="tags" />
+            <sqx-form-row [for]="schemaForm.form.tags" hint="schemas.schemaTagsHint" label="common.tags" vertical>
+                <sqx-tag-editor id="tags" [formField]="schemaForm.form.tags" />
             </sqx-form-row>
 
-            <sqx-form-row check for="validateOnPublish" hint="schemas.validateOnPublishHint" label="schemas.validateOnPublish" vertical>
-                <input class="form-check-input" id="validateOnPublish" formControlName="validateOnPublish" type="checkbox" />
+            <sqx-form-row check [for]="schemaForm.form.validateOnPublish" hint="schemas.validateOnPublishHint" label="schemas.validateOnPublish" vertical>
+                <input class="form-check-input" id="validateOnPublish" [formField]="schemaForm.form.validateOnPublish" type="checkbox" />
             </sqx-form-row>
         </div>
 
         <div class="card-footer">
-            @if (isEditable) {
+            @if (isEditable()) {
                 <button class="float-end btn btn-primary" type="submit">{{ "common.save" | sqxTranslate }}</button>
             }
         </div>

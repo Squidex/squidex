@@ -6,21 +6,16 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
 import { AuthSchemeResponseDto, AuthSchemeValueDto, CreateTeamDto, TeamDto, UpdateTeamDto } from '../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TeamsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getTeams(): Observable<ReadonlyArray<TeamDto>> {
         const url = this.apiUrl.buildUrl('/api/teams');

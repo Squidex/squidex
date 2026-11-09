@@ -6,21 +6,16 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, Resource, StringHelper } from '@app/framework';
 import { IUpdateProfileDto, UpdateProfileDto, UserDto } from './../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class UsersService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public postUser(dto: IUpdateProfileDto): Observable<any> {
         const url = this.apiUrl.buildUrl('api/user');

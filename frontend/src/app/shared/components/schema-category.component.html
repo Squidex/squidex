@@ -1,4 +1,6 @@
-<ul class="nav nav-light flex-column" [hidden]="forContent && schemaCategory.countSchemasInSubtree === 0">
+@let schemaCategory = this.schemaCategory();
+@let isCollapsed = this.isCollapsed();
+<ul class="nav nav-light flex-column" [hidden]="forContent() && schemaCategory.countSchemasInSubtree === 0">
     <div
         class="droppable nav-category"
         cdkDropList
@@ -41,9 +43,9 @@
             </div>
         </li>
 
-        <div class="nav-collapsed" [hidden]="isCollapsed" [style.height]="getContainerHeight()">
-            @if (!forContent) {
-                @for (schema of schemas; track schema.id) {
+        <div class="nav-collapsed" [hidden]="isCollapsed" [style.height]="containerHeight()">
+            @if (!forContent()) {
+                @for (schema of schemas(); track schema.id) {
                     <li class="nav-item truncate" cdkDrag [cdkDragData]="schema" (cdkDragStarted)="dragStarted($event)" sqxTourStep="schema">
                         <a
                             class="nav-link truncate"
@@ -62,7 +64,7 @@
                     </li>
                 }
             } @else {
-                @for (schema of schemas; track schema.id) {
+                @for (schema of schemas(); track schema.id) {
                     <li class="nav-item truncate" sqxTourStep="contentSchema">
                         <a
                             class="nav-link truncate drag-none"
@@ -83,7 +85,7 @@
 
     <div class="categories" [hidden]="isCollapsed">
         @for (category of schemaCategory.categories; track category.displayName) {
-            <sqx-schema-category (remove)="remove.emit($event)" [schemaCategory]="category" [schemaTarget]="schemaTarget" />
+            <sqx-schema-category (remove)="remove.emit($event)" [schemaCategory]="category" [schemaTarget]="schemaTarget()" />
         }
     </div>
 </ul>

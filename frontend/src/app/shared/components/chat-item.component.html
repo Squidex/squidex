@@ -1,7 +1,9 @@
+@let type = this.type();
+@let user = this.user();
 @if (type === "User") {
     <div class="row mt-3">
         <div class="col">
-            <div class="bubble bubble-left"><span inline="false" optional="false" [sqxMarkdown]="snapshot.content"></span></div>
+            <div class="bubble bubble-left"><span inline="false" optional="false" [sqxMarkdown]="contentText()"></span></div>
         </div>
 
         <div class="col-auto"><img class="user-picture" [src]="user.id | sqxUserIdPicture" title="{{ user.displayName }}" /></div>
@@ -15,7 +17,7 @@
         </div>
 
         <div class="col">
-            <div class="bubble bubble-right">{{ content | sqxTranslate }}</div>
+            <div class="bubble bubble-right">{{ contentText() | sqxTranslate }}</div>
         </div>
     </div>
 }
@@ -29,33 +31,33 @@
         <div class="col">
             <div class="bubble bubble-right use-container">
                 <div class="content" (sqxResized)="scrollIntoView()">
-                    @if (snapshot.runningTools.length > 0) {
+                    @if (contentTools().length > 0) {
                         <div class="mb-2">
-                            @for (tool of snapshot.runningTools; track tool) {
+                            @for (tool of contentTools(); track tool) {
                                 <div class="badge badge-secondary me-1">{{ tool }}</div>
                             }
                         </div>
                     }
 
-                    @if (!snapshot.isFailed) {
-                        <span inline="false" (load)="scrollIntoView()" optional="false" [sqxMarkdown]="snapshot.content"></span>
+                    @if (!isFailed()) {
+                        <span inline="false" (load)="scrollIntoView()" optional="false" [sqxMarkdown]="contentText()"></span>
                     }
 
-                    @if (snapshot.isFailed) {
+                    @if (isFailed()) {
                         <span> {{ "chat.failed" | sqxTranslate }}</span>
                     }
 
-                    @if (!snapshot.isRunning && !isFirst && type === "Assistant") {
-                        <button class="btn btn-secondary btn-sm btn-text" (click)="selectContent()" [disabled]="snapshot.isCopying" type="button">
+                    @if (!isRunning() && !isFirst() && type === "Assistant") {
+                        <button class="btn btn-secondary btn-sm btn-text" (click)="selectContent()" [disabled]="isCopying()" type="button">
                             {{ "chat.use" | sqxTranslate }}
-                            @if (snapshot.isCopying) {
+                            @if (isCopying()) {
                                 <sqx-loader />
                             }
                         </button>
                     }
                 </div>
 
-                @if (snapshot.isRunning && !snapshot.content) {
+                @if (isRunning() && !contentText()) {
                     <svg class="loader" height="10" viewBox="0 0 40 16">
                         <circle class="dot" cx="8" cy="8" r="4" />
                         <circle class="dot" cx="20" cy="8" r="4" />

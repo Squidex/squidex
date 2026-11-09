@@ -1,3 +1,5 @@
+@let event = this.event();
+@let expanded = this.expanded();
 <tr class="table-items-row" [class.expanded]="expanded">
     <td class="cell-label2">
         <span class="badge rounded-pill badge-{{ event | sqxSimulatedRuleEventStatus | sqxRuleClass }}">
@@ -36,7 +38,7 @@
                             </div>
                         </ng-container>
                         <ng-container details>
-                            <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.event" valueMode="Json" wordWrap="false" />
+                            <sqx-code-editor disabled="true" height="auto" maxLines="20" [value]="event.event" valueMode="Json" wordWrap="false" />
                         </ng-container>
                     </sqx-history-step>
 
@@ -58,7 +60,7 @@
                                     disabled="true"
                                     height="auto"
                                     maxLines="20"
-                                    [ngModel]="event.enrichedEvent"
+                                    [value]="event.enrichedEvent"
                                     valueMode="Json"
                                     wordWrap="false" />
                             </ng-container>
@@ -71,7 +73,7 @@
                             text="i18n:rules.simulation.eventConditionEvaluated" />
 
                         @if (event.flowState) {
-                            <sqx-state-details [availableSteps]="availableSteps" [branchItems]="branchItems" showEvent="false" [state]="event.flowState" />
+                            <sqx-state-details [availableSteps]="availableSteps()" [branchItems]="branchItems()" showEvent="false" [state]="event.flowState" />
                         }
                     }
                 }

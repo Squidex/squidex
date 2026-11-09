@@ -5,17 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, inject, input } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { ExternalLinkDirective, FromNowPipe, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/shared/internal';
+import { AppsState, AssetDto, HistoryService } from '@app/shared/internal';
 import { HistoryMessagePipe } from '../history/pipes';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { AssetUrlPipe } from './pipes';
-
-interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 
 @Component({
     selector: 'sqx-asset-history',
@@ -23,7 +20,6 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
     templateUrl: './asset-history.component.html',
     imports: [
         AssetUrlPipe,
-        AsyncPipe,
         ExternalLinkDirective,
         FromNowPipe,
         HistoryMessagePipe,
@@ -34,34 +30,20 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
     ],
 })
 export class AssetHistoryComponent {
-    @Input({ required: true })
-    public asset!: AssetDto;
+    private readonly appsState = inject(AppsState);
+    private readonly historyService = inject(HistoryService);
 
-    public assetEvents!: Observable<ReadonlyArray<AssetEvent>>;
+    /** The asset to show the history for. */
+    public readonly asset = input.required<AssetDto>();
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly historyService: HistoryService,
-    ) {
-    }
-
-    public ngOnChanges() {
-        const channel = `assets.${this.asset.id}`;
-
-        this.assetEvents =
-            this.historyService.getHistory(this.appsState.appName, channel).pipe(
-                map(events => {
-                    let version = -1;
-
-                    return events.map(event => {
-                        const canDownload =
-                            event.eventType === 'AssetUpdatedEventV2' ||
-                            event.eventType === 'AssetCreatedEventV2';
-
-                        version++;
-
-                        return { event, version, canDownload };
-                    });
-                }));
-    }
+    protected readonly assetEvents = rxResource({
+        params: () => ({ asset: this.asset() }),
+        stream: ({ params }) => this.historyService.getHistory(this.appsState.appName, `assets.${params.asset.id}`).pipe(
+            map(events => events.map((event, version) => ({
+                event,
+                version,
+                canDownload: event.eventType === 'AssetUpdatedEventV2' || event.eventType === 'AssetCreatedEventV2',
+            })))),
+        defaultValue: [],
+    });
 }

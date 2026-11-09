@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { ConfirmClickDirective, DialogRendererComponent, DialogService, ErrorDto, LocalizerService, RootViewComponent, TooltipDirective } from '@app/framework';
 
@@ -15,31 +15,27 @@ type TestMode = 'ErrorText' | 'ErrorDetails' | 'Info';
     selector: 'sqx-test',
     template: `
         <button class="btn btn-primary" (click)="test()">
-            Show {{ mode }}
+            Show {{ mode() }}
         </button>
-    `
+    `,
 })
 class TestComponent {
     public readonly dialogs = inject(DialogService);
 
-    @Input()
-    public mode: TestMode = 'Info';
+    /** The kind of notification to show. */
+    public readonly mode = input<TestMode>('Info');
 
     public test() {
-        if (this.mode === 'ErrorDetails') {
-            const error = new ErrorDto(500,
-                'Error in Server',
-                'Error Code',
-                [
-                    'Details 1',
-                    'Details 2',
-                    'Details 3',
-                    'Details 4',
-                ],
-            );
+        if (this.mode() === 'ErrorDetails') {
+            const error = new ErrorDto(500, 'Error in Server', 'Error Code', [
+                'Details 1',
+                'Details 2',
+                'Details 3',
+                'Details 4',
+            ]);
 
             this.dialogs.notifyError(error);
-        } else if (this.mode === 'ErrorText') {
+        } else if (this.mode() === 'ErrorText') {
             this.dialogs.notifyError('Error');
         } else {
             this.dialogs.notifyInfo('Info');
@@ -71,7 +67,7 @@ export default {
             ],
         }),
     ],
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-root-view>
@@ -129,6 +125,5 @@ export default {
 type Story = StoryObj<DialogRendererComponent & { mode: TestMode }>;
 
 export const Primary: Story = {
-    args: {
-    },
+    args: {},
 };

@@ -6,9 +6,9 @@
  */
 
 
-import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges, UpdateFieldDto } from '@app/shared';
+import { booleanAttribute, Component, computed, forwardRef, inject, Injector, input, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AppLanguageDto, AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateFieldDto } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { FieldFormComponent } from './forms/field-form.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
@@ -25,114 +25,108 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
+        forwardRef(() => SortableFieldListComponent),
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-        forwardRef(() => SortableFieldListComponent),
     ],
 })
 export class FieldComponent {
-    @Input({ required: true })
-    public field!: FieldDto | FieldDto;
+    private readonly injector = inject(Injector);
+    private readonly schemasState = inject(SchemasState);
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The field to render. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ transform: booleanAttribute })
-    public plain = false;
+    /** The schema the field belongs to. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input()
-    public parent?: FieldDto;
+    /** Renders the field without type icon, status and badges, e.g. for separators. */
+    public readonly plain = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The parent array field, if the field is a nested field. */
+    public readonly parent = input<FieldDto>();
 
-    @Input({ required: true })
-    public settings!: AppSettingsDto;
+    /** The languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public dropdown = new ModalModel();
+    /** The settings of the app. */
+    public readonly settings = input.required<AppSettingsDto>();
 
-    public isEditing = false;
-    public isEditable?: boolean | null;
+    protected readonly isEditing = signal(false);
 
-    public editForm!: EditFieldForm;
+    protected readonly isEditable = computed(() => {
+        return this.field().canUpdate;
+    });
 
-    public fieldWizard = new DialogModel();
+    protected readonly editForm = computed(() => {
+        const properties = this.field().properties;
 
-    public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || (this.field as any)['isLocalizable'];
-    }
+        // Forms create effects, which is not allowed in a reactive context.
+        return untracked(() => {
+            const editForm = new EditFieldForm(properties, this.injector);
+            editForm.load(properties);
+            return editForm;
+        });
+    });
 
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
+    protected readonly isLocalizable = computed(() => {
+        return this.parent()?.isLocalizable || (this.field() as any)['isLocalizable'];
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.field) {
-            this.isEditable = this.field.canUpdate;
+    protected readonly dropdown = new ModalModel();
 
-            this.editForm = new EditFieldForm(this.field.properties);
-            this.editForm.load(this.field.properties);
+    protected readonly fieldWizard = new DialogModel();
+
+    protected toggleEditing() {
+        const isEditing = !this.isEditing();
+
+        this.isEditing.set(isEditing);
+
+        if (isEditing) {
+            this.editForm().load(this.field().properties);
         }
     }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
-        if (this.isEditing) {
-            this.editForm.load(this.field.properties);
-        }
+    protected deleteField() {
+        this.schemasState.deleteField(this.schema(), this.field());
     }
 
-    public deleteField() {
-        this.schemasState.deleteField(this.schema, this.field);
+    protected enableField() {
+        this.schemasState.enableField(this.schema(), this.field());
     }
 
-    public enableField() {
-        this.schemasState.enableField(this.schema, this.field);
+    protected disableField() {
+        this.schemasState.disableField(this.schema(), this.field());
     }
 
-    public disableField() {
-        this.schemasState.disableField(this.schema, this.field);
+    protected showField() {
+        this.schemasState.showField(this.schema(), this.field());
     }
 
-    public showField() {
-        this.schemasState.showField(this.schema, this.field);
+    protected hideField() {
+        this.schemasState.hideField(this.schema(), this.field());
     }
 
-    public hideField() {
-        this.schemasState.hideField(this.schema, this.field);
+    protected sortFields(fields: ReadonlyArray<FieldDto>) {
+        this.schemasState.orderFields(this.schema(), fields, this.field() as any);
     }
 
-    public sortFields(fields: ReadonlyArray<FieldDto>) {
-        this.schemasState.orderFields(this.schema, fields, this.field as any);
+    protected lockField() {
+        this.schemasState.lockField(this.schema(), this.field());
     }
 
-    public lockField() {
-        this.schemasState.lockField(this.schema, this.field);
-    }
-
-    public save() {
-        if (!this.isEditable) {
+    protected save() {
+        if (!this.isEditable()) {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
+        const editForm = this.editForm();
 
-        const properties = createProperties(this.field.properties.fieldType as any, value);
+        editForm.submit(value => {
+            const properties = createProperties(this.field().properties.fieldType as any, value);
 
-        this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto({ properties }))
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+            return this.schemasState.updateField(this.schema(), this.field(), new UpdateFieldDto({ properties }));
+        });
     }
 }

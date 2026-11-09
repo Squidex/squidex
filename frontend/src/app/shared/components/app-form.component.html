@@ -1,8 +1,8 @@
-<form [formGroup]="createForm.form" (ngSubmit)="createApp()">
-    <sqx-modal-dialog (dialogClose)="emitClose()" flexBody="true" [size]="templates.length > 0 ? 'lg' : 'md'" tourId="appForm">
+<form (ngSubmit)="createApp()">
+    <sqx-modal-dialog (dialogClose)="emitClose()" flexBody="true" [size]="templates().length > 0 ? 'lg' : 'md'" tourId="appForm">
         <ng-container title>
-            @if (template) {
-                {{ "apps.createWithTemplate" | sqxTranslate: { template: template.title } }}
+            @if (templateSelected(); as selected) {
+                {{ "apps.createWithTemplate" | sqxTranslate: { template: selected.title } }}
             } @else {
                 {{ "apps.create" | sqxTranslate }}
             }
@@ -11,21 +11,21 @@
             <div class="row g-0">
                 <div class="col col-left">
                     <div class="card-body">
-                        <sqx-form-error [error]="createForm.error | async" />
+                        <sqx-form-error [error]="createForm.error()" />
 
-                        <sqx-form-row class="mt-2" for="name" hint="apps.appNameHint" label="common.name" required vertical>
-                            <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                        <sqx-form-row class="mt-2" [for]="createForm.form.name" hint="apps.appNameHint" label="common.name" required vertical>
+                            <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTextInput="LowerCase" />
                         </sqx-form-row>
 
                         <sqx-form-alert marginBottom="4" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }}</sqx-form-alert>
 
-                        @if (templates.length > 0) {
+                        @if (templates().length > 0) {
                             <h4 class="mt-6">{{ "apps.selectAppTemplate" | sqxTranslate }}</h4>
 
                             <div class="grid" style="--bs-gap: 0.5rem 0.5rem">
                                 <div
                                     class="g-col-6 card card-template card-href"
-                                    [class.border-primary]="!template"
+                                    [class.border-primary]="!templateSelected()"
                                     (click)="selectTemplate()"
                                     data-testid="new-app"
                                     sqxTourStep="addApp">
@@ -37,10 +37,10 @@
                                     </div>
                                 </div>
 
-                                @for (availableTemplate of templates; track availableTemplate) {
+                                @for (availableTemplate of templates(); track availableTemplate) {
                                     <div
                                         class="g-col-6 card card-template card-href"
-                                        [class.border-primary]="availableTemplate === template"
+                                        [class.border-primary]="availableTemplate === templateSelected()"
                                         (click)="selectTemplate(availableTemplate)">
                                         <div class="card-body">
                                             <div class="card-image">
@@ -60,13 +60,13 @@
                         }
                     </div>
                 </div>
-                @if (templates.length > 0) {
+                @if (templates().length > 0) {
                     <div class="col-info d-none d-lg-block">
                         <sqx-form-hint> {{ "apps.appExplanation" | sqxTranslate }}</sqx-form-hint>
 
-                        @if (template) {
+                        @if (templateSelected(); as selected) {
                             <h4 class="mt-4">{{ "apps.template" | sqxTranslate }}</h4>
-                            <div class="help" inline="false" [sqxMarkdown]="template.details"></div>
+                            <div class="help" inline="false" [sqxMarkdown]="selected.details"></div>
                         }
                     </div>
                 }

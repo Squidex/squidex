@@ -1,8 +1,9 @@
+@let transitionValue = transition();
 <div class="row transition g-0 align-items-center">
     <div class="col col-arrow"><i class="icon-corner-down-right text-decent"></i></div>
 
     <div class="col col-step">
-        <div class="transition-to"><i class="icon-circle" [style.color]="transition.step.values.color"></i> {{ transition.to }}</div>
+        <div class="transition-to"><i class="icon-circle" [style.color]="transitionValue.step.values.color"></i> {{ transitionValue.to }}</div>
     </div>
 
     <div class="col-auto col-label">
@@ -12,13 +13,12 @@
     <div class="col">
         <input
             class="form-control"
-            [class.dashed]="!transition.values.expression"
-            [disabled]="!!disabled"
-            [ngModel]="transition.values.expression"
-            (ngModelChange)="changeExpression($event)"
-            [ngModelOptions]="onBlur"
+            [class.dashed]="!transitionValue.values.expression"
+            (change)="changeExpression($any($event.target).value)"
+            [disabled]="disabled()"
             placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
-            spellcheck="false" />
+            spellcheck="false"
+            [value]="transitionValue.values.expression ?? ''" />
     </div>
 
     <div class="col-auto col-label">
@@ -28,18 +28,17 @@
     <div class="col col-roles">
         <sqx-tag-editor
             allowDuplicates="false"
-            [disabled]="!!disabled"
-            [itemsSource]="roles"
-            [ngModel]="transition.values.roles"
-            (ngModelChange)="changeRole($event)"
-            [ngModelOptions]="onBlur"
+            [disabled]="disabled()"
+            [itemsSource]="roles()"
             placeholder="{{ 'common.role' | sqxTranslate }}"
             styleDashed="true"
-            styleScrollable="true" />
+            styleScrollable="true"
+            [value]="transitionValue.values.roles"
+            (valueChange)="changeRole($event)" />
     </div>
 
     <div class="col col-button ps-2">
-        <button class="btn btn-text-danger" attr.aria-label="{{ 'common.remove' | sqxTranslate }}" (click)="remove()" [disabled]="disabled" type="button">
+        <button class="btn btn-text-danger" attr.aria-label="{{ 'common.remove' | sqxTranslate }}" (click)="remove()" [disabled]="disabled()" type="button">
             <i class="icon-bin3"></i>
         </button>
     </div>

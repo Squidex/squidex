@@ -6,36 +6,42 @@
  */
 
 
-import { booleanAttribute, Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormRowComponent, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, AssetsFieldFormModel, AssetsFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent, LocalizedInputComponent, SignalSelectDirective, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
     imports: [
-        FormsModule,
+        FormField,
         FormRowComponent,
+        FormsModule,
         LocalizedInputComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class AssetsValidationComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: AssetsFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<AssetsFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app, used to edit localized default values. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isLocalizable!: boolean;
+    /** Shows the localized default values, if the field is localizable. */
+    public readonly isLocalizable = input(false, { transform: booleanAttribute });
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<AssetsFieldFormModel>;
+    });
 }

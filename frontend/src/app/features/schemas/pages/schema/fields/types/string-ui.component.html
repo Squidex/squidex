@@ -1,60 +1,66 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row #placeholderRow for="placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field.fieldId">
-        <input class="form-control" [id]="placeholderRow.fieldName" formControlName="placeholder" maxlength="100" />
+<div>
+    <sqx-form-row #placeholderRow [for]="form().placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field().fieldId">
+        <input class="form-control" [id]="placeholderRow.fieldName()" [formField]="form().placeholder" />
     </sqx-form-row>
 
-    <sqx-form-row for="editor" label="schemas.field.editor" [prefix]="field.fieldId">
+    <sqx-form-row [for]="form().editor" label="schemas.field.editor" [prefix]="field().fieldId">
         @for (editor of editors; track editor) {
-            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === editor">
-                <input class="radio-input" formControlName="editor" name="editor" type="radio" [value]="editor" />
+            <label class="btn btn-radio" [class.active]="form().editor().value() === editor">
+                <input class="radio-input" [formField]="form().editor" type="radio" [value]="editor" />
                 <i class="icon-control-{{ editor }}"></i> <span class="radio-label">{{ editor }}</span>
             </label>
         }
     </sqx-form-row>
 
-    <sqx-form-row
-        #classNamesRow
-        [class.hidden]="hideClassNames | async"
-        for="classNames"
-        hint="schemas.fieldTypes.string.classNamesHint"
-        label="schemas.fieldTypes.string.classNames"
-        [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="classNamesRow.fieldName" formControlName="classNames" />
+    @if (!form().classNames().hidden()) {
+        <sqx-form-row
+            #classNamesRow
+            [for]="form().classNames"
+            hint="schemas.fieldTypes.string.classNamesHint"
+            label="schemas.fieldTypes.string.classNames"
+            [prefix]="field().fieldId">
+            <sqx-tag-editor [id]="classNamesRow.fieldName()" [formField]="form().classNames" />
+        </sqx-form-row>
+    }
+
+    @if (!form().allowedValues().hidden()) {
+        <sqx-form-row #allowedValuesRow [for]="form().allowedValues" label="schemas.field.allowedValues" [prefix]="field().fieldId">
+            <sqx-tag-editor [id]="allowedValuesRow.fieldName()" [formField]="form().allowedValues" />
+        </sqx-form-row>
+    }
+
+    <sqx-form-row [for]="form().folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field().fieldId">
+        <sqx-asset-folder-dropdown [formField]="form().folderId" />
     </sqx-form-row>
 
-    <sqx-form-row #allowedValuesRow [class.hidden]="hideAllowedValues | async" for="allowedValues" label="schemas.field.allowedValues" [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="allowedValuesRow.fieldName" formControlName="allowedValues" />
+    @if (!form().createEnum().hidden()) {
+        <sqx-form-row
+            #createEnumRow
+            check
+            [for]="form().createEnum"
+            hint="schemas.field.createEnumHint"
+            label="schemas.field.createEnum"
+            [prefix]="field().fieldId">
+            <input class="form-check-input" [id]="createEnumRow.fieldName()" [formField]="form().createEnum" type="checkbox" />
+        </sqx-form-row>
+    }
+
+    @if (!form().inlineEditable().hidden()) {
+        <sqx-form-row #inlineEditableRow check [for]="form().inlineEditable" label="schemas.field.inlineEditable" [prefix]="field().fieldId">
+            <input class="form-check-input" [id]="inlineEditableRow.fieldName()" [formField]="form().inlineEditable" type="checkbox" />
+        </sqx-form-row>
+    }
+
+    <sqx-form-row #isEmbeddableRow check [for]="form().isEmbeddable" hint="schemas.field.isEmbeddableHint" label="schemas.field.isEmbeddable" [prefix]="field().fieldId">
+        <input class="form-check-input" [id]="isEmbeddableRow.fieldName()" [formField]="form().isEmbeddable" type="checkbox" />
     </sqx-form-row>
 
-    <sqx-form-row for="folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field.fieldId">
-        <sqx-asset-folder-dropdown formControlName="folderId" />
-    </sqx-form-row>
-
-    <sqx-form-row
-        #createEnumRow
-        check
-        [class.hidden]="hideAllowedValues | async"
-        for="createEnum"
-        hint="schemas.field.createEnumHint"
-        label="schemas.field.createEnum"
-        [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="createEnumRow.fieldName" formControlName="createEnum" type="checkbox" />
-    </sqx-form-row>
-
-    <sqx-form-row #inlineEditableRow check for="inlineEditable" label="schemas.field.inlineEditable" [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="inlineEditableRow.fieldName" formControlName="inlineEditable" type="checkbox" />
-    </sqx-form-row>
-
-    <sqx-form-row #isEmbeddableRow check for="isEmbeddable" hint="schemas.field.isEmbeddableHint" label="schemas.field.isEmbeddable" [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="isEmbeddableRow.fieldName" formControlName="isEmbeddable" type="checkbox" />
-    </sqx-form-row>
-
-    <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
+    <sqx-form-row #schemaIdsRow [for]="form().schemaIds" label="common.schemas" [prefix]="field().fieldId">
         <sqx-tag-editor
-            [id]="schemaIdsRow.fieldName"
-            formControlName="schemaIds"
-            [itemConverter]="(schemasSource.normalConverter | async)!"
-            [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
+            [id]="schemaIdsRow.fieldName()"
+            [formField]="form().schemaIds"
+            [itemConverter]="schemasSource.normalConverter()"
+            [itemsSource]="schemasSource.normalConverter().suggestions"
             placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
     </sqx-form-row>
 </div>

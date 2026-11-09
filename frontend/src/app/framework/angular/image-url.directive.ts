@@ -5,48 +5,50 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostBinding, Input, NgZone, OnInit, Renderer2 } from '@angular/core';
-import { Subscriptions } from '@app/framework/internal';
+import { DestroyRef, Directive, effect, ElementRef, inject, input, NgZone, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxImageUrl]',
+    host: {
+        '[attr.src]': 'imageUrl()',
+    },
 })
-export class ImageUrlDirective implements  OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ImageUrlDirective {
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly zone = inject(NgZone);
 
-    @Input('sqxImageUrl') @HostBinding('attr.src')
-    public imageUrl!: string;
+    /** The URL of the image. The image is hidden until it has been loaded. */
+    public readonly imageUrl = input.required<string>({ alias: 'sqxImageUrl' });
 
-    constructor(
-        private readonly zone: NgZone,
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    constructor() {
+        const unlisteners = this.zone.runOutsideAngular(() => [
+            this.renderer.listen(this.element.nativeElement, 'load', () => {
+                this.onLoad();
+            }),
+            this.renderer.listen(this.element.nativeElement, 'error', () => {
+                this.onError();
+            }),
+        ]);
 
-    public ngOnInit() {
-        this.zone.runOutsideAngular(() => {
-            this.subscriptions.add(
-                this.renderer.listen(this.element.nativeElement, 'load', () => {
-                    this.onLoad();
-                }));
+        this.destroyRef.onDestroy(() => {
+            for (const unlisten of unlisteners) {
+                unlisten();
+            }
+        });
 
-            this.subscriptions.add(
-                this.renderer.listen(this.element.nativeElement, 'error', () => {
-                    this.onError();
-                }));
+        effect(() => {
+            this.imageUrl();
+            this.onError();
         });
     }
 
-    public ngOnChanges() {
-        this.onError();
-    }
-
-    public onLoad() {
+    private onLoad() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'visible');
     }
 
-    public onError() {
+    private onError() {
         this.renderer.setStyle(this.element.nativeElement, 'visibility', 'hidden');
     }
 }

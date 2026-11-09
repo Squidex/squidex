@@ -7,12 +7,13 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, UpdateAssetScriptsDto, versioned } from '@app/shared/internal';
+import { createService } from '@app/framework/testing';
+import { AppsState, DialogService, UpdateAssetScriptsDto, versioned } from '@app/shared/internal';
 import { AppsService } from '../services/apps.service';
 import { createAssetScripts } from '../services/apps.service.spec';
 import { TestValues } from './_test-helpers';
 import { AssetScriptsState } from './asset-scripts.state';
-import 'src/spec/matchers';
+import '../../../spec/matchers';
 
 describe('AssetScriptsState', () => {
     const { app, appsState, newVersion, version } = TestValues;
@@ -27,7 +28,11 @@ describe('AssetScriptsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         appsService = Mock.ofType<AppsService>();
-        assetScriptsState = new AssetScriptsState(appsState.object, appsService.object, dialogs.object);
+        assetScriptsState = createService(AssetScriptsState, [
+            { provide: AppsState, useValue: appsState.object },
+            { provide: AppsService, useValue: appsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
     });
 
     afterEach(() => {

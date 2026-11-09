@@ -1,4 +1,4 @@
-@if (selectedApp | async; as app) {
+@if (appsState.selectedApp(); as app) {
     <sqx-title [message]="app.displayName" />
     <div class="sidebar"><sqx-left-menu [app]="app" /></div>
 

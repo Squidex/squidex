@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownDirective, NotifoComponent, PlansState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UserNamePipe } from '@app/shared';
+import { ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownDirective, NotifoComponent, PlansState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UserNamePipe } from '@app/shared';
 import { PlanComponent } from './plan.component';
 
 @Component({
@@ -16,7 +15,6 @@ import { PlanComponent } from './plan.component';
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html',
     imports: [
-        AsyncPipe,
         ExternalLinkDirective,
         FormHintComponent,
         LayoutComponent,
@@ -36,28 +34,17 @@ import { PlanComponent } from './plan.component';
         UserNamePipe,
     ],
 })
-export class PlansPageComponent implements OnInit {
-    private overridePlanId?: string;
+export class PlansPageComponent {
+    private readonly route = inject(ActivatedRoute);
+    private readonly overridePlanId: string | undefined = this.route.snapshot.queryParams['planId'];
 
-    public portalUrl = this.apiUrl.buildUrl('/portal/');
+    protected readonly plansState = inject(PlansState);
 
-    constructor(
-        public readonly plansState: PlansState,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly route: ActivatedRoute,
-    ) {
-    }
-
-    public ngOnInit() {
-        this.route.queryParams
-            .subscribe(params => {
-                this.overridePlanId = params['planId'];
-            }).unsubscribe();
-
+    constructor() {
         this.plansState.load(false, this.overridePlanId);
     }
 
-    public reload() {
+    protected reload() {
         this.plansState.load(true, this.overridePlanId);
     }
 }

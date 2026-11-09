@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
+import { Component, computed, effect, forwardRef, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
+import { tap } from 'rxjs';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, SignalSelectDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ContentSectionComponent } from '../forms/content-section.component';
 
 @Component({
@@ -21,92 +22,112 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         ComponentContentsState,
     ],
     imports: [
-        AsyncPipe,
+        forwardRef(() => ContentSectionComponent),
         FormErrorComponent,
+        FormField,
         FormsModule,
         LanguageSelectorComponent,
         ModalDialogComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TooltipDirective,
         TranslatePipe,
-        forwardRef(() => ContentSectionComponent),
     ],
 })
-export class ContentCreatorComponent implements OnInit {
-    @Output()
-    public contentCreate = new EventEmitter<ReadonlyArray<ContentDto>>();
+export class ContentCreatorComponent {
+    private readonly contentsState = inject(ComponentContentsState);
+    private readonly injector = inject(Injector);
+    private readonly schemasState = inject(SchemasState);
+    private isInitialDataLoaded = false;
 
-    @Input()
-    public initialData: any;
+    /** Emits the created content, or an empty array when the dialog is closed. */
+    public readonly contentCreate = output<ReadonlyArray<ContentDto>>();
 
-    @Input()
-    public schemaName?: string | null;
+    /** The data to initialize the new content with, for example when cloning a content. */
+    public readonly initialData = input<any>();
 
-    @Input()
-    public schemaIds?: ReadonlyArray<string>;
+    /** The name of the schema to select initially. */
+    public readonly schemaName = input<string | null>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The IDs of the schemas the user can create contents for. */
+    public readonly schemaIds = input<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The initial language of the editor. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public schema!: SchemaDto;
-    public schemas: ReadonlyArray<SchemaDto> = [];
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    public contentForm!: EditContentForm;
+    protected readonly languageSelected = linkedSignal(() => {
+        return this.language();
+    });
 
-    constructor(
-        private readonly contentsState: ComponentContentsState,
-        private readonly schemasState: SchemasState,
-    ) {
-    }
+    protected readonly schema = linkedSignal<SchemaDto | undefined>(() => {
+        const schemas = this.schemas();
 
-    public ngOnInit() {
-        this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canContentsCreate);
+        return schemas.find(x => x.name === this.schemaName()) || schemas[0];
+    });
 
-        if (this.schemaIds && this.schemaIds.length > 0) {
-            this.schemas = this.schemas.filter(x => x.type === 'Default' && this.schemaIds!.indexOf(x.id) >= 0);
+    protected readonly contentForm = signal<EditContentForm | undefined>(undefined);
+
+    protected readonly schemas = computed(() => {
+        const schemaIds = this.schemaIds();
+
+        const schemas = this.schemasState.snapshot.schemas.filter(x => x.canContentsCreate);
+        if (!schemaIds || schemaIds.length === 0) {
+            return schemas;
         }
 
-        const selectedSchema = this.schemas.find(x => x.name === this.schemaName) || this.schemas[0];
+        return schemas.filter(x => x.type === 'Default' && schemaIds.indexOf(x.id) >= 0);
+    });
 
-        this.selectSchema(selectedSchema);
-    }
+    protected readonly schemaForm = form(this.schema);
 
-    public selectSchema(schema: SchemaDto) {
-        this.schema = schema;
-
-        if (schema) {
-            this.contentsState.schema = schema;
-            this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, { user: this.formContext.user });
-
-            this.formContext['languages'] = this.languages;
-            this.formContext['schema'] = schema;
-
-            if (this.initialData) {
-                this.contentForm.load(this.initialData, true);
-
-                this.initialData = null;
+    constructor() {
+        effect(() => {
+            const schema = this.schema();
+            if (!schema) {
+                return;
             }
-        }
+
+            untracked(() => this.createForm(schema));
+        });
     }
 
-    public saveAndPublish() {
+    private createForm(schema: SchemaDto) {
+        const formContext = this.formContext();
+        const languages = this.languages();
+
+        this.contentsState.schema = schema;
+
+        const contentForm = new EditContentForm(languages, schema, this.schemasState.schemaMap, { user: formContext.user }, this.injector);
+
+        formContext['languages'] = languages;
+        formContext['schema'] = schema;
+
+        const initialData = this.initialData();
+        if (initialData && !this.isInitialDataLoaded) {
+            contentForm.load(initialData, true);
+
+            this.isInitialDataLoaded = true;
+        }
+
+        this.contentForm.set(contentForm);
+    }
+
+    protected saveAndPublish() {
         this.saveContent(true);
     }
 
-    public save() {
+    protected save() {
         this.saveContent(false);
     }
 
-    private saveContent(publish: boolean) {
-        const value = this.contentForm.submit();
-        if (!value) {
-            this.contentForm.submitFailed('i18n:contents.contentNotValid');
+    private async saveContent(publish: boolean) {
+        const contentForm = this.contentForm();
+        if (!contentForm) {
             return;
         }
 
@@ -114,32 +135,33 @@ export class ContentCreatorComponent implements OnInit {
             return;
         }
 
-        this.contentsState.create(value, publish)
-            .subscribe({
-                next: content => {
-                    this.contentForm.submitCompleted({ noReset: true });
+        const isSaved = await contentForm.submit(value => {
+            return this.contentsState.create(value, publish).pipe(tap(content => this.emitSelect(content)));
+        });
 
-                    this.emitSelect(content);
-                },
-                error: error => {
-                    this.contentForm.submitFailed(error);
-                },
-            });
-    }
-
-    private canCreate(publish: boolean) {
-        if (publish) {
-            return this.schema.canContentsCreateAndPublish;
-        } else {
-            return this.schema.canContentsCreate;
+        if (!isSaved && !contentForm.error()) {
+            contentForm.setError('i18n:contents.contentNotValid');
         }
     }
 
-    public emitClose() {
+    private canCreate(publish: boolean) {
+        const schema = this.schema();
+        if (!schema) {
+            return false;
+        }
+
+        if (publish) {
+            return schema.canContentsCreateAndPublish;
+        } else {
+            return schema.canContentsCreate;
+        }
+    }
+
+    protected emitClose() {
         this.contentCreate.emit([]);
     }
 
-    public emitSelect(content: ContentDto) {
+    private emitSelect(content: ContentDto) {
         this.contentCreate.emit([content]);
     }
 }

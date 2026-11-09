@@ -5,24 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { HTTP, MathHelper, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AppsState, AuthService, ChatEventDto, StatefulComponent, TranslationsService } from '@app/shared/internal';
+import { AppsState, AuthService, ChatEventDto, TranslationsService } from '@app/shared/internal';
 import { ChatItemComponent } from './chat-item.component';
 
-interface State {
-    // The questions.
-    chatQuestion: string;
-
-    // Indicates if an item is running.
-    isRunning: boolean;
-
-    // The answers.
-    chatItems: ReadonlyArray<{ content: string | Observable<ChatEventDto>; type: 'User' | 'Assistant' | 'System' }>;
-}
+type ChatItem = { content: string | Observable<ChatEventDto>; type: 'User' | 'Assistant' | 'System' };
 
 @Component({
     selector: 'sqx-chat-dialog',
@@ -36,96 +26,87 @@ interface State {
         TranslatePipe,
     ],
 })
-export class ChatDialogComponent extends StatefulComponent<State> {
-    @Output()
-    public contentSelect = new EventEmitter<string | HTTP.UploadFile | undefined | null>();
+export class ChatDialogComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly authService = inject(AuthService);
+    private readonly translator = inject(TranslationsService);
 
-    @Input()
-    public configuration?: string;
+    /** Emits the content the user wants to use, or nothing when the dialog is closed. */
+    public readonly contentSelect = output<string | HTTP.UploadFile | undefined | null>();
 
-    @Input()
-    public conversationId = MathHelper.guid();
+    /** The name of the chat configuration on the server. */
+    public readonly configuration = input<string>();
 
-    @Input()
-    public folderId?: string;
+    /** The ID of the conversation, to continue a previous conversation. */
+    public readonly conversationId = input(MathHelper.guid());
 
-    @Input()
-    public copyMode?: 'Text' | 'Image';
+    /** The ID of the folder to upload images to. */
+    public readonly folderId = input<string>();
 
-    @ViewChild('input', { static: false })
-    public input!: ElementRef<HTMLInputElement>;
+    /** Defines what is copied when the user uses an answer. */
+    public readonly copyMode = input<'Text' | 'Image'>();
 
-    public user = this.authService.user!;
+    protected readonly chatQuestion = signal('');
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly authService: AuthService,
-        private readonly translator: TranslationsService,
-    ) {
-        super({
-            chatItems: [],
-            chatQuestion: '',
-            isRunning: false,
+    protected readonly chatItems = signal<ReadonlyArray<ChatItem>>([]);
+
+    protected readonly isRunning = signal(false);
+
+    protected readonly user = this.authService.user!;
+
+    constructor() {
+        effect(onCleanup => {
+            const configuration = this.configuration();
+            const conversationId = this.conversationId();
+
+            let observable: Subject<ChatEventDto>;
+            const subscription =
+                this.translator.ask(this.appsState.appName, { conversationId, configuration })
+                    .subscribe(message => {
+                        if (message.type === 'History') {
+                            const { content, source } = message;
+
+                            this.chatItems.update(s => [...s, { content, type: source }]);
+                            return;
+                        }
+
+                        if (!observable) {
+                            observable = new ReplaySubject<ChatEventDto>();
+
+                            this.chatQuestion.set('');
+                            this.chatItems.update(s => [...s, { content: observable, type: 'Assistant' }]);
+                            this.isRunning.set(true);
+                        }
+
+                        observable.next(message);
+                    });
+
+            onCleanup(() => subscription.unsubscribe());
         });
     }
 
-    public ngOnInit() {
-        const { configuration, conversationId } = this;
-
-        let observable: Subject<ChatEventDto>;
-        this.translator.ask(this.appsState.appName, { conversationId, configuration })
-            .subscribe(message => {
-                if (message.type === 'History') {
-                    const { content, source } = message;
-
-                    this.next(s => ({
-                        ...s,
-                        chatItems: [...s.chatItems, { content, type: source }],
-                    }));
-                } else {
-                    if (!observable) {
-                        observable = new ReplaySubject<ChatEventDto>();
-
-                        this.next(s => ({
-                            ...s,
-                            chatQuestion: '',
-                            chatItems: [...s.chatItems, { content: observable, type: 'Assistant' }],
-                            isRunning: true,
-                        }));
-                    }
-
-                    observable.next(message);
-                }
-            });
+    protected setQuestion(chatQuestion: string) {
+        this.chatQuestion.set(chatQuestion);
     }
 
-    public setQuestion(chatQuestion: string) {
-        this.next({ chatQuestion });
+    protected setCompleted() {
+        this.isRunning.set(false);
     }
 
-    public setCompleted() {
-        this.next({ isRunning: false });
-    }
-
-    public ask() {
-        const prompt = this.snapshot.chatQuestion;
-
+    protected ask() {
+        const prompt = this.chatQuestion();
         if (!prompt || prompt.length === 0) {
             return;
         }
 
-        const { configuration, conversationId } = this;
-        const stream = this.translator.ask(this.appsState.appName, { prompt, conversationId, configuration });
+        const stream = this.translator.ask(this.appsState.appName, { prompt, conversationId: this.conversationId(), configuration: this.configuration() });
 
-        this.next(s => ({
+        this.chatQuestion.set('');
+        this.chatItems.update(s => [
             ...s,
-            chatQuestion: '',
-            chatItems: [
-                ...s.chatItems,
-                { content: prompt, type: 'User' },
-                { content: stream, type: 'Assistant' },
-            ],
-            isRunning: true,
-        }));
+            { content: prompt, type: 'User' },
+            { content: stream, type: 'Assistant' },
+        ]);
+        this.isRunning.set(true);
     }
 }

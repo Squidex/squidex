@@ -5,46 +5,47 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, generateSlug, TemplatedFormArray, Types } from '@app/framework';
+import { applyEach, maxLength, required } from '@angular/forms/signals';
+import { generateSlug, SignalForm, SubmitAction, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, MoveAssetDto, RenameAssetFolderDto, RenameTagDto, UpdateAssetScriptsDto } from '../model';
 
-export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto, AssetDto> {
-    public get metadata() {
-        return this.form.controls['metadata'] as TemplatedFormArray;
-    }
+export type AssetMetadataFormModel = { name: string; value: string };
 
-    public get metadataControls(): ReadonlyArray<ExtendedFormGroup> {
-        return this.metadata.controls as any;
-    }
+export type AnnotateAssetFormModel = {
+    isProtected: boolean;
+    fileName: string;
+    slug: string;
+    tags: string[];
+    metadata: AssetMetadataFormModel[];
+};
 
+export class AnnotateAssetForm extends SignalForm<AnnotateAssetFormModel, AnnotateAssetDto, AssetDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            isProtected: new UntypedFormControl(false,
-                Validators.nullValidator,
-            ),
-            fileName: new UntypedFormControl('',
-                Validators.required,
-            ),
-            slug: new UntypedFormControl('',
-                Validators.required,
-            ),
-            tags: new UntypedFormControl([],
-                Validators.nullValidator,
-            ),
-            metadata: new TemplatedFormArray(
-                MetadataTemplate.INSTANCE,
-            ),
-        }));
+        super({ isProtected: false, fileName: '', slug: '', tags: [], metadata: [] }, path => {
+            applyEach(path.metadata, item => {
+                maxLength(item.name, 1000);
+                required(item.name);
+            });
+            required(path.fileName);
+            required(path.slug);
+        });
     }
 
-    public transformSubmit(value: any) {
-        const result = { ...value, metadata: {} };
+    public addMetadata() {
+        this.model.update(x => ({ ...x, metadata: [...x.metadata, { name: '', value: '' }] }));
+    }
+
+    public removeMetadata(index: number) {
+        this.model.update(x => ({ ...x, metadata: x.metadata.filter((_, i) => i !== index) }));
+    }
+
+    protected transformSubmit(value: AnnotateAssetFormModel) {
+        const metadata: Record<string, any> = {};
 
         for (const item of value.metadata) {
             const raw = item.value;
 
-            let parsed = raw;
+            let parsed: any = raw;
 
             if (raw) {
                 try {
@@ -58,71 +59,29 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
                 parsed = null;
             }
 
-            result.metadata[item.name] = parsed;
+            metadata[item.name] = parsed;
         }
 
-        return result;
+        return new AnnotateAssetDto({ ...value, metadata });
     }
 
-    public submit(asset?: AssetDto) {
-        const result: ({ metadata?: object } & Record<string, any>) | null = super.submit() as any;
+    public submitChanges(asset: AssetDto, action: SubmitAction<AnnotateAssetDto | null, unknown>) {
+        return this.submit(value => {
+            return action(getChanges(asset, value));
+        });
+    }
 
-        if (!asset || !result) {
-            return null;
-        }
+    protected transformLoad(value: Partial<AssetDto>): AnnotateAssetFormModel {
+        let fileName = value.fileName ?? '';
 
-        const index = asset.fileName.lastIndexOf('.');
-
+        const index = fileName.lastIndexOf('.');
         if (index > 0) {
-            result.fileName += asset.fileName.substring(index);
+            fileName = fileName.substring(0, index);
         }
 
-        if (result.fileName === asset.fileName) {
-            delete result.fileName;
-        }
-
-        if (result.slug === asset.slug) {
-            delete result.slug;
-        }
-
-        if (result.isProtected === asset.isProtected) {
-            delete result.isProtected;
-        }
-
-        if (Types.equals(result.metadata, asset.metadata)) {
-            delete result.metadata;
-        }
-
-        if (Types.equals(result.tags, asset.tags)) {
-            delete result.tags;
-        }
-
-        if (Object.keys(result).length === 0) {
-            this.enable();
-            return null;
-        }
-
-        return new AnnotateAssetDto(result);
-    }
-
-    public transformLoad(value: Partial<AssetDto>) {
-        const result = { ...value };
-
-        let fileName = value.fileName;
-
-        if (fileName) {
-            const index = fileName.lastIndexOf('.');
-
-            if (index > 0) {
-                fileName = fileName.substring(0, index);
-            }
-
-            result.fileName = fileName;
-        }
+        const metadata: AssetMetadataFormModel[] = [];
 
         if (Types.isObject(value.metadata)) {
-            result.metadata = [];
-
             for (const [name, raw] of Object.entries(value.metadata)) {
                 let converted = '';
 
@@ -132,117 +91,126 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
                     converted = JSON.stringify(raw);
                 }
 
-                result.metadata.push({ name, value: converted });
+                metadata.push({ name, value: converted });
             }
         }
 
-        return result;
+        return {
+            isProtected: value.isProtected ?? false,
+            fileName,
+            slug: value.slug ?? '',
+            tags: value.tags ?? [],
+            metadata,
+        };
     }
 
     public generateSlug(asset: AssetDto) {
-        const fileName = this.form.controls['fileName'].value;
-
-        if (fileName) {
-            let slug = generateSlug(fileName, { allowed: ['.'] });
-
-            if (asset.fileName) {
-                const index = asset.fileName.lastIndexOf('.');
-
-                if (index > 0) {
-                    slug += asset.fileName.substring(index);
-                }
-            }
-
-            this.form.controls['slug'].setValue(slug);
+        const fileName = this.model().fileName;
+        if (!fileName) {
+            return;
         }
+
+        let slug = generateSlug(fileName, { allowed: ['.'] });
+
+        if (asset.fileName) {
+            const index = asset.fileName.lastIndexOf('.');
+
+            if (index > 0) {
+                slug += asset.fileName.substring(index);
+            }
+        }
+
+        this.form.slug().value.set(slug);
     }
 }
 
-class MetadataTemplate {
-    public static readonly INSTANCE = new MetadataTemplate();
+const ASSET_SCRIPT_NAMES = ['query', 'queryPre', 'annotate', 'create', 'delete', 'move', 'update'] as const;
 
-    public createControl() {
-        return new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-            value: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-        });
-    }
-}
+export type AssetScriptName = typeof ASSET_SCRIPT_NAMES[number];
 
-export class EditAssetScriptsForm extends Form<ExtendedFormGroup, UpdateAssetScriptsDto, object> {
+export type EditAssetScriptsFormModel = Record<AssetScriptName, string>;
+
+export class EditAssetScriptsForm extends SignalForm<EditAssetScriptsFormModel, UpdateAssetScriptsDto, Partial<EditAssetScriptsFormModel>> {
+    public readonly scriptNames = ASSET_SCRIPT_NAMES;
+
     constructor() {
-        super(new ExtendedFormGroup({
-            query: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-            queryPre: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-            annotate: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-            create: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-            delete: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-            move: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-            update: new UntypedFormControl('',
-                Validators.nullValidator,
-            ),
-        }));
+        super({ query: '', queryPre: '', annotate: '', create: '', delete: '', move: '', update: '' });
     }
 
-    public transformSubmit(value: any) {
+    protected transformSubmit(value: EditAssetScriptsFormModel) {
         return new UpdateAssetScriptsDto(value);
     }
 }
 
-export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFolderDto, AssetFolderDto> {
+export class RenameAssetFolderForm extends SignalForm<{ folderName: string }, RenameAssetFolderDto, AssetFolderDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            folderName: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ folderName: '' }, path => {
+            required(path.folderName);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { folderName: string }) {
         return new RenameAssetFolderDto(value);
     }
 }
 
-export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameTagDto, RenameTagDto> {
+export class RenameAssetTagForm extends SignalForm<{ tagName: string }, RenameTagDto, RenameTagDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            tagName: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ tagName: '' }, path => {
+            required(path.tagName);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { tagName: string }) {
         return new RenameTagDto(value);
     }
 }
 
-export class MoveAssetForm extends Form<ExtendedFormGroup, MoveAssetDto, AssetDto> {
+export class MoveAssetForm extends SignalForm<{ parentId: string }, MoveAssetDto, AssetDto> {
     constructor() {
-        super(new ExtendedFormGroup({
-            parentId: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ parentId: '' }, path => {
+            required(path.parentId);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: { parentId: string }) {
         return new MoveAssetDto(value);
     }
+}
+
+function getChanges(asset: AssetDto, value: AnnotateAssetDto) {
+    const result: Record<string, any> = {};
+
+    let fileName = value.fileName;
+
+    const index = asset.fileName.lastIndexOf('.');
+    if (index > 0) {
+        fileName += asset.fileName.substring(index);
+    }
+
+    if (fileName !== asset.fileName) {
+        result['fileName'] = fileName;
+    }
+
+    if (value.slug !== asset.slug) {
+        result['slug'] = value.slug;
+    }
+
+    if (value.isProtected !== asset.isProtected) {
+        result['isProtected'] = value.isProtected;
+    }
+
+    if (!Types.equals(value.metadata, asset.metadata)) {
+        result['metadata'] = value.metadata;
+    }
+
+    if (!Types.equals(value.tags, asset.tags)) {
+        result['tags'] = value.tags;
+    }
+
+    if (Object.keys(result).length === 0) {
+        return null;
+    }
+
+    return new AnnotateAssetDto(result);
 }

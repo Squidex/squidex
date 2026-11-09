@@ -6,21 +6,16 @@
  */
 
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
 import { ApiUrlConfig, ErrorDto, HTTP, mapVersioned, pretifyError, Resource, StringHelper, Types, Versioned, VersionOrTag } from '@app/framework';
 import { AppDto, AppsDto, AppSettingsDto, AssetScriptsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from './../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AppsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getApps(): Observable<ReadonlyArray<AppDto>> {
         const url = this.apiUrl.buildUrl('/api/apps');

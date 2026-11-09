@@ -12,7 +12,7 @@ import { Types } from '@app/framework/internal';
 const CACHE: { [url: string]: HttpResponse<any> } = {};
 
 export const cachingInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
-    if (req.method === 'GET' && !req.reportProgress) {
+    if (req.method === 'GET' && !req.reportUploadProgress && !req.reportDownloadProgress) {
         const cacheEntry = CACHE[req.url];
 
         if (cacheEntry) {

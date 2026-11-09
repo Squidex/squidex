@@ -6,21 +6,15 @@
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { firstValueFrom, from, Observable } from 'rxjs';
+import { computed, inject, Service, Signal } from '@angular/core';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, escapeHTML, pretifyError, StringHelper } from '@app/framework';
 import { HistoryEventDto } from './../model';
 import { UsersProviderService } from './users-provider.service';
 
-export function formatHistoryMessage(message: string, users: UsersProviderService): Observable<string> {
-    async function getUserName(id: string): Promise<string> {
-        const user = await firstValueFrom(users.getUser(id, null));
-
-        return user.displayName;
-    }
-
-    async function format(message: string): Promise<string> {
+export function formatHistoryMessage(message: string, users: UsersProviderService): Signal<string | null> {
+    return computed(() => {
         const placeholderMatches = message.matchAll(/{(?<type>[^\s:]*):(?<id>[^}]*)}/g) || [];
         const placeholderValues: string[] = [];
 
@@ -34,10 +28,14 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
 
             const parts = id.split(':');
 
-            if (parts.length === 1) {
-                placeholderValues.push(await getUserName(parts[0]));
-            } else if (parts[0] === 'subject') {
-                placeholderValues.push(await getUserName(parts[1]));
+            if (parts.length === 1 || parts[0] === 'subject') {
+                const user = users.user(parts.length === 1 ? parts[0] : parts[1], null)();
+                if (!user) {
+                    // Wait until all users are loaded.
+                    return null;
+                }
+
+                placeholderValues.push(user.displayName);
             } else if (parts[1].toLowerCase().endsWith('client')) {
                 placeholderValues.push(parts[1]);
             } else {
@@ -45,29 +43,22 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
             }
         }
 
-        message = message.replace(/{([^\s:]*):([^}]*)}/, () => {
+        let result = message.replace(/{([^\s:]*):([^}]*)}/, () => {
             return `<span class="user-ref">${escapeHTML(placeholderValues.shift() || '')}</span>`;
         });
 
-        message = message.replace(/{([^}]*)}/g, (match: string, marker: string) => {
+        result = result.replace(/{([^}]*)}/g, (match: string, marker: string) => {
             return `<span class="marker-ref">${escapeHTML(marker)}</span>`;
         });
 
-        return message;
-    }
-
-    return from(format(message));
+        return result;
+    });
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class HistoryService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getHistory(appName: string, channel: string): Observable<ReadonlyArray<HistoryEventDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history${StringHelper.buildQuery({ channel })}`);

@@ -5,15 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
-import { map } from 'rxjs';
-import { CodeComponent, ExtendedFormGroup, FormHintComponent, FormRowComponent, generateApiKey, MarkdownDirective, RolesState, StatefulControlComponent, Subscriptions, TranslatePipe, Types, value$ } from '@app/shared';
-
-export const SQX_USER_INFO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UserInfoEditorComponent), multi: true,
-};
+import { Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { disabled, form, FormField, required } from '@angular/forms/signals';
+import { CodeComponent, FormHintComponent, FormRowComponent, FormValueControlBase, generateApiKey, MarkdownDirective, RolesState, SignalSelectDirective, syncExternalValue, TranslatePipe, Types } from '@app/shared';
 
 type UserInfo = { apiKey: string; role: string };
 
@@ -21,77 +16,80 @@ type UserInfo = { apiKey: string; role: string };
     selector: 'sqx-user-info-editor',
     styleUrls: ['./user-info-editor.component.scss'],
     templateUrl: './user-info-editor.component.html',
-    providers: [
-        SQX_USER_INFO_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         CodeComponent,
-        FormsModule,
+        FormField,
         FormHintComponent,
-        MarkdownDirective,
-        ReactiveFormsModule,
         FormRowComponent,
+        FormsModule,
+        MarkdownDirective,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
-export class UserInfoEditorComponent extends StatefulControlComponent<any, UserInfo | undefined | null> implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class UserInfoEditorComponent extends FormValueControlBase<UserInfo | null> {
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.applyValue(value));
 
-    @Input({ required: true })
-    public formId!: string;
+    protected readonly rolesState = inject(RolesState);
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** The value of the control. */
+    public readonly value = model<UserInfo | null>(null);
 
-    public readonly form = new ExtendedFormGroup({
-        apiKey: new UntypedFormControl('',
-            Validators.required,
-        ),
-        role: new UntypedFormControl('',
-            Validators.required,
-        ),
+    /** The prefix for the IDs of the inner inputs. */
+    public readonly formId = input.required<string>();
+
+    protected readonly userInfo = signal<UserInfo>({ apiKey: '', role: '' });
+
+    protected readonly apiKey = computed(() => {
+        return this.userInfo().apiKey || 'NONE';
     });
 
-    public readonly apiKey =
-      value$(this.form.get('apiKey')!)
-        .pipe(map(x => x || 'NONE'));
+    protected readonly userInfoForm = form(this.userInfo, path => {
+        disabled(path,
+            {when: () => this.disabled() }
+        );
 
-    constructor(
-        public readonly rolesState: RolesState,
-    ) {
-        super({});
+        required(path.apiKey);
+        required(path.role);
+    });
 
-        this.subscriptions.add(
-            value$(this.form).subscribe(value => {
-                if (this.form.valid) {
-                    this.callChange(value);
-                } else {
-                    this.callChange(null);
+    constructor() {
+        super();
+
+        this.rolesState.loadIfNotLoaded();
+
+        effect(() => {
+            const value = this.buildValue();
+
+            untracked(() => {
+                if (Types.equals(value, this.value())) {
+                    return;
                 }
 
-                this.callTouched();
-            }));
+                this.valueSetter(value);
+            });
+        });
     }
 
-    public ngOnInit() {
-        this.rolesState.loadIfNotLoaded();
-    }
-
-    public writeValue(obj: UserInfo | undefined | null) {
-        if (Types.isObject(obj)) {
-            this.form.setValue(obj, { emitEvent: true });
+    private applyValue(value: UserInfo | null) {
+        if (Types.isObject(value)) {
+            this.userInfo.set({ apiKey: value.apiKey ?? '', role: value.role ?? '' });
         } else {
-            this.form.reset();
+            this.userInfo.set({ apiKey: '', role: '' });
         }
     }
 
-    public async generateApiKey() {
+    protected generateApiKey() {
         const apiKey = generateApiKey();
 
-        this.form.patchValue({ apiKey });
+        this.userInfo.update(x => ({ ...x, apiKey }));
+    }
+
+    private buildValue(): UserInfo | null {
+        if (!this.userInfoForm().valid()) {
+            return null;
+        }
+
+        return { ...this.userInfo() };
     }
 }

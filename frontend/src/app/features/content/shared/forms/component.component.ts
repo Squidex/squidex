@@ -5,19 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, DropdownMenuComponent, EditContentForm, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
+import { booleanAttribute, Component, computed, input, numberAttribute, viewChildren } from '@angular/core';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, DropdownMenuComponent, EditContentForm, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, TranslatePipe, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
     selector: 'sqx-component',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ComponentSectionComponent,
         DropdownMenuComponent,
         FormHintComponent,
@@ -27,70 +23,56 @@ import { ComponentSectionComponent } from './component-section.component';
     ],
 })
 export class ComponentComponent {
-    private readonly subscriptions = new Subscriptions();
+    /** Enables the AI features of the editors. */
+    public readonly hasChatBot = input.required<boolean>();
 
-    @Input({ required: true })
-    public hasChatBot!: boolean;
+    /** The content form the field belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** The nesting level of the field, 0 for root fields. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** The form model of the component field. */
+    public readonly formModel = input.required<ComponentForm>();
 
-    @Input({ required: true })
-    public formModel!: ComponentForm;
+    /** Renders the editors next to the editors of another version. */
+    public readonly isComparing = input.required<boolean, unknown>({ transform: booleanAttribute });
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isComparing = false;
+    /** The language of the field values. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    protected readonly sections = viewChildren(ComponentSectionComponent);
 
-    @ViewChildren(ComponentSectionComponent)
-    public sections!: QueryList<ComponentSectionComponent>;
+    protected readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
+        const formModel = this.formModel();
 
-    public schemasDropdown = new ModalModel();
-    public schemasList: ReadonlyArray<SchemaDto> = [];
+        const properties = formModel.field.properties;
+        if (!Types.is(properties, ComponentFieldPropertiesDto)) {
+            return [];
+        }
 
-    public isDisabled?: Observable<boolean>;
+        return properties.schemaIds?.map(x => formModel.globals.schemas[x]).defined() || [];
+    });
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-    ) {
-    }
+    protected readonly isDisabled = computed(() => {
+        return this.formModel().disabled();
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formModel) {
-            this.subscriptions.unsubscribeAll();
+    protected readonly schemasDropdown = new ModalModel();
 
-            this.isDisabled = disabled$(this.formModel.form);
-
-            this.subscriptions.add(
-                this.formModel.form.valueChanges
-                    .subscribe(() => {
-                        this.changeDetector.detectChanges();
-                    }));
-
-            if (Types.is(this.formModel.field.properties, ComponentFieldPropertiesDto)) {
-                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).defined() || [];
-            }
+    public reset() {
+        for (const section of this.sections()) {
+            section.reset();
         }
     }
 
-    public reset() {
-        this.sections.forEach(section => {
-            section.reset();
-        });
-    }
-
-    public setSchema(schema: SchemaDto) {
-        this.formModel.selectSchema(schema.id);
+    protected setSchema(schema: SchemaDto) {
+        this.formModel().selectSchema(schema.id);
     }
 }

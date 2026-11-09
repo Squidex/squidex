@@ -7,6 +7,7 @@
 
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { CreateTeamDto, DialogService, TeamsService, TeamsState, UpdateTeamDto } from '@app/shared/internal';
 import { createTeam } from '../services/teams.service.spec';
 
@@ -26,7 +27,10 @@ describe('TeamsState', () => {
         teamsService.setup(x => x.getTeams())
             .returns(() => of([team1, team2])).verifiable(Times.atLeastOnce());
 
-        teamsState = new TeamsState(teamsService.object, dialogs.object);
+        teamsState = createService(TeamsState, [
+            { provide: TeamsService, useValue: teamsService.object },
+            { provide: DialogService, useValue: dialogs.object },
+        ]);
         teamsState.load().subscribe();
     });
 

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService, NotifoComponent, UIOptions } from '@app/shared';
 import { NotificationDropdownComponent } from './notification-dropdown.component';
 
@@ -14,20 +14,14 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     selector: 'sqx-notifications-menu',
     styleUrls: ['./notifications-menu.component.scss'],
     templateUrl: './notifications-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         NotificationDropdownComponent,
         NotifoComponent,
     ],
 })
 export class NotificationsMenuComponent {
-    public isNotifoConfigured = false;
+    private readonly authService = inject(AuthService);
+    private readonly uiOptions = inject(UIOptions);
 
-    constructor(authService: AuthService, uiOptions: UIOptions,
-    ) {
-        const notifoApiKey = authService.user?.notifoToken;
-        const notifoApiUrl = uiOptions.value.notifoApi;
-
-        this.isNotifoConfigured = !!notifoApiKey && !!notifoApiUrl;
-    }
+    protected readonly isNotifoConfigured = !!this.authService.user?.notifoToken && !!this.uiOptions.value.notifoApi;
 }

@@ -1,61 +1,56 @@
 <div class="row mb-1">
     <div class="col">
-        <sqx-language-selector [language]="snapshot.language" (languageChange)="setLanguage($event)" [languages]="languages" showAlways size="sm" />
+        <sqx-language-selector [language]="language()" (languageChange)="setLanguage($event)" [languages]="languages()" showAlways size="sm" />
     </div>
 
     <div class="col-auto">
-        <button class="btn btn-sm btn-secondary" attr.aria-label="{{ 'common.clear' | sqxTranslate }}" (click)="unset()" [disabled]="isEmpty" type="button">
+        <button class="btn btn-sm btn-secondary" attr.aria-label="{{ 'common.clear' | sqxTranslate }}" (click)="unset()" [disabled]="valueIsEmpty() || disabled()" type="button">
             <i class="icon-close"></i>
         </button>
     </div>
 </div>
 
-@switch (type) {
+@switch (type()) {
     @case ("text") {
         <input
             class="form-control"
-            [attr.id]="id"
-            [attr.name]="name"
-            [attr.type]="type"
-            (blur)="callTouched()"
-            [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)" />
+            [attr.id]="id()"
+            [attr.name]="name()"
+            [attr.type]="type()"
+            (blur)="markTouched()"
+            [disabled]="disabled()"
+            (input)="setValue($any($event.target).value)"
+            [value]="valueCurrent() ?? ''" />
     }
 
     @case ("number") {
         <input
             class="form-control"
-            [attr.id]="id"
-            [attr.name]="name"
-            [attr.type]="type"
-            (blur)="callTouched()"
-            [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)" />
+            [attr.id]="id()"
+            [attr.name]="name()"
+            [attr.type]="type()"
+            (blur)="markTouched()"
+            [disabled]="disabled()"
+            (input)="setValue($any($event.target).value)"
+            [value]="valueCurrent() ?? ''" />
     }
 
     @case ("tags") {
-        <sqx-tag-editor [id]="id" (editorBlur)="callTouched()" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
+        <sqx-tag-editor [disabled]="disabled()" [id]="id()" (editorBlur)="markTouched()" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("datetime") {
-        <sqx-date-time-editor [id]="id" (editorBlur)="callTouched()" mode="DateTime" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
+        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="markTouched()" mode="DateTime" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("date") {
-        <sqx-date-time-editor [id]="id" (editorBlur)="callTouched()" mode="Date" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
+        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="markTouched()" mode="Date" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("boolean") {
         <div class="form-check">
-            <input
-                class="form-check-input"
-                [attr.id]="id"
-                (blur)="callTouched()"
-                [ngModel]="currentValue"
-                (ngModelChange)="setValue($event)"
-                sqxIndeterminateValue
-                type="checkbox" />
-            <label class="form-check-label" [attr.for]="id"></label>
+            <sqx-checkbox [disabled]="disabled()" [inputId]="id()" (touch)="markTouched()" [value]="valueCurrent()" (valueChange)="setValue($event)" />
+            <label class="form-check-label" [attr.for]="id()"></label>
         </div>
     }
 }

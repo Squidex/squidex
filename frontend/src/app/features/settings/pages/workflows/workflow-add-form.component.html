@@ -1,20 +1,19 @@
 <div class="card card-body card-create mb-4">
     <h5 class="card-title">{{ "workflows.add.title" | sqxTranslate }}</h5>
 
-    <form [formGroup]="addWorkflowForm.form" (ngSubmit)="addWorkflow()">
+    <form (ngSubmit)="addWorkflow()">
         <div class="row gx-2">
             <div class="col">
-                <sqx-control-errors for="name" />
+                <sqx-control-errors [for]="addWorkflowForm.form.name" />
                 <input
                     class="form-control"
                     autocomplete="off"
-                    formControlName="name"
-                    maxlength="40"
+                    [formField]="addWorkflowForm.form.name"
                     placeholder="{{ 'workflows.workflowNamePlaceholder' | sqxTranslate }}" />
             </div>
 
             <div class="col-auto">
-                <button class="btn btn-success" [disabled]="addWorkflowForm.hasNoName | async" type="submit">
+                <button class="btn btn-success" [disabled]="addWorkflowForm.hasNoName()" type="submit">
                     {{ "workflows.add" | sqxTranslate }}
                 </button>
             </div>

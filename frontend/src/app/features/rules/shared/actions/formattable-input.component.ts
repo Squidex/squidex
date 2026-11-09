@@ -6,117 +6,86 @@
  */
 
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, forwardRef, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
+import { Component, computed, input, model, signal } from '@angular/core';
+import { CodeEditorComponent, FormValueControlBase, ScriptCompletions, syncExternalValue, Types } from '@app/shared';
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
-
-export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-formattable-input',
     styleUrls: ['./formattable-input.component.scss'],
     templateUrl: './formattable-input.component.html',
-    providers: [
-        SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
     ],
 })
-export class FormattableInputComponent implements ControlValueAccessor, AfterViewInit {
-    private fnChanged = (_: any) => { /* NOOP */ };
-    private fnTouched = () => { /* NOOP */ };
-    private value?: string;
+export class FormattableInputComponent extends FormValueControlBase<string | null> {
+    // Ignore the values we have emitted ourselves, because the text is trimmed when it is emitted.
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.applyValue(value));
 
-    @Input({ required: true })
-    public type: 'Text' | 'Code' = 'Text';
+    /** The value, optionally wrapped with the template mode, e.g. "Liquid(...)". */
+    public readonly value = model<string | null>(null);
 
-    @Input()
-    public completion: ScriptCompletions | undefined | null;
+    /** Renders a single line input for text or a large editor for code. */
+    public readonly type = input.required<'Text' | 'Code'>();
 
-    @ViewChild(CodeEditorComponent)
-    public codeEditor!: CodeEditorComponent;
+    /** The suggestions for autocompletion. */
+    public readonly completion = input<ScriptCompletions | undefined | null>();
 
-    public disabled = false;
+    protected readonly mode = signal<TemplateMode>('Text');
 
-    public modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
-    public mode: TemplateMode = 'Text';
+    protected readonly text = signal<string | null>(null);
 
-    public editorMode = 'ace/mode/text';
-    public editorCompletion?: ScriptCompletions | undefined | null;
+    protected readonly editorMode = computed(() => {
+        switch (this.mode()) {
+            case 'Script':
+                return 'ace/mode/javascript';
+            case 'Liquid':
+                return 'ace/mode/liquid';
+            default:
+                return 'ace/mode/text';
+        }
+    });
 
-    public ngAfterViewInit() {
-        this.codeEditor.registerOnChange((value: any) => {
-            this.value = value;
+    protected readonly editorCompletion = computed(() => {
+        const completion = this.completion();
+        if (this.mode() === 'Script') {
+            return completion;
+        }
 
-            this.fnChanged(getValueFromMode(value, this.mode));
-        });
+        return completion?.filter(x => x.type !== 'Function');
+    });
 
-        this.codeEditor.registerOnTouched(() => {
-            this.fnTouched();
-        });
+    protected readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
 
-        this.codeEditor.writeValue(this.value);
+    protected setText(text: string | null) {
+        this.text.set(text);
+        this.emitValue();
     }
 
-    public writeValue(obj: any) {
-        const { value, mode } = getModeFromValue(obj);
-
-        this.value = value;
-
-        this.setMode(mode, false);
-        this.codeEditor?.writeValue(value);
-    }
-
-    public setDisabledState(isDisabled: boolean) {
-        this.setDisabled(isDisabled);
-        this.codeEditor?.setDisabledState?.(isDisabled);
-    }
-
-    private setDisabled(isDisabled: boolean) {
-        this.disabled = isDisabled;
-    }
-
-    public setMode(mode: TemplateMode, emit = true) {
-        if (this.mode === mode) {
+    protected setMode(mode: TemplateMode) {
+        if (this.mode() === mode) {
             return;
         }
 
-        if (mode === 'Script') {
-            this.editorMode = 'ace/mode/javascript';
-            this.editorCompletion = this.completion;
-        } else if (mode === 'Liquid') {
-            this.editorMode = 'ace/mode/liquid';
-            this.editorCompletion = this.completion?.filter(x => x.type !== 'Function');
-        } else {
-            this.editorMode = 'ace/mode/text';
-            this.editorCompletion = this.completion?.filter(x => x.type !== 'Function');
-        }
-
-        this.mode = mode;
-
-        if (emit) {
-            this.fnChanged(getValueFromMode(this.value, mode));
-            this.fnTouched();
-        }
+        this.mode.set(mode);
+        this.emitValue();
+        this.markTouched();
     }
 
-    public registerOnChange(fn: any) {
-        this.fnChanged = fn;
+    private applyValue(value: string | null) {
+        const parsed = getModeFromValue(value);
+
+        this.text.set(parsed.value ?? null);
+        this.mode.set(parsed.mode);
     }
 
-    public registerOnTouched(fn: any) {
-        this.fnTouched = fn;
+    private emitValue() {
+        this.valueSetter(getValueFromMode(this.text(), this.mode()) ?? null);
     }
 }
 
-function getValueFromMode(value: string | undefined, mode: TemplateMode) {
+function getValueFromMode(value: string | null | undefined, mode: TemplateMode) {
     if (!value) {
         return value;
     }

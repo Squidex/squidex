@@ -5,123 +5,81 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { StatefulControlComponent, Types } from '@app/framework/internal';
+import { Component, computed, input, linkedSignal, model, numberAttribute } from '@angular/core';
+import { Types } from '@app/framework/internal';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-
-export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true,
-};
-
-interface State {
-    // The current stars to show.
-    stars: number;
-
-    // The array for rendering the stars.
-    starsArray: ReadonlyArray<number>;
-
-    // The selected value.
-    value: number | null;
-}
+import { FormValueControlBase } from '../form-value-control';
 
 @Component({
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
-    providers: [
-        SQX_STARS_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
     ],
 })
-export class StarsComponent extends StatefulControlComponent<State, number | null> {
-    private maximumStarsValue = 5;
+export class StarsComponent extends FormValueControlBase<number | null> {
+    /** The number of selected stars. */
+    public readonly value = model<number | null>(null);
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** The number of stars to render. Shows a hint instead of stars when greater than 15. */
+    public readonly maximumStars = input(5, { transform: (value: unknown) => numberAttribute(value, 5) });
 
-    @Input({ transform: numberAttribute })
-    public set maximumStars(value: number) {
-        const maxStars: number = Types.isNumber(value) ? value : 5;
+    protected readonly valuePreview = linkedSignal(() => this.valueNumber() || 0);
 
-        if (this.maximumStarsValue !== maxStars) {
-            this.maximumStarsValue = value;
+    protected readonly starsArray = computed(() => {
+        const result: number[] = [];
 
-            const starsArray: number[] = [];
-
-            for (let i = 1; i <= maxStars; i++) {
-                starsArray.push(i);
-            }
-
-            this.next({ starsArray });
+        for (let i = 1; i <= this.maximumStars(); i++) {
+            result.push(i);
         }
-    }
 
-    public get maximumStars() {
-        return this.maximumStarsValue;
-    }
+        return result;
+    });
 
-    constructor() {
-        super({
-            stars: -1,
-            starsArray: [1, 2, 3, 4, 5],
-            value: null,
-        });
-    }
+    protected readonly valueNumber = computed(() => {
+        const value = this.value();
 
-    public writeValue(obj: any) {
-        const stars = Types.isNumber(obj) ? obj : 0;
+        return Types.isNumber(value) ? value : null;
+    });
 
-        this.next({ stars });
-    }
-
-    public setPreview(stars: number) {
-        if (this.snapshot.isDisabled) {
+    protected setPreview(stars: number) {
+        if (this.disabled()) {
             return;
         }
 
-        this.next({ stars });
+        this.valuePreview.set(stars);
     }
 
-    public stopPreview() {
-        if (this.snapshot.isDisabled) {
+    protected stopPreview() {
+        if (this.disabled()) {
             return;
         }
 
-        this.next(s => ({ ...s, stars: s.value || 0 }));
+        this.valuePreview.set(this.valueNumber() || 0);
     }
 
-    public reset() {
-        if (this.snapshot.isDisabled) {
+    protected reset() {
+        if (this.disabled()) {
             return false;
         }
 
-        if (this.snapshot.value) {
-            this.next({ stars: -1, value: null });
-
-            this.callChange(null);
-            this.callTouched();
+        if (this.valueNumber()) {
+            this.value.set(null);
+            this.markTouched();
         }
 
         return false;
     }
 
-    public setValue(value: number) {
-        if (this.snapshot.isDisabled) {
+    protected setValue(value: number) {
+        if (this.disabled()) {
             return false;
         }
 
-        if (this.snapshot.value !== value) {
-            this.next({ stars: value, value });
-
-            this.callChange(value);
-            this.callTouched();
+        if (this.valueNumber() !== value) {
+            this.value.set(value);
+            this.markTouched();
         }
 
         return false;

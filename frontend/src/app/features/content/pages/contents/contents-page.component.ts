@@ -7,13 +7,11 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, effect, inject, linkedSignal, signal, untracked, viewChild } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DialogModel, DropdownMenuComponent, EntriesPipe, getTableConfig, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
+import { tap } from 'rxjs/operators';
+import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, DialogModel, DropdownMenuComponent, EntriesPipe, getTableConfig, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentComponent } from '../../shared/list/content.component';
 import { ContentsExportDialogComponent } from './contents-export-dialog.component';
@@ -27,7 +25,6 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ConfirmClickDirective,
         ContentComponent,
         ContentListCellDirective,
@@ -40,7 +37,6 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         DropdownMenuComponent,
         DueTimeSelectorComponent,
         EntriesPipe,
-        FormsModule,
         LanguageSelectorComponent,
         LayoutComponent,
         ListViewComponent,
@@ -61,148 +57,185 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         TranslatePipe,
     ],
 })
-export class ContentsPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ContentsPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly contributorsState = inject(ContributorsState);
+    private readonly localStore = inject(LocalStoreService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly schemasService = inject(SchemasService);
+    private readonly schemasState = inject(SchemasState);
+    private readonly tempService = inject(TempService);
+    private readonly uiState = inject(UIState);
+    private schemaLoaded?: SchemaDto;
 
-    @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector!: DueTimeSelectorComponent;
+    protected readonly contentsRoute = inject(Router2State);
 
-    public schema!: SchemaDto;
+    protected readonly contentsState = inject(ContentsState);
 
-    public tableSettings!: Observable<TableSettings>;
-    public tableViewModal = new ModalModel();
+    protected readonly languagesState = inject(LanguagesState);
 
-    public exportDialog = new DialogModel();
+    protected readonly dueTimeSelector = viewChild.required<DueTimeSelectorComponent>('dueTimeSelector');
 
-    public searchModal = new ModalModel();
+    protected readonly selectedItems = signal<Record<string, boolean>>({});
 
-    public selectedItems: { [id: string]: boolean } = {};
-    public selectedAll = false;
-    public selectionCount = 0;
-    public selectionCanDelete = false;
-    public selectionStatuses: { [name: string]: string } = {};
+    protected readonly language = linkedSignal<AppLanguageDto>(() => {
+        const languageKey = this.localStore.get(Settings.Local.CONTENT_LANGUAGE(this.schema().id));
+        const languageMaster = this.languagesState.isoMasterLanguage();
 
-    public language!: AppLanguageDto;
-    public languages!: ReadonlyArray<AppLanguageDto>;
+        return this.languages().find(x => x.iso2Code === languageKey) || languageMaster;
+    });
 
-    public translationStatus?: TranslationStatuses;
+    protected readonly tableConfig = computed(() => {
+        return getTableConfig(this.tableSettings());
+    });
 
-    public get disableScheduler() {
-        return this.appsState.snapshot.selectedSettings?.hideScheduler === true;
-    }
+    protected readonly schemaName = computed(() => {
+        return this.schemasState.selectedSchema()?.name;
+    });
 
-    public queryModel =
-        this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
-            switchMap(x => this.schemasService.getFilters(this.appsState.appName, x)));
+    protected readonly schema = computed(() => {
+        return this.schemasState.selectedSchema()!;
+    }, { equal: (lhs, rhs) => lhs?.id === rhs?.id });
 
-    public queries =
-        this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
-            map(x => new Queries(this.uiState, `schemas.${x}`)));
+    protected readonly tableSettings = computed(() => {
+        const schema = this.schema();
 
-    constructor(
-        public readonly contentsRoute: Router2State,
-        public readonly contentsState: ContentsState,
-        public readonly languagesState: LanguagesState,
-        private readonly appsState: AppsState,
-        private readonly contributorsState: ContributorsState,
-        private readonly contentsService: ContentsService,
-        private readonly localStore: LocalStoreService,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly schemasState: SchemasState,
-        private readonly schemasService: SchemasService,
-        private readonly tempService: TempService,
-        private readonly uiState: UIState,
-    ) {
-    }
+        return untracked(() => new TableSettings(this.uiState, schema));
+    });
 
-    public ngOnInit() {
+    protected readonly contents = computed(() => {
+        return this.contentsState.contents();
+    });
+
+    protected readonly selection = computed(() => {
+        const contents = this.contents();
+        const selectedItems = this.selectedItems();
+
+        let selectedAll = contents.length > 0;
+        let selectedCount = 0;
+        let selectedCanDelete = true;
+
+        const selectedStatuses: { [name: string]: string } = {};
+
+        for (const content of contents) {
+            for (const info of content.statusUpdates) {
+                selectedStatuses[info.status] = info.color;
+            }
+        }
+
+        for (const content of contents) {
+            if (selectedItems[content.id]) {
+                selectedCount++;
+
+                for (const action of Object.keys(selectedStatuses)) {
+                    if (!content.statusUpdates.find(x => x.status === action)) {
+                        delete selectedStatuses[action];
+                    }
+                }
+
+                if (!content.canDelete) {
+                    selectedCanDelete = false;
+                }
+            } else {
+                selectedAll = false;
+            }
+        }
+
+        return { selectedAll, selectedCount, selectedCanDelete, selectedStatuses };
+    });
+
+    protected readonly languages = computed(() => {
+        return this.languagesState.isoLanguages();
+    });
+
+    protected readonly translationStatus = computed<TranslationStatuses | undefined>(() => {
+        const schema = this.schema();
+        if (!schema) {
+            return undefined;
+        }
+
+        return contentsTranslationStatus(this.contents().map(x => x.data), schema, this.languages());
+    });
+
+    protected readonly disableScheduler = computed(() => {
+        return this.appsState.selectedSettings()?.hideScheduler === true;
+    });
+
+    protected readonly queries = computed(() => {
+        const schemaName = this.schemaName();
+        if (!schemaName) {
+            return undefined;
+        }
+
+        return new Queries(this.uiState, `schemas.${schemaName}`);
+    });
+
+    protected readonly queryModel = rxResource({
+        params: () => this.schemaName(),
+        stream: ({ params: schemaName }) => this.schemasService.getFilters(this.appsState.appName, schemaName),
+    });
+
+    protected readonly tableViewModal = new ModalModel();
+
+    protected readonly exportDialog = new DialogModel();
+
+    public readonly searchModal = new ModalModel();
+
+    constructor() {
         if (this.appsState.snapshot.selectedApp?.canReadContributors) {
             this.contributorsState.loadIfNotLoaded();
         }
 
-        this.subscriptions.add(
-            this.languagesState.isoMasterLanguage
-                .subscribe(language => {
-                    this.language = language;
-                }));
+        effect(() => {
+            const { fieldNames, schema } = this.tableConfig()();
 
-        this.subscriptions.add(
-            this.languagesState.isoLanguages
-                .subscribe(languages => {
-                    this.languages = languages;
-                }));
-
-        const schema$ =
-            getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1), shareReplay(1))));
-
-        const tableSetting$ =
-            schema$.pipe(map(schema => new TableSettings(this.uiState, schema)), shareReplay(1));
-
-        const tableConfig$ =
-            tableSetting$.pipe(switchMap(getTableConfig));
-
-        this.tableSettings = tableSetting$;
-
-        this.subscriptions.add(
-            tableConfig$
-                .subscribe(({ fieldNames, schema }) => {
-                    if (this.schema?.id !== schema.id) {
-                        this.resetSelection();
-
-                        this.schema = schema;
-
-                        const initial =
-                            this.contentsRoute.mapTo(this.contentsState)
-                                .withPaging('contents', 10)
-                                .withSynchronizer(QuerySynchronizer.INSTANCE)
-                                .getInitial();
-
-                        this.contentsState.load(false, true, { fieldNames, ...initial });
-                        this.contentsRoute.listen();
-
-                        const languageKey = this.localStore.get(this.languageKey());
-                        const languageItem = this.languages.find(x => x.iso2Code === languageKey);
-
-                        if (languageItem) {
-                            this.language = languageItem;
-                        }
-                    } else {
-                        this.contentsState.setFieldNames(fieldNames);
-                        this.contentsState.load();
-                    }
-                }));
-
-        this.subscriptions.add(
-            this.contentsState.contents
-                .subscribe(contents => {
-                    this.updateSelectionSummary();
-
-                    this.translationStatus = contentsTranslationStatus(contents.map(x => x.data), this.schema, this.languages);
-                }));
+            untracked(() => this.loadContents(fieldNames, schema));
+        });
     }
 
-    public reload() {
+    private loadContents(fieldNames: string[], schema: SchemaDto) {
+        if (this.schemaLoaded?.id === schema.id) {
+            this.contentsState.setFieldNames(fieldNames);
+            this.contentsState.load();
+            return;
+        }
+
+        this.schemaLoaded = schema;
+        this.resetSelection();
+
+        const initial =
+            this.contentsRoute.mapTo(this.contentsState)
+                .withPaging('contents', 10)
+                .withSynchronizer(QuerySynchronizer.INSTANCE)
+                .getInitial();
+
+        this.contentsState.load(false, true, { fieldNames, ...initial });
+        this.contentsRoute.listen();
+    }
+
+    protected reload() {
         this.contentsState.load(true);
     }
 
-    public reloadTotal() {
+    protected reloadTotal() {
         this.contentsState.load(true, false);
     }
 
-    public delete(content: ContentDto) {
+    protected delete(content: ContentDto) {
         this.contentsState.deleteMany([content]);
     }
 
-    public deleteSelected() {
+    protected deleteSelected() {
         this.contentsState.deleteMany(this.selectItems());
     }
 
-    public changeStatus(content: ContentDto, status: string) {
+    protected changeStatus(content: ContentDto, status: string) {
         this.changeContentItems([content], status);
     }
 
-    public changeSelectedStatus(status: string) {
+    protected changeSelectedStatus(status: string) {
         this.changeContentItems(this.selectItems(c => c.status !== status), status);
     }
 
@@ -211,7 +244,7 @@ export class ContentsPageComponent implements OnInit {
             return;
         }
 
-        this.dueTimeSelector.selectDueTime(action).pipe(
+        this.dueTimeSelector().selectDueTime(action).pipe(
                 tap(() => {
                     this.resetSelection();
                 }),
@@ -219,7 +252,7 @@ export class ContentsPageComponent implements OnInit {
             .subscribe();
     }
 
-    public clone(content: ContentDto) {
+    protected clone(content: ContentDto) {
         if (!content) {
             return;
         }
@@ -231,84 +264,43 @@ export class ContentsPageComponent implements OnInit {
             });
     }
 
-    public changeLanguage(language: AppLanguageDto) {
-        this.language = language;
+    protected changeLanguage(language: AppLanguageDto) {
+        this.language.set(language);
 
-        this.localStore.set(this.languageKey(), language.iso2Code);
+        this.localStore.set(Settings.Local.CONTENT_LANGUAGE(this.schema().id), language.iso2Code);
     }
 
-    public search(query: Query) {
+    protected search(query: Query) {
         this.contentsState.search(query);
     }
 
-    public isItemSelected(content: ContentDto): boolean {
-        return this.selectedItems[content.id] === true;
+    protected isItemSelected(content: ContentDto): boolean {
+        return this.selectedItems()[content.id] === true;
     }
 
-    public resetSelection() {
-        this.selectedItems = {};
-
-        this.updateSelectionSummary();
+    private resetSelection() {
+        this.selectedItems.set({});
     }
 
-    public selectItem(content: ContentDto, isSelected: boolean) {
-        this.selectedItems[content.id] = isSelected;
-
-        this.updateSelectionSummary();
+    protected selectItem(content: ContentDto, isSelected: boolean) {
+        this.selectedItems.update(x => ({ ...x, [content.id]: isSelected }));
     }
 
-    public selectAll(isSelected: boolean) {
-        this.selectedItems = {};
+    protected selectAll(isSelected: boolean) {
+        const selectedItems: Record<string, boolean> = {};
 
         if (isSelected) {
             for (const content of this.contentsState.snapshot.contents) {
-                this.selectedItems[content.id] = true;
+                selectedItems[content.id] = true;
             }
         }
 
-        this.updateSelectionSummary();
-    }
-
-    private updateSelectionSummary() {
-        this.selectedAll = this.contentsState.snapshot.contents.length > 0;
-        this.selectionCount = 0;
-        this.selectionCanDelete = true;
-        this.selectionStatuses = {};
-
-        for (const content of this.contentsState.snapshot.contents) {
-            for (const info of content.statusUpdates) {
-                this.selectionStatuses[info.status] = info.color;
-            }
-        }
-
-        for (const content of this.contentsState.snapshot.contents) {
-            if (this.selectedItems[content.id]) {
-                this.selectionCount++;
-
-                for (const action of Object.keys(this.selectionStatuses)) {
-                    if (!content.statusUpdates.find(x => x.status === action)) {
-                        delete this.selectionStatuses[action];
-                    }
-                }
-
-                if (!content.canDelete) {
-                    this.selectionCanDelete = false;
-                }
-            } else {
-                this.selectedAll = false;
-            }
-        }
+        this.selectedItems.set(selectedItems);
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {
-        return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
-    }
+        const selectedItems = this.selectedItems();
 
-    private languageKey(): any {
-        return Settings.Local.CONTENT_LANGUAGE(this.schema.id);
+        return this.contentsState.snapshot.contents.filter(c => selectedItems[c.id] && (!predicate || predicate(c)));
     }
-}
-
-function getSchemaName(route: ActivatedRoute) {
-    return route.params.pipe(map(x => x['schemaName'] as string), distinctUntilChanged());
 }

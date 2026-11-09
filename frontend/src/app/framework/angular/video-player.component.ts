@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, Renderer2, ViewChild } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, Renderer2, signal, viewChild } from '@angular/core';
 import { ResourceLoaderService } from '@app/framework/internal';
 
 declare const videojs: any;
@@ -14,52 +14,51 @@ declare const videojs: any;
     selector: 'sqx-video-player',
     styleUrls: ['./video-player.component.scss'],
     templateUrl: './video-player.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
-    private player: any;
+export class VideoPlayerComponent {
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly resourceLoader = inject(ResourceLoaderService);
 
-    @Input()
-    public source = '';
+    /** The URL of the video. */
+    public readonly source = input('');
 
-    @Input()
-    public mimeType = '';
+    /** The mime type of the video, for example "video/mp4". */
+    public readonly mimeType = input('');
 
-    @ViewChild('video', { static: false })
-    public video!: ElementRef<HTMLVideoElement>;
+    protected readonly player = signal<any>(null);
 
-    constructor(
-        private readonly resourceLoader: ResourceLoaderService,
-        private readonly renderer: Renderer2,
-    ) {
-    }
+    protected readonly video = viewChild.required<ElementRef<HTMLVideoElement>>('video');
 
-    public ngOnDestroy() {
-        this.player?.dispose();
-    }
+    constructor() {
+        afterNextRender(async () => {
+            await Promise.all([
+                this.resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
+                this.resourceLoader.loadLocalStyle('dependencies/videojs/videojs.min.css'),
+            ]);
 
-    public ngOnChanges() {
-        if (this.player) {
-            if (this.source) {
-                this.player.src({ type: this.mimeType, src: this.source });
-            } else {
-                this.player.src();
-            }
-        }
-    }
+            const video = this.video().nativeElement;
 
-    public async ngAfterViewInit() {
-        await Promise.all([
-            this.resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
-            this.resourceLoader.loadLocalStyle('dependencies/videojs/videojs.min.css'),
-        ]);
-
-        this.renderer.removeClass(this.video.nativeElement, 'hidden');
-
-        this.player = videojs(this.video.nativeElement, {
-            fluid: true,
+            this.renderer.removeClass(video, 'hidden');
+            this.player.set(videojs(video, { fluid: true }));
         });
 
-        this.ngOnChanges();
+        effect(() => {
+            const player = this.player();
+            if (!player) {
+                return;
+            }
+
+            const source = this.source();
+            if (source) {
+                player.src({ type: this.mimeType(), src: source });
+            } else {
+                player.src();
+            }
+        });
+
+        this.destroyRef.onDestroy(() => {
+            this.player()?.dispose();
+        });
     }
 }

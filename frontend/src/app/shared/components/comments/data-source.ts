@@ -5,17 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { inject, Service } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { AutocompleteSource } from '@app/framework';
 import { ContributorsState } from '@app/shared/internal';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ContributorsDataSource implements AutocompleteSource {
-    constructor(
-        private readonly contributorsState: ContributorsState,
-    ) {
-    }
+    private readonly contributorsState = inject(ContributorsState);
 
     public loadIfNotLoaded() {
         this.contributorsState.loadIfNotLoaded();
@@ -26,8 +23,6 @@ export class ContributorsDataSource implements AutocompleteSource {
             return of([]);
         }
 
-        return this.contributorsState.contributors.pipe(
-            map(contributors => contributors.filter(c => c.contributorEmail.indexOf(query) >= 0)),
-        );
+        return of(this.contributorsState.contributors().filter(c => c.contributorEmail.indexOf(query) >= 0));
     }
 }

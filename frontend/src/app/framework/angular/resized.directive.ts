@@ -7,65 +7,68 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { Directive, ElementRef, EventEmitter, Input, NgZone, numberAttribute, Output } from '@angular/core';
-import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
+import { computed, DestroyRef, Directive, ElementRef, inject, input, NgZone, numberAttribute, output } from '@angular/core';
+import { ResizeListener, ResizeService } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxResized], [sqxResizeCondition]',
 })
 export class ResizedDirective implements ResizeListener {
-    private readonly subscriptions = new Subscriptions();
-    private condition: ((rect: DOMRect) => boolean) | undefined;
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly element = inject(ElementRef);
+    private readonly resizeService = inject(ResizeService);
+    private readonly zone = inject(NgZone);
     private conditionValue = false;
 
-    @Input({ alias: 'sqxResizeMinWidth', transform: numberAttribute })
-    public minWidth?: number;
+    /** The condition is true when the element is smaller than this width. */
+    public readonly minWidth = input(0, { alias: 'sqxResizeMinWidth', transform: numberAttribute });
 
-    @Input({ alias: 'sqxResizeMaxWidth', transform: numberAttribute })
-    public maxWidth?: number;
+    /** The condition is true when the element is wider than this width. */
+    public readonly maxWidth = input(0, { alias: 'sqxResizeMaxWidth', transform: numberAttribute });
 
-    @Output('sqxResizeCondition')
-    public resizeCondition = new EventEmitter<boolean>();
+    /** Emits when the min or max width condition changes. */
+    public readonly resizeCondition = output<boolean>({ alias: 'sqxResizeCondition' });
 
-    @Output('sqxResized')
-    public resizeChange = new EventEmitter<DOMRect>();
+    /** Emits the new size when the element is resized and no width condition is defined. */
+    public readonly resizeChange = output<DOMRect>({ alias: 'sqxResized' });
 
-    constructor(resizeService: ResizeService, element: ElementRef,
-        private readonly zone: NgZone,
-    ) {
-        this.subscriptions.add(resizeService.listen(element.nativeElement, this));
-    }
-
-    public ngOnChanges() {
-        const minWidth = parseInt(this.minWidth as any, 10);
-        const maxWidth = parseInt(this.maxWidth as any, 10);
+    protected readonly condition = computed(() => {
+        const minWidth = this.minWidth();
+        const maxWidth = this.maxWidth();
 
         if (minWidth > 0 && maxWidth > 0) {
-            this.condition = rect => rect.width < minWidth! || rect.width > maxWidth!;
+            return (rect: DOMRect) => rect.width < minWidth || rect.width > maxWidth;
         } else if (maxWidth > 0) {
-            this.condition = rect => rect.width > maxWidth!;
+            return (rect: DOMRect) => rect.width > maxWidth;
         } else if (minWidth > 0) {
-            this.condition = rect => rect.width < minWidth!;
+            return (rect: DOMRect) => rect.width < minWidth;
         } else {
-            this.condition = undefined;
+            return undefined;
         }
+    });
+
+    constructor() {
+        const unlisten = this.resizeService.listen(this.element.nativeElement, this);
+
+        this.destroyRef.onDestroy(unlisten);
     }
 
     public onResize(rect: DOMRect) {
-        if (this.condition) {
-            const value = this.condition(rect);
-
-            if (this.conditionValue !== value) {
-                this.zone.run(() => {
-                    this.resizeCondition.emit(value);
-                });
-
-                this.conditionValue = value;
-            }
-        } else {
+        const condition = this.condition();
+        if (!condition) {
             this.zone.run(() => {
                 this.resizeChange.emit(rect);
             });
+            return;
+        }
+
+        const value = condition(rect);
+        if (this.conditionValue !== value) {
+            this.zone.run(() => {
+                this.resizeCondition.emit(value);
+            });
+
+            this.conditionValue = value;
         }
     }
 }

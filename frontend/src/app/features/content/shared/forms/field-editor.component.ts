@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, Subscriptions, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { booleanAttribute, Component, computed, ElementRef, inject, input, numberAttribute, output, signal, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, HTTP, isValidValue, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, SignalSelectDirective, SignalSelectMultipleDirective, StarsComponent, TagEditorComponent, TextInputDirective, ToggleComponent, TooltipDirective, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -29,25 +28,24 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
     imports: [
         ArrayEditorComponent,
         AssetsEditorComponent,
-        AsyncPipe,
         ChatDialogComponent,
+        CheckboxComponent,
         CheckboxGroupComponent,
         CodeEditorComponent,
         ColorPickerComponent,
         ComponentComponent,
         ControlErrorsComponent,
         DateTimeEditorComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
         GeolocationEditorComponent,
         IFrameEditorComponent,
-        IndeterminateValueDirective,
         MarkdownDirective,
         MenuComponent,
         MenuItemComponent,
         ModalDirective,
         RadioGroupComponent,
-        ReactiveFormsModule,
         ReferenceDropdownComponent,
         ReferenceInputComponent,
         ReferencesCheckboxesComponent,
@@ -55,170 +53,163 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
         ReferencesRadioButtonsComponent,
         ReferencesTagsComponent,
         RichEditorComponent,
+        SignalSelectDirective,
+        SignalSelectMultipleDirective,
         StarsComponent,
         StockPhotoEditorComponent,
         TagEditorComponent,
+        TextInputDirective,
         ToggleComponent,
         TooltipDirective,
-        TransformInputDirective,
         UserInfoEditorComponent,
     ],
 })
 export class FieldEditorComponent {
-    private readonly subscriptions = new Subscriptions();
+    private readonly messageBus = inject(MessageBus);
 
-    @Output()
-    public expandedChange = new EventEmitter();
+    /** Emits when the editor wants to change the expanded state. */
+    public readonly expandedChange = output();
 
-    @Input()
-    public comments?: CommentsState | null;
+    /** The comments to show annotations for, if annotations are supported. */
+    public readonly comments = input<CommentsState | null>();
 
-    @Input({ required: true })
-    public hasChatBot!: boolean;
+    /** Enables the AI features of the editor. */
+    public readonly hasChatBot = input.required<boolean>();
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** The content form the field belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** The nesting level of the field, 0 for root fields. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public formModel!: AbstractContentForm<AnyFieldDto, AbstractControl>;
+    /** The form model of the field to edit. */
+    public readonly formModel = input.required<AbstractContentForm<AnyFieldDto>>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The language of the field value. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true })
-    public isCollapsed = false;
+    /** Hides the editor and disables the actions. */
+    public readonly isCollapsed = input.required<boolean>();
 
-    @Input({ transform: numberAttribute })
-    public index: number | null | undefined;
+    /** The index of the field when it is part of an array. */
+    public readonly index = input<number | null | undefined, unknown>(undefined, { transform: numberAttribute });
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isComparing = false;
+    /** Renders the editor next to the editor of another version. */
+    public readonly isComparing = input.required<boolean, unknown>({ transform: booleanAttribute });
 
-    @Input()
-    public displaySuffix = '';
+    /** The text to show after the field name, for example the language. */
+    public readonly displaySuffix = input('');
 
-    @ViewChild('root', { static: false })
-    public root!: ElementRef<HTMLElement>;
+    protected readonly root = viewChild<ElementRef<HTMLElement>>('root');
 
-    @ViewChild('editor', { static: false })
-    public editor!: ElementRef;
+    protected readonly editor = viewChild<any>('editor');
 
-    public readonly uniqueId = MathHelper.guid();
+    protected readonly isSelected = signal(false);
 
-    public isDisabled!: Observable<boolean>;
-    public isEmpty!: Observable<boolean>;
-    public isExpanded = false;
-    public isSelected = new BehaviorSubject<boolean>(false);
-    public chatDialog = new DialogModel();
-    public annotations?: Observable<ReadonlyArray<Annotation>>;
+    protected readonly isExpanded = signal(false);
 
-    public get field() {
-        return this.formModel.field;
-    }
+    protected readonly field = computed(() => {
+        return this.formModel().field;
+    });
 
-    public get fieldForm() {
-        return this.formModel.form;
-    }
+    protected readonly fieldForm = computed<any>(() => {
+        return this.formModel().form;
+    });
 
-    public get isString() {
-        return this.field.properties.fieldType === 'String';
-    }
+    protected readonly isString = computed(() => {
+        return this.field().properties.fieldType === 'String';
+    });
 
-    public get hasComments() {
-        return this.field.properties.hasComments;
-    }
+    protected readonly hasComments = computed(() => {
+        return this.field().properties.hasComments;
+    });
 
-    public get schemaIds() {
-        return Types.is(this.field.properties, ReferencesFieldPropertiesDto) ? this.field.properties.schemaIds : undefined;
-    }
+    protected readonly schemaIds = computed(() => {
+        const properties = this.field().properties;
 
-    constructor(
-        private readonly messageBus: MessageBus,
-    ) {
-    }
+        return Types.is(properties, ReferencesFieldPropertiesDto) ? properties.schemaIds : undefined;
+    });
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.messageBus.of(CommentSelected)
-                .subscribe(message => {
-                    const isSelected = message.editorId.indexOf(this.formModel.path) === 0;
+    protected readonly isDisabled = computed(() => {
+        return this.formModel().disabled();
+    });
 
-                    if (isSelected) {
-                        this.root.nativeElement.scrollIntoView();
-                    }
+    protected readonly isEmpty = computed(() => {
+        return !isValidValue(this.formModel().value());
+    });
 
-                    if (isSelected !== this.isSelected.value) {
-                        this.isSelected.next(isSelected);
-                    }
-                }));
-    }
+    protected readonly annotations = computed(() => {
+        return this.comments()?.getAnnotations(this.formModel().path);
+    }, { equal: Types.equals });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formModel) {
-            this.isDisabled = disabled$(this.formModel.form);
-            this.isEmpty = hasNoValue$(this.formModel.form);
-        }
+    protected readonly uniqueId = MathHelper.guid();
 
-        if (changes.formModel || changes.comments) {
-            this.annotations = this.comments?.getAnnotations(this.formModel.path);
-        }
+    protected readonly chatDialog = new DialogModel();
+
+    constructor() {
+        this.messageBus.on(CommentSelected, message => {
+            const isSelected = message.editorId.indexOf(this.formModel().path) === 0;
+
+            if (isSelected) {
+                this.root()?.nativeElement.scrollIntoView();
+            }
+
+            this.isSelected.set(isSelected);
+        });
     }
 
     public reset() {
-        const editor = this.editor as any;
+        const editor = this.editor();
         if (!editor) {
             return;
         }
 
-        const nativeElement = this.editor.nativeElement;
+        const nativeElement = editor.nativeElement;
 
         if (nativeElement && Types.isFunction(nativeElement['reset'])) {
             nativeElement['reset']();
         }
 
-        if (this.editor && Types.isFunction(editor['reset'])) {
+        if (Types.isFunction(editor['reset'])) {
             editor['reset']();
         }
     }
 
-    public toggleExpanded() {
-        this.isExpanded = !this.isExpanded;
+    protected toggleExpanded() {
+        this.isExpanded.update(x => !x);
     }
 
-    public select() {
-        this.messageBus.emit(new FieldSelected(this.formModel.path));
+    protected select() {
+        this.messageBus.emit(new FieldSelected(this.formModel().path));
     }
 
-    public annotationCreate(annotation?: AnnotationSelection) {
-        this.messageBus.emit(new AnnotationCreate(this.formModel.path, annotation));
+    protected annotationCreate(annotation?: AnnotationSelection) {
+        this.messageBus.emit(new AnnotationCreate(this.formModel().path, annotation));
     }
 
-    public annotationsSelect(annotation: ReadonlyArray<string>) {
+    protected annotationsSelect(annotation: ReadonlyArray<string>) {
         this.messageBus.emit(new AnnotationsSelected(annotation));
     }
 
-    public annotationsUpdate(annotations: ReadonlyArray<Annotation>) {
-        this.comments?.updateAnnotations(this.formModel.path, annotations);
+    protected annotationsUpdate(annotations: ReadonlyArray<Annotation>) {
+        this.comments()?.updateAnnotations(this.formModel().path, annotations);
     }
 
-    public unset() {
-        this.formModel.unset();
+    protected unset() {
+        this.formModel().unset();
     }
 
-    public setValue(content: string | HTTP.UploadFile | null | undefined) {
+    protected setValue(content: string | HTTP.UploadFile | null | undefined) {
         this.chatDialog.hide();
 
         if (Types.isString(content)) {
-            this.formModel.setValue(content);
+            this.formModel().setValue(content);
         }
     }
 }

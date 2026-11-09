@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { IResourceDto, ResourceLinkDto, UIService, UIState, UsersService } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
@@ -68,17 +70,16 @@ describe('UIState', () => {
         usersService.setup(x => x.getResources())
             .returns(() => of(resource));
 
-        uiState = new UIState(uiService.object, usersService.object);
+        uiState = createService(UIState, [
+            { provide: UIService, useValue: uiService.object },
+            { provide: UsersService, useValue: usersService.object },
+        ]);
         uiState.load();
         uiState.loadApp(app);
     });
 
     it('should load settings', () => {
-        let settings: any;
-
-        uiState.settings.subscribe(value => {
-            settings = value;
-        });
+        const settings = uiState.settings();
 
         expect(settings).toEqual({
             key: 'xx',
@@ -99,17 +100,13 @@ describe('UIState', () => {
     });
 
     it('should add value to snapshot if set as common', () => {
-        let settings: any;
-
-        uiState.settings.subscribe(value => {
-            settings = value;
-        });
-
         uiService.setup(x => x.putCommonSetting('root.nested', 123))
             .returns(() => of({})).verifiable();
 
         uiState.setCommon('root.nested', 123);
 
+        const settings = uiState.settings();
+
         expect(settings).toEqual({
             key: 'xx',
             map: {
@@ -126,33 +123,20 @@ describe('UIState', () => {
             },
         });
 
-        uiState.get('root', {}).subscribe(x => {
-            expect(x).toEqual({ nested: 123 });
-        });
-
-        uiState.get('root.nested', 0).subscribe(x => {
-            expect(x).toEqual(123);
-        });
-
-        uiState.get('root.notfound', 1337).subscribe(x => {
-            expect(x).toEqual(1337);
-        });
-
+        expect(uiState.get('root', {})()).toEqual({ nested: 123 });
+        expect(uiState.get('root.nested', 0)()).toEqual(123);
+        expect(uiState.get('root.notfound', 1337)()).toEqual(1337);
         uiService.verifyAll();
     });
 
     it('should add value to snapshot if set as app shared', () => {
-        let settings: any;
-
-        uiState.settings.subscribe(value => {
-            settings = value;
-        });
-
         uiService.setup(x => x.putAppSharedSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
         uiState.setAppShared('root.nested', 123);
 
+        const settings = uiState.settings();
+
         expect(settings).toEqual({
             key: 'xx',
             map: {
@@ -169,33 +153,20 @@ describe('UIState', () => {
             },
         });
 
-        uiState.get('root', {}).subscribe(x => {
-            expect(x).toEqual({ nested: 123 });
-        });
-
-        uiState.get('root.nested', 0).subscribe(x => {
-            expect(x).toEqual(123);
-        });
-
-        uiState.get('root.notfound', 1337).subscribe(x => {
-            expect(x).toEqual(1337);
-        });
-
+        expect(uiState.get('root', {})()).toEqual({ nested: 123 });
+        expect(uiState.get('root.nested', 0)()).toEqual(123);
+        expect(uiState.get('root.notfound', 1337)()).toEqual(1337);
         uiService.verifyAll();
     });
 
     it('should add value to snapshot if set as app user', () => {
-        let settings: any;
-
-        uiState.settings.subscribe(value => {
-            settings = value;
-        });
-
         uiService.setup(x => x.putAppUserSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
         uiState.setAppUser('root.nested', 123);
 
+        const settings = uiState.settings();
+
         expect(settings).toEqual({
             key: 'xx',
             map: {
@@ -212,32 +183,19 @@ describe('UIState', () => {
             },
         });
 
-        uiState.get('root', {}).subscribe(x => {
-            expect(x).toEqual({ nested: 123 });
-        });
-
-        uiState.get('root.nested', 0).subscribe(x => {
-            expect(x).toEqual(123);
-        });
-
-        uiState.get('root.notfound', 1337).subscribe(x => {
-            expect(x).toEqual(1337);
-        });
-
+        expect(uiState.get('root', {})()).toEqual({ nested: 123 });
+        expect(uiState.get('root.nested', 0)()).toEqual(123);
+        expect(uiState.get('root.notfound', 1337)()).toEqual(1337);
         uiService.verifyAll();
     });
 
     it('should remove value from snapshot and common settings if removed', () => {
-        let settings: any;
-
-        uiState.settings.subscribe(value => {
-            settings = value;
-        });
-
         uiService.setup(x => x.deleteCommonSetting('map.onlyCommon'))
             .returns(() => of({})).verifiable();
 
         uiState.remove('map.onlyCommon');
+
+        const settings = uiState.settings();
 
         expect(settings).toEqual({
             key: 'xx',
@@ -255,16 +213,12 @@ describe('UIState', () => {
     });
 
     it('should remove value from snapshot and app shared settings if removed', () => {
-        let settings: any;
-
-        uiState.settings.subscribe(value => {
-            settings = value;
-        });
-
         uiService.setup(x => x.deleteAppSharedSetting(app, 'map.onlyShared'))
             .returns(() => of({})).verifiable();
 
         uiState.remove('map.onlyShared');
+
+        const settings = uiState.settings();
 
         expect(settings).toEqual({
             key: 'xx',
@@ -282,16 +236,12 @@ describe('UIState', () => {
     });
 
     it('should remove value from snapshot and app user settings if removed', () => {
-        let settings: any;
-
-        uiState.settings.subscribe(value => {
-            settings = value;
-        });
-
         uiService.setup(x => x.deleteAppUserSetting(app, 'map.onlyUser'))
             .returns(() => of({})).verifiable();
 
         uiState.remove('map.onlyUser');
+
+        const settings = uiState.settings();
 
         expect(settings).toEqual({
             key: 'xx',
@@ -306,5 +256,52 @@ describe('UIState', () => {
         });
 
         uiService.verifyAll();
+    });
+
+    it('should return default value from signal if settings not loaded', () => {
+        const uiStateUnloaded = createService(UIState, [
+            { provide: UIService, useValue: uiService.object },
+            { provide: UsersService, useValue: usersService.object },
+        ]);
+
+        expect(uiStateUnloaded.getAppUser('map.onlyUser', 'default')()).toEqual('default');
+    });
+
+    it('should wait for app user settings to be loaded', () => {
+        const uiStateUnloaded = createService(UIState, [
+            { provide: UIService, useValue: uiService.object },
+            { provide: UsersService, useValue: usersService.object },
+        ]);
+
+        let value: string | undefined;
+        uiStateUnloaded.waitForAppUser('map.onlyUser', 'default').subscribe(x => {
+            value = x;
+        });
+
+        expect(value).toBeUndefined();
+
+        uiStateUnloaded.loadApp(app);
+        TestBed.tick();
+
+        expect(value).toEqual('user2');
+    });
+
+    it('should wait for common settings to be loaded', () => {
+        const uiStateUnloaded = createService(UIState, [
+            { provide: UIService, useValue: uiService.object },
+            { provide: UsersService, useValue: usersService.object },
+        ]);
+
+        let value: string | undefined;
+        uiStateUnloaded.waitForCommon('map.onlyCommon', 'default').subscribe(x => {
+            value = x;
+        });
+
+        expect(value).toBeUndefined();
+
+        uiStateUnloaded.load();
+        TestBed.tick();
+
+        expect(value).toEqual('common3');
     });
 });

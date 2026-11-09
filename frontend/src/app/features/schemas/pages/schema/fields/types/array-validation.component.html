@@ -1,19 +1,19 @@
-<div [formGroup]="fieldForm">
-    <sqx-form-row for="minItems" label="schemas.fieldTypes.array.count" [prefix]="field.fieldId">
+<div>
+    <sqx-form-row [for]="form().minItems" label="schemas.fieldTypes.array.count" [prefix]="field().fieldId">
         <div class="row g-0">
             <div class="col">
-                <input class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.array.countMin' | sqxTranslate }}" type="number" />
+                <input class="form-control" [formField]="form().minItems" placeholder="{{ 'schemas.fieldTypes.array.countMin' | sqxTranslate }}" type="number" />
             </div>
 
             <div class="col-auto"><label class="col-form-label minmax">-</label></div>
 
             <div class="col">
-                <input class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.array.countMax' | sqxTranslate }}" type="number" />
+                <input class="form-control" [formField]="form().maxItems" placeholder="{{ 'schemas.fieldTypes.array.countMax' | sqxTranslate }}" type="number" />
             </div>
         </div>
     </sqx-form-row>
 
-    <sqx-form-row #uniqueFieldsRow for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
-        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName" formControlName="uniqueFields" />
+    <sqx-form-row #uniqueFieldsRow [for]="form().uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field().fieldId">
+        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName()" [formField]="form().uniqueFields" />
     </sqx-form-row>
 </div>

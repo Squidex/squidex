@@ -1,4 +1,7 @@
-@if (!isDisabled && (assetsState.canCreate | async)) {
+@let assetsState = this.assetsState();
+@let isDisabled = this.isDisabled();
+@let isListView = this.isListView();
+@if (!isDisabled && assetsState.canCreate()) {
     <div class="file-drop" (sqxDropFile)="addFiles($event)" sqxTourStep="upload">
         <h3 class="file-drop-header">{{ "assets.uploadByDrop" | sqxTranslate }}</h3>
 
@@ -15,23 +18,23 @@
     </div>
 }
 
-@if (assetsState.path | async; as path) {
+@if (assetsState.path(); as path) {
     <div cdkDropListGroup>
         @if (path.length > 0) {
             <div class="folders">
-                @if ((assetsState.hasFolders | async) || (assetsState.parentFolder | async)) {
+                @if (assetsState.hasFolders() || assetsState.parentFolder()) {
                     <h5>{{ "common.folders" | sqxTranslate }}</h5>
                 }
 
                 <div class="row g-0">
-                    @if (assetsState.parentFolder | async; as parent) {
+                    @if (assetsState.parentFolder(); as parent) {
                         <div class="folder-container" cdkDropList [cdkDropListData]="parent?.id" (cdkDropListDropped)="move($event)">
                             <div class="folder-container-over"></div>
                             <sqx-asset-folder [assetPathItem]="parent" (navigate)="assetsState.navigate($event.id)" />
                         </div>
                     }
 
-                    @for (assetFolder of assetsState.folders | async; track assetFolder.id) {
+                    @for (assetFolder of assetsState.folders(); track assetFolder.id) {
                         <div
                             class="folder-container"
                             cdkDropList
@@ -53,13 +56,13 @@
             </div>
         }
 
-        @if (assetsState.assets | async; as assets) {
-            @if (assets.length > 0 || snapshot.newFiles.length > 0) {
+        @if (assetsState.assets(); as assets) {
+            @if (assets.length > 0 || newFiles().length > 0) {
                 <h5>{{ "common.files" | sqxTranslate }}</h5>
             }
 
             <div class="row g-0" cdkDropList cdkDropListSortingDisabled [class.unrow]="isListView">
-                @for (file of snapshot.newFiles; track file) {
+                @for (file of newFiles(); track file) {
                     <sqx-asset
                         [assetFile]="file"
                         [folderId]="assetsState.parentId"
@@ -77,11 +80,11 @@
                         [cdkDragDisabled]="isDisabled || !asset.canMove"
                         (delete)="deleteAsset(asset)"
                         (edit)="edit.emit($event)"
-                        [folderIcon]="showFolderIcon && path.length === 0"
+                        [folderIcon]="showFolderIcon() && path.length === 0"
                         [isDisabled]="isDisabled"
                         [isListView]="isListView"
-                        [isSelectable]="!!selectedIds"
-                        [isSelected]="!!isSelected(asset)"
+                        [isSelectable]="!!selectedIds()"
+                        [isSelected]="isSelected(asset)"
                         (loadDone)="replaceAsset($event)"
                         (selectAsset)="assetSelect.emit(asset)"
                         (selectFolder)="selectFolder(asset)" />

@@ -20,19 +20,14 @@ import { AuthService, FormHintComponent, TranslatePipe, UIOptions } from '@app/s
     ],
 })
 export class HomePageComponent {
-    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
+    private readonly authService = inject(AuthService);
+    private readonly location = inject(Location);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly uiOptions = inject(UIOptions);
+    private readonly redirectToLogin = this.uiOptions.value.redirectToLogin;
 
-    public showLoginError = false;
-
-    constructor(
-        private readonly authService: AuthService,
-        private readonly location: Location,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-    ) {
-    }
-
-    public async login() {
+    protected async login() {
         const redirectPath =
             this.route.snapshot.queryParams.redirectPath ||
             this.location.path();
@@ -59,7 +54,7 @@ export class HomePageComponent {
         }
     }
 
-    public isInternetExplorer() {
+    protected isInternetExplorer() {
         return !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
     }
 }

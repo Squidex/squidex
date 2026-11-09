@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { BranchItem, BranchList, FlowView, RuleElementDto, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
@@ -14,56 +14,55 @@ import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
     selector: 'sqx-branch',
     styleUrls: ['./branch.component.scss'],
     templateUrl: './branch.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RuleElementComponent,
         TranslatePipe,
     ],
 })
 export class BranchComponent {
-    @Input({ required: true })
-    public availableSteps: { [name: string]: RuleElementDto } = {};
+    /** The available steps by type, to resolve the metadata of each step. */
+    public readonly availableSteps = input.required<{ [name: string]: RuleElementDto }>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isEditable = true;
+    /** Allows the user to add, edit and remove steps. */
+    public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    @Input({ required: true })
-    public flow!: FlowView;
+    /** The whole flow, to resolve the nested branches. */
+    public readonly flow = input.required<FlowView>();
 
-    @Input({ required: true })
-    public parentId?: string | null;
+    /** The ID of the step that owns this branch, or null for the root branch. */
+    public readonly parentId = input.required<string | null | undefined>();
 
-    @Input({ required: true })
-    public parentBranch = 0;
+    /** The index of this branch within the parent step. */
+    public readonly parentBranch = input.required<number>();
 
-    @Input({ required: true })
-    public branchItems: BranchList = [];
+    /** The steps in this branch. */
+    public readonly branchItems = input.required<BranchList>();
 
-    @Input()
-    public branchLabel?: string = '';
+    /** The label above the branch, for example the condition. */
+    public readonly branchLabel = input<string | undefined>('');
 
-    @Input()
-    public branchTitle?: string = '';
+    /** The title above the branch. */
+    public readonly branchTitle = input<string | undefined>('');
 
-    @Output()
-    public stepAdd = new EventEmitter<FlowStepAdd>();
+    /** Emits when the user wants to add a step. */
+    public readonly stepAdd = output<FlowStepAdd>();
 
-    @Output()
-    public stepUpdate = new EventEmitter<FlowStepUpdate>();
+    /** Emits when the user wants to edit a step. */
+    public readonly stepUpdate = output<FlowStepUpdate>();
 
-    @Output()
-    public stepRemove = new EventEmitter<FlowStepRemove>();
+    /** Emits when the user removes a step. */
+    public readonly stepRemove = output<FlowStepRemove>();
 
-    public edit(item: BranchItem) {
+    protected edit(item: BranchItem) {
         this.stepUpdate.emit({ id: item.id, values: item.step });
     }
 
-    public remove(item: BranchItem) {
-        this.stepRemove.emit({ id: item.id, parentId: this.parentId, branchIndex: this.parentBranch });
+    protected remove(item: BranchItem) {
+        this.stepRemove.emit({ id: item.id, parentId: this.parentId(), branchIndex: this.parentBranch() });
     }
 
-    public add(index = 0) {
-        const afterId = this.branchItems[index]?.id;
-        this.stepAdd.emit({ afterId, parentId: this.parentId, branchIndex: this.parentBranch });
+    protected add(index = 0) {
+        const afterId = this.branchItems()[index]?.id;
+        this.stepAdd.emit({ afterId, parentId: this.parentId(), branchIndex: this.parentBranch() });
     }
 }

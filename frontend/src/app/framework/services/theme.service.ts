@@ -6,8 +6,7 @@
  */
 
 import { DOCUMENT } from '@angular/common';
-import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs';
+import { computed, DestroyRef, inject, Service, signal } from '@angular/core';
 import { LocalStoreService } from './local-store.service';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -18,40 +17,31 @@ const THEME_MODES: ReadonlyArray<ThemeMode> = ['light', 'dark', 'system'];
 
 const THEME_KEY = 'squidex.theme';
 
-@Injectable({
-    providedIn: 'root',
-})
-export class ThemeService implements OnDestroy {
+@Service()
+export class ThemeService {
+    private readonly destroyRef = inject(DestroyRef);
     private readonly document = inject(DOCUMENT);
     private readonly localStore = inject(LocalStoreService);
     private readonly systemQuery = this.document.defaultView?.matchMedia?.('(prefers-color-scheme: dark)');
     private readonly systemListener = () => this.update();
-    private readonly state$ = new BehaviorSubject<{ mode: ThemeMode; theme: Theme }>({ mode: 'system', theme: 'light' });
+    private readonly state = signal<{ mode: ThemeMode; theme: Theme }>({ mode: 'system', theme: 'light' });
 
-    public get mode(): ThemeMode {
-        return this.state$.value.mode;
-    }
+    public readonly mode = computed(() => {
+        return this.state().mode;
+    });
 
-    public get theme(): Theme {
-        return this.state$.value.theme;
-    }
-
-    public get modeChanges(): Observable<ThemeMode> {
-        return this.state$.pipe(map(x => x.mode), distinctUntilChanged());
-    }
-
-    public get themeChanges(): Observable<Theme> {
-        return this.state$.pipe(map(x => x.theme), distinctUntilChanged());
-    }
+    public readonly theme = computed(() => {
+        return this.state().theme;
+    });
 
     constructor() {
         this.systemQuery?.addEventListener?.('change', this.systemListener);
 
-        this.update(parseMode(this.localStore.get(THEME_KEY)));
-    }
+        this.destroyRef.onDestroy(() => {
+            this.systemQuery?.removeEventListener?.('change', this.systemListener);
+        });
 
-    public ngOnDestroy() {
-        this.systemQuery?.removeEventListener?.('change', this.systemListener);
+        this.update(parseMode(this.localStore.get(THEME_KEY)));
     }
 
     public getColor(name: string) {
@@ -67,13 +57,13 @@ export class ThemeService implements OnDestroy {
         this.update(mode);
     }
 
-    private update(mode = this.mode) {
+    private update(mode = this.state().mode) {
         const theme = mode === 'system' ? (this.systemQuery?.matches ? 'dark' : 'light') : mode;
 
         // Bootstrap and our own CSS variables are switched by this attribute.
         this.document.documentElement.setAttribute('data-bs-theme', theme);
 
-        this.state$.next({ mode, theme });
+        this.state.set({ mode, theme });
     }
 }
 

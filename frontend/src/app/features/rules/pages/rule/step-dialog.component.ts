@@ -5,10 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, LowerCasePipe } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { LowerCasePipe } from '@angular/common';
+import { booleanAttribute, Component, effect, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { form, FormField, maxLength } from '@angular/forms/signals';
+import { lastValueFrom } from 'rxjs';
+import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, SignalSelectDirective, StepForm, TextInputDirective, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -18,97 +20,100 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     styleUrls: ['./step-dialog.component.scss'],
     templateUrl: './step-dialog.component.html',
     imports: [
-        AsyncPipe,
         BranchesInputComponent,
         CodeEditorComponent,
         EntriesPipe,
         FormattableInputComponent,
         FormErrorComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
         FormsModule,
         LowerCasePipe,
         MarkdownDirective,
         ModalDialogComponent,
-        ReactiveFormsModule,
         RuleElementComponent,
+        SignalSelectDirective,
+        TextInputDirective,
         TranslatePipe,
     ],
 })
 export class StepDialogComponent {
-    @Input({ required: true })
-    public stepDefinition?: DynamicFlowStepDefinitionDto;
+    private readonly appsState = inject(AppsState);
+    private readonly injector = inject(Injector);
+    private readonly rulesService = inject(RulesService);
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isEditable = true;
+    /** The step to edit, or undefined to add a new step. */
+    public readonly stepDefinition = input.required<DynamicFlowStepDefinitionDto | undefined>();
 
-    @Input({ required: true })
-    public availableSteps: { [name: string]: RuleElementDto } = {};
+    /** Allows the user to change and save the step. */
+    public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    @Input({ required: true })
-    public scriptCompletions: ScriptCompletions | null = [];
+    /** The available steps by type, which the user can choose from. */
+    public readonly availableSteps = input.required<{ [name: string]: RuleElementDto }>();
 
-    @Output()
-    public remove = new EventEmitter();
+    /** The suggestions for autocompletion in script and code properties. */
+    public readonly scriptCompletions = input.required<ScriptCompletions | null>();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Emits when the user removes the step. */
+    public readonly remove = output();
 
-    @Output()
-    public dialogSave = new EventEmitter<DynamicFlowStepDefinitionDto>();
+    /** Emits when the dialog is closed without saving. */
+    public readonly dialogClose = output();
 
-    public currentStep?: StepForm;
+    /** Emits the validated step when the user saves it. */
+    public readonly dialogSave = output<DynamicFlowStepDefinitionDto>();
 
-    public stepName?: string;
-    public stepIgnoreError = false;
+    protected readonly currentStep = signal<StepForm | undefined>(undefined);
 
-    constructor(
-        public appsState: AppsState,
-        private rulesService: RulesService,
-    ) {
+    protected readonly stepName = form(linkedSignal(() => {
+        return this.stepDefinition()?.name ?? '';
+    }), path => {
+        maxLength(path, 40);
+    });
+
+    protected readonly stepIgnoreError = form(linkedSignal(() => {
+        return this.stepDefinition()?.ignoreError || false;
+    }));
+
+    constructor() {
+        effect(() => {
+            const stepDefinition = this.stepDefinition();
+            if (!stepDefinition) {
+                return;
+            }
+
+            untracked(() => {
+                this.selectStep(stepDefinition.step.stepType, stepDefinition.step);
+            });
+        });
     }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.stepDefinition && this.stepDefinition) {
-            this.selectStep(this.stepDefinition.step.stepType, this.stepDefinition.step);
+    protected selectStep(type: string, values?: any) {
+        if (this.currentStep()?.stepType !== type) {
+            const element = this.availableSteps()[type];
 
-            this.stepIgnoreError = this.stepDefinition.ignoreError || false;
-            this.stepName = this.stepDefinition?.name;
-        }
-    }
+            const currentStep = new StepForm(element, type, this.injector);
+            currentStep.setEnabled(this.isEditable());
 
-    public selectStep(type: string, values?: any) {
-        if (this.currentStep?.stepType !== type) {
-            const element = this.availableSteps[type];
-
-            this.currentStep = new StepForm(element, type);
-            this.currentStep.setEnabled(this.isEditable);
+            this.currentStep.set(currentStep);
         }
 
         if (values) {
-            this.currentStep?.load(values || {});
+            this.currentStep()?.load(values || {});
         }
     }
 
-    public save() {
-        if (!this.isEditable || !this.currentStep) {
+    protected save() {
+        const currentStep = this.currentStep();
+        if (!this.isEditable() || !currentStep) {
             return;
         }
 
-        const values = this.currentStep.submit();
-        if (!values) {
-            return;
-        }
+        currentStep.submit(async values => {
+            await lastValueFrom(this.rulesService.validateStep(this.appsState.appName, values), { defaultValue: undefined });
 
-        this.rulesService.validateStep(this.appsState.appName, values)
-            .subscribe({
-                error: error =>{
-                    this.currentStep?.submitFailed(error);
-                },
-                complete: () => {
-                    this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName, ignoreError: this.stepIgnoreError, step: values }));
-                },
-            });
-
+            this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName().value() || undefined, ignoreError: this.stepIgnoreError().value(), step: values }));
+        });
     }
 }

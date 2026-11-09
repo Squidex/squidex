@@ -6,40 +6,33 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, FlowExecutionStepAttemptDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { CodeEditorComponent, FlowExecutionStepAttemptDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-state-attempt',
     styleUrls: ['./state-attempt.component.scss'],
     templateUrl: './state-attempt.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
         TranslatePipe,
     ],
 })
 export class StateAttemptComponent {
-    @Input({ required: true })
-    public attempt!: FlowExecutionStepAttemptDto;
+    /** The execution attempt to show the times, error and log for. */
+    public readonly attempt = input.required<FlowExecutionStepAttemptDto>();
 
-    public output?: string;
+    protected readonly output = computed(() => {
+        let log = '';
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.attempt) {
-            let log = '';
+        for (const line of this.attempt().log) {
+            log += `${line.timestamp.toISOString()}: ${line.message}\n`;
 
-            for (const line of this.attempt.log) {
-                log += `${line.timestamp.toISOString()}: ${line.message}\n`;
-
-                if (line.dump) {
-                    log += `${line.dump}\n\n`;
-                }
+            if (line.dump) {
+                log += `${line.dump}\n\n`;
             }
-
-            this.output = log.replace(/[\r\n\s]+$/, '');
         }
-    }
+
+        return log.replace(/[\r\n\s]+$/, '');
+    });
 }

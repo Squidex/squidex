@@ -7,6 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { createService } from '@app/framework/testing';
 import { DialogService, EventConsumersDto } from '@app/shared';
 import { EventConsumersService } from '../internal';
 import { createEventConsumer } from '../services/event-consumers.service.spec';
@@ -24,7 +25,10 @@ describe('EventConsumersState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         eventConsumersService = Mock.ofType<EventConsumersService>();
-        eventConsumersState = new EventConsumersState(dialogs.object, eventConsumersService.object);
+        eventConsumersState = createService(EventConsumersState, [
+            { provide: DialogService, useValue: dialogs.object },
+            { provide: EventConsumersService, useValue: eventConsumersService.object },
+        ]);
     });
 
     afterEach(() => {

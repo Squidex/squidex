@@ -6,8 +6,7 @@
  */
 
 
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FormRowComponent, FullDateTimePipe, getContentValue, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
@@ -24,7 +23,6 @@ type ViewMode = 'day' | 'week' | 'month';
         ContentStatusComponent,
         CopyDirective,
         FormRowComponent,
-        FormsModule,
         FullDateTimePipe,
         LayoutComponent,
         ModalDialogComponent,
@@ -36,42 +34,43 @@ type ViewMode = 'day' | 'week' | 'month';
         UserNameRefPipe,
         UserPictureRefPipe,
     ],
+    host: {
+        '(click)': 'onClick($event)',
+    },
 })
-export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
+export class CalendarPageComponent {
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly languagesState = inject(LanguagesState);
+    private readonly language: AppLanguageDto = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
+    private readonly localizer = inject(LocalizerService);
+    private readonly resourceLoader = inject(ResourceLoaderService);
     private calendar: any;
-    private language!: AppLanguageDto;
 
-    @ViewChild('calendarContainer', { static: false })
-    public calendarContainer!: ElementRef;
+    protected readonly calendarContainer = viewChild.required<ElementRef>('calendarContainer');
 
-    public view: ViewMode = 'month';
+    protected readonly view = signal<ViewMode>('month');
 
-    public contentSelected?: ContentDto;
-    public contentDialog = new DialogModel();
+    protected readonly contentSelected = signal<ContentDto | undefined>(undefined);
 
-    public title = '';
+    protected readonly title = signal('');
 
-    public isLoading = false;
+    protected readonly isLoading = signal(false);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly contentsService: ContentsService,
-        private readonly resourceLoader: ResourceLoaderService,
-        private readonly languagesState: LanguagesState,
-        private readonly localizer: LocalizerService,
-    ) {
+    protected readonly contentDialog = new DialogModel();
+
+    constructor() {
+        afterNextRender(() => {
+            this.initCalendar();
+        });
+
+        this.destroyRef.onDestroy(() => {
+            this.calendar?.destroy();
+        });
     }
 
-    public ngOnDestroy() {
-        this.calendar?.destroy();
-    }
-
-    public ngOnInit() {
-        this.language = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
-    }
-
-    public async ngAfterViewInit() {
+    private async initCalendar() {
         await Promise.all([
             this.resourceLoader.loadLocalStyle('dependencies/tui-calendar/tui-calendar.min.css'),
             this.resourceLoader.loadLocalScript('dependencies/tui-calendar/tui-code-snippet.min.js'),
@@ -79,7 +78,7 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
         ]);
 
         this.calendar?.destroy();
-        this.calendar = new tui.Calendar(this.calendarContainer.nativeElement, {
+        this.calendar = new tui.Calendar(this.calendarContainer().nativeElement, {
             defaultView: 'month',
             isReadOnly: true,
             isLoading: false,
@@ -89,10 +88,8 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
         });
 
         this.calendar.on('clickSchedule', (event: any) => {
-            this.contentSelected = event.schedule.raw;
+            this.contentSelected.set(event.schedule.raw);
             this.contentDialog.show();
-
-            this.changeDetector.detectChanges();
         });
 
         this.calendar.on('clickDayname', (event: any) => {
@@ -106,8 +103,7 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
         this.load();
     }
 
-    @HostListener('click', ['$event'])
-    public onClick(event: MouseEvent) {
+    protected onClick(event: MouseEvent) {
         const target = event.target as HTMLElement;
 
         if (target.classList.contains('tui-full-calendar-weekday-grid-date')) {
@@ -122,33 +118,38 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
         }
     }
 
-    public changeView(view: ViewMode) {
-        this.view = view;
+    protected changeView(view: ViewMode) {
+        this.view.set(view);
 
         this.calendar?.changeView(view);
 
         this.load();
     }
 
-    public goPrev() {
+    protected goPrev() {
         this.calendar?.prev();
 
         this.load();
     }
 
-    public goNext() {
+    protected goNext() {
         this.calendar?.next();
 
         this.load();
     }
 
-    public cancelStatus() {
-        this.contentsService.cancelStatus(this.appsState.appName, this.contentSelected!, this.contentSelected!.version)
+    protected cancelStatus() {
+        const contentSelected = this.contentSelected();
+        if (!contentSelected) {
+            return;
+        }
+
+        this.contentsService.cancelStatus(this.appsState.appName, contentSelected, contentSelected.version)
             .subscribe(content => {
                 this.calendar?.deleteSchedule(content.id, '1');
 
                 this.contentDialog.hide();
-                this.contentSelected = undefined;
+                this.contentSelected.set(undefined);
             });
     }
 
@@ -162,11 +163,11 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
 
         this.updateRange(scheduledFrom, scheduledTo);
 
-        if (this.isLoading) {
+        if (this.isLoading()) {
             return;
         }
 
-        this.isLoading = true;
+        this.isLoading.set(true);
 
         this.contentsService.getAllContents(this.appsState.appName, {
             scheduledFrom: scheduledFrom.toISOString(),
@@ -189,29 +190,29 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
                 })));
             },
             complete: () => {
-                this.isLoading = false;
+                this.isLoading.set(false);
             },
         });
     }
 
     private updateRange(from: DateTime, to: DateTime) {
-        switch (this.view) {
+        switch (this.view()) {
             case 'month': {
-                this.title = from.toStringFormat('LLLL yyyy');
+                this.title.set(from.toStringFormat('LLLL yyyy'));
                 break;
             }
             case 'day': {
-                this.title = from.toStringFormat('PPPP');
+                this.title.set(from.toStringFormat('PPPP'));
                 break;
             }
             case 'week': {
-                this.title = `${from.toStringFormat('PP')} - ${to.toStringFormat('PP')}`;
+                this.title.set(`${from.toStringFormat('PP')} - ${to.toStringFormat('PP')}`);
                 break;
             }
         }
     }
 
-    public createContentName(content: ContentDto) {
+    protected createContentName(content: ContentDto) {
         const name =
             content.referenceFields
                 .map(f => getContentValue(content, this.language, f, false))

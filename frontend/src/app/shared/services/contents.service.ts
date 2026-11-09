@@ -6,7 +6,7 @@
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, StringHelper, Version, Versioned, VersionOrTag } from '@app/framework';
@@ -62,15 +62,10 @@ export type ContentsByQuery = Readonly<{
 
 type FullQuery = ContentsByIds | ContentsBySchedule | ContentsByReferences | ContentsByReferencing;
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ContentsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getContents(appName: string, schemaName: string, q?: ContentsByQuery): Observable<ContentsDto> {
         const body = buildQuery(q);

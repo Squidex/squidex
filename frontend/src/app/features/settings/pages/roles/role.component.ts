@@ -6,9 +6,10 @@
  */
 
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, TypedSimpleChanges, UpdateRoleDto } from '@app/shared';
+import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, UpdateRoleDto } from '@app/shared';
 
 const DESCRIPTIONS = {
     Developer: 'i18n:roles.defaults.developer',
@@ -37,99 +38,82 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AutocompleteComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
         FormAlertComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         SlicePipe,
         TranslatePipe,
     ],
 })
 export class RoleComponent {
-    @Input({ required: true })
-    public role!: RoleDto;
+    private readonly rolesState = inject(RolesState);
 
-    @Input({ required: true })
-    public allPermissions!: AutocompleteSource;
+    /** The role to show and edit. */
+    public readonly role = input.required<RoleDto>();
 
-    @Input({ required: true })
-    public schemas!: ReadonlyArray<SchemaDto>;
+    /** The source for the permission suggestions. */
+    public readonly allPermissions = input.required<AutocompleteSource>();
 
-    @ViewChild('addInput', { static: false })
-    public addPermissionInput!: AutocompleteComponent;
+    /** The schemas of the app, used to hide individual schemas for the role. */
+    public readonly schemas = input.required<ReadonlyArray<SchemaDto>>();
 
-    public descriptions = DESCRIPTIONS as Record<string, string>;
+    protected readonly properties = linkedSignal<Record<string, any>>(() => ({ ...this.role().properties }));
 
-    public propertiesList = Settings.AppProperties;
-    public properties!: Record<string, any>;
-    public propertiesSimple = SIMPLE_PROPERTIES;
+    protected readonly isEditing = signal(false);
 
-    public isEditing = false;
-    public isEditable = false;
+    protected readonly isEditable = computed(() => {
+        return this.role().canUpdate;
+    });
 
-    public editForm = new EditRoleForm();
+    protected readonly halfSchemas = computed(() => {
+        return Math.ceil(this.schemas().length / 2);
+    });
 
-    public get halfSchemas() {
-        return Math.ceil(this.schemas.length / 2);
+    protected readonly descriptions = DESCRIPTIONS as Record<string, string>;
+
+    protected readonly propertiesList = Settings.AppProperties;
+
+    protected readonly propertiesSimple = SIMPLE_PROPERTIES;
+
+    protected readonly editForm = new EditRoleForm();
+
+    constructor() {
+        effect(() => {
+            this.editForm.load(this.role());
+            this.editForm.setEnabled(this.isEditable());
+        });
     }
 
-    constructor(
-        private readonly rolesState: RolesState,
-    ) {
+    protected getProperty(name: string) {
+        return this.properties()[name];
     }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.role) {
-            this.isEditable = this.role.canUpdate;
-
-            this.properties = this.role.properties;
-
-            this.editForm.load(this.role);
-            this.editForm.setEnabled(this.isEditable);
-        }
+    protected toggleEditing() {
+        this.isEditing.update(x => !x);
     }
 
-    public getProperty(name: string) {
-        return this.properties[name];
+    protected setProperty(name: string, value: boolean) {
+        this.properties.update(x => ({ ...x, [name]: value }));
     }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
+    protected delete() {
+        this.rolesState.delete(this.role());
     }
 
-    public setProperty(name: string, value: boolean) {
-        this.properties[name] = value;
+    protected addPermission() {
+        this.editForm.addPermission();
     }
 
-    public delete() {
-        this.rolesState.delete(this.role);
-    }
+    protected save() {
+        this.editForm.submit(value => {
+            const request = new UpdateRoleDto({ ...value, properties: this.properties() });
 
-    public addPermission() {
-        this.editForm.form.add('');
-    }
-
-    public save() {
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
-
-        const request = new UpdateRoleDto({ ...value, properties: this.properties });
-
-        this.rolesState.update(this.role, request)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+            return this.rolesState.update(this.role(), request);
+        });
     }
 }

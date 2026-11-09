@@ -5,11 +5,9 @@
 * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
 */
 
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TempService {
     private value: any = null;
 

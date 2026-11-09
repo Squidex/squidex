@@ -5,95 +5,89 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Signal, signal, WritableSignal } from '@angular/core';
 import { Placement } from '@floating-ui/dom';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 export type FloatingPlacement = Placement | [Placement, 'inside' | 'outside'];
 
 export interface Openable {
-    isOpenChanges: Observable<boolean>;
-
-    isOpen: boolean;
+    isOpen: Signal<boolean>;
 }
 
-export class DialogModel implements Openable {
-    private readonly isOpen$: BehaviorSubject<boolean>;
+abstract class OpenableBase implements Openable {
+    private readonly isOpenState: WritableSignal<boolean>;
 
-    public get isOpenChanges(): Observable<boolean> {
-        return this.isOpen$;
+    public readonly isOpen: Signal<boolean>;
+
+    constructor(isOpen: boolean) {
+        this.isOpenState = signal(isOpen);
+        this.isOpen = this.isOpenState.asReadonly();
     }
 
-    public get isOpen(): boolean {
-        return this.isOpen$.value;
+    protected setOpen(isOpen: boolean) {
+        this.isOpenState.set(isOpen);
     }
+}
 
+export class DialogModel extends OpenableBase {
     constructor(isOpen = false) {
-        this.isOpen$ = new BehaviorSubject<boolean>(isOpen);
+        super(isOpen);
     }
 
     public show(): DialogModel {
-        this.isOpen$.next(true);
+        this.setOpen(true);
 
         return this;
     }
 
     public hide(): DialogModel {
-        this.isOpen$.next(false);
+        this.setOpen(false);
 
         return this;
     }
 
     public toggle(): DialogModel {
-        this.isOpen$.next(!this.isOpen$.value);
+        this.setOpen(!this.isOpen());
 
         return this;
     }
 }
 
-export class ModalModel implements Openable {
+export class ModalModel extends OpenableBase {
     private static openModal?: ModalModel | null = null;
-    private readonly isOpen$: BehaviorSubject<boolean>;
-
-    public get isOpenChanges(): Observable<boolean> {
-        return this.isOpen$;
-    }
-
-    public get isOpen(): boolean {
-        return this.isOpen$.value;
-    }
 
     constructor(isOpen = false) {
-        this.isOpen$ = new BehaviorSubject<boolean>(isOpen);
+        super(isOpen);
     }
 
     public show(): ModalModel {
-        if (!this.isOpen$.value) {
+        if (!this.isOpen()) {
             if (ModalModel.openModal && ModalModel.openModal !== this) {
                 ModalModel.openModal.hide();
             }
 
             ModalModel.openModal = this;
 
-            this.isOpen$.next(true);
+            this.setOpen(true);
         }
 
         return this;
     }
 
     public hide(): ModalModel {
-        if (this.isOpen$.value) {
+        if (this.isOpen()) {
             if (ModalModel.openModal === this) {
                 ModalModel.openModal = null;
             }
 
-            this.isOpen$.next(false);
+            this.setOpen(false);
         }
 
         return this;
     }
 
     public toggle(): ModalModel {
-        if (this.isOpen$.value) {
+        if (this.isOpen()) {
             this.hide();
         } else {
             this.show();

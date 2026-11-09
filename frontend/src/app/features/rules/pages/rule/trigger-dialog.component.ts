@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
+import { booleanAttribute, Component, effect, inject, Injector, input, output, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { lastValueFrom } from 'rxjs';
+import { AnyTriggerForm, createTriggerForm, EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
 import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
@@ -23,52 +23,57 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
     templateUrl: './trigger-dialog.component.html',
     imports: [
         AssetChangedTriggerComponent,
-        AsyncPipe,
         CommentTriggerComponent,
         ContentChangedTriggerComponent,
         CronJobTriggerComponent,
         EntriesPipe,
         FormErrorComponent,
+        FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         RuleElementComponent,
         SchemaChangedTriggerComponent,
         TranslatePipe,
         UsageTriggerComponent,
     ],
 })
-export class TriggerDialogComponent implements OnInit {
-    @Input({ required: true })
-    public trigger?: RuleTriggerDto | null;
+export class TriggerDialogComponent {
+    private readonly injector = inject(Injector);
+    private readonly rulesService = inject(RulesService);
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isEditable = true;
+    protected readonly schemasState = inject(SchemasState);
 
-    @Input({ required: true })
-    public availableTriggers: Record<string, RuleTriggerMetadataDto> = {};
+    /** The trigger to edit, or null to add a new trigger. */
+    public readonly trigger = input.required<RuleTriggerDto | null | undefined>();
 
-    @Output()
-    public dialogClose = new EventEmitter();
+    /** Allows the user to change and save the trigger. */
+    public readonly isEditable = input.required({ transform: booleanAttribute });
 
-    @Output()
-    public dialogSave = new EventEmitter<RuleTriggerDto>();
+    /** The available triggers by type, which the user can choose from. */
+    public readonly availableTriggers = input.required<Record<string, RuleTriggerMetadataDto>>();
 
-    public currentTrigger?: TriggerForm;
+    /** Emits when the dialog is closed without saving. */
+    public readonly dialogClose = output();
 
-    constructor(
-        public readonly schemasState: SchemasState,
-        private readonly rulesService: RulesService,
-    ) {
+    /** Emits the validated trigger when the user saves it or selects a trigger without properties. */
+    public readonly dialogSave = output<RuleTriggerDto>();
+
+    protected readonly currentTrigger = signal<AnyTriggerForm | undefined>(undefined);
+
+    constructor() {
+        effect(() => {
+            const trigger = this.trigger();
+            if (!trigger) {
+                return;
+            }
+
+            untracked(() => {
+                this.selectTrigger(trigger.triggerType, trigger);
+            });
+        });
     }
 
-    public ngOnInit() {
-        if (this.trigger) {
-            this.selectTrigger(this.trigger.triggerType, this.trigger);
-        }
-    }
-
-    public selectTrigger(type: string, values?: any) {
-        const metadata = this.availableTriggers[type];
+    protected selectTrigger(type: string, values?: any) {
+        const metadata = this.availableTriggers()[type];
 
         if (!metadata) {
             return;
@@ -79,34 +84,32 @@ export class TriggerDialogComponent implements OnInit {
             return;
         }
 
-        if (this.currentTrigger?.triggerType !== type) {
-            this.currentTrigger = new TriggerForm(type);
-            this.currentTrigger.setEnabled(this.isEditable);
+        if (this.currentTrigger()?.triggerType !== type) {
+            const currentTrigger = createTriggerForm(type, this.injector);
+            if (!currentTrigger) {
+                return;
+            }
+
+            currentTrigger.setEnabled(this.isEditable());
+
+            this.currentTrigger.set(currentTrigger);
         }
 
         if (values) {
-            this.currentTrigger?.load(values || {});
+            this.currentTrigger()?.load(values || {});
         }
     }
 
-    public save() {
-        if (!this.isEditable || !this.currentTrigger) {
+    protected save() {
+        const currentTrigger = this.currentTrigger();
+        if (!this.isEditable() || !currentTrigger) {
             return;
         }
 
-        const values = this.currentTrigger.submit();
-        if (!values) {
-            return;
-        }
+        currentTrigger.submit(async values => {
+            await lastValueFrom(this.rulesService.validateTrigger(this.schemasState.appName, values), { defaultValue: undefined });
 
-        this.rulesService.validateTrigger(this.schemasState.appName, values)
-            .subscribe({
-                error: error =>{
-                    this.currentTrigger?.submitFailed(error);
-                },
-                complete: () => {
-                    this.dialogSave.emit(values);
-                },
-            });
+            this.dialogSave.emit(values);
+        });
     }
 }

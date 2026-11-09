@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Optional, Output, TemplateRef, ViewChild } from '@angular/core';
-import { LocalizerService, TypedSimpleChanges } from '../internal';
+import { booleanAttribute, Component, computed, DestroyRef, inject, input, numberAttribute, output, TemplateRef, viewChild } from '@angular/core';
+import { LocalizerService } from '../internal';
 import { ConfirmClickDirective } from './forms/confirm-click.directive';
 import { MenuItemRegistry } from './menu.component';
 import { TooltipDirective } from './modals/tooltip.directive';
@@ -17,7 +16,6 @@ import { TranslatePipe } from './pipes/translate.pipe';
     selector: 'sqx-menu-item',
     styleUrls: ['./menu-item.component.scss'],
     templateUrl: './menu-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         TooltipDirective,
@@ -25,70 +23,59 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ],
 })
 export class MenuItemComponent {
-    @Input()
-    public label = '';
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly localizerService = inject(LocalizerService);
+    private readonly menuItemRegistry = inject(MenuItemRegistry, { optional: true });
 
-    @Input()
-    public menuLabel = '';
+    /** The text of the button. */
+    public readonly label = input('');
 
-    @Input()
-    public icon = '';
+    /** The text in the overflow dropdown. Falls back to the label. */
+    public readonly menuLabel = input('');
 
-    @Input()
-    public tooltip = '';
+    /** The name of the icon, without the "icon-" prefix. */
+    public readonly icon = input('');
 
-    @Input({ transform: numberAttribute })
-    public tabIndex = -1;
+    /** The tooltip of the button. */
+    public readonly tooltip = input('');
 
-    @Input({ transform: booleanAttribute })
-    public disabled = false;
+    /** The tab index of the button. */
+    public readonly tabIndex = input(-1, { transform: numberAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public small = false;
+    /** Disables the button. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public confirmRememberKey = '';
+    /** Renders a small button. */
+    public readonly small = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public confirmTitle = '';
+    /** The key to remember the confirmation, so that it is only asked once. */
+    public readonly confirmRememberKey = input('');
 
-    @Input()
-    public confirmText = '';
+    /** The title of the confirmation dialog. No confirmation is needed when empty. */
+    public readonly confirmTitle = input('');
 
-    @Output()
-    public action = new EventEmitter();
+    /** The text of the confirmation dialog. */
+    public readonly confirmText = input('');
 
-    @ViewChild('dropdownTemplate', { static: true })
-    template!: TemplateRef<any>;
+    /** Emits when the button is clicked and the action is confirmed. */
+    public readonly action = output();
 
-    public actualMenuLabel = '';
+    public readonly template = viewChild.required<TemplateRef<any>>('dropdownTemplate');
 
-    constructor(
-        @Optional() private readonly menuItemRegistry: MenuItemRegistry | null,
-        private readonly localizerService: LocalizerService,
-    ) {
-    }
-
-    public ngOnInit() {
-        this.menuItemRegistry?.registerItem(this);
-    }
-
-    public ngOnDestroy() {
-        this.menuItemRegistry?.unregisterItem(this);
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<MenuItemComponent>) {
-        if (changes.label || changes.menuLabel) {
-             const key = this.menuLabel || this.label;
-             if (key) {
-                this.actualMenuLabel = this.localizerService.getOrKey(key);
-             } else {
-                this.actualMenuLabel = '';
-             }
+    public readonly actualMenuLabel = computed(() => {
+        const key = this.menuLabel() || this.label();
+        if (!key) {
+            return '';
         }
-    }
 
-    public get showInDropdown() {
-        return this.label || this.menuLabel;
+        return this.localizerService.getOrKey(key);
+    });
+
+    constructor() {
+        this.menuItemRegistry?.registerItem(this);
+
+        this.destroyRef.onDestroy(() => {
+            this.menuItemRegistry?.unregisterItem(this);
+        });
     }
 }

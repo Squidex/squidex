@@ -5,45 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { merge, Observable, timer } from 'rxjs';
+import { merge, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { LayoutComponent } from '@app/framework';
-import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, SchemasState, switchSafe, TeamsState } from '@app/shared/internal';
+import { allParams, AppsState, HistoryChannelUpdated, HistoryService, MessageBus, SchemasState, switchSafe, TeamsState } from '@app/shared/internal';
 import { HistoryListComponent } from './history-list.component';
 
 @Component({
     selector: 'sqx-history',
     styleUrls: ['./history.component.scss'],
     templateUrl: './history.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         HistoryListComponent,
         LayoutComponent,
     ],
 })
 export class HistoryComponent {
+    private readonly appsState = inject(AppsState);
     private readonly channel = this.calculateChannel();
+    private readonly historyService = inject(HistoryService);
+    private readonly messageBus = inject(MessageBus);
+    private readonly route = inject(ActivatedRoute);
+    private readonly schemasState = inject(SchemasState);
+    private readonly teamsState = inject(TeamsState);
 
-    public events: Observable<ReadonlyArray<HistoryEventDto>> =
-        merge(
+    protected readonly events = rxResource({
+        stream: () => merge(
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000)),
         ).pipe(
-            switchSafe(() => this.getHistory()));
-
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly historyService: HistoryService,
-        private readonly messageBus: MessageBus,
-        private readonly route: ActivatedRoute,
-        private readonly schemasState: SchemasState,
-        private readonly teamsState: TeamsState,
-    ) {
-    }
+            switchSafe(() => this.getHistory())),
+    });
 
     private getHistory() {
         if (this.teamsState.teamId) {

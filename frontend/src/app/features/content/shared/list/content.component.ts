@@ -9,16 +9,14 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, Component, computed, inject, Injector, input, output, untracked, viewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: '[sqxContent][language][languages][tableFields][schema][tableSettings]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ContentListCellDirective,
@@ -27,7 +25,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
         ContentStatusComponent,
         DropdownMenuComponent,
         ExternalLinkDirective,
-        FormsModule,
         ModalDirective,
         ModalPlacementDirective,
         RouterLink,
@@ -37,109 +34,99 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     ],
 })
 export class ContentComponent {
-    @Output()
-    public clone = new EventEmitter();
+    private readonly contentsState = inject(ContentsState);
+    private readonly injector = inject(Injector);
 
-    @Output()
-    public delete = new EventEmitter();
+    /** Emits when the user clones the content. */
+    public readonly clone = output();
 
-    @Output()
-    public statusChange = new EventEmitter<string>();
+    /** Emits when the user deletes the content. */
+    public readonly delete = output();
 
-    @Output()
-    public selectedChange = new EventEmitter<boolean>();
+    /** Emits the new status when the user changes the status of the content. */
+    public readonly statusChange = output<string>();
 
-    @Input({ transform: booleanAttribute })
-    public selected = false;
+    /** Emits when the user selects or deselects the content. */
+    public readonly selectedChange = output<boolean>();
 
-    @Input()
-    public language!: AppLanguageDto;
+    /** Renders the content as selected. */
+    public readonly selected = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The language to render the values in. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input()
-    public schema?: SchemaDto;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input()
-    public tableFields!: ReadonlyArray<TableField>;
+    /** The schema of the content. */
+    public readonly schema = input<SchemaDto>();
 
-    @Input()
-    public tableSettings!: TableSettings;
+    /** The fields to render as columns. */
+    public readonly tableFields = input.required<ReadonlyArray<TableField>>();
 
-    @Input({ transform: booleanAttribute })
-    public cloneable?: boolean | null;
+    /** The table settings, used to render nested values. */
+    public readonly tableSettings = input.required<TableSettings>();
 
-    @Input()
-    public link: any = null;
+    /** Shows the action to clone the content. */
+    public readonly cloneable = input(false, { transform: booleanAttribute });
 
-    @Input('sqxContent')
-    public content!: ContentDto;
+    /** The router link to the content. */
+    public readonly link = input<any>(null);
 
-    @ViewChildren(ContentListFieldComponent)
-    public fields!: QueryList<ContentListFieldComponent>;
+    /** The content to render. */
+    public readonly content = input.required<ContentDto>({ alias: 'sqxContent' });
 
-    public patchForm?: PatchContentForm;
-    public patchAllowed?: boolean | null;
+    protected readonly fields = viewChildren(ContentListFieldComponent);
 
-    public dropdown = new ModalModel();
+    protected readonly patchAllowed = computed(() => {
+        return this.content().canUpdate;
+    });
 
-    public get isDirty() {
-        return this.patchForm?.form.dirty === true;
-    }
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly contentsState: ContentsState,
-    ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.content) {
-            this.patchAllowed = this.content.canUpdate;
+    protected readonly patchForm = computed(() => {
+        if (!this.patchAllowed()) {
+            return undefined;
         }
 
-        if (this.patchAllowed && (changes.tableFields || changes.language)) {
-            this.patchForm = new PatchContentForm(this.tableFields, this.language);
-        }
-    }
+        const fields = this.tableFields();
+        const language = this.language();
 
-    public save() {
-        if (!this.content.canUpdate || !this.patchForm) {
+        // Forms create effects, which is not allowed in a reactive context.
+        return untracked(() => new PatchContentForm(fields, language, this.injector));
+    });
+
+    protected readonly isDirty = computed(() => {
+        return this.patchForm()?.dirty() === true;
+    });
+
+    protected readonly dropdown = new ModalModel();
+
+    protected async save() {
+        const content = this.content();
+        const patchForm = this.patchForm();
+        if (!content.canUpdate || !patchForm) {
             return;
         }
 
-        const value = this.patchForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.contentsState.patch(this.content, value)
-            .subscribe({
-                next: () => {
-                    this.patchForm!.submitCompleted({ noReset: true });
-
-                    this.changeDetector.detectChanges();
-                },
-                error: error => {
-                    this.patchForm!.submitFailed(error);
-
-                    this.changeDetector.detectChanges();
-                },
-            });
+        await patchForm.submit(value => {
+            return this.contentsState.patch(content, value);
+        });
     }
 
-    public shouldStop(field: TableField) {
+    protected shouldStop(field: TableField) {
+        const isDirty = this.patchForm()?.dirty() === true;
+
         if (field.rootField) {
-            return this.isDirty || (field.rootField.isInlineEditable && this.patchAllowed);
+            return isDirty || (field.rootField.isInlineEditable && this.patchAllowed());
         } else {
-            return this.isDirty;
+            return isDirty;
         }
     }
 
-    public cancel() {
-        this.patchForm?.submitCompleted();
+    protected cancel() {
+        this.patchForm()?.reset();
 
-        this.fields.forEach(x => x.reset());
+        for (const field of this.fields()) {
+            field.reset();
+        }
     }
 }

@@ -1,24 +1,25 @@
+@let roleValue = role();
 <div class="table-items-row table-items-row-expandable">
     <div class="table-items-row-summary row gx-2 align-items-center">
-        <div class="col-5" [class.built]="role.isDefaultRole">
-            <span class="role-name">{{ role.name }}</span>
+        <div class="col-5" [class.built]="roleValue.isDefaultRole">
+            <span class="role-name">{{ roleValue.name }}</span>
         </div>
 
         <div class="col text-decent">
             {{ "common.clients" | sqxTranslate }}
-            <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numClients <= 0">{{ role.numClients }}</span>
+            <span class="badge badge-secondary rounded-pill" [class.text-muted]="roleValue.numClients <= 0">{{ roleValue.numClients }}</span>
         </div>
 
         <div class="col text-decent">
             {{ "common.users" | sqxTranslate }}
-            <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numContributors <= 0">
-                {{ role.numContributors }}
+            <span class="badge badge-secondary rounded-pill" [class.text-muted]="roleValue.numContributors <= 0">
+                {{ roleValue.numContributors }}
             </span>
         </div>
 
         <div class="col-auto">
             <div class="float-end">
-                <button class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()" type="button">
+                <button class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing()" (click)="toggleEditing()" type="button">
                     <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                 </button>
                 <button
@@ -27,7 +28,7 @@
                     confirmRememberKey="deleteRole"
                     confirmText="i18n:roles.deleteConfirmText"
                     confirmTitle="i18n:roles.deleteConfirmTitle"
-                    [disabled]="!role.canDelete"
+                    [disabled]="!roleValue.canDelete"
                     (sqxConfirmClick)="delete()"
                     type="button">
                     <i class="icon-bin3"></i>
@@ -36,7 +37,7 @@
         </div>
     </div>
 
-    @if (isEditing) {
+    @if (isEditing()) {
         <div class="table-items-row-details">
             <form (ngSubmit)="save()">
                 <div class="table-items-row-details-tabs clearfix">
@@ -44,7 +45,7 @@
                         <button class="btn btn-text-secondary" (click)="toggleEditing()" type="button">
                             {{ "common.cancel" | sqxTranslate }}
                         </button>
-                        @if (isEditable) {
+                        @if (isEditable()) {
                             <button class="btn btn-primary ms-1" type="submit">{{ "common.save" | sqxTranslate }}</button>
                         }
                     </div>
@@ -53,20 +54,20 @@
                 <div class="table-items-row-details-tab">
                     <h3>{{ "roles.permissions" | sqxTranslate }}</h3>
                     <sqx-form-hint marginBottom="3"> {{ "roles.permissionsDescription" | sqxTranslate }}</sqx-form-hint>
-                    @if (!role.isDefaultRole) {
-                        @for (control of editForm.controls; track control; let i = $index) {
+                    @if (!roleValue.isDefaultRole) {
+                        @for (permission of editForm.form.permissions; track $index; let i = $index) {
                             <div class="row gx-2 mb-1">
                                 <div class="col">
-                                    <sqx-control-errors [fieldName]="'Permission'" [for]="control" />
-                                    <sqx-autocomplete [formControl]="control" [itemsSource]="allPermissions" />
+                                    <sqx-control-errors [fieldName]="'Permission'" [for]="permission" />
+                                    <sqx-autocomplete [formField]="permission" [itemsSource]="allPermissions()" />
                                 </div>
 
-                                @if (isEditable) {
+                                @if (isEditable()) {
                                     <div class="col-auto">
                                         <button
                                             class="btn btn-text-danger"
                                             attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
-                                            (click)="editForm.form.removeAt(i)"
+                                            (click)="editForm.removePermission(i)"
                                             type="button">
                                             <i class="icon-bin3"></i>
                                         </button>
@@ -75,19 +76,19 @@
                             </div>
                         }
                     } @else {
-                        <sqx-form-alert> {{ descriptions[role.name] | sqxTranslate }}</sqx-form-alert>
+                        <sqx-form-alert> {{ descriptions[roleValue.name] | sqxTranslate }}</sqx-form-alert>
                         <table class="table table-bordered table-fixed">
                             <tbody>
-                                @for (control of editForm.controls; track control; let i = $index) {
+                                @for (permission of editForm.form.permissions; track $index) {
                                     <tr>
-                                        <td>{{ control.value }}</td>
+                                        <td>{{ permission().value() }}</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     }
 
-                    @if (isEditable) {
+                    @if (isEditable()) {
                         <div class="form-group row gx-2">
                             <div class="col">
                                 <div class="form-control preview">{{ "common.permission" | sqxTranslate }}</div>
@@ -105,7 +106,7 @@
                         </div>
                     }
 
-                    @if (!role.isDefaultRole) {
+                    @if (!roleValue.isDefaultRole) {
                         <div class="mt-4">
                             <h3>{{ "roles.properties" | sqxTranslate }}</h3>
                             <sqx-form-hint marginBottom="3"> {{ "roles.propertiesDescription" | sqxTranslate }}</sqx-form-hint>
@@ -114,36 +115,34 @@
                                     <div class="form-check col-6">
                                         <input
                                             class="form-check-input"
-                                            id="{{ role.name }}_{{ property.key }}"
-                                            [disabled]="!isEditable"
-                                            [ngModel]="getProperty(property.key)"
-                                            (ngModelChange)="setProperty(property.key, $event)"
-                                            [ngModelOptions]="{ standalone: true }"
+                                            id="{{ roleValue.name }}_{{ property.key }}"
+                                            (change)="setProperty(property.key, $any($event.target).checked)"
+                                            [checked]="getProperty(property.key)"
+                                            [disabled]="!isEditable()"
                                             type="checkbox" />
-                                        <label class="form-check-label" for="{{ role.name }}_{{ property.key }}">
+                                        <label class="form-check-label" for="{{ roleValue.name }}_{{ property.key }}">
                                             {{ property.name | sqxTranslate }}
                                         </label>
                                     </div>
                                 }
                             </div>
 
-                            @if (schemas && schemas.length > 0) {
+                            @if (schemas() && schemas().length > 0) {
                                 <div class="mt-4">
                                     <h5>{{ "common.schemas" | sqxTranslate }}</h5>
 
                                     <div class="row g-0 rule-section">
                                         <div class="col-6">
-                                            @for (schema of schemas | slice: 0 : halfSchemas; track schema.id) {
+                                            @for (schema of schemas() | slice: 0 : halfSchemas(); track schema.id) {
                                                 <div class="form-check">
                                                     <input
                                                         class="form-check-input"
-                                                        id="{{ role.name }}_schema_{{ schema.name }}"
-                                                        [disabled]="!isEditable"
-                                                        [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
-                                                        (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
-                                                        [ngModelOptions]="{ standalone: true }"
+                                                        id="{{ roleValue.name }}_schema_{{ schema.name }}"
+                                                        (change)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $any($event.target).checked)"
+                                                        [checked]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
+                                                        [disabled]="!isEditable()"
                                                         type="checkbox" />
-                                                    <label class="form-check-label" for="{{ role.name }}_schema_{{ schema.name }}">
+                                                    <label class="form-check-label" for="{{ roleValue.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">
                                                             {{ "roles.properties.hideContents" | sqxTranslate: { schema: schema.displayName } }}
                                                         </span>
@@ -153,17 +152,16 @@
                                         </div>
 
                                         <div class="col-6">
-                                            @for (schema of schemas | slice: halfSchemas; track schema.id) {
+                                            @for (schema of schemas() | slice: halfSchemas(); track schema.id) {
                                                 <div class="form-check">
                                                     <input
                                                         class="form-check-input"
-                                                        id="{{ role.name }}_schema_{{ schema.name }}"
-                                                        [disabled]="!isEditable"
-                                                        [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
-                                                        (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
-                                                        [ngModelOptions]="{ standalone: true }"
+                                                        id="{{ roleValue.name }}_schema_{{ schema.name }}"
+                                                        (change)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $any($event.target).checked)"
+                                                        [checked]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
+                                                        [disabled]="!isEditable()"
                                                         type="checkbox" />
-                                                    <label class="form-check-label" for="{{ role.name }}_schema_{{ schema.name }}">
+                                                    <label class="form-check-label" for="{{ roleValue.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">
                                                             {{ "roles.properties.hideContents" | sqxTranslate: { schema: schema.displayName } }}
                                                         </span>

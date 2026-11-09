@@ -1,19 +1,19 @@
-<form class="inner-form" [formGroup]="synchronizeForm.form" (submit)="synchronize()">
-    @if (isEditable) {
+<form class="inner-form" (submit)="synchronize()">
+    @if (isEditable()) {
         <div class="inner-header">
             <div class="row gx-3 align-items-center">
                 <div class="col"></div>
 
                 <div class="col-auto">
                     <div class="form-check">
-                        <input class="form-check-input" id="fieldsDelete" formControlName="fieldsDelete" type="checkbox" />
+                        <input class="form-check-input" id="fieldsDelete" [formField]="synchronizeForm.form.fieldsDelete" type="checkbox" />
                         <label class="form-check-label" for="fieldsDelete"> {{ "schemas.export.deleteFields" | sqxTranslate }}</label>
                     </div>
                 </div>
 
                 <div class="col-auto">
                     <div class="form-check">
-                        <input class="form-check-input" id="fieldsRecreate" formControlName="fieldsRecreate" type="checkbox" />
+                        <input class="form-check-input" id="fieldsRecreate" [formField]="synchronizeForm.form.fieldsRecreate" type="checkbox" />
                         <label class="form-check-label" for="fieldsRecreate"> {{ "schemas.export.recreateFields" | sqxTranslate }}</label>
                     </div>
                 </div>
@@ -25,5 +25,5 @@
         </div>
     }
 
-    <div class="inner-main"><sqx-code-editor borderless="true" formControlName="json" valueMode="Json" /></div>
+    <div class="inner-main"><sqx-code-editor borderless="true" [formField]="synchronizeForm.form.json" valueMode="Json" /></div>
 </form>

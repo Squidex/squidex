@@ -5,67 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { FieldDto, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, Subscriptions, TagEditorComponent, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldFormModel, NumberFieldPropertiesDto, TagEditorComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
     imports: [
-        AsyncPipe,
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
         TagEditorComponent,
     ],
 })
-export class NumberUIComponent  {
-    private readonly subscriptions = new Subscriptions();
+export class NumberUIComponent {
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    public readonly converter = FloatConverter.INSTANCE;
-    public readonly editors = NumberFieldEditorValues;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<NumberFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<NumberFieldFormModel>;
+    });
 
-    @Input({ required: true })
-    public properties!: NumberFieldPropertiesDto;
+    protected readonly converter = FloatConverter.INSTANCE;
 
-    public hideAllowedValues?: Observable<boolean>;
-    public hideInlineEditable?: Observable<boolean>;
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.fieldForm) {
-            this.subscriptions.unsubscribeAll();
-
-            const editor = this.fieldForm.controls['editor'];
-
-            this.hideAllowedValues =
-                valueProjection$(editor, x => !(x && (x === 'Radio' || x === 'Dropdown')));
-
-            this.hideInlineEditable =
-                valueProjection$(editor, x => x === 'Radio');
-
-            this.subscriptions.add(
-                this.hideAllowedValues.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['allowedValues'].setValue(undefined);
-                    }
-                }));
-
-            this.subscriptions.add(
-                this.hideInlineEditable.subscribe(isSelection => {
-                    if (isSelection) {
-                        this.fieldForm.controls['inlineEditable'].setValue(false);
-                    }
-                }));
-        }
-    }
+    protected readonly editors = NumberFieldEditorValues;
 }

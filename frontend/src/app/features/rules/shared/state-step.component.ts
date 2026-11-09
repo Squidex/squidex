@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { Component, computed, input, linkedSignal } from '@angular/core';
 import { BranchItem, FlowExecutionStepStateDto, FlowStepDto, RuleElementDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from './history-step.component';
 import { RuleClassPipe } from './pipes';
@@ -17,7 +17,6 @@ import { StateStepPropertyComponent } from './state-step-property.component';
     selector: 'sqx-state-step',
     styleUrls: ['./state-step.component.scss'],
     templateUrl: './state-step.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         HistoryStepComponent,
         RuleClassPipe,
@@ -26,35 +25,37 @@ import { StateStepPropertyComponent } from './state-step-property.component';
         TranslatePipe,
     ],
 })
-export class StateStepComponent implements OnChanges {
-    @Input({ required: true })
-    public isFirst = false;
+export class StateStepComponent {
+    /** Marks the step as the first step of the flow. */
+    public readonly isFirst = input.required<boolean>();
 
-    @Input({ required: true })
-    public isLast = false;
+    /** Marks the step as the last step of the flow. */
+    public readonly isLast = input.required<boolean>();
 
-    @Input({ required: true })
-    public isNext = false;
+    /** Highlights the step as the next step to be executed. */
+    public readonly isNext = input.required<boolean>();
 
-    @Input({ required: true })
-    public branchItem!: BranchItem;
+    /** The step in the flow. */
+    public readonly branchItem = input.required<BranchItem>();
 
-    @Input({ required: true })
-    public stepInfo!: RuleElementDto;
+    /** The metadata of the step type. */
+    public readonly stepInfo = input.required<RuleElementDto>();
 
-    @Input({ required: true })
-    public stepDefinition!: FlowStepDto;
+    /** The configuration of the step, to show the property values. */
+    public readonly stepDefinition = input.required<FlowStepDto>();
 
-    @Input({ required: true })
-    public state?: FlowExecutionStepStateDto;
+    /** The execution state of the step, if it has already been executed. */
+    public readonly state = input.required<FlowExecutionStepStateDto | undefined>();
 
-    public attemptIndex = 0;
+    protected readonly attemptIndex = linkedSignal<number>(() => {
+        return this.stepInfo().properties.length > 0 ? -1 : 0;
+    });
 
-    public ngOnChanges() {
-        this.attemptIndex = this.stepInfo.properties.length > 0 ? -1 : 0;
-    }
+    protected readonly isExpandable = computed(() => {
+        return (this.state()?.attempts.length ?? 0) > 0 || this.stepInfo().properties.length > 0;
+    });
 
-    public selectAttempt(attempt: number) {
-        this.attemptIndex = attempt;
+    protected selectAttempt(attempt: number) {
+        this.attemptIndex.set(attempt);
     }
 }

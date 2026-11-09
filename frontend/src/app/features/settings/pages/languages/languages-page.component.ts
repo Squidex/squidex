@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LanguagesState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { LanguageAddFormComponent } from './language-add-form.component';
@@ -17,7 +16,6 @@ import { LanguageComponent } from './language.component';
     styleUrls: ['./languages-page.component.scss'],
     templateUrl: './languages-page.component.html',
     imports: [
-        AsyncPipe,
         LanguageAddFormComponent,
         LanguageComponent,
         LayoutComponent,
@@ -33,17 +31,14 @@ import { LanguageComponent } from './language.component';
         TranslatePipe,
     ],
 })
-export class LanguagesPageComponent implements OnInit {
-    constructor(
-        public readonly languagesState: LanguagesState,
-    ) {
-    }
+export class LanguagesPageComponent {
+    protected readonly languagesState = inject(LanguagesState);
 
-    public ngOnInit() {
+    constructor() {
         this.languagesState.load();
     }
 
-    public reload() {
+    protected reload() {
         this.languagesState.load(true);
     }
 }

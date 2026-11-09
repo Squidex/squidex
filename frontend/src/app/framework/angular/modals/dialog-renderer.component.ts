@@ -6,10 +6,10 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { timer } from 'rxjs';
-import { DialogModel, DialogRequest, DialogService, Notification, StatefulComponent, Subscriptions, Tooltip } from '@app/framework/internal';
+import { DialogModel, DialogRequest, DialogService, Notification, Tooltip } from '@app/framework/internal';
 import { FocusOnInitDirective } from '../forms/focus-on-init.directive';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
@@ -18,25 +18,12 @@ import { ModalPlacementDirective } from './modal-placement.directive';
 import { ModalDirective } from './modal.directive';
 import { TooltipDirective } from './tooltip.directive';
 
-interface State {
-    // The pending dialog request.
-    dialogRequest?: DialogRequest | null;
-
-    // The list of open notifications.
-    notifications: ReadonlyArray<Notification>;
-
-    // The current tooltip.
-    tooltips: ReadonlyArray<Tooltip>;
-}
-
 @Component({
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,
-        FormsModule,
         MarkdownDirective,
         ModalDialogComponent,
         ModalDirective,
@@ -45,94 +32,85 @@ interface State {
         TranslatePipe,
     ],
 })
-export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class DialogRendererComponent {
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly dialogs = inject(DialogService);
 
-    public dialogView = new DialogModel();
+    protected readonly dialogRequest = signal<DialogRequest | null | undefined>(undefined);
 
-    constructor(
-        private readonly dialogs: DialogService,
-    ) {
-        super({ notifications: [], tooltips: [] });
-    }
+    protected readonly notifications = signal<ReadonlyArray<Notification>>([]);
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.dialogView.isOpenChanges.subscribe(isOpen => {
-                if (!isOpen) {
-                    this.finishRequest(false);
-                }
-            }));
+    protected readonly tooltips = signal<ReadonlyArray<Tooltip>>([]);
 
-        this.subscriptions.add(
-            this.dialogs.notifications.subscribe(notification => {
-                this.next(s => ({
-                    ...s,
-                    notifications: [...s.notifications, notification],
-                }));
+    protected readonly dialogView = new DialogModel();
+
+    constructor() {
+        effect(() => {
+            if (!this.dialogView.isOpen()) {
+                untracked(() => this.finishRequest(false));
+            }
+        });
+
+        this.dialogs.notifications.pipe(takeUntilDestroyed())
+            .subscribe(notification => {
+                this.notifications.update(x => [...x, notification]);
 
                 if (notification.displayTime > 0) {
-                    this.subscriptions.add(timer(notification.displayTime).subscribe(() => {
-                        this.close(notification);
-                    }));
+                    timer(notification.displayTime).pipe(takeUntilDestroyed(this.destroyRef))
+                        .subscribe(() => {
+                            this.close(notification);
+                        });
                 }
-            }));
+            });
 
-        this.subscriptions.add(
-            this.dialogs.dialogs
-                .subscribe(dialogRequest => {
-                    this.cancel();
+        this.dialogs.dialogs.pipe(takeUntilDestroyed())
+            .subscribe(dialogRequest => {
+                this.cancel();
 
-                    this.dialogView.show();
+                this.dialogView.show();
+                this.dialogRequest.set(dialogRequest);
+            });
 
-                    this.next({ dialogRequest });
-                }));
-
-        this.subscriptions.add(
-            this.dialogs.tooltips
-                .subscribe(tooltip => {
-                    this.next(s => {
-                        let tooltips = s.tooltips;
-
-                        if (tooltip.multiple || !tooltip.text) {
-                            tooltips = tooltips.filter(x => x.target !== tooltip.target);
-                        }
-
-                        if (tooltip.text) {
-                            if (tooltip.multiple) {
-                                tooltips = [tooltip, ...tooltips];
-                            } else {
-                                tooltips = [tooltip];
-                            }
-                        }
-
-                        return { ...s, tooltips };
-                    });
-                }));
+        this.dialogs.tooltips.pipe(takeUntilDestroyed())
+            .subscribe(tooltip => {
+                this.tooltips.update(tooltips => addTooltip(tooltips, tooltip));
+            });
     }
 
-    public cancel() {
+    protected cancel() {
         this.finishRequest(false);
 
         this.dialogView.hide();
     }
 
-    public confirm() {
+    protected confirm() {
         this.finishRequest(true);
 
         this.dialogView.hide();
     }
 
+    protected close(notification: Notification) {
+        this.notifications.update(x => x.filter(n => notification !== n));
+    }
+
     private finishRequest(value: boolean) {
-        this.snapshot.dialogRequest?.complete(value);
+        this.dialogRequest()?.complete(value);
+        this.dialogRequest.set(null);
+    }
+}
 
-        this.next({ dialogRequest: null });
+function addTooltip(tooltips: ReadonlyArray<Tooltip>, tooltip: Tooltip) {
+    if (tooltip.multiple || !tooltip.text) {
+        tooltips = tooltips.filter(x => x.target !== tooltip.target);
     }
 
-    public close(notification: Notification) {
-        this.next(s => ({
-            ...s,
-            notifications: s.notifications.filter(n => notification !== n),
-        }));
+    if (!tooltip.text) {
+        return tooltips;
     }
+
+    if (tooltip.multiple) {
+        return [tooltip, ...tooltips];
+    }
+
+    return [tooltip];
 }

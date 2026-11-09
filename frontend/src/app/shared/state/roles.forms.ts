@@ -5,52 +5,52 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, hasNoValue$, TemplatedFormArray } from '@app/framework';
+import { computed } from '@angular/core';
+import { applyEach, maxLength, required } from '@angular/forms/signals';
+import { SignalForm } from '@app/framework';
 import { AddRoleDto, RoleDto, UpdateRoleDto } from '../model';
 
-export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
-    public get controls() {
-        return this.form.controls as UntypedFormControl[];
-    }
+type EditRoleFormModel = { permissions: string[] };
 
+export class EditRoleForm extends SignalForm<EditRoleFormModel, UpdateRoleDto, RoleDto> {
     constructor() {
-        super(new TemplatedFormArray(PermissionTemplate.INSTANCE));
+        super({ permissions: [] }, path => {
+            applyEach(path.permissions, permission => {
+                required(permission);
+            });
+        });
     }
 
-    public transformLoad(value: Partial<RoleDto>) {
-        return value.permissions || [];
+    public addPermission() {
+        this.model.update(x => ({ ...x, permissions: [...x.permissions, ''] }));
     }
 
-    public transformSubmit(value: any) {
-        return new UpdateRoleDto({ permissions: value, properties: {} });
+    public removePermission(index: number) {
+        this.model.update(x => ({ ...x, permissions: x.permissions.filter((_, i) => i !== index) }));
+    }
+
+    protected transformLoad(value: Partial<RoleDto>): EditRoleFormModel {
+        return { permissions: [...(value.permissions || [])] };
+    }
+
+    protected transformSubmit(value: EditRoleFormModel) {
+        return new UpdateRoleDto({ permissions: value.permissions, properties: {} });
     }
 }
 
-class PermissionTemplate {
-    public static readonly INSTANCE = new PermissionTemplate();
-
-    public createControl(_: any, initialValue: string) {
-        return new UntypedFormControl(initialValue, Validators.required);
-    }
-}
-
-export class AddRoleForm extends Form<ExtendedFormGroup, AddRoleDto> {
-    public get name() {
-        return this.form.controls['name'];
-    }
-
-    public hasNoName = hasNoValue$(this.name);
+export class AddRoleForm extends SignalForm<{ name: string }, AddRoleDto> {
+    public readonly hasNoName = computed(() => {
+        return !this.model().name;
+    });
 
     constructor() {
-        super(new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-        }));
+        super({ name: '' }, path => {
+            maxLength(path.name, 40);
+            required(path.name);
+        });
     }
 
-    public transformSubmit(value: any) {
+    protected transformSubmit(value: { name: string }) {
         return new AddRoleDto(value);
     }
 }

@@ -5,37 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { AfterViewInit, Directive, DoCheck, ElementRef, HostBinding, HostListener, Input, numberAttribute, Renderer2 } from '@angular/core';
+import { afterEveryRender, Directive, ElementRef, inject, input, numberAttribute, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: 'textarea[sqxAutosize]',
+    host: {
+        '[style.overflow]': '"hidden"',
+        '[rows]': 'rows()',
+        '(input)': 'resize()',
+    },
 })
-export class AutosizeDirective implements AfterViewInit, DoCheck {
-    @HostBinding('style.overflow')
-    public overflow = 'hidden';
+export class AutosizeDirective {
+    private readonly element = inject<ElementRef<HTMLTextAreaElement>>(ElementRef);
+    private readonly renderer = inject(Renderer2);
 
-    @Input({ transform: numberAttribute })
-    @HostBinding('rows')
-    public rows = 1;
+    /** The minimum number of rows. */
+    public readonly rows = input(1, { transform: numberAttribute });
 
-    constructor(
-        private readonly element: ElementRef<HTMLTextAreaElement>,
-        private readonly renderer: Renderer2,
-    ) {
+    constructor() {
+        afterEveryRender(() => {
+            this.resize();
+        });
     }
 
-    public ngAfterViewInit() {
-        this.resize();
-    }
-
-    public ngDoCheck() {
-        this.resize();
-    }
-
-    @HostListener('input')
     protected resize() {
-        const textarea = this.element.nativeElement as HTMLTextAreaElement;
+        const textarea = this.element.nativeElement;
 
         // Calculate border height which is not included in scrollHeight
         const borderHeight = textarea.offsetHeight - textarea.clientHeight;

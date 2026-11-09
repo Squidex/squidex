@@ -1,69 +1,69 @@
-<div class="mb-3" [formGroup]="fieldForm">
-    <sqx-form-row #editorUrlRow for="editorUrl" hints="schemas.field.editorUrlHint" label="schemas.field.editorUrl" [prefix]="field.fieldId">
-        <input class="form-control" [id]="editorUrlRow.fieldName" formControlName="editorUrl" type="url" />
+<div class="mb-3">
+    <sqx-form-row #editorUrlRow [for]="fieldForm().editorUrl" hint="schemas.field.editorUrlHint" label="schemas.field.editorUrl" [prefix]="field().fieldId">
+        <input class="form-control" [id]="editorUrlRow.fieldName()" [formField]="fieldForm().editorUrl" type="url" />
     </sqx-form-row>
 </div>
 
-@switch (field.rawProperties.fieldType) {
+@switch (field().rawProperties.fieldType) {
     @case ("Array") {
-        <sqx-array-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-array-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Assets") {
-        <sqx-assets-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-assets-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Boolean") {
-        <sqx-boolean-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-boolean-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Component") {
-        <sqx-component-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-component-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Components") {
-        <sqx-components-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-components-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("DateTime") {
-        <sqx-date-time-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-date-time-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Geolocation") {
-        <sqx-geolocation-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-geolocation-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Json") {
-        <sqx-json-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-json-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Number") {
-        <sqx-number-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-number-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("References") {
-        <sqx-references-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-references-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("RichText") {
-        <sqx-rich-text-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-rich-text-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("String") {
-        <sqx-string-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-string-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("Tags") {
-        <sqx-tags-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-tags-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 
     @case ("UserInfo") {
-        <sqx-user-info-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-user-info-ui [field]="field()" [fieldForm]="fieldForm()" [properties]="field().rawProperties" />
     }
 }
 
-<div class="mt-3" [formGroup]="fieldForm">
-    <sqx-form-row #isHalfWidthRow check for="isHalfWidth" hint="schemas.field.halfWidthHint" label="schemas.field.halfWidth" [prefix]="field.fieldId">
-        <input class="form-check-input" [id]="isHalfWidthRow.fieldName" formControlName="isHalfWidth" type="checkbox" />
+<div class="mt-3">
+    <sqx-form-row #isHalfWidthRow check [for]="fieldForm().isHalfWidth" hint="schemas.field.halfWidthHint" label="schemas.field.halfWidth" [prefix]="field().fieldId">
+        <input class="form-check-input" [id]="isHalfWidthRow.fieldName()" [formField]="fieldForm().isHalfWidth" type="checkbox" />
     </sqx-form-row>
 </div>

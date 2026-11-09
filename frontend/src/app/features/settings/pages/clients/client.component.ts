@@ -6,23 +6,22 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormRowComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges, UpdateClientDto } from '@app/shared';
+import { Component, inject, input, linkedSignal } from '@angular/core';
+import { disabled, form, FormField, min } from '@angular/forms/signals';
+import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormRowComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, UpdateClientDto } from '@app/shared';
 import { ClientConnectFormComponent } from './client-connect-form.component';
 
 @Component({
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ClientConnectFormComponent,
         ConfirmClickDirective,
         CopyDirective,
         EditableTitleComponent,
+        FormField,
         FormRowComponent,
-        FormsModule,
         ModalDirective,
         TooltipDirective,
         TourStepDirective,
@@ -30,57 +29,54 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
     ],
 })
 export class ClientComponent {
-    @Input({ required: true })
-    public client!: ClientDto;
+    private readonly clientsState = inject(ClientsState);
 
-    @Input({ required: true })
-    public clientRoles!: ReadonlyArray<RoleDto>;
+    protected readonly appsState = inject(AppsState);
 
-    public apiCallsLimit = 0;
+    /** The client to show and edit. */
+    public readonly client = input.required<ClientDto>();
 
-    public connectDialog = new DialogModel(false);
+    /** The roles that can be assigned to the client. */
+    public readonly clientRoles = input.required<ReadonlyArray<RoleDto>>();
 
-    constructor(
-        public readonly appsState: AppsState,
-        private readonly clientsState: ClientsState,
-    ) {
+    protected readonly apiCallsLimit = form(linkedSignal(() => this.client().apiCallsLimit), path => {
+        disabled(path,
+            {when: () => !this.client().canUpdate }
+        );
+        min(path, 0);
+    });
+
+    protected readonly connectDialog = new DialogModel(false);
+
+    protected revoke() {
+        this.clientsState.revoke(this.client());
     }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.client) {
-            this.apiCallsLimit = this.client.apiCallsLimit;
-        }
+    protected regenerateSecret() {
+        this.clientsState.regenerateSecret(this.client());
     }
 
-    public revoke() {
-        this.clientsState.revoke(this.client);
-    }
-
-    public regenerateSecret() {
-        this.clientsState.regenerateSecret(this.client);
-    }
-
-    public updateRole(role: string) {
+    protected updateRole(role: string) {
         const request = new UpdateClientDto({ role });
 
-        this.clientsState.update(this.client, request);
+        this.clientsState.update(this.client(), request);
     }
 
-    public updateAllowAnonymous(allowAnonymous: boolean) {
+    protected updateAllowAnonymous(allowAnonymous: boolean) {
         const request = new UpdateClientDto({ allowAnonymous });
 
-        this.clientsState.update(this.client, request);
+        this.clientsState.update(this.client(), request);
     }
 
-    public updateApiCallsLimit(apiCallsLimit: number) {
+    protected updateApiCallsLimit(apiCallsLimit: number) {
         const request = new UpdateClientDto({ apiCallsLimit });
 
-        this.clientsState.update(this.client, request);
+        this.clientsState.update(this.client(), request);
     }
 
-    public rename(name: string) {
+    protected rename(name: string) {
         const request = new UpdateClientDto({ name });
 
-        this.clientsState.update(this.client, request);
+        this.clientsState.update(this.client(), request);
     }
 }

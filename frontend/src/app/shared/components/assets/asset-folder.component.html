@@ -1,12 +1,12 @@
-<div class="card" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)" [title]="assetFolder.folderName | sqxTranslate">
+<div class="card" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)" [title]="assetFolder().folderName | sqxTranslate">
     <div class="card-body">
         <div class="row g-2">
             <div class="col-auto"><img src="./images/folder.svg" /></div>
 
-            <div class="col truncate">{{ assetFolder.folderName | sqxTranslate }}</div>
+            <div class="col truncate">{{ assetFolder().folderName | sqxTranslate }}</div>
 
             <div class="col-auto">
-                @if ((canDelete || canUpdate) && !isDisabled) {
+                @if ((canDelete() || canUpdate()) && !isDisabled()) {
                     <button
                         class="btn btn-sm btn-text-secondary"
                         #buttonOptions
@@ -16,13 +16,13 @@
                         <i class="icon-dots"></i>
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editDropdown; closeAlways: true">
-                        @if (canUpdate) {
+                        @if (canUpdate()) {
                             <button class="dropdown-item" (click)="editDialog.show()" type="button">{{ "common.rename" | sqxTranslate }}</button>
                             <div class="dropdown-divider"></div>
                         }
                         <button
                             class="dropdown-item dropdown-item-delete"
-                            [class.disabled]="!canDelete"
+                            [class.disabled]="!canDelete()"
                             confirmRememberKey="deleteAssetFolder"
                             confirmText="i18n:assets.deleteFolderConfirmText"
                             confirmTitle="i18n:assets.deleteFolderConfirmTitle"
@@ -36,4 +36,4 @@
         </div>
     </div>
 </div>
-<sqx-asset-folder-dialog [assetFolder]="assetFolder" (dialogClose)="editDialog.hide()" *sqxModal="editDialog" />
+<sqx-asset-folder-dialog [assetFolder]="assetFolder()" (dialogClose)="editDialog.hide()" *sqxModal="editDialog" />

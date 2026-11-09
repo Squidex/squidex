@@ -1,29 +1,32 @@
-<div class="row g-0" [class.compare]="formModelCompare">
-    <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
-        <sqx-focus-marker [controlId]="formModel.path">
-            @if (!(formModel.hiddenChanges | async)) {
-                <div class="table-items-row table-items-row-summary" [class.bounce]="isSelected | async" [class.field-invalid]="isInvalid | async">
-                    @if (formModel.hasChanges | async) {
+@let compareForm = formCompare();
+@let compareModel = formModelCompare();
+
+<div class="row g-0" [class.compare]="compareModel">
+    <div [class.col-12]="!compareModel" [class.col-6]="compareModel">
+        <sqx-focus-marker [controlId]="formModel().path">
+            @if (!formModel().hidden()) {
+                <div class="table-items-row table-items-row-summary" [class.bounce]="isSelected()" [class.field-invalid]="isInvalid()">
+                    @if (formModel().hasChanges()) {
                         <div class="change-marker-host">
                             <div class="change-marker">{{ "contents.pendingChangesTitle" | sqxTranslate }}</div>
                         </div>
                     }
 
-                    @if (showAllControls) {
-                        @for (language of languages; track language; let i = $index) {
+                    @if (showAllControls()) {
+                        @for (languageItem of languages(); track languageItem; let i = $index) {
                             <div class="form-group">
                                 <sqx-field-editor
                                     [comments]="commentsState"
-                                    [displaySuffix]="prefix(language)"
-                                    [form]="form"
-                                    [formContext]="formContext"
-                                    [formLevel]="formLevel"
-                                    [formModel]="formModel.get(language)"
+                                    [displaySuffix]="prefix(languageItem)"
+                                    [form]="form()"
+                                    [formContext]="formContext()"
+                                    [formLevel]="formLevel()"
+                                    [formModel]="formModel().get(languageItem)"
                                     [hasChatBot]="hasChatBot"
-                                    [isCollapsed]="isCollapsed"
-                                    [isComparing]="!!formModelCompare"
-                                    [language]="language"
-                                    [languages]="languages">
+                                    [isCollapsed]="isCollapsed()"
+                                    [isComparing]="!!compareModel"
+                                    [language]="languageItem"
+                                    [languages]="languages()">
                                     <ng-container>
                                         @if (i === 0) {
                                             <ng-container *ngTemplateOutlet="sharedButtons" />
@@ -35,15 +38,15 @@
                     } @else {
                         <sqx-field-editor
                             [comments]="commentsState"
-                            [form]="form"
-                            [formContext]="formContext"
-                            [formLevel]="formLevel"
-                            [formModel]="getControl()"
+                            [form]="form()"
+                            [formContext]="formContext()"
+                            [formLevel]="formLevel()"
+                            [formModel]="control()"
                             [hasChatBot]="hasChatBot"
-                            [isCollapsed]="isCollapsed"
-                            [isComparing]="!!formModelCompare"
-                            [language]="language"
-                            [languages]="languages">
+                            [isCollapsed]="isCollapsed()"
+                            [isComparing]="!!compareModel"
+                            [language]="language()"
+                            [languages]="languages()">
                             <ng-container>
                                 <ng-container *ngTemplateOutlet="sharedButtons" />
                             </ng-container>
@@ -54,11 +57,11 @@
         </sqx-focus-marker>
     </div>
 
-    @if (formModelCompare && formCompare) {
+    @if (compareModel && compareForm) {
         <div class="col-6 col-right">
-            @if (!(isDisabled | async)) {
+            @if (!isDisabled()) {
                 <div class="copy-button-container">
-                    @if (isDifferent | async) {
+                    @if (isDifferent()) {
                         <button class="btn btn-primary btn-sm field-copy" attr.aria-label="{{ 'common.copy' | sqxTranslate }}" (click)="copy()" type="button">
                             <i class="icon-arrow_back"></i>
                         </button>
@@ -66,35 +69,35 @@
                 </div>
             }
 
-            @if (!(formModelCompare!.hiddenChanges | async)) {
+            @if (!compareModel.hidden()) {
                 <div class="table-items-row table-items-row-summary">
-                    @if (showAllControls) {
-                        @for (language of languages; track language) {
+                    @if (showAllControls()) {
+                        @for (languageItem of languages(); track languageItem) {
                             <div class="form-group">
                                 <sqx-field-editor
-                                    [displaySuffix]="prefix(language)"
-                                    [form]="formCompare"
-                                    [formContext]="formContext"
-                                    [formLevel]="formLevel"
-                                    [formModel]="formModelCompare.get(language)"
+                                    [displaySuffix]="prefix(languageItem)"
+                                    [form]="compareForm"
+                                    [formContext]="formContext()"
+                                    [formLevel]="formLevel()"
+                                    [formModel]="compareModel.get(languageItem)"
                                     [hasChatBot]="hasChatBot"
-                                    [isCollapsed]="isCollapsed"
-                                    [isComparing]="!!formModelCompare"
-                                    [language]="language"
-                                    [languages]="languages" />
+                                    [isCollapsed]="isCollapsed()"
+                                    [isComparing]="!!compareModel"
+                                    [language]="languageItem"
+                                    [languages]="languages()" />
                             </div>
                         }
                     } @else {
                         <sqx-field-editor
-                            [form]="formCompare"
-                            [formContext]="formContext"
-                            [formLevel]="formLevel"
-                            [formModel]="getControlCompare()!"
+                            [form]="compareForm"
+                            [formContext]="formContext()"
+                            [formLevel]="formLevel()"
+                            [formModel]="controlCompare()!"
                             [hasChatBot]="hasChatBot"
-                            [isCollapsed]="isCollapsed"
-                            [isComparing]="!!formModelCompare"
-                            [language]="language"
-                            [languages]="languages" />
+                            [isCollapsed]="isCollapsed()"
+                            [isComparing]="!!compareModel"
+                            [language]="language()"
+                            [languages]="languages()" />
                     }
                 </div>
             }
@@ -103,21 +106,21 @@
 </div>
 
 <ng-template #sharedButtons>
-    <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
+    <fieldset class="d-flex gap-1" [disabled]="isDisabled() || isCollapsed()">
         <sqx-field-languages
-            [formModel]="formModel"
-            [language]="language"
+            [formModel]="formModel()"
+            [language]="language()"
             (languageChange)="languageChange.emit($event)"
-            [languages]="languages"
-            [showAllControls]="showAllControls"
+            [languages]="languages()"
+            [showAllControls]="showAllControls()"
             (showAllControlsChange)="changeShowAllControls($event)" />
 
-        <sqx-field-copy-button [formModel]="formModel" [languages]="languages" />
+        <sqx-field-copy-button [formModel]="formModel()" [languages]="languages()" />
 
-        @if (isTranslatable) {
+        @if (isTranslatable()) {
             <sqx-menu-item
                 (action)="translate()"
-                [disabled]="formModel.field.isDisabled"
+                [disabled]="formModel().field.isDisabled"
                 icon="translate"
                 menuLabel="i18n:contents.autotranslateMenu"
                 small
@@ -126,7 +129,7 @@
         }
     </fieldset>
 
-    @if (isCollapsed) {
+    @if (isCollapsed()) {
         <sqx-menu-item (action)="toggle()" icon="angle-down" menuLabel="i18n:common.collapse" small tooltip="i18n:contents.arrayCollapseItem" />
     } @else {
         <sqx-menu-item (action)="toggle()" icon="angle-up" menuLabel="i18n:common.expand" small tooltip="i18n:contents.arrayCollapseItem" />

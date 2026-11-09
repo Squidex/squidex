@@ -5,61 +5,55 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { map, shareReplay } from 'rxjs/operators';
-import { ExtendedFormGroup, Form, value$ } from '@app/framework';
-import { AuthSchemeDto } from '@app/shared';
+import { computed } from '@angular/core';
+import { maxLength, required } from '@angular/forms/signals';
+import { AuthSchemeDto, SignalForm } from '@app/shared';
 
-export class UpdateTeamAuthForm extends Form<ExtendedFormGroup, AuthSchemeDto, Partial<AuthSchemeDto>> {
-    public get domain() {
-        return this.form.controls['domain'];
-    }
+export type UpdateTeamAuthFormModel = {
+    domain: string;
+    displayName: string;
+    clientId: string;
+    clientSecret: string;
+    authority: string;
+    signoutRedirectUrl: string;
+};
 
-    public domainValue$ = value$(this.domain).pipe(
-        map(x => x || 'domain.com'));
+export class UpdateTeamAuthForm extends SignalForm<UpdateTeamAuthFormModel, AuthSchemeDto, Partial<AuthSchemeDto>> {
+    public readonly domainValue = computed(() => {
+        return this.model().domain || 'domain.com';
+    });
 
-    public url = value$(this.form).pipe(
-        map(x => {
-            const q = new URLSearchParams({
-                domain: x.domain,
-                displayName: x.displayName,
-                clientId: x.clientId,
-                clientSecret: x.clientSecret,
-                authority: x.authority,
-            });
+    public readonly url = computed(() => {
+        const value = this.model();
 
-            return q.toString();
-        }),
-        shareReplay(1));
+        const query = new URLSearchParams({
+            domain: value.domain,
+            displayName: value.displayName,
+            clientId: value.clientId,
+            clientSecret: value.clientSecret,
+            authority: value.authority,
+        });
+
+        return query.toString();
+    });
 
     constructor() {
-        super(new ExtendedFormGroup({
-            domain: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(40),
-            ]),
-            displayName: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(40),
-            ]),
-            clientId: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(200),
-            ]),
-            clientSecret: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(200),
-            ]),
-            authority: new UntypedFormControl('', [
-                Validators.required,
-                Validators.maxLength(200),
-            ]),
-            signoutRedirectUrl: new UntypedFormControl('', [
-                Validators.maxLength(500),
-            ]),
-        }));
+        super({ domain: '', displayName: '', clientId: '', clientSecret: '', authority: '', signoutRedirectUrl: '' }, path => {
+            maxLength(path.domain, 40);
+            maxLength(path.displayName, 40);
+            maxLength(path.clientId, 200);
+            maxLength(path.clientSecret, 200);
+            maxLength(path.authority, 200);
+            maxLength(path.signoutRedirectUrl, 500);
+            required(path.domain);
+            required(path.displayName);
+            required(path.clientId);
+            required(path.clientSecret);
+            required(path.authority);
+        });
+    }
 
-        this.url.subscribe();
+    protected transformSubmit(value: UpdateTeamAuthFormModel) {
+        return new AuthSchemeDto(value);
     }
 }
-

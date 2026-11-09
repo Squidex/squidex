@@ -1,32 +1,31 @@
-@if (!autoHide || canGoPrev || canGoNext) {
+@if (!autoHide() || canGoPrev() || canGoNext()) {
     <div class="d-flex align-items-center justify-content-end">
-        @if (paging) {
+        @if (paging(); as paging) {
             <div class="float-end pagination">
                 <select
                     class="form-select form-select-sm"
                     attr.aria-label="{{ 'common.pageSize' | sqxTranslate }}"
-                    [ngModel]="paging.pageSize"
-                    (ngModelChange)="setPageSize($event)">
+                    (change)="setPageSize(+$any($event.target).value)">
                     @for (pageSize of pageSizes; track pageSize) {
-                        <option [ngValue]="pageSize">{{ pageSize }}</option>
+                        <option [selected]="pageSize === paging.pageSize" [value]="pageSize">{{ pageSize }}</option>
                     }
                 </select>
                 <span class="page-info d-flex align-items-center justify-content-end">
                     <span class="btn deactivated">&nbsp;</span> &nbsp;
                     @if (paging.count > 0 && paging.total > 0) {
-                        <button class="btn deactivated" type="button">{{ "common.pagerInfo" | sqxTranslate: translationInfo }}</button>
+                        <button class="btn deactivated" type="button">{{ "common.pagerInfo" | sqxTranslate: translationInfo() }}</button>
                     }
 
                     @if (paging.count > 0 && paging.total <= 0) {
                         <button class="btn" (click)="loadTotal.emit()" title="{{ 'common.pagerReload' | sqxTranslate }}" type="button">
-                            {{ "common.pagerInfoNoTotal" | sqxTranslate: translationInfo }}
+                            {{ "common.pagerInfoNoTotal" | sqxTranslate: translationInfo() }}
                         </button>
                     }
                     <button
                         class="btn btn-sm btn-text-secondary ms-2"
                         attr.aria-label="{{ 'common.prevPage' | sqxTranslate }}"
                         (click)="goPrev()"
-                        [disabled]="!canGoPrev"
+                        [disabled]="!canGoPrev()"
                         type="button">
                         <i class="icon-angle-left"></i>
                     </button>
@@ -34,7 +33,7 @@
                         class="btn btn-sm btn-text-secondary ms-2"
                         attr.aria-label="{{ 'common.nextPage' | sqxTranslate }}"
                         (click)="goNext()"
-                        [disabled]="!canGoNext"
+                        [disabled]="!canGoNext()"
                         type="button">
                         <i class="icon-angle-right"></i>
                     </button>

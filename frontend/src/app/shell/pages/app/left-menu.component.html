@@ -1,3 +1,4 @@
+@let appDto = app();
 <ul class="nav flex-column">
     <li class="nav-item" sqxTourStep="dashboard">
         <a class="nav-link" data-testid="dashboard" routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
@@ -6,7 +7,7 @@
         </a>
     </li>
 
-    @if (!isSchemasHidden(app) && app.canReadSchemas) {
+    @if (!isSchemasHidden() && appDto.canReadSchemas) {
         <li class="nav-item" sqxTourStep="schemas">
             <a class="nav-link" data-testid="schemas" routerLink="schemas" routerLinkActive="active">
                 <i class="nav-icon icon-schemas"></i>
@@ -15,7 +16,7 @@
         </li>
     }
 
-    @if (app.canAccessContent) {
+    @if (appDto.canAccessContent) {
         <li class="nav-item" sqxTourStep="content">
             <a class="nav-link" data-testid="content" routerLink="content" routerLinkActive="active">
                 <i class="nav-icon icon-contents"></i>
@@ -24,7 +25,7 @@
         </li>
     }
 
-    @if (!isAssetsHidden(app) && app.canReadAssets) {
+    @if (!isAssetsHidden() && appDto.canReadAssets) {
         <li class="nav-item" sqxTourStep="assets">
             <a class="nav-link" data-testid="assets" routerLink="assets" routerLinkActive="active">
                 <i class="nav-icon icon-assets"></i>
@@ -33,7 +34,7 @@
         </li>
     }
 
-    @if (app.canReadRules) {
+    @if (appDto.canReadRules) {
         <li class="nav-item" sqxTourStep="rules">
             <a class="nav-link" data-testid="rules" routerLink="rules" routerLinkActive="active">
                 <i class="nav-icon icon-rules"></i>
@@ -42,7 +43,7 @@
         </li>
     }
 
-    @if (!isApiHidden(app)) {
+    @if (!isApiHidden()) {
         <li class="nav-item" sqxTourStep="api">
             <a class="nav-link" data-testid="api" routerLink="api" routerLinkActive="active">
                 <i class="nav-icon icon-api"></i>
@@ -57,7 +58,7 @@
         <a class="nav-link" href="https://squidex.io/help" target="_blank"> <i class="nav-icon icon-help2"></i> </a>
     </li>
 
-    @if (!isSettingsHidden(app)) {
+    @if (!isSettingsHidden()) {
         <li class="nav-item" sqxTourStep="settings">
             <a class="nav-link" data-testid="settings" routerLink="settings" routerLinkActive="active">
                 <i class="nav-icon icon-settings"></i>

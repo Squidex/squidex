@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, input, numberAttribute, output } from '@angular/core';
 import { LoaderComponent, StopClickDirective, TranslatePipe } from '@app/framework';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
@@ -22,74 +22,71 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     ],
 })
 export class AssetFolderDropdownItemComponent {
-    @Input({ required: true })
-    public appName!: string;
+    private readonly assetsService = inject(AssetsService);
+    private readonly changeDetector = inject(ChangeDetectorRef);
 
-    @Input({ required: true })
-    public nodeModel!: AssetFolderDropdowNode;
+    /** The name of the app to load the child folders from. */
+    public readonly appName = input.required<string>();
 
-    @Input({ transform: numberAttribute })
-    public nodeLevel = 0;
+    /** The folder node to render. Its children are loaded on demand. */
+    public readonly nodeModel = input.required<AssetFolderDropdowNode>();
 
-    @Output()
-    public selectNode = new EventEmitter<AssetFolderDropdowNode>();
+    /** The depth of the node in the tree, used for the indentation. */
+    public readonly nodeLevel = input(0, { transform: numberAttribute });
 
-    public get paddingLeft() {
-        return `${this.nodeLevel}rem`;
-    }
+    /** Emits when a node is clicked. */
+    public readonly selectNode = output<AssetFolderDropdowNode>();
 
-    constructor(
-        private readonly assetsService: AssetsService,
-        private readonly changeDetector: ChangeDetectorRef,
-    ) {
-    }
+    protected readonly paddingLeft = computed(() => {
+        return `${this.nodeLevel()}rem`;
+    });
 
-    public toggle() {
-        if (this.nodeModel.isExpanded && this.nodeModel.isLoaded) {
+    protected toggle() {
+        const nodeModel = this.nodeModel();
+        if (nodeModel.isExpanded && nodeModel.isLoaded) {
             this.collapse();
         } else {
             this.expand();
         }
     }
 
-    public collapse() {
-        this.nodeModel.isExpanded = false;
+    private collapse() {
+        this.nodeModel().isExpanded = false;
     }
 
-    public expand() {
-        this.nodeModel.isExpanded = true;
+    private expand() {
+        this.nodeModel().isExpanded = true;
 
         this.loadChildren();
     }
 
-    public loadChildren() {
-        if (this.nodeModel.isLoading || this.nodeModel.isLoaded) {
+    private loadChildren() {
+        const nodeModel = this.nodeModel();
+        if (nodeModel.isLoading || nodeModel.isLoaded) {
             return;
         }
 
-        this.nodeModel.isLoading = true;
+        nodeModel.isLoading = true;
 
-        this.assetsService.getAssetFolders(this.appName, this.nodeModel.item.id, 'Items')
+        this.assetsService.getAssetFolders(this.appName(), nodeModel.item.id, 'Items')
             .subscribe({
                 next: dto => {
                     if (dto.items.length > 0) {
-                        const parent = this.nodeModel;
-
                         for (const item of dto.items) {
-                            if (!parent.children.find(x => x.item.id === item.id)) {
-                                parent.children.push({ item, children: [], parent });
+                            if (!nodeModel.children.find(x => x.item.id === item.id)) {
+                                nodeModel.children.push({ item, children: [], parent: nodeModel });
                             }
                         }
 
-                        parent.children.sortByString(x => x.item.folderName);
+                        nodeModel.children.sortByString(x => x.item.folderName);
                     }
 
-                    this.nodeModel.isLoaded = true;
+                    nodeModel.isLoaded = true;
                     this.changeDetector.detectChanges();
                 },
                 complete: () => {
                     setTimeout(() => {
-                        this.nodeModel.isLoading = false;
+                        nodeModel.isLoading = false;
                         this.changeDetector.detectChanges();
                     }, 250);
                 },

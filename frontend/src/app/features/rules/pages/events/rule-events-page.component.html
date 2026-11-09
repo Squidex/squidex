@@ -4,7 +4,7 @@
         <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:rules.refreshEventsTooltip" type="button">
             <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-        @if (ruleEventsState.canCancelAll | async) {
+        @if (ruleEventsState.canCancelAll()) {
             <button
                 class="btn btn-danger ms-2"
                 confirmRememberKey="cancelAllRuleEvents"
@@ -17,7 +17,7 @@
         }
     </ng-container>
     <ng-container>
-        <sqx-list-view [isLoading]="ruleEventsState.isLoading | async" table="true">
+        <sqx-list-view [isLoading]="ruleEventsState.isLoading()" table="true">
             <table class="table table-items table-fixed">
                 <thead>
                     <tr>
@@ -41,17 +41,17 @@
                     </tr>
                 </thead>
 
-                @for (event of ruleEventsState.ruleEvents | async; track event.id) {
+                @for (event of ruleEventsState.ruleEvents(); track event.id) {
                     <tbody
-                        [availableSteps]="availableSteps"
+                        [availableSteps]="rulesState.steps()"
                         (cancel)="cancel(event)"
                         (enqueue)="enqueue(event)"
-                        [expanded]="event.id === selectedEventId"
+                        [expanded]="event.id === selectedEventId()"
                         (expandedChange)="selectEvent(event.id)"
                         [sqxRuleEvent]="event"></tbody>
                 }
             </table>
-            <sqx-pager autoHide="true" [paging]="ruleEventsState.paging | async" (pagingChange)="ruleEventsState.page($event)" />
+            <sqx-pager autoHide="true" [paging]="ruleEventsState.paging()" (pagingChange)="ruleEventsState.page($event)" />
         </sqx-list-view>
     </ng-container>
 </sqx-layout>

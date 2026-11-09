@@ -6,21 +6,17 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, numberAttribute, viewChild, viewChildren } from '@angular/core';
 import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
-import { combineLatest, Observable } from 'rxjs';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, disabled$, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
     selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ArrayItemComponent,
-        AsyncPipe,
         CdkDrag,
         CdkDragHandle,
         CdkDropList,
@@ -35,144 +31,138 @@ import { ArrayItemComponent } from './array-item.component';
     ],
 })
 export class ArrayEditorComponent {
-    @Input({ required: true })
-    public hasChatBot!: boolean;
+    private readonly localStore = inject(LocalStoreService);
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** Enables the AI features of the editors. */
+    public readonly hasChatBot = input.required<boolean>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** The content form the field belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true })
-    public formModel!: FieldArrayForm;
+    /** The nesting level of the field, 0 for root fields. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isComparing = false;
+    /** The form model of the array or components field. */
+    public readonly formModel = input.required<FieldArrayForm>();
 
-    @Input({ transform: booleanAttribute })
-    public isExpanded = false;
+    /** Renders the editor next to the editor of another version. */
+    public readonly isComparing = input.required<boolean, unknown>({ transform: booleanAttribute });
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** Renders the items in fullscreen mode. */
+    public readonly isExpanded = input(false, { transform: booleanAttribute });
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The language of the field value. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @ViewChildren(ArrayItemComponent)
-    public children!: QueryList<ArrayItemComponent>;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @ViewChildren(VirtualScrollerComponent)
-    public scroller?: QueryList<VirtualScrollerComponent>;
+    protected readonly children = viewChildren(ArrayItemComponent);
 
-    public isArray = false;
+    protected readonly scroller = viewChild(VirtualScrollerComponent);
 
-    public schemasDropdown = new ModalModel();
-    public schemasList: ReadonlyArray<SchemaDto> = [];
+    protected readonly isArray = computed(() => {
+        return !Types.is(this.formModel().field.properties, ComponentsFieldPropertiesDto);
+    });
 
-    public isDisabledOrFull?: Observable<boolean>;
-    public isDisabled?: Observable<boolean>;
-    public isCollapsedInitial = false;
+    protected readonly schemasList = computed<ReadonlyArray<SchemaDto>>(() => {
+        const formModel = this.formModel();
 
-    public get hasField() {
-        return (this.formModel.field as any)['nested']?.length > 0;
-    }
-
-    constructor(
-        private readonly localStore: LocalStoreService,
-    ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formModel) {
-            const maxItems = this.formModel.field.rawProperties['maxItems'] || Number.MAX_VALUE;
-
-            if (Types.is(this.formModel.field.properties, ComponentsFieldPropertiesDto)) {
-                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).defined().sortedByString(x => x.displayName) || [];
-            } else {
-                this.isArray = true;
-            }
-
-            this.isDisabled = disabled$(this.formModel.form);
-            this.isDisabledOrFull = combineLatest([
-                this.isDisabled,
-                this.formModel.itemChanges,
-            ], (disabled, items) => {
-                return disabled || items.length >= maxItems;
-            });
+        const properties = formModel.field.properties;
+        if (!Types.is(properties, ComponentsFieldPropertiesDto)) {
+            return [];
         }
 
-        if (changes.formModel || changes.formLevel) {
-            this.isCollapsedInitial = this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel > 0;
-        }
+        return properties.schemaIds?.map(x => formModel.globals.schemas[x]).defined().sortedByString(x => x.displayName) || [];
+    });
+
+    protected readonly isDisabled = computed(() => {
+        return this.formModel().disabled();
+    });
+
+    protected readonly isDisabledOrFull = computed(() => {
+        const formModel = this.formModel();
+        const maxItems = formModel.field.rawProperties['maxItems'] || Number.MAX_VALUE;
+
+        return this.isDisabled() || formModel.items().length >= maxItems;
+    });
+
+    protected readonly isCollapsedInitial = computed(() => {
+        return this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel() > 0;
+    });
+
+    protected readonly hasField = computed(() => {
+        return (this.formModel().field as any)['nested']?.length > 0;
+    });
+
+    protected readonly schemasDropdown = new ModalModel();
+
+    protected removeItem(index: number) {
+        this.formModel().removeItemAt(index);
     }
 
-    public removeItem(index: number) {
-        this.formModel.removeItemAt(index);
+    protected addCopy(value: ObjectFormBase) {
+        this.formModel().addCopy(value);
     }
 
-    public addCopy(value: ObjectFormBase) {
-        this.formModel.addCopy(value);
+    protected addItem() {
+        this.formModel().addItem();
     }
 
-    public addItem() {
-        this.formModel.addItem();
+    protected addComponent(schema: SchemaDto) {
+        this.formModel().addComponent(schema.id);
     }
 
-    public addComponent(schema: SchemaDto) {
-        this.formModel.addComponent(schema.id);
+    protected clear() {
+        this.formModel().setValue([]);
     }
 
-    public clear() {
-        this.formModel.setValue([]);
-    }
-
-    public sort(event: CdkDragDrop<ReadonlyArray<ObjectFormBase>>) {
-        this.formModel.sort(sorted(event));
+    protected sort(event: CdkDragDrop<ReadonlyArray<ObjectFormBase>>) {
+        this.formModel().sort(sorted(event));
 
         this.reset();
     }
 
-    public move(item: ObjectFormBase, index: number) {
-        this.formModel.move(index, item);
+    protected move(item: ObjectFormBase, index: number) {
+        this.formModel().move(index, item);
 
         this.reset();
     }
 
-    public collapseAll() {
-        for (const item of this.formModel.items) {
+    protected collapseAll() {
+        for (const item of this.formModel().items()) {
             item.collapse();
         }
 
-        if (this.formLevel === 0) {
+        if (this.formLevel() === 0) {
             this.localStore.setBoolean(this.isCollapsedKey(), true);
         }
 
-        this.scroller?.first?.invalidateAllCachedMeasurements();
+        this.scroller()?.invalidateAllCachedMeasurements();
     }
 
-    public expandAll() {
-        for (const item of this.formModel.items) {
+    protected expandAll() {
+        for (const item of this.formModel().items()) {
             item.expand();
         }
 
-        if (this.formLevel === 0) {
+        if (this.formLevel() === 0) {
             this.localStore.setBoolean(this.isCollapsedKey(), false);
         }
 
-        this.scroller?.first?.invalidateAllCachedMeasurements();
+        this.scroller()?.invalidateAllCachedMeasurements();
     }
 
     private reset() {
-        this.children.forEach(child => {
+        this.children().forEach(child => {
             child.reset();
         });
     }
 
     private isCollapsedKey(): string {
-        return Settings.Local.FIELD_COLLAPSED(this.form.schema?.id, this.formModel.field?.fieldId);
+        return Settings.Local.FIELD_COLLAPSED(this.form().schema?.id, this.formModel().field?.fieldId);
     }
 }

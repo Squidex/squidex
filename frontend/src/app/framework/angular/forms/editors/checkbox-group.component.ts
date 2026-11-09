@@ -5,149 +5,103 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { AfterViewChecked, AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer, Types } from '@app/framework/internal';
+import { booleanAttribute, Component, computed, ElementRef, input, linkedSignal, model, signal, viewChild } from '@angular/core';
+import { getTagValues, MathHelper, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
-
-export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true,
-};
-
-interface State {
-    // The checked values.
-    checkedValues: ReadonlyArray<TagValue>;
-
-    // True when all checkboxes can be shown as single line.
-    isSingleline?: boolean;
-}
+import { FormValueControlBase } from '../form-value-control';
 
 @Component({
     selector: 'sqx-checkbox-group',
     styleUrls: ['./checkbox-group.component.scss'],
     templateUrl: './checkbox-group.component.html',
-    providers: [
-        SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ResizedDirective,
     ],
 })
-export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked {
-    private readonly textMeasurer: TextMeasurer;
-    private childrenWidth = 0;
-    private checkedValuesRaw: any;
-    private containerWidth = 0;
-    private labelsMeasured = false;
+export class CheckboxGroupComponent extends FormValueControlBase<ReadonlyArray<string> | null> {
+    private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
 
-    public readonly controlId = MathHelper.guid();
+    /** The values of the checked options. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
 
-    @ViewChild('container', { static: false })
-    public containerElement!: ElementRef<HTMLDivElement>;
+    /** Renders the options in a single line, in multiple lines or depending on the available space. */
+    public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');
 
-    @Input()
-    public layout: 'Auto' | 'Singleline' | 'Multiline' = 'Auto';
+    /** Keeps the order of the values instead of sorting them by name. */
+    public readonly unsorted = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public unsorted = true;
+    /** The values to choose from. */
+    public readonly values = input<ReadonlyArray<string | TagValue>>([]);
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    protected readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
 
-    @Input()
-    public set values(value: ReadonlyArray<string | TagValue>) {
-        this.tagValuesUnsorted = getTagValues(value, false);
-        this.tagValuesSorted = this.tagValuesUnsorted.sortedByString(x => x.lowerCaseName);
+    protected readonly containerWidth = signal(0);
 
-        this.writeValue(this.checkedValuesRaw);
-    }
+    protected readonly checkedValues = linkedSignal<{ raw: unknown; tags: ReadonlyArray<TagValue> }, ReadonlyArray<TagValue>>({
+        source: () => ({ raw: this.value(), tags: this.tagValuesUnsorted() }),
+        computation: ({ raw, tags }, previous) => {
+            // Keep the order of the user's selection, when the value was set by this control.
+            if (previous && previous.source.tags === tags && Types.equals(previous.value.map(x => x.id), raw)) {
+                return previous.value;
+            }
 
-    public get tagValues() {
-        return !this.unsorted ? this.tagValuesSorted : this.tagValuesUnsorted;
-    }
+            if (!Types.isArray(raw) || raw.length === 0) {
+                return [];
+            }
 
-    public tagValuesSorted: ReadonlyArray<TagValue> = [];
-    public tagValuesUnsorted: ReadonlyArray<TagValue> = [];
+            return tags.filter(x => raw.includes(x.value));
+        },
+    });
 
-    constructor() {
-        super({ checkedValues: [] });
+    protected readonly tagValuesUnsorted = computed(() => {
+        return getTagValues(this.values(), false);
+    });
 
-        this.textMeasurer = new TextMeasurer(() => this.containerElement);
-    }
+    protected readonly tagValuesSorted = computed(() => {
+        return this.tagValuesUnsorted().sortedByString(x => x.lowerCaseName);
+    });
 
-    public ngAfterViewInit() {
-        this.calculateWidth();
-    }
-
-    public ngAfterViewChecked() {
-        this.calculateWidth();
-    }
-
-    public ngOnChanges() {
-        this.labelsMeasured = false;
-
-        this.calculateWidth();
-    }
-
-    public updateContainerWidth(width: number) {
-        this.containerWidth = width;
-
-        this.calculateSingleLine();
-    }
-
-    private calculateWidth() {
-        if (this.labelsMeasured) {
-            this.calculateSingleLine();
-            return;
+    protected readonly tagValuesWidth = computed(() => {
+        // The font can only be read from a rendered element, which is the case when the container has a size.
+        if (this.containerWidth() === 0) {
+            return -1;
         }
 
         let width = 0;
-
-        for (const value of this.tagValuesUnsorted) {
+        for (const value of this.tagValuesUnsorted()) {
             width += 40;
             width += this.textMeasurer.getTextSize(value.name);
         }
 
+        return width;
+    });
+
+    protected readonly tagValues = computed(() => {
+        return this.unsorted() ? this.tagValuesUnsorted() : this.tagValuesSorted();
+    });
+
+    protected readonly isSingleline = computed(() => {
+        const layout = this.layout();
+        if (layout !== 'Auto') {
+            return layout === 'Singleline';
+        }
+
+        const width = this.tagValuesWidth();
         if (width < 0) {
-            return;
+            return false;
         }
 
-        this.childrenWidth = width;
-        this.calculateSingleLine();
+        return width < this.containerWidth();
+    });
 
-        this.labelsMeasured = true;
+    protected readonly controlId = MathHelper.guid();
+
+    protected updateContainerWidth(width: number) {
+        this.containerWidth.set(width);
     }
 
-    private calculateSingleLine() {
-        let isSingleline = false;
-
-        if (this.layout !== 'Auto') {
-            isSingleline = this.layout === 'Singleline';
-        } else {
-            isSingleline = this.childrenWidth < this.containerWidth;
-        }
-
-        this.next({ isSingleline });
-    }
-
-    public writeValue(obj: any) {
-        this.checkedValuesRaw = obj;
-
-        let checkedValues: TagValue[] = [];
-
-        if (Types.isArray(obj) && obj.length > 0) {
-            checkedValues = this.tagValuesUnsorted.filter(x => obj.includes(x.value));
-        }
-
-        this.next({ checkedValues });
-    }
-
-    public check(isChecked: boolean, value: TagValue) {
-        let checkedValues = this.snapshot.checkedValues;
+    protected check(isChecked: boolean, value: TagValue) {
+        let checkedValues = this.checkedValues();
 
         if (isChecked) {
             checkedValues = [value, ...checkedValues];
@@ -155,12 +109,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
             checkedValues = checkedValues.removed(value);
         }
 
-        this.next({ checkedValues });
-
-        this.callChange(checkedValues.map(x => x.id));
-    }
-
-    public isChecked(value: TagValue) {
-        return this.snapshot.checkedValues.includes(value);
+        this.checkedValues.set(checkedValues);
+        this.value.set(checkedValues.map(x => x.id));
     }
 }

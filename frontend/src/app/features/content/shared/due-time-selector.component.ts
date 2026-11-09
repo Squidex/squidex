@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, Component, input, signal } from '@angular/core';
+import { form, FormField } from '@angular/forms/signals';
 import { Observable, of, Subject } from 'rxjs';
 import { DateTime, DateTimeEditorComponent, DialogModel, FocusOnInitDirective, ModalDialogComponent, ModalDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 
@@ -19,7 +19,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
     imports: [
         DateTimeEditorComponent,
         FocusOnInitDirective,
-        FormsModule,
+        FormField,
         ModalDialogComponent,
         ModalDirective,
         TooltipDirective,
@@ -29,28 +29,31 @@ const OPTION_IMMEDIATELY = 'Immediately';
 export class DueTimeSelectorComponent {
     private dueTimeResult?: Subject<DateTime | undefined>;
 
-    @Input({ transform: booleanAttribute })
-    public disabled?: boolean | null;
+    /** Skips the dialog and changes the status immediately. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    public dueTimeDialog = new DialogModel();
-    public dueTime: string | null = '';
-    public dueTimeAction: string | null = '';
-    public dueTimeMode = OPTION_IMMEDIATELY;
+    protected readonly dueTime = signal<string | null>('');
+
+    protected readonly dueTimeAction = signal<string | null>('');
+
+    protected readonly dueTimeDialog = new DialogModel();
+
+    protected readonly dueTimeMode = form(signal(OPTION_IMMEDIATELY));
 
     public selectDueTime(action: string): Observable<DateTime | undefined> {
-        if (this.disabled) {
+        if (this.disabled()) {
             return of(undefined);
         }
 
-        this.dueTimeAction = action;
+        this.dueTimeAction.set(action);
         this.dueTimeResult = new Subject<DateTime | undefined>();
         this.dueTimeDialog.show();
 
         return this.dueTimeResult;
     }
 
-    public confirmStatusChange() {
-        const result = this.dueTimeMode === OPTION_IMMEDIATELY ? null : this.dueTime;
+    protected confirmStatusChange() {
+        const result = this.dueTimeMode().value() === OPTION_IMMEDIATELY ? null : this.dueTime();
 
         this.dueTimeResult?.next(result ? DateTime.parseISO(result) : undefined);
         this.dueTimeResult?.complete();
@@ -58,10 +61,10 @@ export class DueTimeSelectorComponent {
         this.cancelStatusChange();
     }
 
-    public cancelStatusChange() {
-        this.dueTimeMode = OPTION_IMMEDIATELY;
+    protected cancelStatusChange() {
+        this.dueTimeMode().value.set(OPTION_IMMEDIATELY);
         this.dueTimeDialog.hide();
         this.dueTimeResult = null!;
-        this.dueTime = null;
+        this.dueTime.set(null);
     }
 }

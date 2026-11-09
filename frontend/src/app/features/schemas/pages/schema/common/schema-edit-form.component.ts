@@ -6,8 +6,9 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, inject, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AppLanguageDto, EditSchemaForm, FormRowComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -15,71 +16,63 @@ import { AppLanguageDto, EditSchemaForm, FormRowComponent, SchemaDto, SchemasSta
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html',
     imports: [
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class SchemaEditFormComponent {
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    private readonly schemasState = inject(SchemasState);
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The schema to edit. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public isEditable?: boolean | null;
+    /** The languages of the app, to provide the localized search fields. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    public schemaForm = new EditSchemaForm();
+    protected readonly isEditable = computed(() => {
+        return this.schema().canUpdate;
+    });
 
-    public fieldNames: ReadonlyArray<string> = [];
-
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
-
-    public ngOnChanges() {
-        this.isEditable = this.schema.canUpdate;
-
-        this.schemaForm.load(this.schema.properties);
-        this.schemaForm.setEnabled(this.isEditable);
+    protected readonly fieldNames = computed(() => {
+        const languages = this.languages();
 
         const fieldNames = new Set<string>();
-        for (const field of this.schema.fields) {
+        for (const field of this.schema().fields) {
             if (field.properties.isContentField && field.properties.fieldType === 'String') {
                 if (field.partitioning === 'invariant') {
                     fieldNames.add(`data.${field.name}.iv`);
                 } else {
-                    for (const language of this.languages) {
+                    for (const language of languages) {
                         fieldNames.add(`data.${field.name}.${language}`);
                     }
                 }
             }
         }
 
-        this.fieldNames = [...fieldNames].sorted();
+        return [...fieldNames].sorted();
+    });
+
+    protected readonly schemaForm = new EditSchemaForm();
+
+    constructor() {
+        effect(() => {
+            const schema = this.schema();
+
+            this.schemaForm.load(schema.properties);
+            this.schemaForm.setEnabled(schema.canUpdate);
+        });
     }
 
-    public saveSchema() {
-        if (!this.isEditable) {
+    protected saveSchema() {
+        if (!this.isEditable()) {
             return;
         }
 
-        const value = this.schemaForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.schemasState.update(this.schema, value)
-            .subscribe({
-                next: () => {
-                    this.schemaForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.schemaForm.submitFailed(error);
-                },
-            });
+        this.schemaForm.submit(value => {
+            return this.schemasState.update(this.schema(), value);
+        });
     }
 }

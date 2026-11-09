@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, VersionTag } from '@app/framework';
@@ -42,31 +42,33 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class LanguagesState extends State<Snapshot> {
+    private readonly appLanguagesService = inject(AppLanguagesService);
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly languagesService = inject(LanguagesService);
     private cachedLanguage$?: Observable<ReadonlyArray<LanguageDto>>;
 
-    public languages =
+    public readonly languages =
         this.project(x => x.languages);
 
-    public isoLanguages =
+    public readonly isoLanguages =
         this.project(x => x.languages.map(y => y.language));
 
-    public isoMasterLanguage =
-        this.projectFrom(this.isoLanguages, x => x.find(l => l.isMaster)!);
+    public readonly isoMasterLanguage =
+        computed(() => this.isoLanguages().find(l => l.isMaster)!);
 
-    public newLanguages =
+    public readonly newLanguages =
         this.project(x => x.allLanguagesNew);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {
@@ -77,12 +79,7 @@ export class LanguagesState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    constructor(
-        private readonly appLanguagesService: AppLanguagesService,
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly languagesService: LanguagesService,
-    ) {
+    constructor() {
         super({
             allLanguages: [],
             allLanguagesNew: [],

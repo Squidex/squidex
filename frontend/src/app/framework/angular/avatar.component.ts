@@ -5,62 +5,45 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
-import { picasso, TypedSimpleChanges } from '@app/framework/internal';
+import { Component, computed, input, linkedSignal, numberAttribute } from '@angular/core';
+import { picasso } from '@app/framework/internal';
 import { SafeUrlPipe } from './safe-html.pipe';
 
 @Component({
     selector: 'sqx-avatar',
     styleUrls: ['./avatar.component.scss'],
     templateUrl: './avatar.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SafeUrlPipe,
     ],
 })
 export class AvatarComponent {
-    @Input()
-    public identifier: string | undefined | null;
+    /** The identifier to generate the fallback image from, for example the user ID. */
+    public readonly identifier = input<string | undefined | null>();
 
-    @Input()
-    public image: string | undefined | null;
+    /** The URL of the image. Falls back to a generated image when not set or not loadable. */
+    public readonly image = input<string | undefined | null>();
 
-    @Input({ transform: numberAttribute })
-    public size = 50;
+    /** The width and height of the avatar in pixels. */
+    public readonly size = input(50, { transform: numberAttribute });
 
-    public imageSource?: string | null;
-    public imageSize = '50px';
+    protected readonly actualImage = linkedSignal(() => this.image());
 
-    public actualImage: string | undefined | null;
+    protected readonly imageSource = computed(() => {
+        return this.actualImage() || this.createSvg(this.identifier());
+    });
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.image) {
-            this.actualImage = this.image;
-        }
+    protected readonly imageSize = computed(() => {
+        return `${this.size()}px`;
+    });
 
-        if (changes.image || changes.identifier) {
-            this.updateSource();
-        }
-
-        if (changes.size) {
-            this.imageSize = `${this.size}px`;
-        }
+    protected unsetImage() {
+        this.actualImage.set(null);
     }
 
-    private updateSource() {
-        this.imageSource = this.actualImage || this.createSvg();
-    }
-
-    public unsetImage() {
-        this.actualImage = null;
-
-        this.updateSource();
-    }
-
-    private createSvg() {
-        if (this.identifier) {
-            return `data:image/svg+xml;utf8,${picasso(this.identifier)}`;
+    private createSvg(identifier: string | undefined | null) {
+        if (identifier) {
+            return `data:image/svg+xml;utf8,${picasso(identifier)}`;
         } else {
             return null;
         }

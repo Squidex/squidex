@@ -8,17 +8,17 @@
                 </button>
             </div>
 
-            @if (languages.length > 1) {
+            @if (languages().length > 1) {
                 <div class="col-auto">
-                    <sqx-language-selector class="languages-buttons" [language]="language" (languageChange)="changeLanguage($event)" [languages]="languages" />
+                    <sqx-language-selector class="languages-buttons" [language]="language()" (languageChange)="changeLanguage($event)" [languages]="languages()" />
                 </div>
             }
         </div>
     </ng-container>
     <ng-container>
-        <sqx-list-view [isLoading]="contentsState.isLoading | async" table="true">
+        <sqx-list-view [isLoading]="contentsState.isLoading()" table="true">
             <ng-container>
-                @if (contentsState.contents | async; as contents) {
+                @if (contentsState.contents(); as contents) {
                     <table class="table table-items table-fixed">
                         @for (content of contents; track content.id) {
                             <tbody
@@ -26,14 +26,14 @@
                                 [columns]="contents | sqxContentsColumns"
                                 [isCompact]="false"
                                 [isDisabled]="false"
-                                [language]="language"
-                                [languages]="languages"
+                                [language]="language()"
+                                [languages]="languages()"
                                 [sqxReferenceItem]="content"
-                                [validations]="(contentsState.validationResults | async)!"
+                                [validations]="contentsState.validationResults()"
                                 [validityVisible]="true"></tbody>
                         }
 
-                        @if ((contentsState.isLoaded | async) && contents.length === 0) {
+                        @if (contentsState.isLoaded() && contents.length === 0) {
                             <tbody>
                                 <tr>
                                     <td class="table-items-row-empty">{{ "contents.noReferencing" | sqxTranslate }}</td>
@@ -44,7 +44,7 @@
                 }
             </ng-container>
             <ng-container footer>
-                <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" />
+                <sqx-pager [paging]="contentsState.paging()" (pagingChange)="contentsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

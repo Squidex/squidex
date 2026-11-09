@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AssignContributorDto, ContributorDto, ContributorsDto, debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, StringHelper, TeamsState, Types, VersionTag } from '@app/shared';
@@ -25,44 +25,44 @@ interface Snapshot extends ListState<string> {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class TeamContributorsState extends State<Snapshot> {
-    public contributors =
+    private readonly contributorsService = inject(TeamContributorsService);
+    private readonly dialogs = inject(DialogService);
+    private readonly teamsState = inject(TeamsState);
+
+    public readonly contributors =
         this.project(x => x.contributors);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.contributors.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public queryRegex =
-        this.projectFrom(this.query, x => getRegex(x));
+    public readonly queryRegex =
+        computed(() => getRegex(this.query()));
 
-    public maxContributors =
+    public readonly maxContributors =
         this.project(x => x.maxContributors);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public contributorsFiltered =
+    public readonly contributorsFiltered =
         this.project(getFilteredContributors);
 
     public get teamId() {
         return this.teamsState.teamId;
     }
 
-    constructor(
-        private readonly teamsState: TeamsState,
-        private readonly contributorsService: TeamContributorsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({
             contributors: [],
             maxContributors: -1,

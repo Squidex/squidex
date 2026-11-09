@@ -1,25 +1,25 @@
-@if (!check) {
-    <label [class]="labelClass" for="{{ fieldName }}">
-        {{ label | sqxTranslate }}
-        @if (required) {
+@if (!check()) {
+    <label [class]="labelClass()" for="{{ fieldName() }}">
+        {{ label() | sqxTranslate }}
+        @if (required()) {
             <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
         }
     </label>
 }
 
-<div [class]="mainClass">
-    @if (!hideError) {
-        <sqx-control-errors [for]="for" [submitCount]="submitCount" />
+<div [class]="mainClass()">
+    @if (!hideError()) {
+        <sqx-control-errors [for]="for()" />
     }
 
-    <div [class.form-check]="check" [class.g-0]="hasUnit" [class.row]="hasUnit">
-        <div [class.col]="hasUnit">
+    <div [class.form-check]="check()" [class.g-0]="hasUnit()" [class.row]="hasUnit()">
+        <div [class.col]="hasUnit()">
             <ng-content></ng-content>
         </div>
 
-        @if (hasUnit) {
+        @if (hasUnit()) {
             <div class="col col-unit">
-                @if (unit) {
+                @if (unit(); as unit) {
                     <label class="col-form-label">{{ unit | sqxTranslate }}</label>
                 } @else {
                     &nbsp;
@@ -27,16 +27,16 @@
             </div>
         }
 
-        @if (check) {
-            <label class="form-check-label" for="{{ fieldName }}"> {{ label | sqxTranslate }}</label>
+        @if (check()) {
+            <label class="form-check-label" for="{{ fieldName() }}"> {{ label() | sqxTranslate }}</label>
         }
     </div>
 
-    @if (hint) {
+    @if (hint(); as hint) {
         <sqx-form-hint> <span [sqxMarkdown]="hint | sqxTranslate"></span> </sqx-form-hint>
     }
 
-    @if (alert) {
+    @if (alert(); as alert) {
         <sqx-form-alert> <span inline="false" [sqxMarkdown]="alert | sqxTranslate"></span> </sqx-form-alert>
     }
 </div>

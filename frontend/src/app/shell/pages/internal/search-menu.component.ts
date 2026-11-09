@@ -5,23 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, Service, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, ShortcutComponent, ShortcutDirective, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { AutocompleteComponent as AutocompleteComponent_1 } from '../../../framework/angular/forms/editors/autocomplete.component';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class SearchSource implements AutocompleteSource {
-    public selectedApp = this.appsState.selectedApp;
+    private readonly appsState = inject(AppsState);
+    private readonly searchService = inject(SearchService);
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly searchService: SearchService,
-    ) {
-    }
+    public readonly selectedApp = this.appsState.selectedApp;
 
     public find(query: string): Observable<readonly any[]> {
         if (!query || query.length < 3) {
@@ -39,11 +34,8 @@ export class SearchSource implements AutocompleteSource {
     providers: [
         SearchSource,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         AutocompleteComponent_1,
-        FormsModule,
         ShortcutComponent,
         ShortcutDirective,
         TooltipDirective,
@@ -51,25 +43,22 @@ export class SearchSource implements AutocompleteSource {
     ],
 })
 export class SearchMenuComponent {
-    @ViewChild(AutocompleteComponent, { static: false })
-    public searchControl!: AutocompleteComponent;
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly router = inject(Router);
 
-    public searchResult?: SearchResultDto;
+    protected readonly searchSource = inject(SearchSource);
 
-    constructor(
-        private readonly router: Router,
-        private readonly apiUrl: ApiUrlConfig,
-        public readonly searchSource: SearchSource,
-    ) {
-    }
+    protected readonly searchControl = viewChild(AutocompleteComponent);
 
-    public selectResult(result: SearchResultDto) {
+    protected readonly searchResult?: SearchResultDto;
+
+    protected selectResult(result: SearchResultDto) {
         if (Types.is(result, SearchResultDto)) {
             const relativeUrl = result.url.substring(this.apiUrl.value.length);
 
             this.router.navigateByUrl(relativeUrl);
 
-            this.searchControl.reset();
+            this.searchControl()?.reset();
         }
     }
 }

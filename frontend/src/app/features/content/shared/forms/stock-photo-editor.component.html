@@ -3,7 +3,7 @@
         class="btn btn-outline-secondary"
         attr.aria-label="{{ 'common.clear' | sqxTranslate }}"
         (click)="reset()"
-        [disabled]="!valueControl.value"
+        [disabled]="!value()"
         type="button">
         <i class="icon-close"></i>
     </button>
@@ -11,27 +11,27 @@
         <i class="icon-search"></i>
     </button>
 
-    <input class="form-control" [disabled]="true" [formControl]="valueControl" readonly />
+    <input class="form-control" [disabled]="true" readonly [value]="value() ?? ''" />
 </div>
 
-@if (stockPhotoThumbnail | async; as url) {
-    <div class="preview mt-1" [class.hidden-important]="snapshot.thumbnailStatus === 'Failed'">
+@if (stockPhotoThumbnail(); as url) {
+    <div class="preview mt-1" [class.hidden-important]="thumbnailStatus() === 'Failed'">
         <img (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()" [src]="url" />
-        @if (snapshot.thumbnailStatus !== "Loaded") {
+        @if (thumbnailStatus() !== "Loaded") {
             <sqx-loader color="white" />
         }
     </div>
 }
 <sqx-modal-dialog (dialogClose)="searchDialog.hide()" fullHeight="true" size="lg" *sqxModal="searchDialog">
     <ng-container title>
-        <input class="form-control search" [formControl]="stockPhotoSearch" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}" sqxFocusOnInit />
-        @if (snapshot.isLoading) {
+        <input class="form-control search" [disabled]="disabled()" (input)="search($event)" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}" sqxFocusOnInit [value]="stockPhotoSearch()" />
+        @if (stockPhotosLoading()) {
             <sqx-loader />
         }
     </ng-container>
     <ng-container content>
         <div class="photos">
-            @for (photo of snapshot.stockPhotos; track photo.thumbUrl) {
+            @for (photo of stockPhotos(); track photo.thumbUrl) {
                 <div class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
                     <img [src]="photo.thumbUrl" />
                     <div class="photo-user">
@@ -43,11 +43,11 @@
             }
         </div>
 
-        @if (snapshot.hasMore) {
+        @if (stockPhotosHasMore()) {
             <div class="mt-4 text-center">
-                <button class="btn btn-outline-secondary" (click)="loadMore()" [disabled]="snapshot.isLoading" type="button">
+                <button class="btn btn-outline-secondary" (click)="loadMore()" [disabled]="stockPhotosLoading()" type="button">
                     {{ "common.loadMore" | sqxTranslate }}
-                    @if (snapshot.isLoading) {
+                    @if (stockPhotosLoading()) {
                         <sqx-loader />
                     }
                 </button>

@@ -5,168 +5,137 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { BehaviorSubject, of } from 'rxjs';
-import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, LoaderComponent, ModalDialogComponent, ModalDirective, StatefulControlComponent, StockPhotoDto, StockPhotoService, StopClickDirective, Subscriptions, thumbnail, TooltipDirective, TranslatePipe, Types, value$, valueProjection$ } from '@app/shared';
+import { Component, computed, inject, linkedSignal, model, signal } from '@angular/core';
+import { of, timer } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, FormValueControlBase, LoaderComponent, ModalDialogComponent, ModalDirective, safeResource, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe } from '@app/shared';
 
-export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,
-};
-
-interface State {
-    // True when loading assets.
-    isLoading?: boolean;
-
-    // The photos.
-    stockPhotos: ReadonlyArray<StockPhotoDto>;
-
-    // True if more photos are available.
-    hasMore?: boolean;
-
-    // The status of the thumbnail.
-    thumbnailStatus?: 'Loaded' | 'Failed';
-}
-
-type Request = { search?: string; page: number };
+type StockPhotoPage = { page: number; items: ReadonlyArray<StockPhotoDto> };
 
 @Component({
     selector: 'sqx-stock-photo-editor',
     styleUrls: ['./stock-photo-editor.component.scss'],
     templateUrl: './stock-photo-editor.component.html',
-    providers: [
-        SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ExternalLinkDirective,
         FocusOnInitDirective,
-        FormsModule,
         LoaderComponent,
         ModalDialogComponent,
         ModalDirective,
-        ReactiveFormsModule,
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class StockPhotoEditorComponent extends FormValueControlBase<string | null> {
+    private readonly stockPhotoService = inject(StockPhotoService);
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** The value of the control. */
+    public readonly value = model<string | null>(null);
 
-    public valueControl = new UntypedFormControl('');
+    protected readonly stockPhotoSearch = signal('');
 
-    public stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
-    public stockPhotoThumbnail = valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x);
-    public stockPhotoSearch = new UntypedFormControl('');
+    protected readonly stockPhotoPage = linkedSignal(() => {
+        this.stockPhotoSearch();
 
-    public searchDialog = new DialogModel();
+        return 1;
+    });
 
-    constructor(
-        private readonly stockPhotoService: StockPhotoService,
-    ) {
-        super({ stockPhotos: [] });
-    }
+    protected readonly stockPhotos = linkedSignal<StockPhotoPage | undefined, ReadonlyArray<StockPhotoDto>>({
+        source: () => this.stockPhotoResult.isLoading() ? undefined : this.stockPhotoResult.value(),
+        computation: (result, previous) => {
+            // Keep the current photos while the next page or search is loading.
+            if (!result) {
+                return previous?.value ?? [];
+            }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            value$(this.valueControl)
-                .subscribe(() => {
-                    this.next({ thumbnailStatus: undefined });
-                }));
+            if (result.page > 1) {
+                return [...previous?.value ?? [], ...result.items];
+            }
 
-        this.subscriptions.add(
-            value$(this.stockPhotoSearch)
-                .subscribe(search => {
-                    this.stockPhotoRequests.next({ search, page: 1 });
-                }));
+            return result.items;
+        },
+    });
 
-        this.subscriptions.add(
-            this.valueControl.valueChanges
-                .subscribe(value => {
-                    this.callChange(value);
-                    this.callTouched();
-                }));
+    protected readonly stockPhotosHasMore = linkedSignal<StockPhotoPage | undefined, boolean>({
+        source: () => this.stockPhotoResult.isLoading() ? undefined : this.stockPhotoResult.value(),
+        computation: (result, previous) => {
+            if (!result) {
+                return previous?.value ?? false;
+            }
 
-        this.subscriptions.add(
-            this.stockPhotoRequests.pipe(
-                debounceTime(500),
-                tap(request => {
-                    if (request.search && request.search.length > 0) {
-                        this.next({ isLoading: true });
-                    }
-                }),
-                switchMap(request => {
-                    if (request.search && request.search.length > 0) {
-                        return this.stockPhotoService.getImages(request.search, request.page).pipe(map(result => ({ request, result })));
-                    } else {
-                        return of(({ request, result: [] }));
-                    }
-                }),
-                tap(({ request, result }) => {
-                    this.next(s => ({
-                        ...s,
-                        isLoading: false,
-                        isDisabled: s.isDisabled,
-                        stockPhotos: request.page > 1 ? [...s.stockPhotos, ...result] : result,
-                        hasMore: result.length === 20,
-                    }));
-                })));
-    }
+            return result.items.length === 20;
+        },
+    });
 
-    public writeValue(obj: string) {
-        if (Types.isString(obj)) {
-            this.valueControl.setValue(obj);
-        } else {
-            this.valueControl.setValue('');
-        }
-    }
+    protected readonly thumbnailStatus = linkedSignal<string | null, 'Loaded' | 'Failed' | undefined>({
+        source: this.value,
+        computation: () => undefined,
+    });
 
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.stockPhotoSearch.disable({ emitEvent: false });
-        } else {
-            this.stockPhotoSearch.enable({ emitEvent: false });
-        }
-    }
+    protected readonly stockPhotosLoading = computed(() => {
+        return this.stockPhotoResult.isLoading() && this.stockPhotoSearch().length > 0;
+    });
 
-    public selectPhoto(photo: StockPhotoDto) {
-        if (!this.snapshot.isDisabled) {
-            this.valueControl.setValue(photo.url);
+    protected readonly stockPhotoThumbnail = computed(() => {
+        const value = this.value();
+
+        return value ? thumbnail(value, undefined, 300) || value : null;
+    });
+
+    protected readonly stockPhotoResult = safeResource<StockPhotoPage, { search: string; page: number }>({
+        params: () => ({ search: this.stockPhotoSearch(), page: this.stockPhotoPage() }),
+        stream: ({ params: { search, page } }) => {
+            if (!search) {
+                return of({ page, items: [] });
+            }
+
+            // The previous request is cancelled when the params change, so the timer debounces typing.
+            return timer(page > 1 ? 0 : 500).pipe(
+                switchMap(() => this.stockPhotoService.getImages(search, page)),
+                map(items => ({ page, items })));
+        },
+        defaultValue: { page: 1, items: [] },
+    });
+
+    protected readonly searchDialog = new DialogModel();
+
+    protected selectPhoto(photo: StockPhotoDto) {
+        if (!this.disabled()) {
+            this.updateValue(photo.url);
 
             this.searchDialog.hide();
         }
     }
 
     public reset() {
-        if (!this.snapshot.isDisabled) {
-            this.valueControl.setValue('');
+        if (!this.disabled()) {
+            this.updateValue(null);
         }
     }
 
-    public loadMore() {
-        const request = this.stockPhotoRequests.value;
-
-        this.stockPhotoRequests.next({ search: request.search, page: request.page + 1 });
+    protected search(event: Event) {
+        this.stockPhotoSearch.set((event.target as HTMLInputElement).value);
     }
 
-    public onThumbnailLoaded() {
-        this.next({ thumbnailStatus: 'Loaded' });
+    protected loadMore() {
+        this.stockPhotoPage.update(x => x + 1);
     }
 
-    public onThumbnailFailed() {
-        this.next({ thumbnailStatus: 'Failed' });
+    protected onThumbnailLoaded() {
+        this.thumbnailStatus.set('Loaded');
     }
 
-    public isSelected(photo: StockPhotoDto) {
-        return photo.url === this.valueControl.value;
+    protected onThumbnailFailed() {
+        this.thumbnailStatus.set('Failed');
+    }
+
+    protected isSelected(photo: StockPhotoDto) {
+        return photo.url === this.value();
+    }
+
+    private updateValue(value: string | null) {
+        this.value.set(value);
+        this.markTouched();
     }
 }

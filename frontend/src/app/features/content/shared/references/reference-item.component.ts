@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
+import { booleanAttribute, Component, computed, input, numberAttribute, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListFieldComponent, ContentValueComponent, getContentValue, META_FIELDS, TooltipDirective, TranslatePipe } from '@app/shared';
 
@@ -16,7 +16,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     selector: '[sqxReferenceItem][language][languages]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         ContentListCellDirective,
@@ -28,55 +27,49 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
     ],
 })
 export class ReferenceItemComponent {
-    public readonly metaFields = META_FIELDS;
+    /** Emits when the user removes the reference. */
+    public readonly delete = output();
 
-    @Output()
-    public delete = new EventEmitter();
+    /** Emits when the user clones the referenced content. */
+    public readonly clone = output();
 
-    @Output()
-    public clone = new EventEmitter();
+    /** The language to render the content values in. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    @Input()
-    public language!: AppLanguageDto;
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input()
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** Shows the button to remove the reference. */
+    public readonly canRemove = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public canRemove?: boolean | null = true;
+    /** Hides the schema name. */
+    public readonly isCompact = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isCompact?: boolean | null;
+    /** Disables the reference. */
+    public readonly isDisabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isDisabled?: boolean | null;
+    /** The validation results of the referenced contents, by content ID. */
+    public readonly validations = input<{ [id: string]: boolean }>();
 
-    @Input({ transform: booleanAttribute })
-    public validations?: { [id: string]: boolean };
+    /** Shows the column with the validation result. */
+    public readonly validityVisible = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public validityVisible?: boolean | null;
+    /** The number of reference fields to render as columns. */
+    public readonly columns = input(0, { transform: numberAttribute });
 
-    @Input({ transform: numberAttribute })
-    public columns = 0;
+    /** The referenced content. */
+    public readonly content = input.required<ContentDto>({ alias: 'sqxReferenceItem' });
 
-    @Input('sqxReferenceItem')
-    public content!: ContentDto;
+    protected readonly values = computed(() => {
+        const content = this.content();
+        const language = this.language();
+        const values: any[] = [];
 
-    public values: ReadonlyArray<any> = [];
-
-    public get isValid() {
-        return !this.validations ? undefined : this.validations[this.content.id];
-    }
-
-    public ngOnChanges() {
-        const values = [];
-
-        for (let i = 0; i < this.columns; i++) {
-            const field = this.content.referenceFields[i];
+        for (let i = 0; i < this.columns(); i++) {
+            const field = content.referenceFields[i];
 
             if (field) {
-                const { formatted } = getContentValue(this.content, this.language, field);
+                const { formatted } = getContentValue(content, language, field);
 
                 values.push(formatted);
             } else {
@@ -84,6 +77,14 @@ export class ReferenceItemComponent {
             }
         }
 
-        this.values = values;
-    }
+        return values;
+    });
+
+    protected readonly isValid = computed(() => {
+        const validations = this.validations();
+
+        return !validations ? undefined : validations[this.content().id];
+    });
+
+    protected readonly metaFields = META_FIELDS;
 }

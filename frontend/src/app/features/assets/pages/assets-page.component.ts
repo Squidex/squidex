@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathComponent, AssetsListComponent, AssetsState, DialogModel, LayoutComponent, ListViewComponent, LocalStoreService, MathHelper, ModalDirective, PagerComponent, Queries, Query, QueryFullTextSynchronizer, Router2State, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, TagEditorComponent, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIState } from '@app/shared';
 
@@ -23,8 +21,6 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
         AssetFolderDialogComponent,
         AssetPathComponent,
         AssetsListComponent,
-        AsyncPipe,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
         ModalDirective,
@@ -42,24 +38,22 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
         TranslatePipe,
     ],
 })
-export class AssetsPageComponent implements OnInit {
-    public editAsset?: AssetDto;
+export class AssetsPageComponent {
+    private readonly assetsRoute = inject(Router2State);
+    private readonly localStore = inject(LocalStoreService);
+    private readonly uiState = inject(UIState);
 
-    public listQueries = new Queries(this.uiState, 'assets');
-    public listMode = false;
+    protected readonly assetsState = inject(AssetsState);
 
-    public addAssetFolderDialog = new DialogModel();
+    protected readonly editAsset = signal<AssetDto | undefined>(undefined);
 
-    constructor(
-        public readonly assetsRoute: Router2State,
-        public readonly assetsState: AssetsState,
-        private readonly localStore: LocalStoreService,
-        private readonly uiState: UIState,
-    ) {
-        this.listMode = this.localStore.getBoolean(Settings.Local.ASSETS_MODE);
-    }
+    protected readonly listMode = signal(this.localStore.getBoolean(Settings.Local.ASSETS_MODE));
 
-    public ngOnInit() {
+    protected readonly listQueries = new Queries(this.uiState, 'assets');
+
+    protected readonly addAssetFolderDialog = new DialogModel();
+
+    constructor() {
         const initial =
             this.assetsRoute.mapTo(this.assetsState)
                 .withPaging('assets', 30)
@@ -73,40 +67,36 @@ export class AssetsPageComponent implements OnInit {
         this.assetsRoute.listen();
     }
 
-    public reload() {
+    protected reload() {
         this.assetsState.load(true);
     }
 
-    public reloadTotal() {
+    protected reloadTotal() {
         this.assetsState.load(true, false);
     }
 
-    public editStart(asset: AssetDto) {
-        this.editAsset = asset;
+    protected editStart(asset: AssetDto) {
+        this.editAsset.set(asset);
     }
 
-    public editDone() {
-        this.editAsset = undefined;
+    protected editDone() {
+        this.editAsset.set(undefined);
     }
 
-    public search(query: Query) {
+    protected search(query: Query) {
         this.assetsState.search(query);
     }
 
-    public replaceAsset(asset: AssetDto) {
+    protected replaceAsset(asset: AssetDto) {
         this.assetsState.replaceAsset(asset);
     }
 
-    public selectTags(tags: ReadonlyArray<string>) {
+    protected selectTags(tags: ReadonlyArray<string>) {
         this.assetsState.selectTags(tags);
     }
 
-    public toggleTag(tag: string) {
-        this.assetsState.toggleTag(tag);
-    }
-
-    public changeView(isListView: boolean) {
-        this.listMode = isListView;
+    protected changeView(isListView: boolean) {
+        this.listMode.set(isListView);
 
         this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }

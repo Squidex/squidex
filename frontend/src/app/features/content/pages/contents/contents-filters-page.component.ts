@@ -5,17 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { ContentsState, defined, LayoutComponent, Queries, Query, QueryListComponent, SavedQueriesComponent, SchemasState, TranslatePipe, UIState } from '@app/shared';
+import { Component, computed, inject } from '@angular/core';
+import { ContentsState, LayoutComponent, Queries, Query, QueryListComponent, SavedQueriesComponent, SchemasState, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-filters-page',
     styleUrls: ['./contents-filters-page.component.scss'],
     templateUrl: './contents-filters-page.component.html',
     imports: [
-        AsyncPipe,
         LayoutComponent,
         QueryListComponent,
         SavedQueriesComponent,
@@ -23,20 +20,21 @@ import { ContentsState, defined, LayoutComponent, Queries, Query, QueryListCompo
     ],
 })
 export class ContentsFiltersPageComponent {
-    public schemaQueries =
-        this.schemasState.selectedSchema.pipe(
-            defined(),
-            map(schema => new Queries(this.uiState, `schemas.${schema.name}`),
-        ));
+    private readonly schemasState = inject(SchemasState);
+    private readonly uiState = inject(UIState);
 
-    constructor(
-        public readonly contentsState: ContentsState,
-        private readonly schemasState: SchemasState,
-        private readonly uiState: UIState,
-    ) {
-    }
+    protected readonly contentsState = inject(ContentsState);
 
-    public search(query: Query) {
+    protected readonly schemaQueries = computed(() => {
+        const schema = this.schemasState.selectedSchema();
+        if (!schema) {
+            return null;
+        }
+
+        return new Queries(this.uiState, `schemas.${schema.name}`);
+    });
+
+    protected search(query?: Query) {
         this.contentsState.search(query);
     }
 }

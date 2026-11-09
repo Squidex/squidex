@@ -6,20 +6,15 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
 import { AssignContributorDto, ContributorsDto } from './../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ContributorsService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getContributors(appName: string): Observable<Versioned<ContributorsDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);

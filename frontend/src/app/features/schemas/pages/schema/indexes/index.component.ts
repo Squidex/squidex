@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { ConfirmClickDirective, IndexDto, IndexesState, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -18,21 +18,18 @@ import { ConfirmClickDirective, IndexDto, IndexesState, TranslatePipe } from '@a
     ],
 })
 export class IndexComponent {
-    @Input({ required: true })
-    public index!: IndexDto;
+    private readonly indexesState = inject(IndexesState);
 
-    public isExpanded?: boolean | null;
+    /** The index to show. */
+    public readonly index = input.required<IndexDto>();
 
-    constructor(
-        private readonly indexesState: IndexesState,
-    ) {
+    protected readonly isExpanded = signal(false);
+
+    protected toggleExpanded() {
+        this.isExpanded.update(x => !x);
     }
 
-    public toggleExpanded() {
-        this.isExpanded = !this.isExpanded;
-    }
-
-    public delete() {
-        this.indexesState.delete(this.index);
+    protected delete() {
+        this.indexesState.delete(this.index());
     }
 }

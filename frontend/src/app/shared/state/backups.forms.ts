@@ -5,32 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
+import { computed } from '@angular/core';
+import { maxLength, required } from '@angular/forms/signals';
+import { SignalForm, SignalValidators } from '@app/framework';
 import { RestoreRequestDto } from '../model';
 
-export class RestoreForm extends Form<ExtendedFormGroup, RestoreRequestDto> {
-    public get url() {
-        return this.form.controls['url'];
-    }
+export type RestoreFormModel = { name: string; url: string };
 
-    public hasNoUrl = hasNoValue$(this.url);
+export class RestoreForm extends SignalForm<RestoreFormModel, RestoreRequestDto> {
+    public readonly hasNoUrl = computed(() => {
+        return !this.model().url;
+    });
 
     constructor() {
-        super(
-            new ExtendedFormGroup({
-                name: new UntypedFormControl('', [
-                    Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage'),
-                ]),
-                url: new UntypedFormControl('',
-                    Validators.required,
-                ),
-            }),
-        );
+        super({ name: '', url: '' }, path => {
+            maxLength(path.name, 40);
+            SignalValidators.patternWithMessage(path.name, '[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage');
+            required(path.url);
+        });
     }
 
-    protected transformSubmit(value: any) {
+    protected transformSubmit(value: RestoreFormModel) {
         return new RestoreRequestDto(value);
     }
 }

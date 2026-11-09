@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
@@ -20,26 +20,24 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class TemplatesState extends State<Snapshot> {
-    public templates =
+    private readonly dialogs = inject(DialogService);
+    private readonly templatesService = inject(TemplatesService);
+
+    public readonly templates =
         this.project(x => x.templates);
 
-    public starters =
+    public readonly starters =
         this.project(x => x.templates.filter(x => x.isStarter));
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    constructor(
-        private readonly templatesService: TemplatesService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ templates: [] });
 
         debug(this, 'templates');

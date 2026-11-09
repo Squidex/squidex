@@ -55,7 +55,7 @@ RUN dotnet tool install --tool-path /tools dotnet-dump \
 #
 # Stage 2, Build Frontend
 #
-FROM squidex/frontend-build:22.19 AS frontend
+FROM squidex/frontend-build:24.22 AS frontend
 
 WORKDIR /source
 

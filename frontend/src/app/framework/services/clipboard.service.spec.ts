@@ -7,7 +7,7 @@
 
 import { ClipboardService } from './clipboard.service';
 
-describe('ShortcutService', () => {
+describe('ClipboardService', () => {
     it('should instantiate', () => {
         const clipboardService = new ClipboardService();
 
@@ -17,7 +17,7 @@ describe('ShortcutService', () => {
     it('should return empty string if clipboard is empty', () => {
         const clipboardService = new ClipboardService();
 
-        expect(clipboardService.selectText()).toBe('');
+        expect(clipboardService.text()).toBe('');
     });
 
     it('should get value from clipboard', () => {
@@ -25,20 +25,6 @@ describe('ShortcutService', () => {
 
         clipboardService.setText('MyContent');
 
-        expect(clipboardService.selectText()).toBe('MyContent');
-    });
-
-    it('should raise subject if setting text', () => {
-        const clipboardService = new ClipboardService();
-
-        let text = '';
-
-        clipboardService.textChanges.subscribe(t => {
-            text = t;
-        });
-
-        clipboardService.setText('MyContent');
-
-        expect(text).toBe('MyContent');
+        expect(clipboardService.text()).toBe('MyContent');
     });
 });

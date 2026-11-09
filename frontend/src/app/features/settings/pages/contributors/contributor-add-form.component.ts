@@ -5,21 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Injectable, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, of } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
-import { AssignContributorForm, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
+import { Component, computed, effect, inject, input, Service } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { firstValueFrom, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AssignContributorForm, AssignContributorFormModel, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, SignalSelectDirective, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class UsersDataSource implements AutocompleteSource {
-    constructor(
-        private readonly contributorsState: ContributorsState,
-        private readonly usersService: UsersService,
-    ) {
-    }
+    private readonly contributorsState = inject(ContributorsState);
+    private readonly usersService = inject(UsersService);
+
 
     public find(query: string): Observable<ReadonlyArray<any>> {
         if (!query) {
@@ -27,11 +25,12 @@ export class UsersDataSource implements AutocompleteSource {
         }
 
         return this.usersService.getUsers(query).pipe(
-            withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
+            map(users => {
+                const contributors = this.contributorsState.contributors();
                 const results: any[] = [];
 
                 for (const user of users) {
-                    if (!contributors!.find(t => t.contributorId === user.id)) {
+                    if (!contributors.find(t => t.contributorId === user.id)) {
                         results.push(user);
                     }
                 }
@@ -48,60 +47,51 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource,
     ],
     imports: [
-        AsyncPipe,
         AutocompleteComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
         ImportContributorsDialogComponent,
         ModalDirective,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
         UserDtoPicture,
     ],
 })
 export class ContributorAddFormComponent {
-    private defaultValue: any;
+    private readonly contributorsState = inject(ContributorsState);
+    private readonly dialogs = inject(DialogService);
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<RoleDto>;
+    protected readonly usersDataSource = inject(UsersDataSource);
 
-    public assignContributorForm = new AssignContributorForm();
+    /** The roles that can be assigned to new contributors. */
+    public readonly roles = input.required<ReadonlyArray<RoleDto>>();
 
-    public importDialog = new DialogModel();
+    protected readonly defaultValue = computed<Partial<AssignContributorFormModel>>(() => {
+        return { role: this.roles()[0]?.name, user: '' };
+    });
 
-    constructor(
-        public readonly contributorsState: ContributorsState,
-        public readonly usersDataSource: UsersDataSource,
-        private readonly dialogs: DialogService,
-    ) {
+    protected readonly assignContributorForm = new AssignContributorForm();
+
+    protected readonly importDialog = new DialogModel();
+
+    constructor() {
+        effect(() => {
+            this.assignContributorForm.load(this.defaultValue());
+        });
     }
 
-    public ngOnChanges() {
-        this.defaultValue = { role: this.roles?.[0]?.name, user: '' };
+    protected assignContributor() {
+        this.assignContributorForm.submitAndUpdate(async value => {
+            const isCreated = await firstValueFrom(this.contributorsState.assign(value));
 
-        this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
-    }
+            if (isCreated) {
+                this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
+            } else {
+                this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
+            }
 
-    public assignContributor() {
-        const value = this.assignContributorForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.contributorsState.assign(value)
-            .subscribe({
-                next: isCreated => {
-                    this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
-
-                    if (isCreated) {
-                        this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
-                    } else {
-                        this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
-                    }
-                },
-                error: error => {
-                    this.assignContributorForm.submitFailed(error);
-                },
-            });
+            return this.defaultValue();
+        }, { resetAfterSubmit: true });
     }
 }

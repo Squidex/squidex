@@ -5,38 +5,39 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } from '@app/shared';
+import { Component, computed, inject, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, RolesState, SignalSelectDirective, UserInfoFieldFormModel, UserInfoFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-user-info-validation',
     styleUrls: ['user-info-validation.component.scss'],
     templateUrl: 'user-info-validation.component.html',
     imports: [
-        AsyncPipe,
+        FormField,
         FormRowComponent,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
     ],
 })
-export class UserInfoValidationComponent implements OnInit {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+export class UserInfoValidationComponent {
+    protected readonly rolesState = inject(RolesState);
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public properties!: UserInfoFieldPropertiesDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    constructor(
-        public readonly rolesState: RolesState,
-    ) {
-    }
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<UserInfoFieldPropertiesDto>();
 
-    public ngOnInit() {
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<UserInfoFieldFormModel>;
+    });
+
+    constructor() {
         this.rolesState.loadIfNotLoaded();
     }
 }

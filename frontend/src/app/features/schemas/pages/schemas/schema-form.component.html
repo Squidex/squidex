@@ -1,7 +1,7 @@
-<form [formGroup]="actualForm.form" (ngSubmit)="createSchema()">
+<form (ngSubmit)="createSchema()">
     <sqx-modal-dialog (dialogClose)="emitClose()" hasTabs="true" size="lg" tourId="schemaForm">
         <ng-container title>
-            @if (source) {
+            @if (sourceActual()) {
                 {{ "schemas.clone" | sqxTranslate }}
             } @else {
                 {{ "schemas.create" | sqxTranslate }}
@@ -12,20 +12,20 @@
                 <div class="col">
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
+                            <button class="nav-link" [class.active]="selectedTab() === 0" (click)="selectTab(0)" type="button">
                                 {{ "schemas.createCustom" | sqxTranslate }}
                             </button>
                         </li>
 
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
+                            <button class="nav-link" [class.active]="selectedTab() === 1" (click)="selectTab(1)" type="button">
                                 {{ "schemas.createFromJson" | sqxTranslate }}
                             </button>
                         </li>
 
                         @if (hasChatBot) {
                             <li class="nav-item">
-                                <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)" type="button">
+                                <button class="nav-link" [class.active]="selectedTab() === 2" (click)="selectTab(2)" type="button">
                                     {{ "schemas.createAI" | sqxTranslate }}
                                     <span class="badge rounded-pill badge-primary">New</span>
                                 </button>
@@ -36,25 +36,25 @@
             </div>
         </ng-container>
         <ng-container content>
-            <sqx-form-error [error]="actualForm.error | async" />
+            <sqx-form-error [error]="actualForm().error()" />
 
-            @if (selectedTab !== 2) {
-                <sqx-form-row for="name" hint="schemas.schemaNameHint" label="common.name" required [submitCount]="createForm.submitCount | async" vertical>
-                    <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+            @if (selectedTab() !== 2) {
+                <sqx-form-row [for]="createForm.form.name" hint="schemas.schemaNameHint" label="common.name" required vertical>
+                    <input class="form-control" id="name" autocomplete="off" [formField]="createForm.form.name" sqxFocusOnInit sqxTextInput="LowerCase" />
                 </sqx-form-row>
 
                 <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }}</sqx-form-alert>
             }
 
-            @if (selectedTab === 0) {
+            @if (selectedTab() === 0) {
                 <div class="form-group mt-4">
                     <div class="row">
                         <div class="col-12 col-md-4 type">
                             <label>
-                                <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Default'" />
+                                <input class="radio-input" [formField]="createForm.form.type" type="radio" [value]="'Default'" />
                                 <div class="row flex-nowrap g-0">
                                     <div class="col-auto">
-                                        <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Default'">
+                                        <div class="btn-radio" [class.active]="createForm.model().type === 'Default'">
                                             <i class="icon-multiple-content"></i>
                                         </div>
                                     </div>
@@ -70,10 +70,10 @@
 
                         <div class="col-12 col-md-4 type">
                             <label>
-                                <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Singleton'" />
+                                <input class="radio-input" [formField]="createForm.form.type" type="radio" [value]="'Singleton'" />
                                 <div class="row flex-nowrap g-0">
                                     <div class="col-auto">
-                                        <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Singleton'">
+                                        <div class="btn-radio" [class.active]="createForm.model().type === 'Singleton'">
                                             <i class="icon-single-content"></i>
                                         </div>
                                     </div>
@@ -89,10 +89,10 @@
 
                         <div class="col-12 col-md-4 type">
                             <label>
-                                <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Component'" />
+                                <input class="radio-input" [formField]="createForm.form.type" type="radio" [value]="'Component'" />
                                 <div class="row flex-nowrap g-0">
                                     <div class="col-auto">
-                                        <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Component'">
+                                        <div class="btn-radio" [class.active]="createForm.model().type === 'Component'">
                                             <i class="icon-component"></i>
                                         </div>
                                     </div>
@@ -108,23 +108,23 @@
                     </div>
                 </div>
 
-                @if (schemasState.categoryNames | async; as categories) {
+                @if (schemasState.categoryNames(); as categories) {
                     @if (categories.length > 0) {
-                        <sqx-form-row for="category" label="common.category">
-                            <select class="form-select" id="category" formControlName="initialCategory">
+                        <sqx-form-row [for]="createForm.form.initialCategory" label="common.category">
+                            <select class="form-select" id="initialCategory" [formField]="createForm.form.initialCategory">
                                 <option></option>
 
                                 @for (category of categories; track category) {
-                                    <option [ngValue]="category">{{ category }}</option>
+                                    <option [value]="category">{{ category }}</option>
                                 }
                             </select>
                         </sqx-form-row>
                     }
                 }
-            } @else if (selectedTab === 1) {
-                <sqx-code-editor formControlName="importing" height="auto" minLines="50" valueMode="Json" />
-            } @else if (selectedTab === 2) {
-                <sqx-form-row for="prompt" label="common.prompt">
+            } @else if (selectedTab() === 1) {
+                <sqx-code-editor [formField]="createForm.form.importing" height="auto" minLines="50" valueMode="Json" />
+            } @else if (selectedTab() === 2) {
+                <sqx-form-row [for]="generateForm.form.prompt" label="common.prompt">
                     <div class="row g-2 form-group">
                         <div class="col">
                             <sqx-form-hint> {{ "schemas.promptHint" | sqxTranslate }}</sqx-form-hint>
@@ -132,8 +132,8 @@
                         <div class="col-auto">
                             <label>&nbsp;</label>
                             <div>
-                                <button class="btn btn-primary" (click)="generatePreview()" [disabled]="generateForm.submitting | async" type="button">
-                                    @if (generateForm.submitting | async) {
+                                <button class="btn btn-primary" (click)="generatePreview()" [disabled]="generateForm.submitting()" type="button">
+                                    @if (generateForm.submitting()) {
                                         <sqx-loader color="white" size="12" />
                                     }
 
@@ -146,14 +146,14 @@
 
                 <sqx-form-alert> {{ "schemas.promptExample" | sqxTranslate }}</sqx-form-alert>
 
-                <sqx-code-editor disabled="true" [height]="1000" [ngModel]="generateLog" [ngModelOptions]="{ standalone: true }" />
+                <sqx-code-editor disabled="true" [height]="1000" [value]="generateLog()" />
             }
         </ng-container>
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" [disabled]="selectedTab === 2 && !generateLog" type="submit">
+            <button class="btn btn-success" [disabled]="selectedTab() === 2 && !generateLog()" type="submit">
                 {{ "common.create" | sqxTranslate }}
             </button>
         </ng-container>

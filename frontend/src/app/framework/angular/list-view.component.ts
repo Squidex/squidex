@@ -6,22 +6,20 @@
  */
 
 import { NgTemplateOutlet } from '@angular/common';
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
-import { StatefulComponent } from '@app/framework/internal';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, Renderer2, signal, viewChild } from '@angular/core';
 import { CompensateScrollbarDirective } from './compensate-scrollbar.directive';
 import { LoaderComponent } from './loader.component';
 import { SyncScollingDirective } from './sync-scrolling.directive';
-
-interface State {
-    // True when loading.
-    isLoading: boolean;
-}
 
 @Component({
     selector: 'sqx-list-view',
     styleUrls: ['./list-view.component.scss'],
     templateUrl: './list-view.component.html',
-    changeDetection: ChangeDetectionStrategy.Default,
+    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+    changeDetection: ChangeDetectionStrategy.Eager,
+    host: {
+        ['[class.overflow]']: 'overflow()',
+    },
     imports: [
         CompensateScrollbarDirective,
         LoaderComponent,
@@ -29,74 +27,76 @@ interface State {
         SyncScollingDirective,
     ],
 })
-export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {
-    private timer: any;
+export class ListViewComponent {
+    private readonly renderer = inject(Renderer2);
 
-    @ViewChild('headerElement', { static: false })
-    public headerElement!: ElementRef<ParentNode>;
+    /** Lets the content overflow the list instead of scrolling inside. */
+    public readonly overflow = input(false, { transform: booleanAttribute });
 
-    @ViewChild('footerElement', { static: false })
-    public footerElement!: ElementRef<ParentNode>;
+    /** Syncs the horizontal scroll position of header and content, for wide tables. */
+    public readonly syncedHeader = input(false, {
+        transform: booleanAttribute,
+    });
 
-    @ViewChild('contentElement', { static: false })
-    public contentElement!: ElementRef<ParentNode>;
+    /** The width of the inner header, content and footer. */
+    public readonly innerWidth = input('100%');
 
-    @Input({ transform: booleanAttribute }) @HostBinding('class.overflow')
-    public overflow?: boolean | null;
+    /** Renders the content as table. */
+    public readonly table = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public syncedHeader?: boolean | null;
+    /** Renders the synced header and the table without padding. */
+    public readonly tableNoPadding = input(false, {
+        transform: booleanAttribute,
+    });
 
-    @Input()
-    public innerWidth = '100%';
+    /** Renders the content without padding. */
+    public readonly noPadding = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public table?: boolean | null;
+    /** Indicates that the items have been loaded. */
+    public readonly isLoaded = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public tableNoPadding?: boolean | null;
+    /** Shows the loading indicator. It is hidden with a short delay to avoid flickering. */
+    public readonly isLoading = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public noPadding?: boolean | null;
+    protected readonly headerElement =
+        viewChild<ElementRef<ParentNode>>('headerElement');
 
-    @Input({ transform: booleanAttribute })
-    public isLoaded: boolean | undefined | null = true;
+    protected readonly footerElement =
+        viewChild<ElementRef<ParentNode>>('footerElement');
 
-    @Input({ transform: booleanAttribute })
-    public set isLoading(value: boolean | undefined | null) {
-        clearTimeout(this.timer);
+    protected readonly isLoadingVisible = signal(false);
 
-        if (value) {
-            this.next({ isLoading: value });
-        } else {
-            this.timer = setTimeout(() => {
-                this.next({ isLoading: !!value });
-            }, 250);
-        }
-    }
-
-    public get isLoading() {
-        return this.snapshot.isLoading;
-    }
-
-    constructor(
-        private readonly renderer: Renderer2,
-    ) {
-        super({ isLoading: false });
-    }
-
-    public ngAfterViewInit() {
-        this.hideWhenEmpty(this.headerElement);
-        this.hideWhenEmpty(this.footerElement);
-    }
-
-    private hideWhenEmpty(element: ElementRef) {
-        if (element && element.nativeElement) {
-            const isEmpty = element.nativeElement.children[0].children.length === 0;
-
-            if (isEmpty) {
-                this.renderer.setStyle(element.nativeElement, 'display', 'none');
+    constructor() {
+        effect((onCleanup) => {
+            if (this.isLoading()) {
+                this.isLoadingVisible.set(true);
+                return;
             }
-        }
+
+            const timer = setTimeout(
+                () => this.isLoadingVisible.set(false),
+                250,
+            );
+
+            onCleanup(() => clearTimeout(timer));
+        });
+
+        afterNextRender(() => {
+            hideWhenEmpty(this.renderer, this.headerElement());
+            hideWhenEmpty(this.renderer, this.footerElement());
+        });
+    }
+}
+
+function hideWhenEmpty(
+    renderer: Renderer2,
+    element: ElementRef<ParentNode> | undefined,
+) {
+    if (!element?.nativeElement) {
+        return;
+    }
+
+    if (element.nativeElement.children[0].children.length === 0) {
+        renderer.setStyle(element.nativeElement, 'display', 'none');
     }
 }

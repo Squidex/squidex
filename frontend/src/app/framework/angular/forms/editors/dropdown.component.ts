@@ -6,10 +6,8 @@
  */
 
 
-import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { map } from 'rxjs/operators';
-import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, StringHelper, Subscriptions, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { booleanAttribute, Component, computed, contentChildren, effect, input, model, output, signal, TemplateRef, untracked } from '@angular/core';
+import { FloatingPlacement, Keys, ModalModel, StringHelper, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -18,186 +16,114 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { TemplateWrapperDirective } from '../../template-wrapper.directive';
 import { FocusOnInitDirective } from '../focus-on-init.directive';
-import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
-
-export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
-};
-
-interface State {
-    // The suggested item.
-    suggestedItems: ReadonlyArray<any>;
-
-    // The selected suggested index.
-    suggestedIndex: number;
-
-    // The selected item.
-    selectedItem?: any;
-
-    // The current search query.
-    query?: RegExp;
-}
+import { FormValueControlBase, syncExternalValue } from '../form-value-control';
 
 @Component({
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',
-    providers: [
-        SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         FocusOnInitDirective,
-        FormsModule,
-        ForwardFormClassesDirective,
         LoaderComponent,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
         ScrollActiveDirective,
         TemplateWrapperDirective,
         TranslatePipe,
     ],
 })
-export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
-    private readonly subscriptions = new Subscriptions();
-    private value: any;
+export class DropdownComponent extends FormValueControlBase<any> {
+    private readonly valueSetter = syncExternalValue(() => this.value, value => {
+        this.selectIndex(this.getSelectedIndex(value), false);
+    });
 
-    @Output()
-    public dropdownOpen = new EventEmitter();
+    /** The value of the control. */
+    public readonly value = model<any>(null);
 
-    @Output()
-    public dropdownClose = new EventEmitter();
+    /** Emits when the dropdown is opened. */
+    public readonly dropdownOpen = output();
 
-    @Input({ transform: booleanAttribute })
-    public itemsLoading?: boolean | null;
+    /** Emits when the dropdown is closed. */
+    public readonly dropdownClose = output();
 
-    @Input()
-    public itemsEmptyText = 'i18n:common.empty';
+    /** Shows a loading indicator instead of the empty text when there are no items. */
+    public readonly itemsLoading = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public items: ReadonlyArray<any> | undefined | null = [];
+    /** The text to show when there are no items. */
+    public readonly itemsEmptyText = input('i18n:common.empty');
 
-    @Input({ transform: booleanAttribute })
-    public itemSeparator?: boolean | null;
+    /** The items to choose from. */
+    public readonly items = input<ReadonlyArray<any> | undefined | null>([]);
 
-    @Input()
-    public formId?: string;
+    /** Renders a separator between the items. */
+    public readonly itemSeparator = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public formName?: string;
+    /** The ID of the inner input. */
+    public readonly formId = input<string>();
 
-    @Input()
-    public searchProperty = 'name';
+    /** The name of the inner input. */
+    public readonly formName = input<string>();
 
-    @Input()
-    public valueProperty?: string;
+    /** The property of complex items to search in. */
+    public readonly searchProperty = input('name');
 
-    @Input({ transform: booleanAttribute })
-    public canSearch?: boolean | null = true;
+    /** The property of the selected item to use as value. */
+    public readonly valueProperty = input<string>();
 
-    @Input()
-    public dropdownPosition: FloatingPlacement = 'bottom-start';
+    /** Shows a search input in the dropdown. */
+    public readonly canSearch = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public dropdownFullWidth = false;
+    /** The position of the dropdown. */
+    public readonly dropdownPosition = input<FloatingPlacement>('bottom-start');
 
-    @Input()
-    public dropdownStyles: any = {};
+    /** Makes the dropdown as wide as the input. */
+    public readonly dropdownFullWidth = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    /** Additional styles for the dropdown. */
+    public readonly dropdownStyles = input<any>({});
 
-    @ContentChildren(TemplateRef)
-    public templates!: QueryList<any>;
+    protected readonly templates = contentChildren(TemplateRef);
 
-    public dropdown = new ModalModel();
+    protected readonly suggestedItems = signal<ReadonlyArray<any>>([]);
 
-    public templateSelection!: TemplateRef<any>;
-    public templateItem!: TemplateRef<any>;
+    protected readonly suggestedIndex = signal(-1);
 
-    public queryInput = new UntypedFormControl();
+    protected readonly selectedItem = signal<any>(undefined);
+
+    protected readonly query = signal<RegExp | undefined>(undefined);
+
+    protected readonly queryText = signal('');
+
+    protected readonly templateItem = computed(() => {
+        return this.templates()[0];
+    });
+
+    protected readonly templateSelection = computed(() => {
+        const templates = this.templates();
+
+        return templates[templates.length - 1];
+    });
+
+    protected readonly dropdown = new ModalModel();
 
     constructor() {
-        super({
-            selectedItem: undefined,
-            suggestedIndex: -1,
-            suggestedItems: [],
+        super();
+
+        effect(() => {
+            const items = this.items() || [];
+
+            untracked(() => {
+                this.suggestedItems.set(items);
+
+                this.selectSearch('');
+                this.selectIndex(this.getSelectedIndex(this.value()), false);
+            });
         });
     }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.queryInput.valueChanges.pipe(
-                map((queryText: string) => {
-                    if (!this.items || !queryText) {
-                        return { query: undefined, items: this.items };
-                    } else {
-                        const query = StringHelper.searchRegex(queryText);
-
-                        const items = this.items.filter(x => {
-                            if (Types.isString(x)) {
-                                return query.test(x);
-                            } else {
-                                return query.test(x[this.searchProperty]);
-                            }
-                        });
-
-                        return { query, items };
-                    }
-                }))
-                .subscribe(({ query, items }) => {
-                    this.next({
-                        suggestedItems: items || [],
-                        query,
-                    });
-                }));
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.items) {
-            this.items = this.items || [];
-
-            this.next({ suggestedItems: this.items });
-
-            this.selectSearch('');
-            this.selectIndex(this.getSelectedIndex(this.value), false);
-        }
-    }
-
-    public ngAfterContentInit() {
-        if (this.templates.length === 1) {
-            this.templateItem = this.templates.first;
-            this.templateSelection = this.templates.first;
-        } else {
-            this.templateItem = this.templates.first;
-            this.templateSelection = this.templates.last;
-        }
-
-        if (this.templateItem) {
-            this.detectChanges();
-        }
-    }
-
-    public writeValue(obj: any) {
-        this.value = obj;
-
-        this.selectIndex(this.getSelectedIndex(obj), false);
-    }
-
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.queryInput.disable({ emitEvent: false });
-        } else {
-            this.queryInput.enable({ emitEvent: false });
-        }
-    }
-
-    public onKeyDown(event: KeyboardEvent) {
-        if (Keys.isEscape(event) && this.dropdown.isOpen) {
+    protected onKeyDown(event: KeyboardEvent) {
+        if (Keys.isEscape(event) && this.dropdown.isOpen()) {
             this.closeModal();
             return false;
         } else if (Keys.isUp(event)) {
@@ -207,55 +133,55 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
             this.selectNextIndex();
             return false;
         } else if (Keys.isEnter(event)) {
-            this.selectIndexAndClose(this.snapshot.suggestedIndex);
+            this.selectIndexAndClose(this.suggestedIndex());
             return false;
         }
 
         return true;
     }
 
-    public openModal() {
-        if (!this.dropdown.isOpen) {
+    protected openModal() {
+        if (!this.dropdown.isOpen()) {
             this.selectSearch('');
         }
 
-        if (!this.dropdown.isOpen) {
+        if (!this.dropdown.isOpen()) {
             this.dropdownOpen.emit();
 
             this.dropdown.show();
         }
 
-        this.callTouched();
+        this.markTouched();
     }
 
-    public selectIndexAndClose(selectedIndex: number) {
+    protected onSearch(queryText: string) {
+        this.selectSearch(queryText);
+    }
+
+    protected selectIndexAndClose(selectedIndex: number) {
         this.selectIndex(selectedIndex, true);
 
         this.closeModal();
     }
 
-    public closeModal() {
-        if (this.dropdown.isOpen) {
+    private closeModal() {
+        if (this.dropdown.isOpen()) {
             this.dropdownClose.emit();
 
             this.dropdown.hide();
         }
     }
 
-    private selectSearch(value: string) {
-        this.queryInput.setValue(value);
+    private selectPrevIndex() {
+        this.selectIndex(this.suggestedIndex() - 1, true);
     }
 
-    public selectPrevIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex - 1, true);
+    private selectNextIndex() {
+        this.selectIndex(this.suggestedIndex() + 1, true);
     }
 
-    public selectNextIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex + 1, true);
-    }
-
-    public selectIndex(suggestedIndex: number, fromUserAction: boolean) {
-        const items = this.snapshot.suggestedItems || [];
+    private selectIndex(suggestedIndex: number, fromUserAction: boolean) {
+        const items = this.suggestedItems();
 
         const selectedItem = items[suggestedIndex];
 
@@ -268,38 +194,74 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         }
 
         if (fromUserAction) {
-            let selectedValue = selectedItem;
-
-            if (this.valueProperty && this.valueProperty.length > 0 && selectedValue) {
-                selectedValue = selectedValue[this.valueProperty];
-            }
-
-            if (this.value !== selectedValue) {
-                this.value = selectedValue;
-
-                this.callChange(selectedValue);
-                this.callTouched();
-            }
+            this.selectValue(selectedItem);
         }
 
-        this.next({ suggestedIndex, selectedItem });
+        this.suggestedIndex.set(suggestedIndex);
+        this.selectedItem.set(selectedItem);
+    }
+
+    private selectValue(selectedItem: any) {
+        const valueProperty = this.valueProperty();
+
+        let selectedValue = selectedItem;
+        if (valueProperty && valueProperty.length > 0 && selectedValue) {
+            selectedValue = selectedValue[valueProperty];
+        }
+
+        selectedValue ??= null;
+
+        if (this.value() === selectedValue) {
+            return;
+        }
+
+        this.valueSetter(selectedValue);
+        this.markTouched();
+    }
+
+    private selectSearch(queryText: string) {
+        this.queryText.set(queryText);
+        this.search(queryText);
+    }
+
+    private search(queryText: string) {
+        const items = this.items();
+        if (!items || !queryText) {
+            this.query.set(undefined);
+            this.suggestedItems.set(items || []);
+            return;
+        }
+
+        const query = StringHelper.searchRegex(queryText);
+        const searchProperty = this.searchProperty();
+
+        this.query.set(query);
+        this.suggestedItems.set(items.filter(x => {
+            if (Types.isString(x)) {
+                return query.test(x);
+            } else {
+                return query.test(x[searchProperty]);
+            }
+        }));
     }
 
     private getSelectedIndex(value: any) {
-        if (!value || !this.items) {
+        const items = this.items();
+        if (!value || !items) {
             return -1;
         }
 
-        if (this.valueProperty && this.valueProperty.length > 0) {
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
+        const valueProperty = this.valueProperty();
+        if (!valueProperty || valueProperty.length === 0) {
+            return items.indexOf(value);
+        }
 
-                if (item && item[this.valueProperty] === value) {
-                    return i;
-                }
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            if (item && item[valueProperty] === value) {
+                return i;
             }
-        } else {
-            return this.items.indexOf(value);
         }
 
         return -1;

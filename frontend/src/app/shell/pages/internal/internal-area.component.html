@@ -1,7 +1,7 @@
 @if (!isEmbedded) {
     <nav class="navbar navbar-light navbar-expand fixed-top align-items-center">
         <span class="navbar-brand align-items-center justify-content-center d-flex" routerLink="/app">
-            <sqx-logo [isLoading]="loadingService.loading | async" />
+            <sqx-logo [isLoading]="loadingService.loading()" />
         </span>
         <div class="navbar-nav"><sqx-apps-menu /></div>
 

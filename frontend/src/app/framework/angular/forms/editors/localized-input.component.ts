@@ -5,114 +5,87 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
+import { Component, computed, input, model, signal } from '@angular/core';
+import { Types } from '@app/framework/internal';
 import { Language, LanguageSelectorComponent } from '../../language-selector.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { IndeterminateValueDirective } from '../indeterminate-value.directive';
+import { CheckboxComponent } from '../checkbox.component';
+import { FormValueControlBase } from '../form-value-control';
 import { DateTimeEditorComponent } from './date-time-editor.component';
 import { TagEditorComponent } from './tag-editor.component';
 
-export const SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => LocalizedInputComponent), multi: true,
-};
-
 const DEFAULT_LANGUAGE = { iso2Code: 'iv', englishName: 'Invariant' };
 
-interface State {
-    // The selected language.
-    language: Language;
-}
+type LocalizedValue = { [key: string]: any };
 
 @Component({
     selector: 'sqx-localized-input',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
-    providers: [
-        SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR,
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        CheckboxComponent,
         DateTimeEditorComponent,
-        FormsModule,
-        IndeterminateValueDirective,
         LanguageSelectorComponent,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
-export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
-    private value: { [key: string]: any } | undefined;
+export class LocalizedInputComponent extends FormValueControlBase<LocalizedValue | null> {
+    /** The values per language. */
+    public readonly value = model<LocalizedValue | null>(null);
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<Language>;
+    /** The languages to edit a value for. */
+    public readonly languages = input.required<ReadonlyArray<Language>>();
 
-    @Input()
-    public type: 'text' | 'boolean' | 'datetime' | 'date' | 'tags' | 'number' = 'text';
+    /** The editor to use for each value. */
+    public readonly type = input<'text' | 'boolean' | 'datetime' | 'date' | 'tags' | 'number'>('text');
 
-    @Input()
-    public name = '';
+    /** The name attribute of the inner input. */
+    public readonly name = input('');
 
-    @Input()
-    public id = '';
+    /** The ID of the inner input. */
+    public readonly id = input('');
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+    protected readonly language = signal<Language>(DEFAULT_LANGUAGE);
 
-    public dropdown = new ModalModel();
+    protected readonly valueObject = computed(() => {
+        const value = this.value();
 
-    public get currentValue() {
-        if (!this.snapshot.language || !this.value) {
-            return undefined;
-        }
+        return Types.isObject(value) ? value as LocalizedValue : null;
+    });
 
-        return this.value[this.snapshot.language.iso2Code];
-    }
+    protected readonly valueCurrent = computed(() => {
+        return this.valueObject()?.[this.language().iso2Code] ?? null;
+    });
 
-    public get isEmpty() {
-        if (!this.snapshot.language || !this.value) {
+    protected readonly valueIsEmpty = computed(() => {
+        const value = this.valueObject();
+        if (!value) {
             return true;
         }
 
-        return !this.value.hasOwnProperty(this.snapshot.language.iso2Code);
+        return !value.hasOwnProperty(this.language().iso2Code);
+    });
+
+    protected setLanguage(language: Language) {
+        this.language.set(language);
     }
 
-    constructor() {
-        super({ language: DEFAULT_LANGUAGE });
+    protected setValue(value: any) {
+        const result = { ...this.valueObject() || {}, [this.language().iso2Code]: value };
+
+        this.value.set(result);
     }
 
-    public setLanguage(language: Language) {
-        this.next({ language });
-    }
+    protected unset() {
+        const result = { ...this.valueObject() || {} };
 
-    public writeValue(obj: any) {
-        if (Types.isObject(obj)) {
-            this.value = obj;
+        delete result[this.language().iso2Code];
+
+        if (Object.keys(result).length === 0) {
+            this.value.set(null);
         } else {
-            this.value = {};
+            this.value.set(result);
         }
-    }
-
-    public setValue(value: any) {
-        this.value = { ...this.value || {} };
-        this.value[this.snapshot.language.iso2Code] = value;
-
-        this.callChange(this.value);
-    }
-
-    public unset() {
-        this.value = { ...this.value || {} };
-
-        delete this.value[this.snapshot.language.iso2Code];
-
-        if (Object.keys(this.value).length === 0) {
-            this.value = undefined;
-        }
-
-        this.callChange(this.value);
     }
 }

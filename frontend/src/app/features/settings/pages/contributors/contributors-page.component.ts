@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ContributorsState, LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, RolesState, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ContributorAddFormComponent } from './contributor-add-form.component';
@@ -21,10 +19,8 @@ import { ContributorComponent } from './contributor.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ContributorAddFormComponent,
         ContributorComponent,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
         NotifoComponent,
@@ -40,15 +36,14 @@ import { ContributorComponent } from './contributor.component';
         TranslatePipe,
     ],
 })
-export class ContributorsPageComponent implements OnInit {
-    constructor(
-        public readonly contributorsRoute: Router2State,
-        public readonly contributorsState: ContributorsState,
-        public readonly rolesState: RolesState,
-    ) {
-    }
+export class ContributorsPageComponent {
+    private readonly contributorsRoute = inject(Router2State);
 
-    public ngOnInit() {
+    protected readonly contributorsState = inject(ContributorsState);
+
+    protected readonly rolesState = inject(RolesState);
+
+    constructor() {
         this.rolesState.load();
 
         const initial =
@@ -60,11 +55,11 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.load(false, initial);
     }
 
-    public reload() {
+    protected reload() {
         this.contributorsState.load(true);
     }
 
-    public search(query: string) {
+    protected search(query: string) {
         this.contributorsState.search(query);
     }
 }

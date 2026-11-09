@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { ConfirmClickDirective, DarkenPipe, ExternalLinkDirective, RuleTriggerMetadataDto, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleIconComponent } from './rule-icon.component';
 
@@ -14,7 +14,6 @@ import { RuleIconComponent } from './rule-icon.component';
     selector: 'sqx-rule-element',
     styleUrls: ['./rule-element.component.scss'],
     templateUrl: './rule-element.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
         DarkenPipe,
@@ -26,33 +25,33 @@ import { RuleIconComponent } from './rule-icon.component';
     ],
 })
 export class RuleElementComponent {
-    @Input({ required: true })
-    public elementType!: string;
+    /** The type of the trigger or step, used as fallback title. */
+    public readonly elementType = input.required<string>();
 
-    @Input({ required: true })
-    public elementInfo!: RuleTriggerMetadataDto;
+    /** The metadata of the trigger or step, with icon, title and description. */
+    public readonly elementInfo = input.required<RuleTriggerMetadataDto>();
 
-    @Input()
-    public label?: string;
+    /** The tooltip of the icon. Falls back to the title of the element. */
+    public readonly label = input<string>();
 
-    @Input({ transform: booleanAttribute })
-    public showName?: boolean | null = true;
+    /** Shows the name next to the icon. */
+    public readonly showName = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public showDescription?: boolean | null = true;
+    /** Shows the description below the name. */
+    public readonly showDescription = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public showRemove?: boolean | null = false;
+    /** Shows a button to remove the element. */
+    public readonly showRemove = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disabled = false;
+    /** Shows the element as not clickable. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public size: 'sm' | 'md' | 'lg' = 'lg';
+    /** The size of the icon. */
+    public readonly size = input<'sm' | 'md' | 'lg'>('lg');
 
-    @Output()
-    public remove = new EventEmitter();
+    /** Emits when the remove button is clicked and confirmed. */
+    public readonly remove = output();
 
-    @Output()
-    public iconClick = new EventEmitter();
+    /** Emits when the icon is clicked. */
+    public readonly iconClick = output();
 }

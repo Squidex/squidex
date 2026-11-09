@@ -6,18 +6,15 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, EventConsumerDto, EventConsumersDto, IResourceDto, pretifyError } from '@app/shared';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class EventConsumersService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getEventConsumers(): Observable<EventConsumersDto> {
         const url = this.apiUrl.buildUrl('/api/event-consumers');

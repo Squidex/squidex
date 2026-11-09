@@ -5,18 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
+import { Component, input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-loader',
     styleUrls: ['./loader.component.scss'],
     templateUrl: './loader.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoaderComponent {
-    @Input({ transform: numberAttribute })
-    public size = 18;
+    /** The width and height of the spinner in pixels. */
+    public readonly size = input(18, { transform: numberAttribute });
 
-    @Input()
-    public color: 'input' | 'theme' | 'white' | 'text' = 'text';
+    /** The color scheme of the spinner. */
+    public readonly color = input<'input' | 'theme' | 'white' | 'text'>('text');
 }

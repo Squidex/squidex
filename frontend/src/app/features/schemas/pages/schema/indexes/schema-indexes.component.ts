@@ -6,10 +6,10 @@
  */
 
 
-import { AsyncPipe } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap, timer } from 'rxjs';
-import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, Subscriptions, TranslatePipe, UIOptions } from '@app/shared';
+import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, TranslatePipe, UIOptions } from '@app/shared';
 import { IndexFormComponent } from './index-form.component';
 import { IndexComponent } from './index.component';
 
@@ -18,38 +18,36 @@ import { IndexComponent } from './index.component';
     styleUrls: ['./schema-indexes.component.scss'],
     templateUrl: './schema-indexes.component.html',
     imports: [
-        AsyncPipe,
         CodeComponent,
-        IndexFormComponent,
         IndexComponent,
+        IndexFormComponent,
+        ListViewComponent,
         MarkdownDirective,
         ModalDirective,
-        ListViewComponent,
         TranslatePipe,
     ],
 })
-export class SchemaIndexesComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class SchemaIndexesComponent {
+    private readonly uiOptions = inject(UIOptions);
 
-    public readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
+    protected readonly indexesState = inject(IndexesState);
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    protected readonly languagesState = inject(LanguagesState);
 
-    public addIndexDialog = new DialogModel();
+    /** The schema to manage the indexes for. */
+    public readonly schema = input.required<SchemaDto>();
 
-    constructor(
-        public readonly indexesState: IndexesState,
-        public readonly languagesState: LanguagesState,
-    ) {
-    }
+    protected readonly canCreateIndexes = this.uiOptions.value.canCreateIndexes;
 
-    public ngOnInit() {
+    protected readonly addIndexDialog = new DialogModel();
+
+    constructor() {
         this.indexesState.load();
 
-        this.subscriptions.add(
-            timer(3000, 3000).pipe(
-                switchMap(() => this.indexesState.load(false, true))));
+        timer(3000, 3000).pipe(
+            switchMap(() => this.indexesState.load(false, true)),
+            takeUntilDestroyed())
+            .subscribe();
 
         this.languagesState.load();
     }

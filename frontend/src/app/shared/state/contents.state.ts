@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { DateTime, debug, DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
@@ -46,41 +46,45 @@ interface Snapshot extends ListState<Query> {
 }
 
 export abstract class ContentsStateBase extends State<Snapshot> {
-    public selectedContent: Observable<ContentDto | undefined | null> =
+    private readonly appsState = inject(AppsState);
+    private readonly contentsService = inject(ContentsService);
+    private readonly dialogs = inject(DialogService);
+
+    public readonly selectedContent =
         this.project(x => x.selectedContent, Types.equals);
 
-    public contents =
+    public readonly contents =
         this.project(x => x.contents);
 
-    public paging =
+    public readonly paging =
         this.project(x => getPagingInfo(x, x.contents.length));
 
-    public query =
+    public readonly query =
         this.project(x => x.query);
 
-    public validationResults =
+    public readonly validationResults =
         this.project(x => x.validationResults);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public canCreateAndPublish =
+    public readonly canCreateAndPublish =
         this.project(x => x.canCreateAndPublish === true);
 
-    public canCreateAny =
+    public readonly canCreateAny =
         this.project(x => x.canCreate === true || x.canCreateAndPublish === true);
 
-    public statuses =
+    public readonly statuses =
         this.project(x => x.statuses);
 
-    public statusQueries =
-        this.projectFrom(this.statuses, getStatusQueries);
+    public readonly statusQueries =
+        computed(() => getStatusQueries(this.statuses()));
 
     public get appId() {
         return this.appsState.appId;
@@ -90,11 +94,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    protected constructor(name: string,
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService,
-    ) {
+    protected constructor(name: string) {
         super({
             contents: [],
             fieldNames: null,
@@ -443,14 +443,12 @@ function isReferrerError(error?: ServerErrorDto) {
     return error?.errorCode === 'OBJECT_REFERENCED';
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class ContentsState extends ContentsStateBase {
-    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
-        private readonly schemasState: SchemasState,
-    ) {
-        super('contents', appsState, contentsService, dialogs);
+    private readonly schemasState = inject(SchemasState);
+
+    constructor() {
+        super('contents');
     }
 
     public get schemaName() {
@@ -458,14 +456,12 @@ export class ContentsState extends ContentsStateBase {
     }
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class ComponentContentsState extends ContentsStateBase {
     public schema!: { name: string };
 
-    constructor(
-        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
-    ) {
-        super('componentContents', appsState, contentsService, dialogs);
+    constructor() {
+        super('componentContents');
     }
 
     public get schemaName() {

@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CodeComponent, FormHintComponent, FormRowComponent, TranslatePipe, TriggerForm } from '@app/shared';
+import { Component, input } from '@angular/core';
+import { FormField } from '@angular/forms/signals';
+import { CodeComponent, ConditionTriggerForm, FormHintComponent, FormRowComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-changed-trigger',
@@ -15,14 +15,13 @@ import { CodeComponent, FormHintComponent, FormRowComponent, TranslatePipe, Trig
     templateUrl: './asset-changed-trigger.component.html',
     imports: [
         CodeComponent,
+        FormField,
         FormHintComponent,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class AssetChangedTriggerComponent {
-    @Input({ required: true })
-    public triggerForm!: TriggerForm;
+    /** The form to edit the trigger settings. */
+    public readonly triggerForm = input.required<ConditionTriggerForm>();
 }

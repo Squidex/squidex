@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Settings, StopClickDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -14,7 +14,6 @@ import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, 
     selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AvatarComponent,
         ConfirmClickDirective,
@@ -28,23 +27,25 @@ import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, 
     ],
 })
 export class AppComponent {
-    @Input({ required: true })
-    public app!: AppDto;
+    /** The app to show in the card. */
+    public readonly app = input.required<AppDto>();
 
-    @Output()
-    public leave = new EventEmitter<AppDto>();
+    /** Emits the app when the user confirms to leave it. */
+    public readonly leave = output<AppDto>();
 
-    public dropdown = new ModalModel();
+    protected readonly canShowContents = computed(() => {
+        return this.app().canAccessContent;
+    });
 
-    public get canShowContents() {
-        return this.app.canAccessContent;
-    }
+    protected readonly canShowAssets = computed(() => {
+        const app = this.app();
 
-    public get canShowAssets() {
-        return this.app.canReadAssets && this.app.roleProperties[Settings.AppProperties.HIDE_ASSETS] !== true;
-    }
+        return app.canReadAssets && app.roleProperties[Settings.AppProperties.HIDE_ASSETS] !== true;
+    });
 
-    public get canShowSettings() {
-        return this.app.roleProperties[Settings.AppProperties.HIDE_SETTINGS] !== true;
-    }
+    protected readonly canShowSettings = computed(() => {
+        return this.app().roleProperties[Settings.AppProperties.HIDE_SETTINGS] !== true;
+    });
+
+    protected readonly dropdown = new ModalModel();
 }

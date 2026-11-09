@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TeamDto, TranslatePipe } from '@app/shared';
 
@@ -13,7 +13,6 @@ import { TeamDto, TranslatePipe } from '@app/shared';
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RouterLink,
         RouterLinkActive,
@@ -21,6 +20,6 @@ import { TeamDto, TranslatePipe } from '@app/shared';
     ],
 })
 export class LeftMenuComponent {
-    @Input({ required: true })
-    public team!: TeamDto;
+    /** The team to show the menu for. */
+    public readonly team = input.required<TeamDto>();
 }

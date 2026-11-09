@@ -2,128 +2,70 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights r vbeserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { ChangeDetectionStrategy, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
-import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
-import { merge } from 'rxjs';
-import { LocalizerService, StatefulComponent, Subscriptions, Types } from '@app/framework/internal';
+import { Component, computed, inject, input } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
+import { LocalizerService, Types } from '@app/framework/internal';
 import { ControlErrorsMessagesComponent } from './control-errors-messages.component';
-import { formatError } from './error-formatting';
-import { touchedChange$ } from './forms-helper';
-
-interface State {
-    // The error messages to show.
-    errorMessages: ReadonlyArray<string>;
-}
+import { formatSignalErrors, getFieldKey } from './signal-validators';
 
 @Component({
     selector: 'sqx-control-errors',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsMessagesComponent,
     ],
 })
-export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
-    private readonly subscriptions = new Subscriptions();
-    private controlDisplayName = '';
-    private control: AbstractControl | null = null;
+export class ControlErrorsComponent {
+    private readonly localizer = inject(LocalizerService);
 
-    @Input({ required: true })
-    public for!: string | AbstractControl;
+    /** The field to show the errors for. */
+    public readonly for = input.required<string | FieldTree<unknown>>();
 
-    @Input()
-    public submitCount: null | number | undefined;
+    /** The field name in the error messages. Falls back to a name derived from the control. */
+    public readonly fieldName = input<string | null>();
 
-    @Input()
-    public fieldName: string | null | undefined;
-
-    public get isTouched() {
-        return this.control?.touched || Types.is(this.control, UntypedFormArray);
-    }
-
-    constructor(
-        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
-        private readonly localizer: LocalizerService,
-    ) {
-        super({ errorMessages: [] });
-    }
-
-    public ngOnChanges() {
-        const previousControl = this.control;
-
-        if (this.fieldName) {
-            this.controlDisplayName = this.fieldName;
-        } else if (this.for) {
-            if (Types.isString(this.for)) {
-                let translation = this.localizer.get(`common.${this.for}`)!;
-
-                if (!translation) {
-                    translation = this.for.substring(0, 1).toUpperCase() + this.for.substring(1);
-                }
-
-                this.controlDisplayName = translation;
-            } else {
-                this.controlDisplayName = this.localizer.get('common.field')!;
-            }
+    protected readonly field = computed(() => {
+        const control = this.for();
+        if (!Types.isFunction(control)) {
+            return null;
         }
 
-        if (Types.isString(this.for)) {
-            if (this.formGroupDirective && this.formGroupDirective.form) {
-                this.control = this.formGroupDirective.form.controls[this.for];
-            } else {
-                this.control = null;
-            }
-        } else {
-            this.control = this.for;
+        return control as FieldTree<unknown>;
+    });
+
+    protected readonly controlDisplayName = computed(() => {
+        const fieldName = this.fieldName();
+        if (fieldName) {
+            return fieldName;
         }
 
-        if (this.control !== previousControl) {
-            this.subscriptions.unsubscribeAll();
-
-            if (this.control) {
-                this.subscriptions.add(
-                    merge(
-                        this.control.valueChanges,
-                        this.control.statusChanges,
-                        touchedChange$(this.control),
-                    ).subscribe(() => {
-                        this.createMessages();
-                    }));
-            }
+        let control = this.for();
+        if (Types.isFunction(control)) {
+            control = getFieldKey(control as FieldTree<unknown>);
         }
 
-        this.createMessages();
-    }
-
-    private createMessages() {
-        const errorMessages: string[] = [];
-
-        const submitCount = this.submitCount;
-        const submitted = !Types.isNumber(submitCount) || submitCount > 0;
-
-        if (this.control && this.control.invalid && this.isTouched && this.control.errors && submitted) {
-            for (const [key, error] of Object.entries(this.control.errors)) {
-                const message = formatError(this.localizer, this.controlDisplayName, key, error, this.control.value);
-
-                if (Types.isString(message)) {
-                    errorMessages.push(message);
-                } else if (Types.isArray(message)) {
-                    for (const error of message) {
-                        errorMessages.push(error);
-                    }
-                }
-            }
+        if (!Types.isString(control) || !control) {
+            return this.localizer.get('common.field')!;
         }
 
-        if (errorMessages.length === 0 && this.snapshot.errorMessages.length === 0) {
-            return;
+        return this.localizer.get(`common.${control}`) || control.substring(0, 1).toUpperCase() + control.substring(1);
+    });
+
+    protected readonly errorMessages = computed(() => {
+        const field = this.field();
+        if (!field) {
+            return [];
         }
 
-        this.next({ errorMessages });
-    }
+        const state = field();
+        if (!state.touched() && !Types.isArray(state.value())) {
+            return [];
+        }
+
+        return formatSignalErrors(this.localizer, this.controlDisplayName(), field);
+    }, { equal: Types.equals });
 }

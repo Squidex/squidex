@@ -5,20 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Directive, HostListener, Input } from '@angular/core';
+import { booleanAttribute, Directive, input } from '@angular/core';
 
 @Directive({
     selector: '[sqxStopClick]',
+    host: {
+        '(click)': 'onClick($event)',
+    },
 })
 export class StopClickDirective {
-    @Input({ alias: 'sqxStopClick', transform: booleanAttribute })
-    public shouldStop: any = true;
+    /** Stops the propagation of click events when true. */
+    public readonly shouldStop = input(true, { alias: 'sqxStopClick', transform: booleanAttribute });
 
-    @HostListener('click', ['$event'])
-    public onClick(event: Event) {
-        const shouldStop: any = this.shouldStop;
-
-        if (shouldStop || shouldStop === '') {
+    protected onClick(event: Event) {
+        if (this.shouldStop()) {
             event.stopPropagation();
             event.stopImmediatePropagation();
         }

@@ -5,22 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { tap } from 'rxjs/operators';
-import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Subscriptions, TranslatePipe } from '@app/shared';
+import { Component, effect, inject, untracked } from '@angular/core';
+import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-notification-dropdown',
     styleUrls: ['./notification-dropdown.component.scss'],
     templateUrl: './notification-dropdown.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         CollaborationService,
         CommentsState,
     ],
     imports: [
-        AsyncPipe,
         CommentComponent,
         DropdownMenuComponent,
         ModalDirective,
@@ -28,30 +24,26 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
         TranslatePipe,
     ],
 })
-export class NotificationDropdownComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class NotificationDropdownComponent {
+    private readonly authService = inject(AuthService);
+    private readonly collaboration = inject(CollaborationService);
 
-    public modalMenu = new ModalModel();
+    protected readonly commentsState = inject(CommentsState);
 
-    public commentUser: string;
-    public commentItems = this.commentsState.groupedUnresolvedComments;
+    protected readonly modalMenu = new ModalModel();
 
-    constructor(authService: AuthService,
-        public readonly commentsState: CommentsState,
-        public readonly collaboration: CollaborationService,
-    ) {
-        this.commentUser = authService.user!.token;
-    }
+    protected readonly commentUser = this.authService.user!.token;
 
-    public ngOnInit() {
+    constructor() {
         this.collaboration.connect('users/collaboration');
 
-        this.subscriptions.add(
-            this.modalMenu.isOpenChanges.pipe(
-                tap(_ => {
-                    this.commentsState.prune(100);
-                    this.commentsState.markRead();
-                }),
-            ));
+        effect(() => {
+            this.modalMenu.isOpen();
+
+            untracked(() => {
+                this.commentsState.prune(100);
+                this.commentsState.markRead();
+            });
+        });
     }
 }

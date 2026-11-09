@@ -6,24 +6,15 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AuthService, ContentDto, DropdownMenuComponent, interpolate, isSafeUrl, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, StatefulComponent, TranslatePipe } from '@app/shared';
-
-interface State {
-    // The name of the selected preview config.
-    previewNameSelected?: string;
-
-    // All other preview configs.
-    previewNamesMore: ReadonlyArray<string>;
-}
+import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-preview-button',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         ModalDirective,
@@ -31,41 +22,53 @@ interface State {
         TranslatePipe,
     ],
 })
-export class PreviewButtonComponent extends StatefulComponent<State> implements OnChanges {
-    @Input()
-    public confirm?: () => Observable<boolean>;
+export class PreviewButtonComponent {
+    private readonly authService = inject(AuthService);
+    private readonly localStore = inject(LocalStoreService);
 
-    @Input({ required: true })
-    public content!: ContentDto;
+    /** Asks the user for confirmation before the preview is opened, for example to save pending changes. */
+    public readonly confirm = input<() => Observable<boolean>>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The content to preview. */
+    public readonly content = input.required<ContentDto>();
 
-    public dropdown = new ModalModel();
+    /** The schema of the content, with the preview URLs. */
+    public readonly schema = input.required<SchemaDto>();
 
-    constructor(
-        private readonly authService: AuthService,
-        private readonly localStore: LocalStoreService,
-    ) {
-        super({ previewNamesMore: [] });
-    }
+    protected readonly previewName = linkedSignal(() => {
+        return this.localStore.get(this.configKey());
+    });
 
-    public ngOnChanges() {
-        let selectedName = this.localStore.get(this.configKey());
+    protected readonly previewNameSelected = computed<string | undefined>(() => {
+        const previewUrls = this.schema().previewUrls;
 
-        if (!selectedName || !this.schema.previewUrls[selectedName]) {
-            selectedName = Object.keys(this.schema.previewUrls)[0];
+        const selectedName = this.previewName();
+        if (!selectedName || !previewUrls[selectedName]) {
+            return Object.keys(previewUrls)[0];
         }
 
-        this.selectUrl(selectedName);
-    }
+        return selectedName;
+    });
 
-    public follow(name?: string) {
+    protected readonly previewNamesMore = computed(() => {
+        const previewNameSelected = this.previewNameSelected();
+        const previewNames = Object.keys(this.schema().previewUrls);
+        if (!previewNameSelected) {
+            return previewNames.sorted();
+        }
+
+        return previewNames.removed(previewNameSelected).sorted();
+    });
+
+    protected readonly dropdown = new ModalModel();
+
+    protected follow(name?: string) {
         if (name) {
             this.selectUrl(name);
 
-            if (this.confirm) {
-                this.confirm().pipe(take(1))
+            const confirm = this.confirm();
+            if (confirm) {
+                confirm().pipe(take(1))
                     .subscribe(confirmed => {
                         if (confirmed) {
                             this.navigateTo(name);
@@ -80,34 +83,19 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     }
 
     private navigateTo(name: string) {
-        const urlVars = { ...this.content, ...this.authService.user || {} };
-        const urlLink = interpolate(this.schema.previewUrls[name], urlVars, 'iv');
-        if (!isSafeUrl(urlLink)) {
-            return;
-        }
+        const urlVars = { ...this.content(), ...this.authService.user || {} };
+        const urlLink = interpolate(this.schema().previewUrls[name], urlVars, 'iv');
 
         window.open(urlLink, '_blank');
     }
 
     private selectUrl(selectedName: string) {
-        this.next(s => {
-            if (selectedName === s.previewNameSelected) {
-                return s;
-            }
+        this.previewName.set(selectedName);
 
-            const state = { ...s };
-
-            const keys = Object.keys(this.schema.previewUrls);
-            state.previewNameSelected = selectedName;
-            state.previewNamesMore = keys.removed(selectedName).sorted();
-
-            this.localStore.set(this.configKey(), selectedName);
-
-            return state;
-        });
+        this.localStore.set(this.configKey(), selectedName);
     }
 
     private configKey() {
-        return Settings.Local.SCHEMA_PREVIEW(this.schema.id);
+        return Settings.Local.SCHEMA_PREVIEW(this.schema().id);
     }
 }

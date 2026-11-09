@@ -13,12 +13,12 @@
                     <div class="col-6">
                         <sqx-tag-editor
                             class="tags"
-                            [itemsSource]="assetsState.tagsNames | async"
-                            [ngModel]="assetsState.selectedTagNames | async"
-                            (ngModelChange)="selectTags($event)"
+                            [itemsSource]="assetsState.tagsNames()"
+                            nullWhenEmpty="false"
                             placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             styleScrollable="true"
-                            undefinedWhenEmpty="false" />
+                            [value]="assetsState.selectedTagNames()"
+                            (valueChange)="selectTags($event)" />
                     </div>
 
                     <div class="col-6">
@@ -27,7 +27,7 @@
                             formClass="form"
                             placeholder="{{ 'assets.searchByName' | sqxTranslate }}"
                             [queriesTypes]="'common.assets' | sqxTranslate"
-                            [query]="assetsState.query | async"
+                            [query]="assetsState.query()"
                             (queryChange)="search($event)" />
                     </div>
                 </div>
@@ -38,18 +38,18 @@
                     <button
                         class="btn btn-secondary btn-toggle"
                         attr.aria-label="{{ 'assets.listView' | sqxTranslate }}"
-                        [class.btn-primary]="snapshot.isListView"
+                        [class.btn-primary]="isListView()"
                         (click)="changeView(true)"
-                        [disabled]="snapshot.isListView"
+                        [disabled]="isListView()"
                         type="button">
                         <i class="icon-list"></i>
                     </button>
                     <button
                         class="btn btn-secondary btn-toggle"
                         attr.aria-label="{{ 'assets.gridView' | sqxTranslate }}"
-                        [class.btn-primary]="!snapshot.isListView"
+                        [class.btn-primary]="!isListView()"
                         (click)="changeView(false)"
-                        [disabled]="!snapshot.isListView"
+                        [disabled]="!isListView()"
                         type="button">
                         <i class="icon-grid"></i>
                     </button>
@@ -58,24 +58,24 @@
         </div>
     </ng-container>
     <ng-container content>
-        <sqx-list-view [isLoading]="assetsState.isLoading | async" overflow="true">
+        <sqx-list-view [isLoading]="assetsState.isLoading()" overflow="true">
             <ng-container content>
                 <sqx-assets-list
                     (assetSelect)="selectAsset($event)"
                     [assetsState]="assetsState"
                     [isDisabled]="true"
-                    [isListView]="snapshot.isListView"
-                    [selectedIds]="snapshot.selectedAssets" />
+                    [isListView]="isListView()"
+                    [selectedIds]="selectedAssets()" />
             </ng-container>
             <ng-container footer>
-                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging | async" (pagingChange)="assetsState.page($event)" />
+                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging()" (pagingChange)="assetsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>
     <ng-container footer>
         <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
-        <button class="btn btn-success" (click)="emitSelect()" [disabled]="snapshot.selectionCount === 0" type="submit">
-            {{ "assets.linkSelected" | sqxTranslate: { count: snapshot.selectionCount } }})
+        <button class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount() === 0" type="submit">
+            {{ "assets.linkSelected" | sqxTranslate: { count: selectionCount() } }})
         </button>
     </ng-container>
 </sqx-modal-dialog>

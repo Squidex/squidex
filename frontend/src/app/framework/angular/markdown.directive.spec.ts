@@ -5,112 +5,142 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Renderer2 } from '@angular/core';
-import { IMock, It, Mock, Times } from 'typemoq';
+import { Component, input, Renderer2 } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { MarkdownDirective } from './markdown.directive';
 
+@Component({
+    template:
+        '<div [inline]="inline()" [optional]="optional()" [sqxMarkdown]="markdown()"></div>',
+    imports: [MarkdownDirective],
+})
+class TestHostComponent {
+    public readonly markdown = input<string>('');
+    public readonly inline = input(true);
+    public readonly optional = input(false);
+}
+
 describe('MarkdownDirective', () => {
-    let renderer: IMock<Renderer2>;
-    let markdownElement: any = {};
-    let markdownDirective: MarkdownDirective;
+    let markdownFixture: ComponentFixture<TestHostComponent>;
+    let setProperty: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
-        renderer = Mock.ofType<Renderer2>();
+        markdownFixture = TestBed.createComponent(TestHostComponent);
 
-        markdownElement = {};
-        markdownDirective = new MarkdownDirective(markdownElement, renderer.object);
+        const renderer = markdownFixture.debugElement
+            .query(By.css('div'))
+            .injector.get(Renderer2);
+
+        setProperty = vi.spyOn(renderer, 'setProperty');
     });
 
     it('should render empty text as text', () => {
-        markdownDirective.markdown = '';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: '' });
 
         verifyTextRender('');
     });
 
     it('should render as text if result has no tags', () => {
-        markdownDirective.inline = true;
-        markdownDirective.markdown = 'markdown';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: 'markdown', inline: true });
 
         verifyTextRender('markdown');
     });
 
     it('should render as text if optional', () => {
-        markdownDirective.optional = true;
-        markdownDirective.markdown = '**bold**';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: '**bold**', optional: true });
 
         verifyTextRender('**bold**');
     });
 
     it('should render HTML as text if optional', () => {
-        markdownDirective.optional = true;
-        markdownDirective.markdown = '<img src="x" onerror="alert(1)">';
-        markdownDirective.ngOnChanges();
+        setInputs({
+            markdown: '<img src="x" onerror="alert(1)">',
+            optional: true,
+        });
 
         verifyTextRender('<img src="x" onerror="alert(1)">');
     });
 
     it('should render HTML escaped if optional with exclamation', () => {
-        markdownDirective.optional = true;
-        markdownDirective.markdown = '!<img src="x" onerror="alert(1)">';
-        markdownDirective.ngOnChanges();
+        setInputs({
+            markdown: '!<img src="x" onerror="alert(1)">',
+            optional: true,
+        });
 
-        verifyHtmlRender('&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;');
+        verifyHtmlRender(
+            '&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;',
+        );
     });
 
     it('should render if optional with exclamation', () => {
-        markdownDirective.optional = true;
-        markdownDirective.markdown = '!**bold**';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: '!**bold**', optional: true });
 
         verifyHtmlRender('<strong>bold</strong>');
     });
 
     it('should render with exclamation if not optional', () => {
-        markdownDirective.markdown = '!text';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: '!text' });
 
         verifyTextRender('!text');
     });
 
     it('should render as HTML if it has encoded characters', () => {
-        markdownDirective.inline = false;
-        markdownDirective.markdown = '\'Example\'';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: "'Example'", inline: false });
 
         verifyHtmlRender('<p>&#39;Example&#39;</p>\n');
     });
 
     it('should render as HTML if it has tags', () => {
-        markdownDirective.inline = false;
-        markdownDirective.markdown = '**bold**';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: '**bold**', inline: false });
 
         verifyHtmlRender('<p><strong>bold</strong></p>\n');
     });
 
     it('should render as inline HTML if it has tags', () => {
-        markdownDirective.markdown = '**bold**';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: '**bold**' });
 
         verifyHtmlRender('<strong>bold</strong>');
     });
 
     it('should render HTML escaped', () => {
-        markdownDirective.inline = false;
-        markdownDirective.markdown = '<h1>Header</h1>';
-        markdownDirective.ngOnChanges();
+        setInputs({ markdown: '<h1>Header</h1>', inline: false });
 
         verifyHtmlRender('<p>&lt;h1&gt;Header&lt;/h1&gt;</p>\n');
     });
 
+    it('should render again if markdown changes', () => {
+        setInputs({ markdown: 'text1' });
+        setInputs({ markdown: 'text2' });
+
+        verifyTextRender('text2');
+    });
+
+    function setInputs(inputs: {
+        markdown: string;
+        inline?: boolean;
+        optional?: boolean;
+    }) {
+        for (const [key, value] of Object.entries(inputs)) {
+            markdownFixture.componentRef.setInput(key, value);
+        }
+
+        markdownFixture.detectChanges();
+    }
+
     function verifyTextRender(text: string) {
-        renderer.verify(x => x.setProperty(It.isAny(), 'textContent', text), Times.once());
+        expect(setProperty).toHaveBeenLastCalledWith(
+            expect.anything(),
+            'textContent',
+            text,
+        );
     }
 
     function verifyHtmlRender(text: string) {
-        renderer.verify(x => x.setProperty(It.isAny(), 'innerHTML', text), Times.once());
+        expect(setProperty).toHaveBeenLastCalledWith(
+            expect.anything(),
+            'innerHTML',
+            text,
+        );
     }
 });

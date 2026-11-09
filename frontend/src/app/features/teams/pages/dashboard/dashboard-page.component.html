@@ -1,7 +1,7 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
-@if (selectedTeam | async; as team) {
+@if (teamsState.selectedTeam(); as team) {
     <div class="dashboard" animate.enter="fade-in" animate.leave="fade-out">
-        @if (!isScrolled) {
+        @if (!isScrolled()) {
             <div class="dashboard-summary" animate.enter="fade-in" animate.leave="fade-out">
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
 
@@ -9,7 +9,7 @@
             </div>
         }
         <gridster #grid [options]="gridOptions">
-            @for (item of gridConfig; track item) {
+            @for (item of gridConfig(); track item) {
                 <gridster-item [item]="item">
                     @switch (item.type) {
                         @case ("apps") {
@@ -17,35 +17,35 @@
                         }
 
                         @case ("api-calls") {
-                            <sqx-api-calls-card [usage]="callsUsage" />
+                            <sqx-api-calls-card [usage]="callsUsage.value()" />
                         }
 
                         @case ("api-traffic-summary") {
-                            <sqx-api-traffic-summary-card [usage]="callsUsage" />
+                            <sqx-api-traffic-summary-card [usage]="callsUsage.value()" />
                         }
 
                         @case ("api-calls-summary") {
-                            <sqx-api-calls-summary-card [usage]="callsUsage" />
+                            <sqx-api-calls-summary-card [usage]="callsUsage.value()" />
                         }
 
                         @case ("asset-uploads-count") {
-                            <sqx-asset-uploads-count-card [usage]="storageUsage" />
+                            <sqx-asset-uploads-count-card [usage]="storageUsage.value()" />
                         }
 
                         @case ("asset-uploads-size-summary") {
-                            <sqx-asset-uploads-size-summary-card [usage]="storageCurrent" />
+                            <sqx-asset-uploads-size-summary-card [usage]="storageCurrent.value()" />
                         }
 
                         @case ("asset-uploads-size") {
-                            <sqx-asset-uploads-size-card [usage]="storageUsage" />
+                            <sqx-asset-uploads-size-card [usage]="storageUsage.value()" />
                         }
 
                         @case ("api-traffic") {
-                            <sqx-api-traffic-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
+                            <sqx-api-traffic-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage.value()" />
                         }
 
                         @case ("api-performance") {
-                            <sqx-api-performance-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
+                            <sqx-api-performance-card [isStacked]="isStacked()" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage.value()" />
                         }
 
                         @case ("random-dog") {
@@ -67,7 +67,7 @@
                 </gridster-item>
             }
 
-            <div [style.height]="extendedHeight" [style.width]="'0px'"></div>
+            <div [style.height]="extendedHeight()" [style.width]="'0px'"></div>
         </gridster>
     </div>
 }

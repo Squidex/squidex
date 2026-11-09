@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
+import { Component, input } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-component-ui',
@@ -15,12 +15,12 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
     templateUrl: 'component-ui.component.html',
 })
 export class ComponentUIComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: ReferencesFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<ReferencesFieldPropertiesDto>();
 }

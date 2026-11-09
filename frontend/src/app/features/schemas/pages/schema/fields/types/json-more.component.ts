@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { CodeEditorComponent, FieldDto, FormRowComponent, JsonFieldPropertiesDto } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { CodeEditorComponent, FieldDto, FieldFormModel, FormRowComponent, JsonFieldFormModel, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-json-more',
@@ -15,18 +15,21 @@ import { CodeEditorComponent, FieldDto, FormRowComponent, JsonFieldPropertiesDto
     templateUrl: 'json-more.component.html',
     imports: [
         CodeEditorComponent,
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
     ],
 })
 export class JsonMoreComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public properties!: JsonFieldPropertiesDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<JsonFieldPropertiesDto>();
+
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<JsonFieldFormModel>;
+    });
 }

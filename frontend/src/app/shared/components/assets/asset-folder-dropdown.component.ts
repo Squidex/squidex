@@ -6,24 +6,16 @@
  */
 
 
-import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalDirective, ModalModel, ModalPlacementDirective, StatefulControlComponent, TranslatePipe, Types } from '@app/framework';
+import { ChangeDetectorRef, Component, inject, linkedSignal, model, signal } from '@angular/core';
+import { FormValueControlBase, ModalDirective, ModalModel, ModalPlacementDirective, syncExternalValue, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
 import { AssetFolderDropdownItemComponent } from './asset-folder-dropdown-item.component';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
-
-export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetFolderDropdownComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-asset-folder-dropdown',
     styleUrls: ['./asset-folder-dropdown.component.scss'],
     templateUrl: './asset-folder-dropdown.component.html',
-    providers: [
-        SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR,
-    ],
     imports: [
         AssetFolderDropdownItemComponent,
         ModalDirective,
@@ -31,43 +23,39 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
         TranslatePipe,
     ],
 })
-export class AssetFolderDropdownComponent extends StatefulControlComponent<any, string> {
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
+export class AssetFolderDropdownComponent extends FormValueControlBase<string | null> {
+    private readonly appsState = inject(AppsState);
+    private readonly assetsService = inject(AssetsService);
+    private readonly changeDetector = inject(ChangeDetectorRef);
+    private readonly valueSetter = syncExternalValue(() => this.value, value => this.loadSelection(value));
+    private selectedId?: string;
 
-    public get appName() {
-        return this.appsState.appName;
-    }
+    /** The ID of the selected folder. */
+    public readonly value = model<string | null>(null);
 
-    public root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
+    protected readonly selection = linkedSignal(() => this.root);
 
-    public selection = this.root;
-    public selectionPath = '';
+    protected readonly selectionPath = signal('');
 
-    public dropdown = new ModalModel();
+    protected readonly appName = this.appsState.appName;
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-    ) {
-        super({});
-    }
+    protected readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
 
-    public writeValue(obj: string) {
-        if (!Types.isString(obj)) {
-            obj = ROOT_ITEM.id;
+    protected readonly dropdown = new ModalModel();
+
+    private loadSelection(value: string | null) {
+        const id = Types.isString(value) ? value : ROOT_ITEM.id;
+        if (id === this.selectedId) {
+            return;
         }
 
-        const node = this.findNode(this.root, obj);
-
+        const node = this.findNode(this.root, id);
         if (node?.isLoaded) {
             this.select(node, false);
             return;
         }
 
-        this.assetsService.getAssetFolders(this.appName, obj, 'PathAndItems')
+        this.assetsService.getAssetFolders(this.appName, id, 'PathAndItems')
             .subscribe(dto => {
                 let parent = this.root;
 
@@ -97,7 +85,11 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
             });
     }
 
-    public select(selected: AssetFolderDropdowNode, emit = true) {
+    protected select(selected: AssetFolderDropdowNode, emit = true) {
+        if (emit && this.disabled()) {
+            return;
+        }
+
         this.resetSelected(this.root);
 
         const path: AssetFolderDropdowNode[] = [];
@@ -111,18 +103,20 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
             current = current.parent;
         }
 
-        this.selection = selected;
-        this.selection.isSelected = true;
-        this.selectionPath = path.filter(x => x.item !== ROOT_ITEM).map(x => x.item.folderName).join('/');
+        selected.isSelected = true;
+
+        this.selectedId = selected.item.id;
+        this.selection.set(selected);
+        this.selectionPath.set(path.filter(x => x.item !== ROOT_ITEM).map(x => x.item.folderName).join('/'));
 
         if (emit) {
-            this.callChange(selected.item.id);
-            this.callTouched();
+            this.valueSetter(selected.item.id);
+            this.markTouched();
 
             this.dropdown.hide();
         }
 
-        this.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     private resetSelected(node: AssetFolderDropdowNode) {

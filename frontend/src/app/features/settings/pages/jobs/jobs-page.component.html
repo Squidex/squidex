@@ -4,7 +4,7 @@
         <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:jobs.refreshTooltip" type="button">
             <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-        @if (jobsState.canRebuildTextIndex | async) {
+        @if (jobsState.canRebuildTextIndex()) {
             <button
                 class="btn btn-outline-secondary me-2"
                 confirmText="i18n:jobs.textIndexConfirmText"
@@ -15,19 +15,19 @@
                 {{ "jobs.textIndexStart" | sqxTranslate }}
             </button>
         }
-        @if (jobsState.canCreateBackup | async) {
-            <button class="btn btn-success" (click)="startBackup()" [disabled]="jobsState.maxBackupsReached | async" type="button">
+        @if (jobsState.canCreateBackup()) {
+            <button class="btn btn-success" (click)="startBackup()" [disabled]="jobsState.maxBackupsReached()" type="button">
                 {{ "jobs.backupStart" | sqxTranslate }}
             </button>
         }
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="jobsState.isLoading | async">
-            @if (jobsState.maxBackupsReached | async) {
+        <sqx-list-view innerWidth="50rem" [isLoading]="jobsState.isLoading()">
+            @if (jobsState.maxBackupsReached()) {
                 <div class="alert alert-danger mb-4">{{ "jobs.backupMaximumReached" | sqxTranslate }}</div>
             }
 
-            @if ((jobsState.isLoaded | async) && (jobsState.jobs | async); as jobs) {
+            @if (jobsState.isLoaded() && jobsState.jobs(); as jobs) {
                 @if (jobs.length === 0) {
                     <div class="table-items-row table-items-row-summary table-items-row-empty">{{ "jobs.empty" | sqxTranslate }}</div>
                 }

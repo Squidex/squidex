@@ -1,22 +1,22 @@
-@if (config) {
+@if (config()) {
     <button
         class="btn settings-button"
         #buttonSettings
-        [class.btn-primary]="needsAttention"
-        [class.focused]="needsAttention"
+        [class.btn-primary]="needsAttention()"
+        [class.focused]="needsAttention()"
         (click)="dropdownModal.toggle()"
         type="button">
         <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
     </button>
     <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonSettings" *sqxModal="dropdownModal">
-        @for (item of configOptions; track item) {
+        @for (item of configOptions(); track item) {
             <div class="dropdown-item">
                 <div class="form-check">
                     <input
                         class="form-check-input"
                         id="field_{{ item.type }}"
-                        [ngModel]="isSelected(item)"
-                        (ngModelChange)="addOrRemove(item)"
+                        [checked]="!!isSelected(item)"
+                        (change)="addOrRemove(item)"
                         type="checkbox" />
                     <label class="form-check-label" for="field_{{ item.type }}"> {{ item.name }} </label>
                 </div>
@@ -41,7 +41,7 @@
     <sqx-modal-dialog (dialogClose)="expertDialog.hide()" fullHeight="true" size="lg" *sqxModal="expertDialog">
         <ng-container title> {{ "dashboard.editConfig" | sqxTranslate }}</ng-container>
         <ng-container content>
-            <div class="json-editor"><sqx-code-editor borderless="true" [(ngModel)]="expertConfig" valueMode="Json" /></div>
+            <div class="json-editor"><sqx-code-editor borderless="true" [(value)]="expertConfig" valueMode="Json" /></div>
         </ng-container>
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="expertDialog.hide()" type="button">

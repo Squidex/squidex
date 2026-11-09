@@ -5,40 +5,37 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ShortcutService } from '@app/framework/internal';
 import { ShortcutComponent } from './shortcut.component';
 
 describe('ShortcutComponent', () => {
-    const changeDetector: any = {
-        detach: () => {
-            return 0;
-        },
-    };
-
     let shortcutService: ShortcutService;
-    let shortcutComponent: ShortcutComponent;
+    let shortcutFixture: ComponentFixture<ShortcutComponent>;
+    let isTriggered = false;
 
     beforeEach(() => {
         shortcutService = new ShortcutService();
-        shortcutComponent = new ShortcutComponent(changeDetector, shortcutService);
+
+        TestBed.configureTestingModule({
+            providers: [
+                { provide: ShortcutService, useValue: shortcutService },
+            ],
+        });
+
+        shortcutFixture = TestBed.createComponent(ShortcutComponent);
+        shortcutFixture.componentInstance.trigger.subscribe(() => { isTriggered = true; });
+
+        isTriggered = false;
     });
 
-    it('should init without keys', () => {
-        shortcutComponent.keys = null!;
-        shortcutComponent.ngOnInit();
-    });
-
-    it('should destroy without keys', () => {
-        shortcutComponent.keys = null!;
-        shortcutComponent.ngOnDestroy();
+    it('should init and destroy without keys', () => {
+        shortcutFixture.detectChanges();
+        shortcutFixture.destroy();
     });
 
     it('should raise event if triggered', () => {
-        let isTriggered = false;
-
-        shortcutComponent.keys = 'ctrl+a';
-        shortcutComponent.ngOnInit();
-        shortcutComponent.trigger.subscribe(() => { isTriggered = true; });
+        setInputs({ keys: 'ctrl+a' });
 
         shortcutService.raise('ctrl+a');
 
@@ -46,12 +43,7 @@ describe('ShortcutComponent', () => {
     });
 
     it('should not raise event if triggered but disabled', () => {
-        let isTriggered = false;
-
-        shortcutComponent.keys = 'ctrl+a';
-        shortcutComponent.ngOnInit();
-        shortcutComponent.trigger.subscribe(() => { isTriggered = true; });
-        shortcutComponent.disabled = true;
+        setInputs({ keys: 'ctrl+a', disabled: true });
 
         shortcutService.raise('ctrl+a');
 
@@ -59,15 +51,32 @@ describe('ShortcutComponent', () => {
     });
 
     it('should not raise event if triggered but destroyed', () => {
-        let isTriggered = false;
-
-        shortcutComponent.keys = 'ctrl+a';
-        shortcutComponent.ngOnInit();
-        shortcutComponent.trigger.subscribe(() => { isTriggered = true; });
-        shortcutComponent.ngOnDestroy();
+        setInputs({ keys: 'ctrl+a' });
+        shortcutFixture.destroy();
 
         shortcutService.raise('ctrl+a');
 
         expect(isTriggered).toBeFalsy();
     });
+
+    it('should listen to new keys if keys changed', () => {
+        setInputs({ keys: 'ctrl+a' });
+        setInputs({ keys: 'ctrl+b' });
+
+        shortcutService.raise('ctrl+a');
+
+        expect(isTriggered).toBeFalsy();
+
+        shortcutService.raise('ctrl+b');
+
+        expect(isTriggered).toBeTruthy();
+    });
+
+    function setInputs(inputs: { keys: string; disabled?: boolean }) {
+        for (const [key, value] of Object.entries(inputs)) {
+            shortcutFixture.componentRef.setInput(key, value);
+        }
+
+        shortcutFixture.detectChanges();
+    }
 });

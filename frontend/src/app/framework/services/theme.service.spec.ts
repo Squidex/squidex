@@ -8,7 +8,7 @@
 import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { LocalStoreService } from './local-store.service';
-import { Theme, ThemeService } from './theme.service';
+import { ThemeService } from './theme.service';
 
 describe('ThemeService', () => {
     let listeners: (() => void)[];
@@ -52,8 +52,8 @@ describe('ThemeService', () => {
     it('should use light theme from system by default', () => {
         const themeService = TestBed.inject(ThemeService);
 
-        expect(themeService.mode).toEqual('system');
-        expect(themeService.theme).toEqual('light');
+        expect(themeService.mode()).toEqual('system');
+        expect(themeService.theme()).toEqual('light');
         expect(documentElement.getAttribute('data-bs-theme')).toEqual('light');
     });
 
@@ -62,8 +62,8 @@ describe('ThemeService', () => {
 
         const themeService = TestBed.inject(ThemeService);
 
-        expect(themeService.mode).toEqual('system');
-        expect(themeService.theme).toEqual('dark');
+        expect(themeService.mode()).toEqual('system');
+        expect(themeService.theme()).toEqual('dark');
         expect(documentElement.getAttribute('data-bs-theme')).toEqual('dark');
     });
 
@@ -72,8 +72,8 @@ describe('ThemeService', () => {
 
         const themeService = TestBed.inject(ThemeService);
 
-        expect(themeService.mode).toEqual('dark');
-        expect(themeService.theme).toEqual('dark');
+        expect(themeService.mode()).toEqual('dark');
+        expect(themeService.theme()).toEqual('dark');
     });
 
     it('should ignore invalid mode from local store', () => {
@@ -81,7 +81,7 @@ describe('ThemeService', () => {
 
         const themeService = TestBed.inject(ThemeService);
 
-        expect(themeService.mode).toEqual('system');
+        expect(themeService.mode()).toEqual('system');
     });
 
     it('should store and apply mode', () => {
@@ -90,7 +90,7 @@ describe('ThemeService', () => {
         themeService.setMode('dark');
 
         expect(localStore.get('squidex.theme')).toEqual('dark');
-        expect(themeService.theme).toEqual('dark');
+        expect(themeService.theme()).toEqual('dark');
         expect(documentElement.getAttribute('data-bs-theme')).toEqual('dark');
     });
 
@@ -104,16 +104,12 @@ describe('ThemeService', () => {
     it('should follow system changes if mode is system', () => {
         const themeService = TestBed.inject(ThemeService);
 
-        const themes: Theme[] = [];
-
-        themeService.themeChanges.subscribe(theme => {
-            themes.push(theme);
-        });
+        expect(themeService.theme()).toEqual('light');
 
         systemDark = true;
         listeners.forEach(x => x());
 
-        expect(themes).toEqual(['light', 'dark']);
+        expect(themeService.theme()).toEqual('dark');
     });
 
     it('should not follow system changes if mode is explicit', () => {
@@ -124,7 +120,7 @@ describe('ThemeService', () => {
         systemDark = true;
         listeners.forEach(x => x());
 
-        expect(themeService.theme).toEqual('light');
+        expect(themeService.theme()).toEqual('light');
     });
 });
 

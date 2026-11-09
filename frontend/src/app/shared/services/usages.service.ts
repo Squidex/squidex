@@ -6,21 +6,16 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError } from '@app/framework';
 import { CallsUsageDto, CurrentStorageDto, StorageUsagePerDateDto } from '../model';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class UsagesService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getLog(appName: string): Observable<string> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/usages/log`);

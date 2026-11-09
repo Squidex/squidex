@@ -6,29 +6,29 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, SchemaDto, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { Component, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, SchemaDto, SignalSelectDirective, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form-common',
     styleUrls: ['./field-form-common.component.scss'],
     templateUrl: './field-form-common.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class FieldFormCommonComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema the field belongs to. */
+    public readonly schema = input.required<SchemaDto>();
 }

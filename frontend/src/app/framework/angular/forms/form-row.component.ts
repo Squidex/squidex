@@ -2,37 +2,30 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights r vbeserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, HostBinding, Input, Optional, SkipSelf } from '@angular/core';
-import { AbstractControl, FormGroupDirective } from '@angular/forms';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
 import { Types } from '@app/framework/internal';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ControlErrorsComponent } from './control-errors.component';
 import { FormAlertComponent } from './form-alert.component';
 import { FormHintComponent } from './form-hint.component';
+import { getFieldKey } from './signal-validators';
 
 @Component({
     selector: 'sqx-form-row',
     styleUrls: ['./form-row.component.scss'],
     templateUrl: './form-row.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         'class': 'form-group',
-        '[class.d-block]': 'vertical',
-        '[class.row]': '!vertical',
-        '[class.form-group-aligned]': 'centered',
+        '[class]': 'class()',
+        '[class.d-block]': 'vertical()',
+        '[class.row]': '!vertical()',
+        '[class.form-group-aligned]': 'centered()',
     },
-    viewProviders: [
-        {
-            provide: FormGroupDirective,
-            useFactory: (directive: FormGroupDirective) => directive,
-            deps: [[new Optional(), new SkipSelf(), FormGroupDirective]],
-        },
-    ],
     imports: [
         ControlErrorsComponent,
         FormAlertComponent,
@@ -42,102 +35,108 @@ import { FormHintComponent } from './form-hint.component';
     ],
 })
 export class FormRowComponent {
-    @Input({ required: true })
-    public for!: string | AbstractControl;
+    /** The control or the name of the control in the parent form group. */
+    public readonly for = input.required<string | FieldTree<unknown>>();
 
-    @Input()
-    public label?: string;
+    /** The label of the field. */
+    public readonly label = input<string>();
 
-    @Input()
-    public unit?: string;
+    /** The unit, rendered after the field. */
+    public readonly unit = input<string>();
 
-    @Input({ transform: booleanAttribute })
-    public showUnit = false;
+    /** Reserves the space for the unit, even if no unit is defined. */
+    public readonly showUnit = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public submitCount: null | number | undefined;
+    /** The ID of the field. Required when the control is not defined by name. */
+    public readonly formId = input<string>();
 
-    @Input()
-    public formId?: string;
+    /** The hint below the field. Supports markdown. */
+    public readonly hint = input<string>();
 
-    @Input()
-    public hint?: string;
+    /** The alert below the field. Supports markdown. */
+    public readonly alert = input<string>();
 
-    @Input()
-    public alert?: string;
+    /** The width of the label. */
+    public readonly labelSize = input<'md' | 'lg'>('md');
 
-    @Input()
-    public labelSize: 'md' | 'lg' = 'md';
+    /** Hides the validation errors. */
+    public readonly hideError = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public hideError = false;
+    /** Renders the field as checkbox with the label after the field. */
+    public readonly check = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public check = false;
+    /** Aligns the label vertically with the field. */
+    public readonly centered = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public centered = false;
+    /** Renders the label above the field. */
+    public readonly vertical = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public vertical = false;
+    /** Marks the field as required in the label. */
+    public readonly required = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public required = false;
+    /** The prefix for the ID of the field, to make it unique. */
+    public readonly prefix = input<any>('');
 
-    @Input()
-    public prefix: any = '';
+    /** Additional CSS classes for the host element. */
+    public readonly class = input('');
 
-    @Input()
-    @HostBinding('class')
-    public class = '';
+    public readonly fieldName = computed(() => {
+        const prefix = this.prefix();
 
-    public fieldName = '';
+        const name = this.getName();
+        if (prefix) {
+            return `${prefix}_${name}`;
+        }
 
-    protected get hasUnit() {
-        return !!this.unit || this.showUnit;
-    }
+        return name;
+    });
 
-    protected get labelClass() {
-        if (this.vertical) {
+    protected readonly hasUnit = computed(() => {
+        return !!this.unit() || this.showUnit();
+    });
+
+    protected readonly labelClass = computed(() => {
+        if (this.vertical()) {
             return '';
         }
 
-        const w = this.labelSize === 'md' ? 3 : 4;
+        const w = this.labelSize() === 'md' ? 3 : 4;
         return `col-${w} col-form-label`;
-    }
+    });
 
-    protected get offsetClass() {
-        if (this.vertical || !this.check) {
+    protected readonly offsetClass = computed(() => {
+        if (this.vertical() || !this.check()) {
             return '';
         }
 
-        const w = this.labelSize === 'md' ? 3 : 4;
+        const w = this.labelSize() === 'md' ? 3 : 4;
         return `offset-${w}`;
-    }
+    });
 
-    protected get mainClass() {
-        if (this.vertical) {
+    protected readonly mainClass = computed(() => {
+        if (this.vertical()) {
             return '';
         }
 
-        const w = this.labelSize === 'md' ? 9 : 8;
-        return `col-${w} ${this.offsetClass}`;
-    }
+        const w = this.labelSize() === 'md' ? 9 : 8;
+        return `col-${w} ${this.offsetClass()}`;
+    });
 
-    public ngOnChanges() {
-        let name = '';
-        if (Types.isString(this.for)) {
-            name = this.for;
-        } else if (this.formId) {
-            name = this.formId;
-        } else {
-            throw new Error('Form id is required.');
+    private getName() {
+        const control = this.for();
+        if (Types.isString(control)) {
+            return control;
         }
 
-        if (this.prefix) {
-            name = `${this.prefix}_${name}`;
+        const formId = this.formId();
+        if (formId) {
+            return formId;
         }
 
-        this.fieldName = name;
+        if (Types.isFunction(control)) {
+            return getFieldKey(control);
+        }
+
+        throw new Error('Form id is required.');
     }
 }

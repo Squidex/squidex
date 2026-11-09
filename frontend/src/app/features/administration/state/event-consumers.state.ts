@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, EventConsumerDto, LoadingState, shareSubscribed, State } from '@app/shared';
@@ -16,21 +16,21 @@ interface Snapshot extends LoadingState {
     eventConsumers: ReadonlyArray<EventConsumerDto>;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class EventConsumersState extends State<Snapshot> {
-    public eventConsumers =
+    private readonly dialogs = inject(DialogService);
+    private readonly eventConsumersService = inject(EventConsumersService);
+
+    public readonly eventConsumers =
         this.project(x => x.eventConsumers);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    constructor(
-        private readonly dialogs: DialogService,
-        private readonly eventConsumersService: EventConsumersService,
-    ) {
+    constructor() {
         super({ eventConsumers: [] });
 
         debug(this, 'eventConsumers');

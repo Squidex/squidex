@@ -5,45 +5,65 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { catchError, map, Observable, of, share, shareReplay } from 'rxjs';
+import { computed, inject, Service, Signal, signal, untracked } from '@angular/core';
+import { catchError, of } from 'rxjs';
 import { UserDto } from '../model';
 import { AuthService } from './auth.service';
 import { UsersService } from './users.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class UsersProviderService {
-    private readonly caches: { [id: string]: Observable<UserDto> } = {};
+    private readonly authService = inject(AuthService);
+    private readonly usersService = inject(UsersService);
+    private readonly loaded: { [id: string]: Signal<UserDto | undefined> } = {};
+    private readonly mapped: { [key: string]: Signal<UserDto | undefined> } = {};
 
-    constructor(
-        private readonly usersService: UsersService,
-        private readonly authService: AuthService,
-    ) {
+    public user(id: string, me: string | null = 'Me'): Signal<UserDto | undefined> {
+        const key = `${id}|${me}`;
+
+        let result = this.mapped[key];
+        if (!result) {
+            const source = this.load(id);
+
+            result = computed(() => {
+                const dto = source();
+                if (!dto) {
+                    return undefined;
+                }
+
+                const currentUser = this.authService.user;
+                if (me && currentUser && dto.id === currentUser.id) {
+                    return new UserDto({ id: dto.id, displayName: me } as any);
+                }
+
+                return dto;
+            });
+
+            this.mapped[key] = result;
+        }
+
+        return result;
     }
 
-    public getUser(id: string, me: string | null = 'Me'): Observable<UserDto> {
-        let result = this.caches[id];
-
+    private load(id: string) {
+        let result = this.loaded[id];
         if (!result) {
-            result =
+            const user = signal<UserDto | undefined>(undefined);
+
+            // Pipes call this while the template is rendered, so the request must not be tracked.
+            untracked(() => {
                 this.usersService.getUser(id).pipe(
                     catchError(() => {
                         return of(new UserDto({ id: 'Unknown', displayName: 'Unknown' } as any));
-                    }),
-                    shareReplay(1));
+                    }))
+                .subscribe(dto => user.set(dto));
+            });
 
-            this.caches[id] = result;
+            result = user.asReadonly();
+
+            this.loaded[id] = result;
         }
 
-        return result.pipe(
-            map(dto => {
-                if (me && this.authService.user && dto.id === this.authService.user.id) {
-                    dto = new UserDto({ id: dto.id, displayName: me } as any);
-                }
-                return dto;
-            }),
-            share());
+        return result;
     }
 }

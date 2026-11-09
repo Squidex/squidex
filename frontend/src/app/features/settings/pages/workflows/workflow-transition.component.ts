@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { booleanAttribute, Component, input, output } from '@angular/core';
 import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView, WorkflowView } from '@app/shared';
 
 @Component({
@@ -14,44 +13,41 @@ import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTr
     styleUrls: ['./workflow-transition.component.scss'],
     templateUrl: './workflow-transition.component.html',
     imports: [
-        FormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
 export class WorkflowTransitionComponent {
-    public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
+    /** Emits the updated workflow when the transition is changed or removed. */
+    public readonly update = output<WorkflowView>();
 
-    @Output()
-    public update = new EventEmitter<WorkflowView>();
+    /** The workflow the transition belongs to. */
+    public readonly workflow = input.required<WorkflowView>();
 
-    @Input({ required: true })
-    public workflow!: WorkflowView;
+    /** The transition to show and edit. */
+    public readonly transition = input.required<WorkflowTransitionView>();
 
-    @Input({ required: true })
-    public transition!: WorkflowTransitionView;
+    /** The roles that can be selected for the transition. */
+    public readonly roles = input.required<ReadonlyArray<string>>();
 
-    @Input({ required: true })
-    public roles!: ReadonlyArray<string>;
+    /** Prevents the transition from being changed. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disabled?: boolean | null;
-
-    public changeExpression(expression: string) {
+    protected changeExpression(expression: string) {
         this.change({ expression });
     }
 
-    public changeRole(roles: string[]) {
+    protected changeRole(roles: string[]) {
         this.change({ roles });
     }
 
-    public remove() {
-        const { from, to } = this.transition;
-        this.update.emit(this.workflow.removeTransition(from, to));
+    protected remove() {
+        const { from, to } = this.transition();
+        this.update.emit(this.workflow().removeTransition(from, to));
     }
 
     private change(changes: Partial<WorkflowTransitionValues>) {
-        const { from, to } = this.transition;
-        this.update.emit(this.workflow.setTransition(from, to, changes));
+        const { from, to } = this.transition();
+        this.update.emit(this.workflow().setTransition(from, to, changes));
     }
 }

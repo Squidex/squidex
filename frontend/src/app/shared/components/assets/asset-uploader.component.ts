@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
@@ -14,9 +13,7 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     selector: 'sqx-asset-uploader',
     styleUrls: ['./asset-uploader.component.scss'],
     templateUrl: './asset-uploader.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         DropdownMenuComponent,
         FileDropDirective,
         ModalDirective,
@@ -26,16 +23,15 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     ],
 })
 export class AssetUploaderComponent {
-    public modalMenu = new ModalModel();
+    private readonly assetsState = inject(AssetsState);
 
-    constructor(
-        public readonly appsState: AppsState,
-        public readonly assetUploader: AssetUploaderState,
-        public readonly assetsState: AssetsState,
-    ) {
-    }
+    protected readonly appsState = inject(AppsState);
 
-    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
+    protected readonly assetUploader = inject(AssetUploaderState);
+
+    protected modalMenu = new ModalModel();
+
+    protected addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         for (const file of files) {
             this.assetUploader.uploadFile(file)
                 .subscribe({
@@ -50,7 +46,7 @@ export class AssetUploaderComponent {
         this.modalMenu.show();
     }
 
-    public stopUpload(upload: Upload) {
+    protected stopUpload(upload: Upload) {
         this.assetUploader.stopUpload(upload);
     }
 }

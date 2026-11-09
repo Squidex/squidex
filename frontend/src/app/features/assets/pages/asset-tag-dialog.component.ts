@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, effect, inject, input, output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { firstValueFrom } from 'rxjs';
 import { FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/internal';
 
@@ -16,57 +17,44 @@ import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/i
     styleUrls: ['./asset-tag-dialog.component.scss'],
     templateUrl: './asset-tag-dialog.component.html',
     imports: [
-        AsyncPipe,
         FocusOnInitDirective,
         FormErrorComponent,
+        FormField,
         FormRowComponent,
         FormsModule,
         ModalDialogComponent,
-        ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class AssetTagDialogComponent implements OnInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class AssetTagDialogComponent {
+    private readonly assetsState = inject(AssetsState);
 
-    @Input({ required: true })
-    public tagName!: string;
+    /** Emits when the dialog is closed, after a rename or when canceled. */
+    public readonly dialogClose = output();
 
-    public editForm = new RenameAssetTagForm();
+    /** The name of the tag to rename. */
+    public readonly tagName = input.required<string>();
 
-    constructor(
-        private readonly assetsState: AssetsState,
-    ) {
+    protected readonly editForm = new RenameAssetTagForm();
+
+    constructor() {
+        effect(() => {
+            this.editForm.load({ tagName: this.tagName() });
+        });
     }
 
-    public ngOnInit() {
-        this.editForm.load({ tagName: this.tagName });
-    }
-
-    public emitClose() {
+    protected emitClose() {
         this.dialogClose.emit();
     }
 
-    public renameAssetTag() {
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
+    protected renameAssetTag() {
+        this.editForm.submit(async value => {
+            if (value.tagName !== this.tagName()) {
+                await firstValueFrom(this.assetsState.renameTag(this.tagName(), value.tagName));
+            }
 
-        if (value.tagName === this.tagName) {
             this.emitClose();
-        }
-
-        this.assetsState.renameTag(this.tagName, value?.tagName)
-            .subscribe({
-                next: () => {
-                    this.emitClose();
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        });
     }
 }

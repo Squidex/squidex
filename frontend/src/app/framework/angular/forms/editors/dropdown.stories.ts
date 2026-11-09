@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DropdownComponent, LocalizerService, RootViewComponent } from '@app/framework';
 
@@ -17,13 +16,14 @@ const TRANSLATIONS = {
 
 @Component({
     selector: 'sqx-dropdown-test',
-    imports: [RootViewComponent, DropdownComponent],
+    imports: [DropdownComponent, RootViewComponent],
     template: `
         <sqx-root-view>
             <sqx-dropdown
                 [items]="items"
                 [itemsLoading]="itemsLoading"
-                (dropdownOpen)="load()">
+                (dropdownOpen)="load()"
+            >
             </sqx-dropdown>
         </sqx-root-view>
     `,
@@ -54,20 +54,17 @@ export default {
             control: 'boolean',
         },
         change: {
-            action:'ngModelChange',
+            action: 'valueChange',
         },
         position: {
             control: 'radio',
-            options: [
-                'bottom-start',
-                'bottom-end',
-            ],
+            options: ['bottom-start', 'bottom-end'],
         },
     },
     args: {
         position: 'bottom-start',
     },
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-root-view>
@@ -77,19 +74,15 @@ export default {
                     [dropdownFullWidth]="dropdownFullWidth"
                     [items]="items"
                     [itemsLoading]="itemsLoading"
-                    (ngModelChange)="change($event)"
-                    [ngModel]="model">
+                    (valueChange)="change($event)"
+                    [value]="model">
                 </sqx-dropdown>
             </sqx-root-view>
         `,
     }),
     decorators: [
         moduleMetadata({
-            imports: [
-                FormsModule,
-                RootViewComponent,
-                TestComponent,
-            ],
+            imports: [RootViewComponent, TestComponent],
             providers: [
                 {
                     provide: LocalizerService,
@@ -152,7 +145,7 @@ export const FullWidth: Story = {
 };
 
 export const Lazy: Story = {
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-dropdown-test></sqx-dropdown-test>
@@ -161,7 +154,7 @@ export const Lazy: Story = {
 };
 
 export const ComplexValues: Story = {
-    render: args => ({
+    render: (args) => ({
         props: args,
         template: `
             <sqx-root-view>
@@ -172,7 +165,7 @@ export const ComplexValues: Story = {
                     [items]="items"
                     [itemsLoading]="itemsLoading"
                     [searchProperty]="searchProperty"
-                    [ngModel]="model"
+                    [value]="model"
                     [valueProperty]="valueProperty">
                     <ng-template let-target="$implicit">
                         {{target.label}}
@@ -183,19 +176,24 @@ export const ComplexValues: Story = {
     }),
     args: {
         searchProperty: 'label',
-        items: [{
-            id: 1,
-            label: 'Lorem',
-        }, {
-            id: 2,
-            label: 'ipsum',
-        }, {
-            id: 3,
-            label: 'dolor',
-        }, {
-            id: 4,
-            label: 'sit',
-        }],
+        items: [
+            {
+                id: 1,
+                label: 'Lorem',
+            },
+            {
+                id: 2,
+                label: 'ipsum',
+            },
+            {
+                id: 3,
+                label: 'dolor',
+            },
+            {
+                id: 4,
+                label: 'sit',
+            },
+        ],
         model: 2,
         valueProperty: 'id',
     },

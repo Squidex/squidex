@@ -8,7 +8,7 @@
 import { Location } from '@angular/common';
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { map, take, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { UIOptions } from '@app/framework';
 import { AuthService } from '../services/auth.service';
 
@@ -20,8 +20,7 @@ export const mustBeNotAuthenticatedGuard = (route: ActivatedRouteSnapshot) => {
 
     const redirect = options.value.redirectToLogin && !route.queryParams.logout;
 
-    return authService.userChanges.pipe(
-        take(1),
+    return authService.userLoaded.pipe(
         tap(user => {
             const redirectPath = location.path(true);
 

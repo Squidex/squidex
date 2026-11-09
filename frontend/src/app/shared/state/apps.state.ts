@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { debug, DialogService, shareSubscribed, State, Types } from '@app/framework';
@@ -23,17 +23,18 @@ interface Snapshot {
     selectedSettings: AppSettingsDto | null;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class AppsState extends State<Snapshot> {
-    public apps =
+    private readonly appsService = inject(AppsService);
+    private readonly dialogs = inject(DialogService);
+
+    public readonly apps =
         this.project(x => x.apps);
 
-    public selectedApp =
+    public readonly selectedApp =
         this.project(x => x.selectedApp);
 
-    public selectedSettings =
+    public readonly selectedSettings =
         this.project(x => x.selectedSettings);
 
     public get appId() {
@@ -44,10 +45,7 @@ export class AppsState extends State<Snapshot> {
         return this.snapshot.selectedApp?.name || '';
     }
 
-    constructor(
-        private readonly appsService: AppsService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({
             apps: [],
             selectedApp: null,

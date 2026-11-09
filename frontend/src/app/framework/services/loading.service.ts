@@ -5,52 +5,37 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
-import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
+import { computed, inject, Service, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { Types } from '../utils/types';
 
-@Injectable({
-    providedIn: 'root',
-})
-export class LoadingService implements OnDestroy {
-    private readonly routerSubscription: Subscription;
-    private readonly loading$ = new BehaviorSubject(0);
+@Service()
+export class LoadingService {
+    private readonly router = inject(Router);
+    private readonly loadingCount = signal(0);
     private readonly loadingOperations: { [key: string]: boolean } = {};
 
-    public get loading(): Observable<boolean> {
-        return this.loading$.pipe(map(x => x > 0));
-    }
+    public readonly loading = computed(() => {
+        return this.loadingCount() > 0;
+    });
 
     public scheduler: ((action: (() => void)) => void) = action => {
         setTimeout(action, 200);
     };
 
-    constructor(router: Router) {
-        this.routerSubscription =
-            router.events.subscribe(event => {
-                if (Types.is(event, NavigationStart)) {
-                    this.startLoading(event.id.toString());
-                } else if (
-                    Types.is(event, NavigationEnd) ||
-                    Types.is(event, NavigationCancel) ||
-                    Types.is(event, NavigationError)) {
-                    this.completeLoading(event.id.toString());
-                }
+    constructor() {
+        this.router.events.pipe(takeUntilDestroyed())
+            .subscribe(event => {
+                this.handleRouterEvent(event);
             });
-    }
-
-    public ngOnDestroy() {
-        if (this.routerSubscription) {
-            this.routerSubscription.unsubscribe();
-        }
     }
 
     public startLoading(key: string) {
         if (!this.loadingOperations[key]) {
             this.loadingOperations[key] = true;
 
-            this.loading$.next(this.loading$.value + 1);
+            this.loadingCount.update(x => x + 1);
         }
     }
 
@@ -59,12 +44,19 @@ export class LoadingService implements OnDestroy {
             delete this.loadingOperations[key];
 
             this.scheduler(() => {
-                const value = this.loading$.value;
-
-                if (value > 0) {
-                    this.loading$.next(value - 1);
-                }
+                this.loadingCount.update(x => Math.max(0, x - 1));
             });
+        }
+    }
+
+    private handleRouterEvent(event: Event) {
+        if (Types.is(event, NavigationStart)) {
+            this.startLoading(event.id.toString());
+            return;
+        }
+
+        if (Types.is(event, NavigationEnd) || Types.is(event, NavigationCancel) || Types.is(event, NavigationError)) {
+            this.completeLoading(event.id.toString());
         }
     }
 }

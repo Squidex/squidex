@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { ChangePlanDto, debug, DialogService, LoadingState, PlanDto, PlansLockedReason, ReferralInfoDto, shareSubscribed, State, TeamsState, VersionTag } from '@app/shared';
@@ -42,27 +42,31 @@ interface Snapshot extends LoadingState {
     version: VersionTag;
 }
 
-@Injectable()
+@Service({ autoProvided: false })
 export class TeamPlansState extends State<Snapshot> {
-    public plans =
+    private readonly dialogs = inject(DialogService);
+    private readonly plansService = inject(TeamPlansService);
+    private readonly teamsState = inject(TeamsState);
+
+    public readonly plans =
         this.project(x => x.plans);
 
-    public planOwner =
+    public readonly planOwner =
         this.project(x => x.planOwner);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public locked =
+    public readonly locked =
         this.project(x => x.locked);
 
-    public referral =
+    public readonly referral =
         this.project(x => x.referral);
 
-    public portalLink =
+    public readonly portalLink =
         this.project(x => x.portalLink);
 
     public get teamId() {
@@ -71,11 +75,7 @@ export class TeamPlansState extends State<Snapshot> {
 
     public window = window;
 
-    constructor(
-        private readonly teamsState: TeamsState,
-        private readonly dialogs: DialogService,
-        private readonly plansService: TeamPlansService,
-    ) {
+    constructor() {
         super({ plans: [], version: VersionTag.EMPTY });
 
         debug(this, 'teamPlans');

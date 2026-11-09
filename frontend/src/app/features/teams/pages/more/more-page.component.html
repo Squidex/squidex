@@ -2,20 +2,20 @@
     <ng-container>
         <sqx-list-view innerWidth="55rem">
             <ng-container content>
-                <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+                <form (ngSubmit)="save()">
                     <h5>{{ "apps.generalSettings" | sqxTranslate }}</h5>
 
                     <div class="card mb-4">
                         <div class="card-body">
-                            <sqx-form-error [error]="updateForm.error | async" />
+                            <sqx-form-error [error]="updateForm.error()" />
 
-                            <sqx-form-row for="name" hint="teams.teamNameHint" label="common.name" vertical>
-                                <input class="form-control" id="name" formControlName="name" maxlength="100" />
+                            <sqx-form-row [for]="updateForm.form.name" hint="teams.teamNameHint" label="common.name" vertical>
+                                <input class="form-control" id="name" [formField]="updateForm.form.name" />
                             </sqx-form-row>
                         </div>
 
                         <div class="card-footer">
-                            <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
+                            <button class="float-end btn btn-primary" [disabled]="!isEditable()" type="submit">
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         </div>
@@ -36,7 +36,7 @@
                                 class="btn btn-danger"
                                 confirmText="i18n:teams.deleteConfirmText"
                                 confirmTitle="i18n:teams.deleteConfirmTitle"
-                                [disabled]="!isDeletable"
+                                [disabled]="!isDeletable()"
                                 (sqxConfirmClick)="deleteTeam()"
                                 type="button">
                                 {{ "teams.delete" | sqxTranslate }}

@@ -6,30 +6,32 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormRowComponent } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { DateTimeFieldEditorValues, DateTimeFieldFormModel, DateTimeFieldPropertiesDto, FieldDto, FieldFormModel, FormRowComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-ui',
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
     ],
 })
 export class DateTimeUIComponent {
-    public readonly converter = FloatConverter.INSTANCE;
-    public readonly editors = DateTimeFieldEditorValues;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<DateTimeFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public properties!: DateTimeFieldPropertiesDto;
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<DateTimeFieldFormModel>;
+    });
+
+    protected readonly editors = DateTimeFieldEditorValues;
 }

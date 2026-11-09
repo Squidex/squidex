@@ -6,27 +6,19 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, input, output, signal } from '@angular/core';
 import { FileDropDirective, HTTP, TourStepDirective, TranslatePipe } from '@app/framework';
-import { AssetDto, AssetFolderDto, AssetsState, getFiles, StatefulComponent, Types } from '@app/shared/internal';
+import { AssetDto, AssetFolderDto, AssetsState, getFiles, Types } from '@app/shared/internal';
 import { AssetFolderComponent } from './asset-folder.component';
 import { AssetComponent } from './asset.component';
-
-interface State {
-    // The new files.
-    newFiles: ReadonlyArray<HTTP.UploadFile>;
-}
 
 @Component({
     selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetComponent,
         AssetFolderComponent,
-        AsyncPipe,
         CdkDrag,
         CdkDropList,
         CdkDropListGroup,
@@ -35,33 +27,31 @@ interface State {
         TranslatePipe,
     ],
 })
-export class AssetsListComponent extends StatefulComponent<State> {
-    @Output()
-    public edit = new EventEmitter<AssetDto>();
+export class AssetsListComponent {
+    /** Emits the asset that should be edited. */
+    public readonly edit = output<AssetDto>();
 
-    @Output()
-    public assetSelect = new EventEmitter<AssetDto>();
+    /** Emits the asset that has been clicked. */
+    public readonly assetSelect = output<AssetDto>();
 
-    @Input({ required: true })
-    public assetsState!: AssetsState;
+    /** The state with the assets and folders to show. */
+    public readonly assetsState = input.required<AssetsState>();
 
-    @Input({ transform: booleanAttribute })
-    public isDisabled?: boolean | null;
+    /** Disables uploading, editing, deleting and moving of assets. */
+    public readonly isDisabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public isListView?: boolean | null;
+    /** Renders the assets as rows instead of cards. */
+    public readonly isListView = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public selectedIds?: Record<string, AssetDto>;
+    /** The selected assets by ID. Makes the assets selectable when defined. */
+    public readonly selectedIds = input<Record<string, AssetDto>>();
 
-    @Input({ transform: booleanAttribute })
-    public showFolderIcon?: boolean | null = true;
+    /** Shows a button to open the folder of an asset, when no folder is selected. */
+    public readonly showFolderIcon = input(true, { transform: booleanAttribute });
 
-    constructor() {
-        super({ newFiles: [] });
-    }
+    protected readonly newFiles = signal<ReadonlyArray<HTTP.UploadFile>>([]);
 
-    public add(file: HTTP.UploadFile, asset: AssetDto) {
+    protected add(file: HTTP.UploadFile, asset: AssetDto) {
         if (asset.isDuplicate) {
             setTimeout(() => {
                 this.remove(file);
@@ -69,61 +59,56 @@ export class AssetsListComponent extends StatefulComponent<State> {
         } else {
             this.remove(file);
 
-            this.assetsState.addAsset(asset);
+            this.assetsState().addAsset(asset);
         }
     }
 
-    public move(drag: CdkDragDrop<any>) {
-        if (!this.isDisabled && drag.isPointerOverContainer) {
-            const item = drag.item.data;
+    protected move(drag: CdkDragDrop<any>) {
+        if (this.isDisabled() || !drag.isPointerOverContainer) {
+            return;
+        }
 
-            if (Types.is(item, AssetDto)) {
-                this.assetsState.moveAsset(item, drag.container.data);
-            } else {
-                this.assetsState.moveAssetFolder(item, drag.container.data);
-            }
+        const item = drag.item.data;
+        if (Types.is(item, AssetDto)) {
+            this.assetsState().moveAsset(item, drag.container.data);
+        } else {
+            this.assetsState().moveAssetFolder(item, drag.container.data);
         }
     }
 
-    public replaceAsset(asset: AssetDto) {
-        this.assetsState.replaceAsset(asset);
+    protected replaceAsset(asset: AssetDto) {
+        this.assetsState().replaceAsset(asset);
     }
 
-    public selectFolder(asset: AssetDto) {
-        this.assetsState.navigate(asset.parentId);
+    protected selectFolder(asset: AssetDto) {
+        this.assetsState().navigate(asset.parentId);
     }
 
-    public deleteAsset(asset: AssetDto) {
-        this.assetsState.deleteAsset(asset);
+    protected deleteAsset(asset: AssetDto) {
+        this.assetsState().deleteAsset(asset);
     }
 
-    public deleteAssetFolder(assetFolder: AssetFolderDto) {
-        this.assetsState.deleteAssetFolder(assetFolder);
+    protected deleteAssetFolder(assetFolder: AssetFolderDto) {
+        this.assetsState().deleteAssetFolder(assetFolder);
     }
 
-    public isSelected(asset: AssetDto) {
-        return this.selectedIds && this.selectedIds[asset.id];
+    protected isSelected(asset: AssetDto) {
+        return !!this.selectedIds()?.[asset.id];
     }
 
-    public remove(file: HTTP.UploadFile) {
-        this.next(s => ({
-            ...s,
-            newFiles: s.newFiles.removed(file),
-        }));
+    protected remove(file: HTTP.UploadFile) {
+        this.newFiles.update(s => s.removed(file));
 
         return true;
     }
 
-    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
-        this.next(s => ({
-            ...s,
-            newFiles: [...getFiles(files), ...s.newFiles],
-        }));
+    protected addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
+        this.newFiles.update(s => [...getFiles(files), ...s]);
 
         return true;
     }
 
-    public canEnter(drag: CdkDrag, drop: CdkDropList) {
+    protected canEnter(drag: CdkDrag, drop: CdkDropList) {
         return drag.data.id !== drop.data;
     }
 }

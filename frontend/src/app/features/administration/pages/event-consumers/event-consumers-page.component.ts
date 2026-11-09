@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { DialogModel, EventConsumerDto, LayoutComponent, ListViewComponent, ModalDialogComponent, ModalDirective, ShortcutDirective, SidebarMenuDirective, Subscriptions, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { DialogModel, EventConsumerDto, LayoutComponent, ListViewComponent, ModalDialogComponent, ModalDirective, ShortcutDirective, SidebarMenuDirective, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { EventConsumersState } from '../../internal';
 import { EventConsumerComponent } from './event-consumer.component';
 
@@ -19,7 +19,6 @@ import { EventConsumerComponent } from './event-consumer.component';
     styleUrls: ['./event-consumers-page.component.scss'],
     templateUrl: './event-consumers-page.component.html',
     imports: [
-        AsyncPipe,
         EventConsumerComponent,
         LayoutComponent,
         ListViewComponent,
@@ -37,31 +36,28 @@ import { EventConsumerComponent } from './event-consumer.component';
         TranslatePipe,
     ],
 })
-export class EventConsumersPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class EventConsumersPageComponent {
+    protected readonly eventConsumersState = inject(EventConsumersState);
 
-    public eventConsumerErrorDialog = new DialogModel();
-    public eventConsumerError?: string;
+    protected readonly eventConsumerError = signal<string | undefined>(undefined);
 
-    constructor(
-        public readonly eventConsumersState: EventConsumersState,
-    ) {
-    }
+    protected readonly eventConsumerErrorDialog = new DialogModel();
 
-    public ngOnInit() {
+    constructor() {
         this.eventConsumersState.load();
 
-        this.subscriptions.add(
-            timer(1000, 1000).pipe(
-                switchMap(() => this.eventConsumersState.load(false, true))));
+        timer(1000, 1000).pipe(
+                switchMap(() => this.eventConsumersState.load(false, true)),
+                takeUntilDestroyed())
+            .subscribe();
     }
 
-    public reload() {
+    protected reload() {
         this.eventConsumersState.load(true, false);
     }
 
-    public showError(eventConsumer: EventConsumerDto) {
-        this.eventConsumerError = eventConsumer.error;
+    protected showError(eventConsumer: EventConsumerDto) {
+        this.eventConsumerError.set(eventConsumer.error);
         this.eventConsumerErrorDialog.show();
     }
 }

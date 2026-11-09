@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormsModule } from '@angular/forms';
-import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
+import { Meta, StoryObj } from '@storybook/angular';
 import { CheckboxGroupComponent } from '@app/framework';
 
 export default {
@@ -20,8 +19,11 @@ export default {
             control: 'boolean',
         },
         change: {
-            action:'ngModelChange',
+            action: 'valueChange',
         },
+    },
+    args: {
+        layout: 'Auto',
     },
     render: args => ({
         props: args,
@@ -30,21 +32,14 @@ export default {
                 <sqx-checkbox-group
                     [disabled]="disabled"
                     [layout]="layout"
-                    (ngModelChange)="change($event)"
-                    [ngModel]="model"
+                    (valueChange)="change($event)"
+                    [value]="model"
                     [unsorted]="unsorted"
                     [values]="values">
                 </sqx-checkbox-group>
             </div>
         `,
     }),
-    decorators: [
-        moduleMetadata({
-            imports: [
-                FormsModule,
-            ],
-        }),
-    ],
 } as Meta;
 
 type Story = StoryObj<CheckboxGroupComponent & { model: any }>;

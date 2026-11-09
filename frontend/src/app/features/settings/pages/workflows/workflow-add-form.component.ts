@@ -5,51 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePipe, WorkflowsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-workflow-add-form',
     styleUrls: ['./workflow-add-form.component.scss'],
     templateUrl: './workflow-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class WorkflowAddFormComponent {
-    public addWorkflowForm = new AddWorkflowForm();
+    private readonly workflowsState = inject(WorkflowsState);
 
-    constructor(
-        private readonly workflowsState: WorkflowsState,
-    ) {
+    protected readonly addWorkflowForm = new AddWorkflowForm();
+
+    protected addWorkflow() {
+        this.addWorkflowForm.submit(value => {
+            return this.workflowsState.add(value);
+        }, { resetAfterSubmit: true });
     }
 
-    public addWorkflow() {
-        const value = this.addWorkflowForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.workflowsState.add(value)
-            .subscribe({
-                next: () => {
-                    this.addWorkflowForm.submitCompleted();
-                },
-                error: error => {
-                    this.addWorkflowForm.submitFailed(error);
-                },
-            });
-    }
-
-    public cancel() {
-        this.addWorkflowForm.submitCompleted();
+    protected cancel() {
+        this.addWorkflowForm.reset();
     }
 }

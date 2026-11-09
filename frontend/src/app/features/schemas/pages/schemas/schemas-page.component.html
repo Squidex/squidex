@@ -2,7 +2,7 @@
 <sqx-layout expandedWidth="32" layout="left" overflow="true" padding="true" titleCollapsed="i18n:common.schemas" white="true" width="18">
     <ng-container menu>
         <div class="row g-0 flex-grow-1">
-            @if (schemasState.canCreate | async) {
+            @if (schemasState.canCreate()) {
                 <div class="col-auto">
                     <button
                         class="btn btn-success me-2"
@@ -21,7 +21,7 @@
             <div class="col search-form">
                 <input
                     class="form-control"
-                    [formControl]="schemasFilter"
+                    [formField]="schemasFilter"
                     placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}"
                     shortcut="CTRL + I"
                     shortcutAction="focus" />
@@ -31,15 +31,15 @@
     </ng-container>
     <ng-container>
         <div cdkDropListGroup>
-            @for (category of categories | async; track category.displayName) {
+            @for (category of categories(); track category.displayName) {
                 <sqx-schema-category (remove)="removeCategory($event)" [schemaCategory]="category" />
             }
         </div>
 
-        <form class="mt-4" [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
-            <input class="form-control" formControlName="name" placeholder="{{ 'schemas.createCategory' | sqxTranslate }}" />
+        <form class="mt-4" (ngSubmit)="addCategory()">
+            <input class="form-control" [formField]="addCategoryForm.form.name" placeholder="{{ 'schemas.createCategory' | sqxTranslate }}" />
         </form>
     </ng-container>
 </sqx-layout>
-<sqx-schema-form (create)="redirectSchema($event)" (dialogClose)="addSchemaDialog.hide()" [source]="source" *sqxModal="addSchemaDialog" />
+<sqx-schema-form (create)="redirectSchema($event)" (dialogClose)="addSchemaDialog.hide()" [source]="source()" *sqxModal="addSchemaDialog" />
 <router-outlet />

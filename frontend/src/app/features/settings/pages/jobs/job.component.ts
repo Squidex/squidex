@@ -5,63 +5,61 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, StatusIconComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { Component, computed, inject, input, signal } from '@angular/core';
+import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, StatusIconComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-job',
     styleUrls: ['./job.component.scss'],
     templateUrl: './job.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         ConfirmClickDirective,
         ExternalLinkDirective,
-        FormsModule,
         FromNowPipe,
         StatusIconComponent,
         TranslatePipe,
     ],
 })
 export class JobComponent {
-    @Input({ required: true })
-    public job!: JobDto;
+    private readonly jobsState = inject(JobsState);
 
-    public duration = '';
-    public details = '';
+    protected readonly apiUrl = inject(ApiUrlConfig);
 
-    public isExpanded = false;
+    /** The job to show. */
+    public readonly job = input.required<JobDto>();
 
-    constructor(
-        public readonly apiUrl: ApiUrlConfig,
-        private readonly jobsState: JobsState,
-    ) {
-    }
+    protected readonly isExpanded = signal(false);
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.job) {
-            this.duration = Duration.create(this.job.started, this.job.stopped!).toString();
+    protected readonly duration = computed(() => {
+        const job = this.job();
 
-            this.details = '';
-            this.details += 'Arguments:\n';
-            this.details += JSON.stringify(this.job.taskArguments, undefined, 2);
+        return Duration.create(job.started, job.stopped!).toString();
+    });
 
-            if (this.job.log.length > 0) {
-                this.details += '\n\nLog:';
+    protected readonly details = computed(() => {
+        const job = this.job();
 
-                for (const log of this.job.log) {
-                    this.details += `\n${log.timestamp.toISODateUTC()} ${log.message}`;
-                }
+        let details = '';
+        details += 'Arguments:\n';
+        details += JSON.stringify(job.taskArguments, undefined, 2);
+
+        if (job.log.length > 0) {
+            details += '\n\nLog:';
+
+            for (const log of job.log) {
+                details += `\n${log.timestamp.toISODateUTC()} ${log.message}`;
             }
         }
+
+        return details;
+    });
+
+    protected delete() {
+        this.jobsState.delete(this.job());
     }
 
-    public delete() {
-        this.jobsState.delete(this.job);
-    }
-
-    public toggleExpanded() {
-        this.isExpanded = !this.isExpanded;
+    protected toggleExpanded() {
+        this.isExpanded.update(x => !x);
     }
 }

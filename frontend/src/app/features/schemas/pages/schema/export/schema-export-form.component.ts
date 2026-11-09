@@ -6,8 +6,9 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, effect, inject, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -16,48 +17,36 @@ import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, Tr
     templateUrl: './schema-export-form.component.html',
     imports: [
         CodeEditorComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
 export class SchemaExportFormComponent {
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    private readonly schemasState = inject(SchemasState);
 
-    public synchronizeForm = new SynchronizeSchemaForm();
+    /** The schema to export and synchronize. */
+    public readonly schema = input.required<SchemaDto>();
 
-    public isEditable = false;
+    protected readonly isEditable = computed(() => {
+        return this.schema().canUpdateScripts;
+    });
 
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
+    protected readonly synchronizeForm = new SynchronizeSchemaForm();
+
+    constructor() {
+        effect(() => {
+            this.synchronizeForm.loadSchema(this.schema());
+        });
     }
 
-    public ngOnChanges() {
-        this.isEditable = this.schema.canUpdateScripts;
-
-        this.synchronizeForm.loadSchema(this.schema);
-    }
-
-    public synchronize() {
-        if (!this.isEditable) {
+    protected synchronize() {
+        if (!this.isEditable()) {
             return;
         }
 
-        const value = this.synchronizeForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.schemasState.synchronize(this.schema, value)
-            .subscribe({
-                next: () => {
-                    this.synchronizeForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.synchronizeForm.submitFailed(error);
-                },
-            });
+        this.synchronizeForm.submit(value => {
+            return this.schemasState.synchronize(this.schema(), value);
+        });
     }
 }

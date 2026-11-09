@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EMPTY, Observable, switchMap } from 'rxjs';
-import { CodeEditorComponent, ConfirmClickDirective, ControlErrorsComponent, SchemaDto, ScriptCompletions, TranslatePipe, TypedSimpleChanges, value$ } from '@app/shared';
+import { Component, inject, input, output } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { CodeEditorComponent, ConfirmClickDirective, ContentChangedSchemaModel, ControlErrorsComponent, SchemaDto, ScriptCompletions, SignalSelectDirective, TranslatePipe } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 
 @Component({
@@ -17,37 +17,30 @@ import { CompletionsCache } from './completions-cache';
     styleUrls: ['./content-changed-schema.component.scss'],
     templateUrl: './content-changed-schema.component.html',
     imports: [
-        AsyncPipe,
         CodeEditorComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
+        FormField,
         FormsModule,
-        ReactiveFormsModule,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
 export class ContentChangedSchemaComponent {
-    @Input({ required: true })
-    public schemas?: ReadonlyArray<SchemaDto> | null;
+    private readonly completionsCache = inject(CompletionsCache);
 
-    @Input({ required: true })
-    public form!: FormGroup;
+    /** The schemas the user can choose from. */
+    public readonly schemas = input.required<ReadonlyArray<SchemaDto> | null | undefined>();
 
-    @Output()
-    public remove = new EventEmitter<any>();
+    /** The field with the schema and the condition. */
+    public readonly field = input.required<FieldTree<ContentChangedSchemaModel>>();
 
-    public completions: Observable<ScriptCompletions> = EMPTY;
+    /** Emits when the user confirms to remove the schema. */
+    public readonly remove = output();
 
-    constructor(
-        private readonly completionsCache: CompletionsCache,
-    ) {
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.form) {
-            this.completions =
-                value$(this.form.controls['schemaId']).pipe(
-                    switchMap(x => this.completionsCache.getCompletions(x, true)));
-        }
-    }
+    protected readonly completions = rxResource<ScriptCompletions | null, string | undefined>({
+        params: () => this.field().schemaId().value() || undefined,
+        stream: ({ params }) => this.completionsCache.getCompletions(params, true),
+        defaultValue: null,
+    });
 }

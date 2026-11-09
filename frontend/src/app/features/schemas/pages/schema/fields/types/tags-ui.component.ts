@@ -6,30 +6,33 @@
  */
 
 
-import { Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, TagEditorComponent, TagsFieldEditorValues, TagsFieldPropertiesDto } from '@app/shared';
+import { Component, computed, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { FieldDto, FieldFormModel, FormRowComponent, TagEditorComponent, TagsFieldEditorValues, TagsFieldFormModel, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-ui',
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html',
     imports: [
+        FormField,
         FormRowComponent,
-        FormsModule,
-        ReactiveFormsModule,
         TagEditorComponent,
     ],
 })
 export class TagsUIComponent {
-    public readonly editors = TagsFieldEditorValues;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The type specific properties of the field. */
+    public readonly properties = input.required<TagsFieldPropertiesDto>();
 
-    @Input({ required: true })
-    public properties!: TagsFieldPropertiesDto;
+    protected readonly form = computed(() => {
+        return this.fieldForm() as FieldTree<TagsFieldFormModel>;
+    });
+
+    protected readonly editors = TagsFieldEditorValues;
 }

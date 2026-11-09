@@ -1,5 +1,6 @@
-<div class="focus-container" (click)="onClick($event)" [style.borderColor]="(focusedUser | async)?.id | sqxStringColor">
-    @if (focusedUser | async; as user) {
+@let user = focusedUser();
+<div class="focus-container" (click)="onClick($event)" [style.borderColor]="user?.id | sqxStringColor">
+    @if (user) {
         <div class="focused">
             <div class="focus-user" [style.background]="user.id | sqxStringColor">{{ user.displayName }}</div>
         </div>

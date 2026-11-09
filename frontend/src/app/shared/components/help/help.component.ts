@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '@app/framework';
 import { HelpService } from '@app/shared/internal';
@@ -16,19 +16,16 @@ import { HelpMarkdownPipe } from './help-markdown.pipe';
     selector: 'sqx-help',
     styleUrls: ['./help.component.scss'],
     templateUrl: './help.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         HelpMarkdownPipe,
         LayoutComponent,
     ],
 })
 export class HelpComponent {
-    public helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);
+    private readonly helpService = inject(HelpService);
+    private readonly route = inject(ActivatedRoute);
 
-    constructor(
-        private readonly helpService: HelpService,
-        private readonly route: ActivatedRoute,
-    ) {
-    }
+    protected readonly helpMarkdown = rxResource({
+        stream: () => this.helpService.getHelp(this.route.snapshot.data.helpPage),
+    });
 }

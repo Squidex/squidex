@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
@@ -22,20 +22,23 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class IndexesState extends State<Snapshot> {
-    public indexes =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly indexesService = inject(IndexesService);
+    private readonly schemasState = inject(SchemasState);
+
+    public readonly indexes =
         this.project(x => x.indexes);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
     public get appId() {
@@ -54,12 +57,7 @@ export class IndexesState extends State<Snapshot> {
         return this.schemasState.schemaName;
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly schemasState: SchemasState,
-        private readonly indexesService: IndexesService,
-        private readonly dialogs: DialogService,
-    ) {
+    constructor() {
         super({ indexes: [] });
 
         debug(this, 'indexes');

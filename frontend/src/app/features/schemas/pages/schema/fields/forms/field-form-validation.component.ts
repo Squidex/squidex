@@ -6,9 +6,9 @@
  */
 
 
-import { booleanAttribute, Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, AppSettingsDto, FieldDto, FormRowComponent, SchemaDto } from '@app/shared';
+import { booleanAttribute, Component, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+import { AppLanguageDto, AppSettingsDto, FieldDto, FieldFormModel, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayValidationComponent } from '../types/array-validation.component';
 import { AssetsValidationComponent } from '../types/assets-validation.component';
 import { BooleanValidationComponent } from '../types/boolean-validation.component';
@@ -32,15 +32,14 @@ import { UserInfoValidationComponent } from '../types/user-info-validation.compo
         ArrayValidationComponent,
         AssetsValidationComponent,
         BooleanValidationComponent,
-        ComponentValidationComponent,
         ComponentsValidationComponent,
+        ComponentValidationComponent,
         DateTimeValidationComponent,
-        FormsModule,
+        FormField,
+        FormRowComponent,
         GeolocationValidationComponent,
         JsonValidationComponent,
         NumberValidationComponent,
-        FormRowComponent,
-        ReactiveFormsModule,
         ReferencesValidationComponent,
         RichTextValidationComponent,
         StringValidationComponent,
@@ -49,21 +48,21 @@ import { UserInfoValidationComponent } from '../types/user-info-validation.compo
     ],
 })
 export class FieldFormValidationComponent {
-    @Input({ required: true })
-    public fieldForm!: UntypedFormGroup;
+    /** The form to edit the field properties. */
+    public readonly fieldForm = input.required<FieldTree<FieldFormModel>>();
 
-    @Input({ required: true })
-    public field!: FieldDto;
+    /** The field to edit. */
+    public readonly field = input.required<FieldDto>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The schema the field belongs to. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public settings!: AppSettingsDto;
+    /** The settings of the app. */
+    public readonly settings = input.required<AppSettingsDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The languages of the app, used to edit localized default values. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public isLocalizable!: boolean;
+    /** Shows the localized default values, if the field is localizable. */
+    public readonly isLocalizable = input(false, { transform: booleanAttribute });
 }

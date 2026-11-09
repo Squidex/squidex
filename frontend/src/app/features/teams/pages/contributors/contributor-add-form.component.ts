@@ -5,24 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { Component, Injectable } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject, Service } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { AutocompleteComponent, AutocompleteSource, DialogModel, DialogService, FormHintComponent, ModalDirective, TranslatePipe, UsersService } from '@app/shared';
 import { UserDtoPicture } from '@app/shared';
 import { AssignTeamContributorForm } from '../../internal';
 import { TeamContributorsState } from '../../state/team-contributors.state';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class UsersDataSource implements AutocompleteSource {
-    constructor(
-        private readonly contributorsState: TeamContributorsState,
-        private readonly usersService: UsersService,
-    ) {
-    }
+    private readonly contributorsState = inject(TeamContributorsState);
+    private readonly usersService = inject(UsersService);
+
 
     public find(query: string): Observable<ReadonlyArray<any>> {
         if (!query) {
@@ -30,11 +28,13 @@ export class UsersDataSource implements AutocompleteSource {
         }
 
         return this.usersService.getUsers(query).pipe(
-            withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
+            map(users => {
+                const contributors = this.contributorsState.contributors();
+
                 const results: any[] = [];
 
                 for (const user of users) {
-                    if (!contributors!.find(t => t.contributorId === user.id)) {
+                    if (!contributors.find(t => t.contributorId === user.id)) {
                         results.push(user);
                     }
                 }
@@ -52,49 +52,36 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource,
     ],
     imports: [
-        AsyncPipe,
         AutocompleteComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
         ImportContributorsDialogComponent,
         ModalDirective,
-        ReactiveFormsModule,
         TranslatePipe,
         UserDtoPicture,
     ],
 })
 export class ContributorAddFormComponent {
-    public assignContributorForm = new AssignTeamContributorForm();
+    private readonly contributorsState = inject(TeamContributorsState);
+    private readonly dialogs = inject(DialogService);
 
-    public importDialog = new DialogModel();
+    protected readonly usersDataSource = inject(UsersDataSource);
 
-    constructor(
-        public readonly contributorsState: TeamContributorsState,
-        public readonly usersDataSource: UsersDataSource,
-        private readonly dialogs: DialogService,
-    ) {
-    }
+    protected readonly assignContributorForm = new AssignTeamContributorForm();
 
-    public assignContributor() {
-        const value = this.assignContributorForm.submit();
-        if (!value) {
-            return;
-        }
+    protected readonly importDialog = new DialogModel();
 
-        this.contributorsState.assign(value)
-            .subscribe({
-                next: isCreated => {
-                    this.assignContributorForm.submitCompleted({ newValue: { user: '' } });
-
+    protected assignContributor() {
+        this.assignContributorForm.submit(value => {
+            return this.contributorsState.assign(value).pipe(
+                tap(isCreated => {
                     if (isCreated) {
                         this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
                     } else {
                         this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
                     }
-                },
-                error: error => {
-                    this.assignContributorForm.submitFailed(error);
-                },
-            });
+                }));
+        }, { resetAfterSubmit: true });
     }
 }

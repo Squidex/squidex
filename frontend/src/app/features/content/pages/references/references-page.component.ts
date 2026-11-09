@@ -5,24 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { distinctUntilChanged, map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { Component, computed, effect, inject, linkedSignal, untracked } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, routeParam, Router2State, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../shared/references/reference-item.component';
 
 @Component({
     selector: 'sqx-references-page',
     styleUrls: ['./references-page.component.scss'],
     templateUrl: './references-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         ComponentContentsState,
         Router2State,
     ],
     imports: [
-        AsyncPipe,
         ContentsColumnsPipe,
         LanguageSelectorComponent,
         LayoutComponent,
@@ -35,57 +30,48 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
         TranslatePipe,
     ],
 })
-export class ReferencesPageComponent implements OnInit {
-    private readonly subscriptions = new Subscriptions();
+export class ReferencesPageComponent {
+    private readonly contentsRoute = inject(Router2State);
+    private readonly languagesState = inject(LanguagesState);
 
-    public language!: AppLanguageDto;
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    protected readonly contentsState = inject(ComponentContentsState);
 
-    constructor(
-        public readonly contentsRoute: Router2State,
-        public readonly contentsState: ComponentContentsState,
-        public readonly languagesState: LanguagesState,
-        private readonly route: ActivatedRoute,
-    ) {
+    protected readonly language = linkedSignal<AppLanguageDto>(() => {
+        return this.languagesState.isoMasterLanguage();
+    });
+
+    protected readonly referenceId = routeParam('referenceId');
+
+    protected readonly languages = computed(() => {
+        return this.languagesState.isoLanguages();
+    });
+
+    constructor() {
+        effect(() => {
+            const referenceId = this.referenceId();
+            if (!referenceId) {
+                return;
+            }
+
+            untracked(() => {
+                const initial =
+                    this.contentsRoute.mapTo(this.contentsState)
+                        .withPaging('contents', 10)
+                        .withSynchronizer(QuerySynchronizer.INSTANCE)
+                        .getInitial();
+
+                this.contentsState.schema = { name: null! };
+                this.contentsState.loadReferences(referenceId, initial);
+                this.contentsRoute.listen();
+            });
+        });
     }
 
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.languagesState.isoMasterLanguage
-                .subscribe(language => {
-                    this.language = language;
-                }));
-
-        this.subscriptions.add(
-            this.languagesState.isoLanguages
-                .subscribe(languages => {
-                    this.languages = languages;
-                }));
-
-        this.subscriptions.add(
-            getReferenceId(this.route)
-                .subscribe(referenceId => {
-                    const initial =
-                        this.contentsRoute.mapTo(this.contentsState)
-                            .withPaging('contents', 10)
-                            .withSynchronizer(QuerySynchronizer.INSTANCE)
-                            .getInitial();
-
-                    this.contentsState.schema = { name: null! };
-                    this.contentsState.loadReferences(referenceId, initial);
-                    this.contentsRoute.listen();
-                }));
-    }
-
-    public reload() {
+    protected reload() {
         this.contentsState.load(true);
     }
 
-    public changeLanguage(language: AppLanguageDto) {
-        this.language = language;
+    protected changeLanguage(language: AppLanguageDto) {
+        this.language.set(language);
     }
-}
-
-function getReferenceId(route: ActivatedRoute) {
-    return route.params.pipe(map(x => x['referenceId'] as string), distinctUntilChanged());
 }

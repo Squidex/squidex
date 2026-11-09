@@ -1,6 +1,7 @@
-<div class="form-horizontal" [formGroup]="triggerForm.form">
-    <sqx-form-row for="condition" label="common.condition">
-        <textarea class="form-control code" id="condition" formControlName="condition" placeholder="{{ 'rules.conditionHint' | sqxTranslate }}"></textarea>
+@let form = triggerForm().form;
+<div class="form-horizontal">
+    <sqx-form-row [for]="form.condition" label="common.condition">
+        <textarea class="form-control code" id="condition" [formField]="form.condition" placeholder="{{ 'rules.conditionHint' | sqxTranslate }}"></textarea>
 
         <div class="help">
             <h4>{{ "common.conditions" | sqxTranslate }}</h4>

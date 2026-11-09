@@ -5,19 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { EMPTY, map, Observable, shareReplay } from 'rxjs';
 import { SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
-@Injectable()
+@Service({ autoProvided: false })
 export class CompletionsCache {
+    private readonly schemasService = inject(SchemasService);
+    private readonly schemasState = inject(SchemasState);
     private readonly cache: { [schema: string]: Observable<ScriptCompletions> } = {};
-
-    constructor(
-        private readonly schemasService: SchemasService,
-        private readonly schemasState: SchemasState,
-    ) {
-    }
 
     public getCompletions(schema: string, skipFunctions: boolean) {
         if (!schema) {

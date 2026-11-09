@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, StringHelper, Version } from '@app/framework';
@@ -29,33 +29,35 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class SchemasState extends State<Snapshot> {
-    public selectedSchema =
+    private readonly appsState = inject(AppsState);
+    private readonly dialogs = inject(DialogService);
+    private readonly schemasService = inject(SchemasService);
+
+    public readonly selectedSchema =
         this.project(x => x.selectedSchema);
 
-    public schemas =
+    public readonly schemas =
         this.project(x => x.schemas);
 
-    public isLoaded =
+    public readonly isLoaded =
         this.project(x => x.isLoaded === true);
 
-    public isLoading =
+    public readonly isLoading =
         this.project(x => x.isLoading === true);
 
-    public canCreate =
+    public readonly canCreate =
         this.project(x => x.canCreate === true);
 
-    public publishedSchemas =
-        this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
+    public readonly publishedSchemas =
+        computed(() => this.schemas().filter(s => s.isPublished));
 
-    public addedCategories =
+    public readonly addedCategories =
         this.project(x => x.addedCategories);
 
-    public categoryNames =
-        this.projectFrom2(this.schemas, this.addedCategories, (s, c) => buildCategoryNames(c, s));
+    public readonly categoryNames =
+        computed(() => buildCategoryNames(this.addedCategories(), this.schemas()));
 
     public get appId() {
         return this.appsState.appId;
@@ -77,11 +79,7 @@ export class SchemasState extends State<Snapshot> {
         return this.snapshot.schemas.toMap(x => x.id);
     }
 
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly schemasService: SchemasService,
-    ) {
+    constructor() {
         super({ schemas: [], addedCategories: new Set() });
 
         debug(this, 'schemas');

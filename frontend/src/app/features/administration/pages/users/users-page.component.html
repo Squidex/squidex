@@ -8,13 +8,13 @@
             <form class="form-inline ms-2" (ngSubmit)="search()">
                 <input
                     class="form-control"
-                    [formControl]="usersFilter"
+                    [formField]="usersFilter"
                     placeholder="{{ 'users.search' | sqxTranslate }}"
                     shortcut="CTRL + SHIFT + S"
                     shortcutAction="focus" />
             </form>
 
-            @if (usersState.canCreate | async) {
+            @if (usersState.canCreate()) {
                 <button class="btn btn-success ms-2" routerLink="new" shortcut="CTRL + U" title="i18n:users.createTooltip" type="button">
                     <i class="icon-plus"></i> {{ "users.create" | sqxTranslate }}
                 </button>
@@ -22,7 +22,7 @@
         </div>
     </ng-container>
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="usersState.isLoading | async" table="true">
+        <sqx-list-view innerWidth="50rem" [isLoading]="usersState.isLoading()" table="true">
             <ng-container header>
                 <table class="table table-items table-fixed" #header>
                     <thead>
@@ -45,7 +45,7 @@
                 </table>
             </ng-container>
             <ng-container>
-                @if (usersState.users | async; as users) {
+                @if (usersState.users(); as users) {
                     <table class="table table-items table-fixed" [sqxSyncWidth]="header">
                         @for (user of users; track user.id) {
                             <tbody [sqxUser]="user"></tbody>
@@ -54,7 +54,7 @@
                 }
             </ng-container>
             <ng-container footer>
-                <sqx-pager [paging]="usersState.paging | async" (pagingChange)="usersState.page($event)" />
+                <sqx-pager [paging]="usersState.paging()" (pagingChange)="usersState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

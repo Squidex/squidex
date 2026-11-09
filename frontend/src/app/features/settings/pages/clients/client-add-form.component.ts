@@ -5,52 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TextInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-add-form',
     styleUrls: ['./client-add-form.component.scss'],
     templateUrl: './client-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         ControlErrorsComponent,
+        FormField,
         FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
-        TransformInputDirective,
+        TextInputDirective,
         TranslatePipe,
     ],
 })
 export class ClientAddFormComponent {
-    public addClientForm = new AddClientForm();
+    private readonly clientsState = inject(ClientsState);
 
-    constructor(
-        private readonly clientsState: ClientsState,
-    ) {
+    protected readonly addClientForm = new AddClientForm();
+
+    protected addClient() {
+        this.addClientForm.submit(value => {
+            return this.clientsState.attach(value);
+        }, { resetAfterSubmit: true });
     }
 
-    public addClient() {
-        const value = this.addClientForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.clientsState.attach(value)
-            .subscribe({
-                next: () => {
-                    this.addClientForm.submitCompleted();
-                },
-                error: error => {
-                    this.addClientForm.submitFailed(error);
-                },
-            });
-    }
-
-    public cancel() {
-        this.addClientForm.submitCompleted();
+    protected cancel() {
+        this.addClientForm.reset();
     }
 }

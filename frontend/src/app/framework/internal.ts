@@ -7,8 +7,6 @@
 
 export * from './angular/drag-helper';
 export * from './angular/routers/router-utils';
-export * from './angular/stateful.component';
-export * from './angular/subscriptions';
 export * from './configurations';
 export * from './services/analytics.service';
 export * from './services/clipboard.service';
@@ -28,6 +26,7 @@ export * from './services/title.service';
 export * from './services/toolbar.service';
 export * from './utils/angular';
 export * from './utils/array-helper';
+export * from './utils/clipboard';
 export * from './utils/completion';
 export * from './utils/cookies';
 export * from './utils/date-helper';

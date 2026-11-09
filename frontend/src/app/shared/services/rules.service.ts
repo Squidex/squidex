@@ -6,7 +6,7 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, VersionOrTag } from '@app/framework';
@@ -84,15 +84,10 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
 
 export type StepsDto = Readonly<{ [name: string]: RuleElementDto }>;
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export class RulesService {
-    constructor(
-        private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig,
-    ) {
-    }
+    private readonly apiUrl = inject(ApiUrlConfig);
+    private readonly http = inject(HttpClient);
 
     public getSteps(): Observable<StepsDto> {
         const url = this.apiUrl.buildUrl('api/rules/steps');

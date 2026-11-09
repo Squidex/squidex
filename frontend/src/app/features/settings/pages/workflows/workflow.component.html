@@ -1,21 +1,22 @@
+@let workflowViewValue = workflowView();
 <div class="table-items-row table-items-row-expandable workflow">
     <div class="table-items-row-summary row g-0 align-items-center">
         <div class="col col-name">
-            <span class="workflow-name">{{ workflowView.dto.displayName }}</span>
+            <span class="workflow-name">{{ workflowViewValue.dto.displayName }}</span>
         </div>
 
         <div class="col col-tags">
             <sqx-tag-editor
-                [itemConverter]="(schemasSource.normalConverter | async)!"
-                [ngModel]="workflowView.dto.schemaIds"
+                [itemConverter]="schemasSource().normalConverter()"
                 readonly="true"
                 styleBlank="true"
-                styleScrollable="true" />
+                styleScrollable="true"
+                [value]="workflowViewValue.dto.schemaIds" />
         </div>
 
         <div class="col-options">
             <div class="float-end">
-                <button class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()" type="button">
+                <button class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing()" (click)="toggleEditing()" type="button">
                     <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                 </button>
                 <button
@@ -24,7 +25,7 @@
                     confirmRememberKey="deleteWorkflow"
                     confirmText="i18n:workflows.deleteConfirmText"
                     confirmTitle="i18n:workflows.deleteConfirmTitle"
-                    [disabled]="!workflowView.dto.canDelete"
+                    [disabled]="!workflowViewValue.dto.canDelete"
                     (sqxConfirmClick)="remove()"
                     type="button">
                     <i class="icon-bin3"></i>
@@ -33,18 +34,18 @@
         </div>
     </div>
 
-    @if (isEditing) {
+    @if (isEditing()) {
         <div class="table-items-row-details">
             <div class="table-items-row-details-tabs clearfix">
                 <ul class="nav nav-tabs2">
                     <li class="nav-item">
-                        <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
+                        <button class="nav-link" [class.active]="selectedTab() === 0" (click)="selectTab(0)" type="button">
                             {{ "workflows.tabEdit" | sqxTranslate }}
                         </button>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
+                        <button class="nav-link" [class.active]="selectedTab() === 1" (click)="selectTab(1)" type="button">
                             {{ "workflows.tabVisualize" | sqxTranslate }}
                         </button>
                     </li>
@@ -54,51 +55,50 @@
                     <button class="btn btn-text-secondary" (click)="toggleEditing()" type="button">
                         {{ "common.cancel" | sqxTranslate }}
                     </button>
-                    @if (isEditable) {
+                    @if (isEditable()) {
                         <button class="btn btn-primary ms-1" (click)="save()" type="submit">{{ "common.save" | sqxTranslate }}</button>
                     }
                 </div>
             </div>
 
             <div class="table-items-row-details-tab">
-                @if (selectedTab === 0) {
-                    <sqx-form-error [error]="error" />
+                @if (selectedTab() === 0) {
+                    <sqx-form-error [error]="error()" />
 
-                    <sqx-form-row #nameRow for="name" hint="workflows.workflowNameHint" label="common.name" [prefix]="workflowView.dto.id" vertical>
+                    <sqx-form-row #nameRow for="name" hint="workflows.workflowNameHint" label="common.name" [prefix]="workflowViewValue.dto.id" vertical>
                         <input
                             class="form-control"
-                            [id]="nameRow.fieldName"
-                            [disabled]="!isEditable"
-                            [ngModel]="workflowView.dto.name"
-                            (ngModelChange)="rename($event)"
-                            [ngModelOptions]="onBlur" />
+                            (change)="rename($any($event.target).value)"
+                            [disabled]="!isEditable()"
+                            [id]="nameRow.fieldName()"
+                            [value]="workflowViewValue.dto.name ?? ''" />
                     </sqx-form-row>
 
-                    <sqx-form-row #schemaIdsRow for="schemaIds" hint="workflows.schemasHint" label="common.schemas" [prefix]="workflowView.dto.id" vertical>
+                    <sqx-form-row #schemaIdsRow for="schemaIds" hint="workflows.schemasHint" label="common.schemas" [prefix]="workflowViewValue.dto.id" vertical>
                         <sqx-tag-editor
-                            [id]="schemaIdsRow.fieldName"
-                            [disabled]="!isEditable"
-                            [itemConverter]="(schemasSource.converter | async)!"
-                            [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
-                            [ngModel]="workflowView.dto.schemaIds"
-                            (ngModelChange)="changeSchemaIds($event)"
-                            placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
+                            [id]="schemaIdsRow.fieldName()"
+                            [disabled]="!isEditable()"
+                            [itemConverter]="schemasSource().converter()"
+                            [itemsSource]="schemasSource().normalConverter().suggestions"
+                            placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"
+                            [value]="workflowViewValue.dto.schemaIds"
+                            (valueChange)="changeSchemaIds($event)" />
                     </sqx-form-row>
 
-                    @for (step of workflowView.steps; track step.name) {
+                    @for (step of workflowViewValue.steps; track step.name) {
                         <sqx-workflow-step
-                            [disabled]="!workflowView.dto.canUpdate"
-                            [roles]="roles"
+                            [disabled]="!workflowViewValue.dto.canUpdate"
+                            [roles]="roles()"
                             [step]="step"
                             (update)="update($event)"
-                            [workflow]="workflowView" />
+                            [workflow]="workflowViewValue" />
                     }
 
-                    @if (workflowView.dto.canUpdate) {
+                    @if (workflowViewValue.dto.canUpdate) {
                         <button class="btn btn-success" (click)="addStep()" type="button">{{ "workflows.addStep" | sqxTranslate }}</button>
                     }
                 } @else {
-                    <sqx-workflow-diagram [workflow]="workflowView" />
+                    <sqx-workflow-diagram [workflow]="workflowViewValue" />
                 }
             </div>
         </div>

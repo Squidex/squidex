@@ -5,93 +5,74 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldDto, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
+import { booleanAttribute, Component, forwardRef, inject, input, linkedSignal, numberAttribute, output } from '@angular/core';
+import { AppLanguageDto, EditContentForm, FieldDto, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, SchemaDto, Settings } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
-
-interface State {
-    // The when the section is collapsed.
-    isCollapsed: boolean;
-}
 
 @Component({
     selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
+        forwardRef(() => ContentFieldComponent),
         FormHintComponent,
         MarkdownDirective,
-        forwardRef(() => ContentFieldComponent),
     ],
 })
-export class ContentSectionComponent extends StatefulComponent<State> {
-    @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
+export class ContentSectionComponent {
+    private readonly localStore = inject(LocalStoreService);
 
-    @Input({ transform: booleanAttribute })
-    public isCompact?: boolean | null;
+    /** Emits when the user selects another language. */
+    public readonly languageChange = output<AppLanguageDto>();
 
-    @Input({ required: true })
-    public form!: EditContentForm;
+    /** Renders the fields with full width, even if they are configured as half width fields. */
+    public readonly isCompact = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public formCompare?: EditContentForm | null;
+    /** The content form the section belongs to. */
+    public readonly form = input.required<EditContentForm>();
 
-    @Input({ required: true, transform: numberAttribute })
-    public formLevel!: number;
+    /** The content form of the other version, when comparing two versions. */
+    public readonly formCompare = input<EditContentForm | null>();
 
-    @Input({ required: true })
-    public formContext!: any;
+    /** The nesting level of the section, 0 for root sections. */
+    public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
-    @Input({ required: true })
-    public formSection!: FieldSection<FieldDto, FieldForm>;
+    /** Additional context information that is passed to custom editors. */
+    public readonly formContext = input.required<any>();
 
-    @Input({ required: true })
-    public schema!: SchemaDto;
+    /** The section with the separator and the fields to render. */
+    public readonly formSection = input.required<FieldSection<FieldDto, FieldForm>>();
 
-    @Input({ required: true })
-    public language!: AppLanguageDto;
+    /** The schema of the content. */
+    public readonly schema = input.required<SchemaDto>();
 
-    @Input({ required: true })
-    public languages!: ReadonlyArray<AppLanguageDto>;
+    /** The selected language. */
+    public readonly language = input.required<AppLanguageDto>();
 
-    constructor(
-        private readonly localStore: LocalStoreService,
-    ) {
-        super({ isCollapsed: false });
+    /** All languages of the app. */
+    public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-        this.project(x => x.isCollapsed).subscribe(isCollapsed => {
-            if (this.formSection?.separator && this.schema) {
-                this.localStore.setBoolean(this.isCollapsedKey(), isCollapsed);
-            }
-        });
-    }
+    protected readonly isCollapsed = linkedSignal(() => {
+        if (!this.formSection().separator) {
+            return false;
+        }
 
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.formSection || changes.schema) {
-            if (this.formSection?.separator && this.schema) {
-                const isCollapsed = this.localStore.getBoolean(this.isCollapsedKey());
+        return this.localStore.getBoolean(this.isCollapsedKey());
+    });
 
-                this.next({ isCollapsed });
-            }
+    protected toggle() {
+        this.isCollapsed.update(x => !x);
+
+        if (this.formSection().separator) {
+            this.localStore.setBoolean(this.isCollapsedKey(), this.isCollapsed());
         }
     }
 
-    public toggle() {
-        this.next(s => ({
-            ...s,
-            isCollapsed: !s.isCollapsed,
-        }));
-    }
-
-    public getFieldFormCompare(formState: FieldForm) {
-        return this.formCompare?.get(formState.field.name);
+    protected getFieldFormCompare(formState: FieldForm) {
+        return this.formCompare()?.get(formState.field.name);
     }
 
     private isCollapsedKey(): string {
-        return Settings.Local.FIELD_COLLAPSED(this.schema?.id, this.formSection?.separator?.fieldId);
+        return Settings.Local.FIELD_COLLAPSED(this.schema()?.id, this.formSection()?.separator?.fieldId);
     }
 }
