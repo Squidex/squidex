@@ -127,23 +127,48 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### MongoDB parameters
 
-| Name                               | Description                                                | Value               |
-| ---------------------------------- | ---------------------------------------------------------- | ------------------- |
-| `mongodb.architecture`             | MongoDB(®) architecture (standalone or replicaset).        | `replicaset`        |
-| `mongodb.enabled`                  | Uses the custom mongoDB instance.                          | `true`              |
-| `mongodb.replicaCount`             | The number of replicas.                                    | `3`                 |
-| `mongodb.auth.enabled`             | Enable authentication for MongoDB.                         | `false`             |
-| `mongodb.auth.rootUsername`        | The MongoDB root user name.                                | `""`                |
-| `mongodb.auth.rootPassword`        | The MongoDB root password.                                 | `""`                |
-| `mongodb.auth.existingSecret`      | The name of the existing secret to use for authentication. | `""`                |
-| `mongodb.persistence.enabled`      | If true, persistent volume claims are created.             | `true`              |
-| `mongodb.persistence.storageClass` | The storage class for the persistent volume claim.         | `""`                |
-| `mongodb.persistence.accessModes`  | Persistent volume access modes.                            | `["ReadWriteOnce"]` |
-| `mongodb.persistence.size`         | Persistent volume size.                                    | `10Gi`              |
-| `extraSecrets`                     | Extra secrets, bound as `envFrom`                          | `[]`                |
-| `extraConfigMaps`                  | Extra configMaps, bound as `envFrom`                       | `[]`                |
-| `extraVolumes`                     | Extra volumes bound to the pod                             | `[]`                |
-| `extraVolumeMounts`                | Extra volumes mounted into the main container              | `[]`                |
+| Name                               | Description                                                                                  | Value                                           |
+| ---------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `mongodb.architecture`             | MongoDB(®) architecture (standalone or replicaset).                                          | `replicaset`                                    |
+| `mongodb.enabled`                  | Uses the custom mongoDB instance.                                                            | `true`                                          |
+| `mongodb.replicaCount`             | The number of replicas (ignored for standalone).                                             | `3`                                             |
+| `mongodb.replicaSetName`           | The name of the replica set.                                                                 | `rs0`                                           |
+| `mongodb.image.repository`         | MongoDB image repository.                                                                    | `mongo`                                         |
+| `mongodb.image.tag`                | MongoDB image tag.                                                                           | `8.0`                                           |
+| `mongodb.image.pullPolicy`         | MongoDB image pull policy.                                                                   | `IfNotPresent`                                  |
+| `mongodb.auth.enabled`             | Enable authentication for MongoDB.                                                           | `false`                                         |
+| `mongodb.auth.rootUsername`        | The MongoDB root user name.                                                                  | `root`                                          |
+| `mongodb.auth.rootPassword`        | The MongoDB root password (generated if empty). Use URL-safe characters only.                | `""`                                            |
+| `mongodb.auth.existingSecret`      | Existing secret with the keys `mongodb-root-password` and `mongodb-replica-set-key`.         | `""`                                            |
+| `mongodb.persistence.enabled`      | If true, persistent volume claims are created.                                               | `true`                                          |
+| `mongodb.persistence.storageClass` | The storage class for the persistent volume claim.                                           | `""`                                            |
+| `mongodb.persistence.accessModes`  | Persistent volume access modes.                                                              | `["ReadWriteOnce"]`                             |
+| `mongodb.persistence.size`         | Persistent volume size.                                                                      | `10Gi`                                          |
+| `mongodb.resources`                | Resource requests and limits.                                                                | `{"requests":{"cpu":"100m","memory":"512Mi"}}` |
+| `mongodb.podSecurityContext`       | Pod security context. UID 1001 keeps volumes from the former Bitnami chart readable.         | `runAsUser: 1001`, `fsGroup: 1001`, ...         |
+| `mongodb.containerSecurityContext` | Container security context.                                                                  | `allowPrivilegeEscalation: false`, ...          |
+| `mongodb.nodeSelector`             | Node selector for the MongoDB pods.                                                          | `{}`                                            |
+| `mongodb.tolerations`              | Tolerations for the MongoDB pods.                                                            | `[]`                                            |
+| `mongodb.affinity`                 | Affinity for the MongoDB pods (spreads members across nodes by default).                     | soft pod anti-affinity                          |
+| `extraSecrets`                     | Extra secrets, bound as `envFrom`                                                            | `[]`                                            |
+| `extraConfigMaps`                  | Extra configMaps, bound as `envFrom`                                                         | `[]`                                            |
+| `extraVolumes`                     | Extra volumes bound to the pod                                                               | `[]`                                            |
+| `extraVolumeMounts`                | Extra volumes mounted into the main container                                                | `[]`                                            |
+
+If `mongodb.auth.enabled` is true, the connection strings for Squidex include the root credentials automatically.
+
+## Upgrading
+
+### To 3.0.0
+
+The Bitnami MongoDB subchart has been replaced by a MongoDB StatefulSet in this chart, which uses the official `mongo` image. Names, labels, volume layout, the replica set name and the secret keys are compatible with the former Bitnami deployment, so existing volumes and passwords are reused. Because the StatefulSet spec cannot be changed in place, delete it without deleting its pods and volumes before the upgrade:
+
+```bash
+$ kubectl delete statefulset my-release-mongodb --cascade=orphan
+$ helm upgrade my-release squidex7
+```
+
+Removed parameters: `mongodb.arbiter` and all other Bitnami specific MongoDB settings.
 
 Parameters are generated with: https://github.com/bitnami-labs/readme-generator-for-helm#configuration-file
 
