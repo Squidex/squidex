@@ -67,7 +67,7 @@ public sealed class DynamicSchemeProvider(
         var team = await appProvider.GetTeamByAuthDomainAsync(parts[1], default);
         if (team?.AuthScheme != null)
         {
-            return CreateScheme(team.Id.ToString(), team.AuthScheme).Scheme;
+            return CreateScheme(team.Id.ToString(), team.AuthScheme, true).Scheme;
         }
 
         return null;
@@ -147,14 +147,22 @@ public sealed class DynamicSchemeProvider(
             return cached as SchemeResult;
         }
 
-        var scheme =
-            await GetSchemeByTeamAsync(name, ct) ??
-            await GetSchemeByTempNameAsync(name, ct);
+        SchemeResult? result = null;
 
-        var result =
-            scheme != null ?
-            CreateScheme(name, scheme) :
-            null;
+        var teamScheme = await GetSchemeByTeamAsync(name, ct);
+        if (teamScheme != null)
+        {
+            result = CreateScheme(name, teamScheme, true);
+        }
+        else
+        {
+            var tempScheme = await GetSchemeByTempNameAsync(name, ct);
+            if (tempScheme != null)
+            {
+                // Temporary schemes can be created by anybody to test the configuration and are never trusted.
+                result = CreateScheme(name, tempScheme, false);
+            }
+        }
 
         if (httpContextAccessor.HttpContext != null)
         {
@@ -169,7 +177,8 @@ public sealed class DynamicSchemeProvider(
     {
         var app = await appProvider.GetTeamAsync(DomainId.Create(name), ct);
 
-        return app?.AuthScheme;
+        // Unverified schemes could be used to sign in with emails of a domain that the team does not own.
+        return app?.IsAuthDomainVerified == true ? app.AuthScheme : null;
     }
 
     private async Task<AuthScheme?> GetSchemeByTempNameAsync(string name,
@@ -180,7 +189,7 @@ public sealed class DynamicSchemeProvider(
         return value != null ? jsonSerializer.Deserialize<AuthScheme>(new MemoryStream(value)) : null;
     }
 
-    private SchemeResult CreateScheme(string name, AuthScheme config)
+    private SchemeResult CreateScheme(string name, AuthScheme config, bool isTeamScheme)
     {
         var scheme = new AuthenticationScheme(name, config.DisplayName, typeof(DynamicOpenIdConnectHandler));
 
@@ -189,7 +198,7 @@ public sealed class DynamicSchemeProvider(
             Events = new OidcHandler(new MyIdentityOptions
             {
                 OidcOnSignoutRedirectUrl = config.SignoutRedirectUrl,
-            }),
+            }, isTeamScheme, config.Domain ?? string.Empty),
             Authority = config.Authority,
             CallbackPath = new PathString($"/signin-{name}"),
             ClientId = config.ClientId,

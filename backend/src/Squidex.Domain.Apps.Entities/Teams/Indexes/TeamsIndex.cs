@@ -35,7 +35,7 @@ public sealed class TeamsIndex(ITeamRepository teamRepository) : ITeamsIndex
 
             var team = await teamRepository.FindByAuthDomainAsync(authDomain, ct);
 
-            return IsValid(team) ? team : null;
+            return IsValid(team) && team!.IsAuthDomainVerified ? team : null;
         }
     }
 

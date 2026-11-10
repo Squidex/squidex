@@ -156,6 +156,42 @@ describe('TeamsService', () => {
         },
     ));
 
+    it('should make post request to verify auth domain', inject(
+        [TeamsService, HttpTestingController],
+        (teamsService: TeamsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    verify: { method: 'POST', href: '/api/teams/my-team/auth/verify' },
+                },
+            };
+
+            let auth: Versioned<AuthSchemeResponseDto>;
+            teamsService
+                .verifyTeamAuth(resource, version)
+                .subscribe((result) => {
+                    auth = result;
+                });
+
+            const req = httpMock.expectOne(
+                'http://service/p/api/teams/my-team/auth/verify',
+            );
+
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+            req.flush(teamAuthResponse(12), {
+                headers: {
+                    etag: '2',
+                },
+            });
+
+            expect(auth!).toEqual({
+                payload: createTeamAuth(12),
+                version: new VersionTag('2'),
+            });
+        },
+    ));
+
     it('should make put request to update auth', inject(
         [TeamsService, HttpTestingController],
         (teamsService: TeamsService, httpMock: HttpTestingController) => {
@@ -262,8 +298,12 @@ describe('TeamsService', () => {
                 clientSecret: 'client-secret',
                 authority: 'squidex.io/authority',
             },
+            isVerified: false,
+            verificationRecordName: '_squidex.squidex.io',
+            verificationRecordValue: `squidex-team=${id}`,
             _links: {
                 update: { method: 'PUT', href: `teams/${id}/auth` },
+                verify: { method: 'POST', href: `teams/${id}/auth/verify` },
             },
         };
     }
@@ -296,10 +336,17 @@ export function createTeamAuth(id: number) {
             clientSecret: 'client-secret',
             authority: 'squidex.io/authority',
         }),
+        isVerified: false,
+        verificationRecordName: '_squidex.squidex.io',
+        verificationRecordValue: `squidex-team=${id}`,
         _links: {
             update: new ResourceLinkDto({
                 method: 'PUT',
                 href: `teams/${id}/auth`,
+            }),
+            verify: new ResourceLinkDto({
+                method: 'POST',
+                href: `teams/${id}/auth/verify`,
             }),
         },
     });

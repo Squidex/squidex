@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure;
@@ -118,6 +119,39 @@ public static class GuardTeam
                 !Uri.IsWellFormedUriString(scheme.SignoutRedirectUrl, UriKind.Absolute))
             {
                 e(Not.ValidUrl(nameof(scheme.SignoutRedirectUrl)), $"{prefix}.{nameof(scheme.SignoutRedirectUrl)}");
+            }
+        });
+    }
+
+    public static Task CanVerifyAuthDomain(VerifyAuthDomain command, Team team, IAppProvider appProvider, IAuthDomainVerifier verifier,
+        CancellationToken ct)
+    {
+        Guard.NotNull(command);
+
+        return Validate.It(async e =>
+        {
+            var domain = team.AuthScheme?.Domain;
+
+            if (string.IsNullOrWhiteSpace(domain))
+            {
+                e(T.Get("teams.authDomainNotConfigured"));
+                return;
+            }
+
+            var existing = await appProvider.GetTeamByAuthDomainAsync(domain, ct);
+
+            if (existing != null && existing.Id != command.TeamId)
+            {
+                e(T.Get("teams.domainInUse"));
+                return;
+            }
+
+            if (!await verifier.IsVerifiedAsync(domain, command.TeamId, ct))
+            {
+                var name = AuthDomainRecord.GetName(domain);
+                var value = AuthDomainRecord.GetValue(command.TeamId);
+
+                e(T.Get("teams.authDomainNotVerified", new { name, value }));
             }
         });
     }

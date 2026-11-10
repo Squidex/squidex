@@ -52,6 +52,10 @@ describe('TeamAuthState', () => {
             expect(authState.snapshot.scheme).toEqual(scheme);
             expect(authState.snapshot.isLoaded).toBeTruthy();
             expect(authState.snapshot.canUpdate).toBeTruthy();
+            expect(authState.snapshot.canVerify).toBeTruthy();
+            expect(authState.snapshot.isVerified).toBeFalsy();
+            expect(authState.snapshot.verificationRecordName).toEqual('_squidex.squidex.io');
+            expect(authState.snapshot.verificationRecordValue).toEqual('squidex-team=42');
             expect(authState.snapshot.version).toEqual(version);
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
@@ -106,14 +110,35 @@ describe('TeamAuthState', () => {
             expect(authState.snapshot.scheme).toEqual(newScheme);
             expect(authState.snapshot.version).toEqual(newVersion);
         });
+
+        it('should verify domain', () => {
+            authService.setup(x => x.verifyTeamAuth(It.isAny(), version))
+                .returns(() => of(versioned(newVersion, createAuthResponse(scheme, true)))).verifiable();
+
+            authState.verify().subscribe();
+
+            expect(authState.snapshot.isVerified).toBeTruthy();
+            expect(authState.snapshot.canVerify).toBeFalsy();
+            expect(authState.snapshot.version).toEqual(newVersion);
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
     });
 });
 
-function createAuthResponse(scheme: AuthSchemeDto | undefined): AuthSchemeResponseDto {
+function createAuthResponse(scheme: AuthSchemeDto | undefined, isVerified = false): AuthSchemeResponseDto {
+    const _links: Record<string, ResourceLinkDto> = {
+        update: new ResourceLinkDto({ method: 'PUT', href: 'teams/42/auth' }),
+    };
+
+    if (!isVerified) {
+        _links['verify'] = new ResourceLinkDto({ method: 'POST', href: 'teams/42/auth/verify' });
+    }
+
     return new AuthSchemeResponseDto({
         scheme,
-        _links: {
-            update: new ResourceLinkDto({ method: 'PUT', href: 'teams/42/auth' }),
-        },
+        isVerified,
+        verificationRecordName: '_squidex.squidex.io',
+        verificationRecordValue: 'squidex-team=42',
+        _links,
     });
 }

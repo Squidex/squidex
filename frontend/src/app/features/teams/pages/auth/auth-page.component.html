@@ -16,6 +16,48 @@
                         </div>
                     </div>
 
+                    @if (isEditing() && isSaved()) {
+                        <div class="card-body verification">
+                            @if (isVerified()) {
+                                <div class="alert alert-success mb-0">{{ "teams.auth.verifiedHint" | sqxTranslate }}</div>
+                            } @else {
+                                <div class="alert alert-warning">{{ "teams.auth.notVerifiedHint" | sqxTranslate }}</div>
+
+                                <sqx-form-row for="verificationRecordName" label="teams.auth.verificationRecordName">
+                                    <div class="input-group">
+                                        <input class="form-control" id="verificationRecordName" #recordName readonly value="{{ verificationRecordName() }}" />
+                                        <button
+                                            class="btn btn-outline-secondary"
+                                            attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                            [sqxCopy]="recordName"
+                                            type="button">
+                                            <i class="icon-copy"></i>
+                                        </button>
+                                    </div>
+                                </sqx-form-row>
+
+                                <sqx-form-row for="verificationRecordValue" label="teams.auth.verificationRecordValue">
+                                    <div class="input-group">
+                                        <input class="form-control" id="verificationRecordValue" #recordValue readonly value="{{ verificationRecordValue() }}" />
+                                        <button
+                                            class="btn btn-outline-secondary"
+                                            attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                            [sqxCopy]="recordValue"
+                                            type="button">
+                                            <i class="icon-copy"></i>
+                                        </button>
+                                    </div>
+                                </sqx-form-row>
+
+                                @if (canVerify()) {
+                                    <button class="btn btn-primary" (click)="verify()" type="button">
+                                        {{ "teams.auth.verify" | sqxTranslate }}
+                                    </button>
+                                }
+                            }
+                        </div>
+                    }
+
                     @if (isEditing()) {
                         <form (ngSubmit)="save()">
                             <div class="card-body">

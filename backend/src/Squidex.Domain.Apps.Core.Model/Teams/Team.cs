@@ -21,6 +21,8 @@ public record Team : Entity
 
     public AuthScheme? AuthScheme { get; init; }
 
+    public bool IsAuthDomainVerified { get; init; }
+
     public bool IsDeleted { get; init; }
 
     [Pure]
@@ -55,7 +57,26 @@ public record Team : Entity
             return this;
         }
 
-        return this with { AuthScheme = authScheme };
+        // The verification is only valid for the domain that has been verified.
+        var isVerified = IsAuthDomainVerified && string.Equals(authScheme?.Domain, AuthScheme?.Domain, StringComparison.OrdinalIgnoreCase);
+
+        return this with { AuthScheme = authScheme, IsAuthDomainVerified = isVerified };
+    }
+
+    [Pure]
+    public Team VerifyAuthDomain(string domain)
+    {
+        if (IsAuthDomainVerified)
+        {
+            return this;
+        }
+
+        if (!string.Equals(domain, AuthScheme?.Domain, StringComparison.OrdinalIgnoreCase))
+        {
+            return this;
+        }
+
+        return this with { IsAuthDomainVerified = true };
     }
 
     [Pure]

@@ -70,11 +70,26 @@ public class TeamsIndexTests : GivenContext
     [Fact]
     public async Task Should_resolve_team_by_domain()
     {
+        var team = Team with { IsAuthDomainVerified = true };
+
         A.CallTo(() => teamRepository.FindByAuthDomainAsync("squidex.io", CancellationToken))
-            .Returns(Team);
+            .Returns(team);
 
         var actual = await sut.GetTeamByAuthDomainAsync("squidex.io", CancellationToken);
 
-        Assert.Same(actual, Team);
+        Assert.Same(actual, team);
+    }
+
+    [Fact]
+    public async Task Should_not_resolve_team_by_domain_if_not_verified()
+    {
+        var team = Team with { IsAuthDomainVerified = false };
+
+        A.CallTo(() => teamRepository.FindByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(team);
+
+        var actual = await sut.GetTeamByAuthDomainAsync("squidex.io", CancellationToken);
+
+        Assert.Null(actual);
     }
 }

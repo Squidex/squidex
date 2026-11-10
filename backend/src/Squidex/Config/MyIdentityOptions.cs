@@ -72,6 +72,8 @@ public sealed class MyIdentityOptions
 
     public bool OidcOverridePermissionsWithCustomClaimsOnLogin { get; set; }
 
+    public bool OidcRequireVerifiedEmail { get; set; }
+
     public bool AdminRecreate { get; set; }
 
     public bool AllowPasswordAuth { get; set; }

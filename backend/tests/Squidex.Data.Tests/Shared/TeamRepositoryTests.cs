@@ -53,6 +53,15 @@ public abstract class TeamRepositoryTests
             CreatedBy = createdBy,
         };
 
+        var byAuthUnverified = new Team
+        {
+            Id = DomainId.NewGuid(),
+            Name = "by-auth-unverified",
+            Created = created,
+            CreatedBy = createdBy,
+            AuthScheme = new AuthScheme { Domain = "squidex.io" },
+        };
+
         var byAuth = new Team
         {
             Id = DomainId.NewGuid(),
@@ -60,6 +69,7 @@ public abstract class TeamRepositoryTests
             Created = created,
             CreatedBy = createdBy,
             AuthScheme = new AuthScheme { Domain = "squidex.io" },
+            IsAuthDomainVerified = true,
         };
 
         var byContributors = new Team
@@ -73,6 +83,7 @@ public abstract class TeamRepositoryTests
 
         await PrepareAsync(sut, [
             known,
+            byAuthUnverified,
             byAuth,
             byContributors,
         ]);
@@ -98,6 +109,29 @@ public abstract class TeamRepositoryTests
         var found = await sut.FindByAuthDomainAsync("squidex.io");
 
         Assert.Equal("by-auth", found!.Name);
+    }
+
+    [Fact]
+    public async Task Should_not_find_by_auth_schema_if_not_verified()
+    {
+        var sut = await CreateSutAsync();
+
+        var authDomain = $"{Guid.NewGuid()}.io";
+
+        var unverified = new Team
+        {
+            Id = DomainId.NewGuid(),
+            Name = "unverified",
+            Created = SystemClock.Instance.GetCurrentInstant(),
+            CreatedBy = RefToken.Client("client1"),
+            AuthScheme = new AuthScheme { Domain = authDomain },
+        };
+
+        await PrepareAsync(sut, [unverified]);
+
+        var found = await sut.FindByAuthDomainAsync(authDomain);
+
+        Assert.Null(found);
     }
 
     [Theory]
@@ -139,6 +173,7 @@ public abstract class TeamRepositoryTests
             Created = SystemClock.Instance.GetCurrentInstant(),
             CreatedBy = RefToken.Client("client1"),
             AuthScheme = new AuthScheme { Domain = authDomain },
+            IsAuthDomainVerified = true,
             Contributors = Contributors.Empty.Assign(contributorId, Role.Owner),
             IsDeleted = true,
         };

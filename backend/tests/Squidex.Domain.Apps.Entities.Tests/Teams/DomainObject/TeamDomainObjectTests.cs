@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
@@ -20,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 public class TeamDomainObjectTests : HandlerTestBase<Team>
 {
     private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+    private readonly IAuthDomainVerifier authDomainVerifier = A.Fake<IAuthDomainVerifier>();
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
     private readonly IUser user;
@@ -70,6 +72,7 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         var serviceProvider =
             new ServiceCollection()
                 .AddSingleton(appProvider)
+                .AddSingleton(authDomainVerifier)
                 .AddSingleton(billingPlans)
                 .AddSingleton(billingManager)
                 .AddSingleton(userResolver)
@@ -137,6 +140,38 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         var actual = await PublishIdempotentAsync(sut, command);
 
         await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task VerifyAuthDomain_should_create_events_and_verify_domain()
+    {
+        A.CallTo(() => authDomainVerifier.IsVerifiedAsync(scheme.Domain, TeamId, A<CancellationToken>._))
+            .Returns(true);
+
+        var command = new VerifyAuthDomain();
+
+        await ExecuteCreateAsync();
+        await ExecuteUpsertAuthAsync();
+
+        var actual = await PublishIdempotentAsync(sut, command);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task VerifyAuthDomain_should_throw_exception_if_record_not_found()
+    {
+        A.CallTo(() => authDomainVerifier.IsVerifiedAsync(scheme.Domain, TeamId, A<CancellationToken>._))
+            .Returns(false);
+
+        var command = new VerifyAuthDomain();
+
+        await ExecuteCreateAsync();
+        await ExecuteUpsertAuthAsync();
+
+        await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(sut, command));
+
+        Assert.False(sut.Snapshot.IsAuthDomainVerified);
     }
 
     [Fact]

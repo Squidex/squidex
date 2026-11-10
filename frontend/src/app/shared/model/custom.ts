@@ -213,6 +213,10 @@ export class AuthSchemeResponseDto extends generated.AuthSchemeResponseDto {
     public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
+
+    public get canVerify() {
+        return this.compute('canVerify', () => hasAnyLink(this._links, 'verify'));
+    }
 }
 
 export class ClientDto extends generated.ClientDto {

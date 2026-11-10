@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.IdentityServer.Config;
 using Squidex.Config;
+using Squidex.Config.Authentication;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
@@ -277,6 +278,12 @@ public sealed class AccountController(
             if (string.IsNullOrWhiteSpace(email))
             {
                 throw new DomainException(T.Get("users.noEmailAddress"));
+            }
+
+            // Otherwise an attacker could squat an email address or claim the account of an invited user.
+            if (!login.Principal.IsEmailVerified())
+            {
+                throw new DomainException(T.Get("users.emailNotVerified"));
             }
 
             user = await userService.FindByEmailAsync(email!, HttpContext.RequestAborted);

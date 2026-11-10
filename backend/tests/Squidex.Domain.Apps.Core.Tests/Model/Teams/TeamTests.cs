@@ -69,6 +69,55 @@ public class TeamTests
     }
 
     [Fact]
+    public void Should_verify_auth_domain()
+    {
+        var team_1 = team_0.ChangeAuthScheme(new AuthScheme { Domain = "squidex.io" });
+        var team_2 = team_1.VerifyAuthDomain("SQUIDEX.io");
+        var team_3 = team_2.VerifyAuthDomain("squidex.io");
+
+        Assert.False(team_1.IsAuthDomainVerified);
+        Assert.True(team_2.IsAuthDomainVerified);
+        Assert.Same(team_2, team_3);
+    }
+
+    [Fact]
+    public void Should_not_verify_auth_domain_if_domain_does_not_match()
+    {
+        var team_1 = team_0.ChangeAuthScheme(new AuthScheme { Domain = "squidex.io" });
+        var team_2 = team_1.VerifyAuthDomain("other.io");
+
+        Assert.Same(team_1, team_2);
+        Assert.False(team_2.IsAuthDomainVerified);
+    }
+
+    [Fact]
+    public void Should_keep_verification_if_domain_does_not_change()
+    {
+        var team_1 = team_0.ChangeAuthScheme(new AuthScheme { Domain = "squidex.io" }).VerifyAuthDomain("squidex.io");
+        var team_2 = team_1.ChangeAuthScheme(new AuthScheme { Domain = "Squidex.io", DisplayName = "Changed" });
+
+        Assert.True(team_2.IsAuthDomainVerified);
+    }
+
+    [Fact]
+    public void Should_reset_verification_if_domain_changes()
+    {
+        var team_1 = team_0.ChangeAuthScheme(new AuthScheme { Domain = "squidex.io" }).VerifyAuthDomain("squidex.io");
+        var team_2 = team_1.ChangeAuthScheme(new AuthScheme { Domain = "other.io" });
+
+        Assert.False(team_2.IsAuthDomainVerified);
+    }
+
+    [Fact]
+    public void Should_reset_verification_if_scheme_removed()
+    {
+        var team_1 = team_0.ChangeAuthScheme(new AuthScheme { Domain = "squidex.io" }).VerifyAuthDomain("squidex.io");
+        var team_2 = team_1.ChangeAuthScheme(null);
+
+        Assert.False(team_2.IsAuthDomainVerified);
+    }
+
+    [Fact]
     public void Should_update_contributors()
     {
         var team_1 = team_0.UpdateContributors(true, (_, c) => c.Assign("me", Role.Owner));

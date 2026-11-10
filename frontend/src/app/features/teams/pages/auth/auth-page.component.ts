@@ -45,6 +45,16 @@ export class AuthPageComponent {
 
     protected readonly isEditing = signal(false);
 
+    protected readonly canVerify = this.authState.canVerify;
+
+    protected readonly isVerified = this.authState.isVerified;
+
+    protected readonly verificationRecordName = this.authState.verificationRecordName;
+
+    protected readonly verificationRecordValue = this.authState.verificationRecordValue;
+
+    protected readonly isSaved = computed(() => !!this.authState.scheme());
+
     protected readonly urlToRedirect = computed(() => {
         const team = this.teamsState.selectedTeam();
         if (!team) {
@@ -82,6 +92,14 @@ export class AuthPageComponent {
         if (!isEditing) {
             this.authState.update(undefined);
         }
+    }
+
+    protected verify() {
+        if (!this.canVerify()) {
+            return;
+        }
+
+        this.authState.verify();
     }
 
     protected save() {

@@ -49,6 +49,10 @@ public partial class TeamDomainObject
                 newSnapshot = snapshot.ChangeAuthScheme(e.Scheme);
                 break;
 
+            case TeamAuthDomainVerified e:
+                newSnapshot = snapshot.VerifyAuthDomain(e.Domain);
+                break;
+
             case TeamDeleted:
                 newSnapshot = snapshot with { Plan = null, IsDeleted = true };
                 break;

@@ -59,13 +59,14 @@ public sealed class EFTeamRepository<TContext>(IDbContextFactory<TContext> dbCon
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var entity =
+            var entities =
                 await dbContext.Set<EFTeamEntity>()
                     .Where(x => x.IndexedAuthDomain == authDomain)
                     .Where(x => !x.IndexedDeleted)
-                    .FirstOrDefaultAsync(ct);
+                    .ToListAsync(ct);
 
-            return entity?.Document;
+            // Several teams can use the same domain, but only one of them can verify it.
+            return entities.Select(x => x.Document).FirstOrDefault(x => x.IsAuthDomainVerified);
         }
     }
 

@@ -79,6 +79,18 @@ export class TeamsService {
             pretifyError('i18n:teams.teamLoadFailed'));
     }
 
+    public verifyTeamAuth(resource: Resource, version: VersionOrTag): Observable<Versioned<AuthSchemeResponseDto>> {
+        const link = resource._links['verify'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            mapVersioned((payload) => {
+                return AuthSchemeResponseDto.fromJSON(payload.body);
+            }),
+            pretifyError('i18n:teams.auth.verifyFailed'));
+    }
+
     public leaveTeam(teamId: string, resource: Resource): Observable<any> {
         const link = resource._links['leave'];
 
