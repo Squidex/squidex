@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -19,6 +20,7 @@ namespace Squidex.Domain.Teams.Apps.Teams.DomainObject.Guards;
 
 public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
 {
+    private readonly IAuthDomainVerifier verifier = A.Fake<IAuthDomainVerifier>();
     private readonly IUserResolver users = A.Fake<IUserResolver>();
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly Plan planBasic = new Plan();
@@ -175,6 +177,59 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new UpsertAuth { Scheme = scheme, TeamId = Team.Id };
 
         await GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken);
+    }
+
+    [Fact]
+    public async Task CanVerifyAuthDomain_should_throw_exception_if_no_scheme_configured()
+    {
+        var command = new VerifyAuthDomain { TeamId = Team.Id };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanVerifyAuthDomain(command, Team with { AuthScheme = null }, AppProvider, verifier, CancellationToken),
+            new ValidationError("No authentication domain is configured."));
+    }
+
+    [Fact]
+    public async Task CanVerifyAuthDomain_should_throw_exception_if_domain_verified_by_another_team()
+    {
+        A.CallTo(() => AppProvider.GetTeamByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(Team with { Id = DomainId.NewGuid() });
+
+        var command = new VerifyAuthDomain { TeamId = Team.Id };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanVerifyAuthDomain(command, Team with { AuthScheme = scheme }, AppProvider, verifier, CancellationToken),
+            new ValidationError("Domain is already used for another team."));
+
+        A.CallTo(() => verifier.IsVerifiedAsync(A<string>._, A<DomainId>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task CanVerifyAuthDomain_should_throw_exception_if_record_not_found()
+    {
+        A.CallTo(() => AppProvider.GetTeamByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(Task.FromResult<Team?>(null));
+
+        A.CallTo(() => verifier.IsVerifiedAsync("squidex.io", Team.Id, CancellationToken))
+            .Returns(false);
+
+        var command = new VerifyAuthDomain { TeamId = Team.Id };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanVerifyAuthDomain(command, Team with { AuthScheme = scheme }, AppProvider, verifier, CancellationToken),
+            new ValidationError($"The DNS TXT record '_squidex.squidex.io' with the value 'squidex-team={Team.Id}' has not been found."));
+    }
+
+    [Fact]
+    public async Task CanVerifyAuthDomain_should_not_throw_exception_if_record_found()
+    {
+        A.CallTo(() => AppProvider.GetTeamByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(Team);
+
+        A.CallTo(() => verifier.IsVerifiedAsync("squidex.io", Team.Id, CancellationToken))
+            .Returns(true);
+
+        var command = new VerifyAuthDomain { TeamId = Team.Id };
+
+        await GuardTeam.CanVerifyAuthDomain(command, Team with { AuthScheme = scheme }, AppProvider, verifier, CancellationToken);
     }
 
     [Fact]

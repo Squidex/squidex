@@ -62,11 +62,12 @@ public sealed class MongoTeamRepository(IMongoDatabase database) : MongoSnapshot
     {
         using (Telemetry.Activities.StartActivity("MongoTeamRepository/FindByAuthDomainAsync"))
         {
-            var entity =
+            var entities =
                 await Collection.Find(x => x.IndexedAuthDomain == authDomain && !x.IndexedDeleted)
-                    .FirstOrDefaultAsync(ct);
+                    .ToListAsync(ct);
 
-            return entity?.Document;
+            // Several teams can use the same domain, but only one of them can verify it.
+            return entities.Select(x => x.Document).FirstOrDefault(x => x.IsAuthDomainVerified);
         }
     }
 }

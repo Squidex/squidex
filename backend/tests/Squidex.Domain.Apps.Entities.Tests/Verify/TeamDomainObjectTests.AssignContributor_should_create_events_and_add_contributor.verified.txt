@@ -4,6 +4,7 @@
     Guid_1: Owner,
     me: Owner
   },
+  IsAuthDomainVerified: false,
   IsDeleted: false,
   Id: Guid_2,
   CreatedBy: subject:me,

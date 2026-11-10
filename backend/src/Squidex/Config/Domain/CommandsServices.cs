@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.Teams.DomainObject;
 using Squidex.Domain.Apps.Entities.Teams.Indexes;
@@ -104,6 +105,9 @@ public static class CommandsServices
 
         services.AddSingletonAs<TeamsIndex>()
             .As<ITeamsIndex>();
+
+        services.AddSingletonAs<DnsAuthDomainVerifier>()
+            .As<IAuthDomainVerifier>();
 
         services.AddSingletonAs<AppCommandMiddleware>()
             .As<ICommandMiddleware>();

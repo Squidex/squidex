@@ -168,6 +168,30 @@ public sealed class TeamsController(ICommandBus commandBus, IAppProvider appProv
     }
 
     /// <summary>
+    /// Verify the ownership of the team auth domain with a DNS TXT record.
+    /// </summary>
+    /// <param name="team">The ID of the team.</param>
+    /// <response code="200">Domain verified.</response>
+    /// <response code="400">DNS record not found or domain used by another team.</response>
+    /// <response code="404">Team not found.</response>
+    [HttpPost]
+    [Route("teams/{team}/auth/verify")]
+    [ProducesResponseType(typeof(AuthSchemeResponseDto), StatusCodes.Status200OK)]
+    [ApiPermission(PermissionIds.TeamAuthChange)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PostTeamAuthVerify(string team)
+    {
+        var command = new VerifyAuthDomain();
+
+        var response = await InvokeCommandAsync(command, x =>
+        {
+            return AuthSchemeResponseDto.FromDomain(x, Resources);
+        });
+
+        return Ok(response);
+    }
+
+    /// <summary>
     /// Delete the team.
     /// </summary>
     /// <param name="team">The ID of the team to delete.</param>

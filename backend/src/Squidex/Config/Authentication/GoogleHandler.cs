@@ -7,6 +7,7 @@
 
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Shared.Identity;
@@ -56,6 +57,22 @@ public sealed class GoogleHandler : OAuthEvents
             context.Identity?.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, pictureUrl));
         }
 
+        var user = context.User.Deserialize<GoogleUser>(JsonSerializerOptions.Web);
+
+        // The property name depends on the version of the user info endpoint.
+        var isVerified = user?.EmailVerified == true || user?.VerifiedEmail == true;
+
+        context.Identity.SetEmailVerified(isVerified);
+
         return base.CreatingTicket(context);
+    }
+
+    private sealed class GoogleUser
+    {
+        [JsonPropertyName("email_verified")]
+        public bool? EmailVerified { get; init; }
+
+        [JsonPropertyName("verified_email")]
+        public bool? VerifiedEmail { get; init; }
     }
 }

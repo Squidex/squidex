@@ -111,6 +111,16 @@ public partial class TeamDomainObject(
                     return Snapshot;
                 }, ct);
 
+            case VerifyAuthDomain verifyAuthDomain:
+                return ApplyReturnAsync(verifyAuthDomain, async (c, ct) =>
+                {
+                    await GuardTeam.CanVerifyAuthDomain(c, Snapshot, AppProvider, AuthDomainVerifier, ct);
+
+                    VerifyAuthDomain(c);
+
+                    return Snapshot;
+                }, ct);
+
             case DeleteTeam delete:
                 return ApplyAsync(delete, async (c, ct) =>
                 {
@@ -200,6 +210,11 @@ public partial class TeamDomainObject(
         Raise(command, new TeamAuthChanged());
     }
 
+    private void VerifyAuthDomain(VerifyAuthDomain command)
+    {
+        Raise(command, new TeamAuthDomainVerified { Domain = Snapshot.AuthScheme!.Domain });
+    }
+
     private void AssignContributor(AssignContributor command, bool isAdded)
     {
         Raise(command, new TeamContributorAssigned { IsAdded = isAdded });
@@ -227,6 +242,11 @@ public partial class TeamDomainObject(
     private IAppProvider AppProvider
     {
         get => serviceProvider.GetRequiredService<IAppProvider>();
+    }
+
+    private IAuthDomainVerifier AuthDomainVerifier
+    {
+        get => serviceProvider.GetRequiredService<IAuthDomainVerifier>();
     }
 
     private IBillingPlans BillingPlans

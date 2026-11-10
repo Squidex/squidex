@@ -1105,6 +1105,12 @@
   <data name="teams.appsAssigned" xml:space="preserve">
     <value>Team kann nicht gelöscht werden, wenn Apps zugewiesen sind.</value>
   </data>
+  <data name="teams.authDomainNotConfigured" xml:space="preserve">
+    <value>Es ist keine Authentifizierungsdomain konfiguriert.</value>
+  </data>
+  <data name="teams.authDomainNotVerified" xml:space="preserve">
+    <value>Der DNS-TXT-Eintrag '{name}' mit dem Wert '{value}' wurde nicht gefunden.</value>
+  </data>
   <data name="teams.domainInUse" xml:space="preserve">
     <value>Die Domain wird bereits für ein anderes Team verwendet.</value>
   </data>
@@ -1146,6 +1152,9 @@
   </data>
   <data name="users.deleteYourselfError" xml:space="preserve">
     <value>Sie können sich nicht selbst löschen.</value>
+  </data>
+  <data name="users.emailNotVerified" xml:space="preserve">
+    <value>Der Authentifizierungsanbieter hat Ihre E-Mail-Adresse nicht bestätigt.</value>
   </data>
   <data name="users.error.headline" xml:space="preserve">
     <value>Operation fehlgeschlagen</value>

@@ -29,6 +29,8 @@ public sealed class GithubHandler : OAuthEvents
             throw new DomainException(T.Get("login.githubPrivateEmail"));
         }
 
+        context.Identity.SetEmailVerified(true);
+
         return base.CreatingTicket(context);
     }
 }

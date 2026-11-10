@@ -3,6 +3,7 @@
     UniqueId: Guid_1,
     Snapshot: {
       Name: My Team,
+      IsAuthDomainVerified: false,
       IsDeleted: false,
       Id: Guid_1,
       CreatedBy: client:client,

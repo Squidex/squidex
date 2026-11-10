@@ -1582,9 +1582,19 @@ export interface IUpdateTeamDto {
 export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeResponseDto {
     /** The auth scheme if configured. */
     readonly scheme?: AuthSchemeDto | undefined;
+    /** True, if the ownership of the domain has been verified. */
+    readonly isVerified!: boolean;
+    /** The name of the DNS TXT record to verify the ownership of the domain. */
+    readonly verificationRecordName?: string | undefined;
+    /** The value of the DNS TXT record to verify the ownership of the domain. */
+    readonly verificationRecordValue?: string | undefined;
 
     public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
+    }
+
+    public get canVerify() {
+        return this.compute('canVerify', () => hasAnyLink(this._links, 'verify'));
     }
 
     constructor(data?: IAuthSchemeResponseDto) {
@@ -1594,6 +1604,9 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
     init(_data: any) {
         super.init(_data);
         (<any>this).scheme = _data["scheme"] ? AuthSchemeDto.fromJSON(_data["scheme"]) : <any>undefined;
+        (<any>this).isVerified = _data["isVerified"];
+        (<any>this).verificationRecordName = _data["verificationRecordName"];
+        (<any>this).verificationRecordValue = _data["verificationRecordValue"];
         this.cleanup(this);
         return this;
     }
@@ -1607,6 +1620,9 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["scheme"] = this.scheme ? this.scheme.toJSON() : <any>undefined;
+        data["isVerified"] = this.isVerified;
+        data["verificationRecordName"] = this.verificationRecordName;
+        data["verificationRecordValue"] = this.verificationRecordValue;
         super.toJSON(data);
         this.cleanup(data);
         return data;
@@ -1616,6 +1632,12 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
 export interface IAuthSchemeResponseDto extends IResourceDto {
     /** The auth scheme if configured. */
     readonly scheme?: AuthSchemeDto | undefined;
+    /** True, if the ownership of the domain has been verified. */
+    readonly isVerified: boolean;
+    /** The name of the DNS TXT record to verify the ownership of the domain. */
+    readonly verificationRecordName?: string | undefined;
+    /** The value of the DNS TXT record to verify the ownership of the domain. */
+    readonly verificationRecordValue?: string | undefined;
 }
 
 export class AuthSchemeDto implements IAuthSchemeDto {

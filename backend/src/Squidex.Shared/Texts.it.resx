@@ -1105,6 +1105,12 @@
   <data name="teams.appsAssigned" xml:space="preserve">
     <value>Cannot delete team, when apps are assigned.</value>
   </data>
+  <data name="teams.authDomainNotConfigured" xml:space="preserve">
+    <value>No authentication domain is configured.</value>
+  </data>
+  <data name="teams.authDomainNotVerified" xml:space="preserve">
+    <value>The DNS TXT record '{name}' with the value '{value}' has not been found.</value>
+  </data>
   <data name="teams.domainInUse" xml:space="preserve">
     <value>Domain is already used for another team.</value>
   </data>
@@ -1146,6 +1152,9 @@
   </data>
   <data name="users.deleteYourselfError" xml:space="preserve">
     <value>Non puoi cancellare te stesso.</value>
+  </data>
+  <data name="users.emailNotVerified" xml:space="preserve">
+    <value>The authentication provider has not verified your email address.</value>
   </data>
   <data name="users.error.headline" xml:space="preserve">
     <value>Operazione non riuscita</value>

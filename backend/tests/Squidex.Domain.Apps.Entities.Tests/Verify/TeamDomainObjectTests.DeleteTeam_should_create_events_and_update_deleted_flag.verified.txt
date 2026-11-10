@@ -6,6 +6,7 @@
       Contributors: {
         me: Owner
       },
+      IsAuthDomainVerified: false,
       IsDeleted: true,
       Id: Guid_1,
       CreatedBy: subject:me,

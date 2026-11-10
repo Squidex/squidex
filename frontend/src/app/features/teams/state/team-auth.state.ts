@@ -8,14 +8,29 @@
 import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
-import { AuthSchemeDto, AuthSchemeValueDto, debug, DialogService, LoadingState, shareSubscribed, State, TeamsService, TeamsState, VersionTag } from '@app/shared';
+import { AuthSchemeDto, AuthSchemeResponseDto, AuthSchemeValueDto, debug, DialogService, LoadingState, shareSubscribed, State, TeamsService, TeamsState, VersionTag } from '@app/shared';
 
 interface Snapshot extends LoadingState {
     // The current scheme.
     scheme?: AuthSchemeDto | null;
 
+    // The current response, needed for the links.
+    response?: AuthSchemeResponseDto;
+
     // Indicates if the user can update the auth settings.
     canUpdate?: boolean;
+
+    // Indicates if the user can verify the domain.
+    canVerify?: boolean;
+
+    // Indicates if the domain is verified.
+    isVerified?: boolean;
+
+    // The name of the DNS record to verify the domain.
+    verificationRecordName?: string;
+
+    // The value of the DNS record to verify the domain.
+    verificationRecordValue?: string;
 
     // The team version.
     version: VersionTag;
@@ -32,6 +47,18 @@ export class TeamAuthState extends State<Snapshot> {
 
     public readonly canUpdate =
         this.project(x => x.canUpdate === true);
+
+    public readonly canVerify =
+        this.project(x => x.canVerify === true);
+
+    public readonly isVerified =
+        this.project(x => x.isVerified === true);
+
+    public readonly verificationRecordName =
+        this.project(x => x.verificationRecordName);
+
+    public readonly verificationRecordValue =
+        this.project(x => x.verificationRecordValue);
 
     public readonly isLoaded =
         this.project(x => x.isLoaded === true);
@@ -66,14 +93,7 @@ export class TeamAuthState extends State<Snapshot> {
                     this.dialogs.notifyInfo('i18n:teams.auth.reloaded');
                 }
 
-                const { scheme, canUpdate } = payload;
-                this.next({
-                    canUpdate,
-                    isLoaded: true,
-                    isLoading: false,
-                    scheme,
-                    version,
-                }, 'Loading Success');
+                this.replacePayload(payload, version, { isLoaded: true, isLoading: false }, 'Loading Success');
             }),
             finalize(() => {
                 this.next({ isLoading: false }, 'Loading Done');
@@ -84,15 +104,43 @@ export class TeamAuthState extends State<Snapshot> {
     public update(scheme: AuthSchemeDto | undefined): Observable<AuthSchemeDto | undefined | null> {
         return this.teamService.putTeamAuth(this.teamId, AuthSchemeValueDto.fromJSON({ scheme }), this.version).pipe(
             tap(({ version, payload }) => {
-                this.next({
-                    ...payload,
-                    version,
-                }, 'Change');
+                this.replacePayload(payload, version, {}, 'Change');
             }),
             map(({ payload }) => {
                 return payload.scheme;
             }),
             shareSubscribed(this.dialogs));
+    }
+
+    public verify(): Observable<any> {
+        const response = this.snapshot.response;
+        if (!response) {
+            throw new Error('Auth settings not loaded.');
+        }
+
+        return this.teamService.verifyTeamAuth(response, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.dialogs.notifyInfo('i18n:teams.auth.verified');
+
+                this.replacePayload(payload, version, {}, 'Verified');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    private replacePayload(payload: AuthSchemeResponseDto, version: VersionTag, state: Partial<Snapshot>, event: string) {
+        const { canUpdate, canVerify, isVerified, scheme, verificationRecordName, verificationRecordValue } = payload;
+
+        this.next({
+            ...state,
+            canUpdate,
+            canVerify,
+            isVerified,
+            response: payload,
+            scheme,
+            verificationRecordName,
+            verificationRecordValue,
+            version,
+        }, event);
     }
 
     private get version() {
