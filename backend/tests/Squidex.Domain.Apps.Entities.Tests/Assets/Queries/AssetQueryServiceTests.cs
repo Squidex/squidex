@@ -27,7 +27,7 @@ public class AssetQueryServiceTests : GivenContext
     {
         SetupEnricher();
 
-        A.CallTo(() => queryParser.ParseAsync(ApiContext, A<Q>._, CancellationToken))
+        A.CallTo(() => queryParser.ParseAsync(ApiContext, A<Q>._, A<CancellationToken>._))
             .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
         var options = Options.Create(new AssetOptions());
@@ -190,6 +190,25 @@ public class AssetQueryServiceTests : GivenContext
 
         AssertAsset(asset1, actual[0]);
         AssertAsset(asset2, actual[1]);
+    }
+
+    [Fact]
+    public async Task Should_parse_asset_query_with_timeout()
+    {
+        var parseToken = default(CancellationToken);
+
+        A.CallTo(() => queryParser.ParseAsync(ApiContext, A<Q>._, A<CancellationToken>._))
+            .ReturnsLazily(c =>
+            {
+                parseToken = c.GetArgument<CancellationToken>(2);
+
+                return Task.FromResult(c.GetArgument<Q>(1)!);
+            });
+
+        await sut.QueryAsync(ApiContext, null, Q.Empty, CancellationToken);
+
+        Assert.True(parseToken.CanBeCanceled);
+        Assert.NotEqual(CancellationToken, parseToken);
     }
 
     [Fact]

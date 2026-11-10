@@ -42,7 +42,7 @@ public class ContentQueryServiceTests : GivenContext
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
             .Returns([Schema]);
 
-        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<Schema?>._, CancellationToken))
+        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<Schema?>._, A<CancellationToken>._))
             .ReturnsLazily(c => Task.FromResult<Q?>(c.GetArgument<Q>(1)!));
 
         var options = Options.Create(new ContentsOptions());
@@ -334,7 +334,7 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext(permissionId: PermissionIds.AppContentsRead);
 
-        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, Schema, CancellationToken))
+        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, Schema, A<CancellationToken>._))
             .Returns(Task.FromResult<Q?>(null));
 
         await sut.QueryAsync(requestContext, SchemaId.Name, Q.Empty, CancellationToken);
@@ -348,13 +348,34 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext(permissionId: PermissionIds.AppContentsRead);
 
-        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, null, CancellationToken))
+        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, null, A<CancellationToken>._))
             .Returns(Task.FromResult<Q?>(null));
 
         await sut.QueryAsync(requestContext, Q.Empty, CancellationToken);
 
         A.CallTo(contentRepository)
             .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_parse_content_query_with_timeout()
+    {
+        var requestContext = SetupContext(permissionId: PermissionIds.AppContentsRead);
+
+        var parseToken = default(CancellationToken);
+
+        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, Schema, A<CancellationToken>._))
+            .ReturnsLazily(c =>
+            {
+                parseToken = c.GetArgument<CancellationToken>(3);
+
+                return Task.FromResult<Q?>(null);
+            });
+
+        await sut.QueryAsync(requestContext, SchemaId.Name, Q.Empty, CancellationToken);
+
+        Assert.True(parseToken.CanBeCanceled);
+        Assert.NotEqual(CancellationToken, parseToken);
     }
 
     private void SetupEnricher()
