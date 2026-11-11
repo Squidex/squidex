@@ -260,7 +260,7 @@ public sealed class ContentQueryService(
             // Enforce a hard timeout
             combined.CancelAfter(options.TimeoutQuery);
 
-            return await queryParser.ParseAsync(context, q, schema, ct);
+            return await queryParser.ParseAsync(context, q, schema, combined.Token);
         }
     }
 

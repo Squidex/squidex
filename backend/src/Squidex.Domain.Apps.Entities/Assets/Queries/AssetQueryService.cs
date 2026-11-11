@@ -213,7 +213,7 @@ public sealed class AssetQueryService(
             // Enforce a hard timeout
             combined.CancelAfter(options.TimeoutQuery);
 
-            return await queryParser.ParseAsync(context, q, ct);
+            return await queryParser.ParseAsync(context, q, combined.Token);
         }
     }
 
