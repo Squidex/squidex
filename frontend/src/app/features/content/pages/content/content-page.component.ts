@@ -234,7 +234,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     private updateContext() {
         const content = this.content();
 
-        this.mutableContext['action'] = content ? 'Create' : 'Update';
+        this.mutableContext['action'] = content ? 'Update' : 'Create';
         this.mutableContext['initialContent'] = content;
         this.mutableContext['language'] = this.language();
         this.mutableContext['languages'] = this.languages();
