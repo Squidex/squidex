@@ -29,5 +29,8 @@ export namespace UILanguages {
     }, {
         iso2Code: 'de',
         localName: 'Deutsch',
+    }, {
+        iso2Code: 'pl',
+        localName: 'Polski',
     }];
 }
