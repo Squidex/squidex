@@ -66,11 +66,8 @@ public static class ValidationExtensions
         }
         else if (operation.CommandId != DomainId.Empty)
         {
-            var indexOfSelf = path.IndexOf(x => x.Id == operation.CommandId);
-            var indexOfParent = path.IndexOf(x => x.Id == parentId);
-
-            // If we would move the folder to its own parent (the parent comes first in the path), we would create a recursion.
-            if (indexOfSelf >= 0 && indexOfParent > indexOfSelf)
+            // The path goes from the root to the new parent. If it contains the folder itself, the new parent is the folder or one of its children.
+            if (path.Any(x => x.Id == operation.CommandId))
             {
                 operation.AddError(T.Get("assets.folderRecursion"), nameof(MoveAssetFolder.ParentId));
             }
