@@ -89,6 +89,17 @@ describe('TeamContributorsState', () => {
             expect(contributorsState.contributorsFiltered()).toEqual(oldContributors.items.slice(10, 20));
             expect(contributorsState.snapshot.page).toEqual(1);
             expect(contributorsState.snapshot.pageSize).toEqual(10);
+            expect(contributorsState.paging()).toEqual({ page: 1, pageSize: 10, total: 20, count: 10 });
+        });
+
+        it('should reset page and calculate paging from filtered contributors if searching', () => {
+            contributorsState.load().subscribe();
+            contributorsState.page({ page: 1, pageSize: 10 });
+            contributorsState.search('4');
+
+            expect(contributorsState.contributorsFiltered()).toEqual(createContributors(4, 14).items);
+            expect(contributorsState.snapshot.page).toEqual(0);
+            expect(contributorsState.paging()).toEqual({ page: 0, pageSize: 10, total: 2, count: 2 });
         });
 
         it('should show filtered contributors if searching', () => {

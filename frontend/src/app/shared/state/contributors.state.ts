@@ -8,7 +8,7 @@
 import { computed, inject, Service } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, StringHelper, Types, VersionTag } from '@app/framework';
+import { debug, DialogService, ErrorDto, ListState, PagingInfo, shareMapSubscribed, shareSubscribed, State, StringHelper, Types, VersionTag } from '@app/framework';
 import { AssignContributorDto, ContributorDto, ContributorsDto } from '../model';
 import { ContributorsService } from '../services/contributors.service';
 import { AppsState } from './apps.state';
@@ -30,6 +30,7 @@ interface Snapshot extends ListState<string> {
 @Service()
 export class ContributorsState extends State<Snapshot> {
     private readonly appsState = inject(AppsState);
+    private readonly contributorsPage = this.project(getContributorsPage);
     private readonly contributorsService = inject(ContributorsService);
     private readonly dialogs = inject(DialogService);
 
@@ -37,7 +38,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.contributors);
 
     public readonly paging =
-        this.project(x => getPagingInfo(x, x.contributors.length));
+        computed(() => this.contributorsPage().paging);
 
     public readonly query =
         this.project(x => x.query);
@@ -58,7 +59,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.canCreate === true);
 
     public readonly contributorsFiltered =
-        this.project(getFilteredContributors);
+        computed(() => this.contributorsPage().items);
 
     public get appId() {
         return this.appsState.appId;
@@ -119,7 +120,8 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public search(query: string) {
-        this.next({ query }, 'Results Filtered');
+        // The current page may not exist anymore for the filtered results.
+        this.next({ query, page: 0 }, 'Results Filtered');
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
@@ -166,7 +168,7 @@ function getRegex(query?: string): RegExp | undefined {
     return query ? StringHelper.searchRegex(query) : undefined;
 }
 
-function getFilteredContributors(snapshot: Snapshot) {
+function getContributorsPage(snapshot: Snapshot): { items: ReadonlyArray<ContributorDto>; paging: PagingInfo } {
     const { contributors, query, page, pageSize } = snapshot;
 
     let filtered = contributors;
@@ -177,5 +179,8 @@ function getFilteredContributors(snapshot: Snapshot) {
         filtered = filtered.filter(x => regex.test(x.contributorName));
     }
 
-    return filtered.slice(page * pageSize, (page + 1) * pageSize);
+    const items = filtered.slice(page * pageSize, (page + 1) * pageSize);
+
+    // The paging must be calculated from the filtered contributors, not from all contributors.
+    return { items, paging: { page, pageSize, total: filtered.length, count: items.length } };
 }
