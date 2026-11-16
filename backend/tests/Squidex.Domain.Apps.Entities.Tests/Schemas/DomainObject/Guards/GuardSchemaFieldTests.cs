@@ -198,6 +198,24 @@ public class GuardSchemaFieldTests : GivenContext, IClassFixture<TranslationsFix
     }
 
     [Fact]
+    public void CanDelete_should_throw_exception_if_nested_field_locked()
+    {
+        var command = new DeleteField { ParentFieldId = 3, FieldId = 301 };
+
+        Schema = Schema.LockField(301, 3);
+
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanDelete(command, Schema));
+    }
+
+    [Fact]
+    public void CanDelete_should_not_throw_exception_if_nested_field_not_locked()
+    {
+        var command = new DeleteField { ParentFieldId = 3, FieldId = 301 };
+
+        GuardSchemaField.CanDelete(command, Schema);
+    }
+
+    [Fact]
     public void CanDelete_should_not_throw_exception_if_not_locked()
     {
         var command = new DeleteField { FieldId = 1 };
@@ -213,6 +231,26 @@ public class GuardSchemaFieldTests : GivenContext, IClassFixture<TranslationsFix
         Schema = Schema.UpdateField(1, f => f.Lock());
 
         Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(command, Schema));
+    }
+
+    [Fact]
+    public void CanUpdate_should_throw_exception_if_nested_field_locked()
+    {
+        var command = new UpdateField { ParentFieldId = 3, FieldId = 301, Properties = new NumberFieldProperties() };
+
+        Schema = Schema.LockField(301, 3);
+
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(command, Schema));
+    }
+
+    [Fact]
+    public void CanLock_should_not_throw_exception_if_nested_field_locked()
+    {
+        var command = new LockField { ParentFieldId = 3, FieldId = 301 };
+
+        Schema = Schema.LockField(301, 3);
+
+        GuardSchemaField.CanLock(command, Schema);
     }
 
     [Fact]
