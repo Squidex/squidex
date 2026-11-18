@@ -32,7 +32,7 @@
                     @if (!hasComments()) {
                         <sqx-menu-item
                             (action)="annotationCreate()"
-                            [disabled]="isCollapsed() || !hasChatBot()"
+                            [disabled]="isCollapsed()"
                             icon="comments"
                             menuLabel="i18n:contents.comment"
                             small
