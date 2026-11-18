@@ -22,6 +22,7 @@
 
                     @if (isString()) {
                         <sqx-menu-item
+                            (action)="chatDialog.show()"
                             [disabled]="isDisabled() || isCollapsed() || !hasChatBot()"
                             label="AI"
                             menuLabel="i18n:contents.fieldAIMenu"
