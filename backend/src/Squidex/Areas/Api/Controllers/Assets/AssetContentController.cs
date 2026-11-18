@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets;
@@ -100,6 +101,12 @@ public sealed class AssetContentController(
             Response.Headers[HeaderNames.CacheControl] = "public,max-age=0";
 
             return StatusCode(403);
+        }
+
+        // Large target sizes allocate huge image buffers and are also persisted for every combination.
+        if (!assetOptions.IsValidResizeSize(request.Width, request.Height))
+        {
+            throw new ValidationException($"Width and height must not be greater than {assetOptions.MaxResizeDimension}.");
         }
 
         if (asset != null && request.Version > EtagVersion.Any && asset.Version != request.Version)

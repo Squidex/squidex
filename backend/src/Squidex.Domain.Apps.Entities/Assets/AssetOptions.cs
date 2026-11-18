@@ -25,6 +25,8 @@ public sealed class AssetOptions
 
     public int MaxConcurrentResizes { get; set; }
 
+    public int MaxResizeDimension { get; set; } = 4096;
+
     public TimeSpan MaxCacheDuration { get; set; } = TimeSpan.FromDays(365);
 
     public string? CDN { get; set; }
@@ -32,4 +34,15 @@ public sealed class AssetOptions
     public TimeSpan TimeoutFind { get; set; } = TimeSpan.FromSeconds(1);
 
     public TimeSpan TimeoutQuery { get; set; } = TimeSpan.FromSeconds(5);
+
+    public bool IsValidResizeSize(int? width, int? height)
+    {
+        // Zero or less disables the limit.
+        if (MaxResizeDimension <= 0)
+        {
+            return true;
+        }
+
+        return (width ?? 0) <= MaxResizeDimension && (height ?? 0) <= MaxResizeDimension;
+    }
 }
