@@ -40,6 +40,11 @@ public static class GuardHelper
                 throw new DomainObjectNotFoundException(fieldId.ToString(CultureInfo.InvariantCulture));
             }
 
+            if (!allowLocked)
+            {
+                EnsureNotLocked(nestedField);
+            }
+
             return nestedField;
         }
 
