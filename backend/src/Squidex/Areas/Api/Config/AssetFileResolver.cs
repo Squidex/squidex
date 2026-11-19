@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Apps;
@@ -17,7 +17,11 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Config;
 
-public class AssetFileResolver(IAssetUsageTracker assetUsage, IUsageGate usageGate, IHttpClientFactory httpClientFactory)
+public class AssetFileResolver(
+    IAssetUsageTracker assetUsage,
+    IUsageGate usageGate,
+    IHttpClientFactory httpClientFactory,
+    IOptions<AssetOptions> assetOptions)
 {
     public async Task<IAssetFile> ToFileAsync(UploadModel model, HttpContext httpContext, App? app,
         CancellationToken ct)
@@ -81,15 +85,18 @@ public class AssetFileResolver(IAssetUsageTracker assetUsage, IUsageGate usageGa
             return null;
         }
 
-        var requestSize = httpContext.Features.Get<IRequestSizeLimitMetadata>()?.MaxRequestBodySize ?? int.MaxValue;
+        // Use the same limit as for direct uploads.
+        var maxSize = assetOptions.Value.MaxSize > 0 ? assetOptions.Value.MaxSize : long.MaxValue;
 
         try
         {
             using var httpClient = httpClientFactory.CreateClient("Assets");
-            using var httpResponse = await httpClient.GetAsync(fileUrl, ct);
+
+            // Only read the headers, otherwise the whole body is buffered in memory before the size is checked.
+            using var httpResponse = await httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead, ct);
 
             var length = httpResponse.Content.Headers.ContentLength;
-            if (length == null || length > requestSize)
+            if (length == null || length > maxSize)
             {
                 throw new ValidationException(T.Get("common.httpDownloadRequestSize"));
             }
@@ -102,17 +109,45 @@ public class AssetFileResolver(IAssetUsageTracker assetUsage, IUsageGate usageGa
             await using var httpStream = await httpResponse.Content.ReadAsStreamAsync(ct);
 
             var tempFile = new TempAssetFile(fileName, httpResponse.Content.Headers.ContentType?.ToString()!);
-
-            await using (var tempStream = tempFile.OpenWrite())
+            try
             {
-                await httpStream.CopyToAsync(tempStream, ct);
+                await using (var tempStream = tempFile.OpenWrite())
+                {
+                    await CopyWithLimitAsync(httpStream, tempStream, maxSize, ct);
+                }
+            }
+            catch
+            {
+                await tempFile.DisposeAsync();
+                throw;
             }
 
             return tempFile;
         }
-        catch
+        catch (Exception ex) when (ex is not ValidationException)
         {
             throw new ValidationException(T.Get("common.httpDownloadFailed"));
+        }
+    }
+
+    private static async Task CopyWithLimitAsync(Stream source, Stream target, long maxSize,
+        CancellationToken ct)
+    {
+        var buffer = new byte[81920];
+        var bytesTotal = 0L;
+        int bytesRead;
+
+        while ((bytesRead = await source.ReadAsync(buffer, ct)) > 0)
+        {
+            bytesTotal += bytesRead;
+
+            // Do not trust the content length header, the body could be longer.
+            if (bytesTotal > maxSize)
+            {
+                throw new ValidationException(T.Get("common.httpDownloadRequestSize"));
+            }
+
+            await target.WriteAsync(buffer.AsMemory(0, bytesRead), ct);
         }
     }
 
