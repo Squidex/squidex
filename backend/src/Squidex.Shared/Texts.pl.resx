@@ -1,0 +1,1426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="annotations_AbsoluteUrl" xml:space="preserve">
+    <value>Pole '{name|lower}' musi zawierać bezwzględny adres URL.</value>
+  </data>
+  <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
+    <value>Pole '{0}' musi zawierać bezwzględny adres URL.</value>
+  </data>
+  <data name="annotations_Compare" xml:space="preserve">
+    <value>Pole '{name|lower}' musi mieć tę samą wartość co {other|lower}.</value>
+  </data>
+  <data name="dotnet_annotations_Compare" xml:space="preserve">
+    <value>Pole '{0}' musi mieć tę samą wartość co {1}.</value>
+  </data>
+  <data name="annotations_EmailAddress" xml:space="preserve">
+    <value>Pole '{name|lower}' nie zawiera prawidłowego adresu e-mail.</value>
+  </data>
+  <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
+    <value>Pole '{0}' nie zawiera prawidłowego adresu e-mail.</value>
+  </data>
+  <data name="annotations_Range" xml:space="preserve">
+    <value>Pole '{name|lower}' musi mieć wartość od {min} do {max}.</value>
+  </data>
+  <data name="dotnet_annotations_Range" xml:space="preserve">
+    <value>Pole '{0}' musi mieć wartość od {1} do {2}.</value>
+  </data>
+  <data name="annotations_RegularExpression" xml:space="preserve">
+    <value>Pole '{name|lower}' ma nieprawidłowy format.</value>
+  </data>
+  <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
+    <value>Pole '{0}' ma nieprawidłowy format.</value>
+  </data>
+  <data name="annotations_Required" xml:space="preserve">
+    <value>Pole '{name|lower}' jest wymagane.</value>
+  </data>
+  <data name="dotnet_annotations_Required" xml:space="preserve">
+    <value>Pole '{0}' jest wymagane.</value>
+  </data>
+  <data name="annotations_StringLength" xml:space="preserve">
+    <value>Maksymalna długość pola '{name|lower}' to {max}.</value>
+  </data>
+  <data name="dotnet_annotations_StringLength" xml:space="preserve">
+    <value>Maksymalna długość pola '{0}' to {1}.</value>
+  </data>
+  <data name="annotations_StringLengthMinimum" xml:space="preserve">
+    <value>Długość pola '{name|lower}' musi mieścić się w zakresie od {min} do {max}.</value>
+  </data>
+  <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
+    <value>Długość pola '{0}' musi mieścić się w zakresie od {1} do {2}.</value>
+  </data>
+  <data name="apps.clients.idAlreadyExists" xml:space="preserve">
+    <value>Klient o tym identyfikatorze już istnieje.</value>
+  </data>
+  <data name="apps.contributors.cannotChangeYourself" xml:space="preserve">
+    <value>Nie można zmienić własnej roli.</value>
+  </data>
+  <data name="apps.contributors.maxReached" xml:space="preserve">
+    <value>Osiągnięto maksymalną liczbę współpracowników dostępną w planie.</value>
+  </data>
+  <data name="apps.contributors.onlyOneOwner" xml:space="preserve">
+    <value>Nie można usunąć jedynego właściciela.</value>
+  </data>
+  <data name="apps.languages.fallbackNotFound" xml:space="preserve">
+    <value>Aplikacja nie ma języka zastępczego '{fallback}'.</value>
+  </data>
+  <data name="apps.languages.languageAlreadyAdded" xml:space="preserve">
+    <value>Ten język został już dodany.</value>
+  </data>
+  <data name="apps.languages.masterLanguageNoFallbacks" xml:space="preserve">
+    <value>Język główny nie może mieć języków zastępczych.</value>
+  </data>
+  <data name="apps.languages.masterLanguageNotOptional" xml:space="preserve">
+    <value>Język główny nie może być opcjonalny.</value>
+  </data>
+  <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
+    <value>Nie można usunąć języka głównego.</value>
+  </data>
+  <data name="apps.maximumTotalReached" xml:space="preserve">
+    <value>Nie można utworzyć więcej aplikacji. Aby znieść to ograniczenie, skontaktuj się z pomocą techniczną.</value>
+  </data>
+  <data name="apps.nameAlreadyExists" xml:space="preserve">
+    <value>Aplikacja o tej nazwie już istnieje.</value>
+  </data>
+  <data name="apps.notImage" xml:space="preserve">
+    <value>Plik nie jest obrazem</value>
+  </data>
+  <data name="apps.plans.assignedToTeam" xml:space="preserve">
+    <value>Planem zarządza zespół.</value>
+  </data>
+  <data name="apps.plans.notFound" xml:space="preserve">
+    <value>Plan o tym identyfikatorze nie istnieje.</value>
+  </data>
+  <data name="apps.plans.notPlanOwner" xml:space="preserve">
+    <value>Plan może zmienić tylko użytkownik, który go pierwotnie skonfigurował.</value>
+  </data>
+  <data name="apps.roles.defaultRoleNotRemovable" xml:space="preserve">
+    <value>Nie można usunąć roli domyślnej.</value>
+  </data>
+  <data name="apps.roles.defaultRoleNotUpdateable" xml:space="preserve">
+    <value>Nie można zmienić roli domyślnej.</value>
+  </data>
+  <data name="apps.roles.nameAlreadyExists" xml:space="preserve">
+    <value>Rola o tej nazwie już istnieje.</value>
+  </data>
+  <data name="apps.roles.usedRoleByClientsNotRemovable" xml:space="preserve">
+    <value>Nie można usunąć roli przypisanej do klienta.</value>
+  </data>
+  <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
+    <value>Nie można usunąć roli przypisanej do współpracownika.</value>
+  </data>
+  <data name="apps.transfer.planAssigned" xml:space="preserve">
+    <value>Przed przeniesieniem aplikacji należy anulować subskrypcję.</value>
+  </data>
+  <data name="apps.transfer.teamNotFound" xml:space="preserve">
+    <value>Zespół nie istnieje.</value>
+  </data>
+  <data name="assets.folderNotFound" xml:space="preserve">
+    <value>Folder zasobów nie istnieje.</value>
+  </data>
+  <data name="assets.folderRecursion" xml:space="preserve">
+    <value>Nie można przenieść folderu do jego własnego podfolderu.</value>
+  </data>
+  <data name="assets.maxSizeReached" xml:space="preserve">
+    <value>Osiągnięto maksymalny łączny rozmiar zasobów.</value>
+  </data>
+  <data name="assets.referenced" xml:space="preserve">
+    <value>Zasób jest używany w treści i nie można go usunąć.</value>
+  </data>
+  <data name="common.action" xml:space="preserve">
+    <value>Akcja</value>
+  </data>
+  <data name="common.aspectHeight" xml:space="preserve">
+    <value>Proporcja – wysokość</value>
+  </data>
+  <data name="common.aspectWidth" xml:space="preserve">
+    <value>Proporcja – szerokość</value>
+  </data>
+  <data name="common.calculatedDefaultValue" xml:space="preserve">
+    <value>Obliczana wartość domyślna</value>
+  </data>
+  <data name="common.clientId" xml:space="preserve">
+    <value>Identyfikator klienta</value>
+  </data>
+  <data name="common.clientSecret" xml:space="preserve">
+    <value>Klucz tajny klienta</value>
+  </data>
+  <data name="common.contentType" xml:space="preserve">
+    <value>Typ zawartości</value>
+  </data>
+  <data name="common.contributorId" xml:space="preserve">
+    <value>Identyfikator lub e-mail współpracownika</value>
+  </data>
+  <data name="common.critical" xml:space="preserve">
+    <value>Krytyczny</value>
+  </data>
+  <data name="common.data" xml:space="preserve">
+    <value>Dane</value>
+  </data>
+  <data name="common.defaultValue" xml:space="preserve">
+    <value>Wartość domyślna</value>
+  </data>
+  <data name="common.displayName" xml:space="preserve">
+    <value>Nazwa wyświetlana</value>
+  </data>
+  <data name="common.documentation" xml:space="preserve">
+    <value>Dokumentacja</value>
+  </data>
+  <data name="common.editor" xml:space="preserve">
+    <value>Edytor</value>
+  </data>
+  <data name="common.email" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="common.errorNoPermission" xml:space="preserve">
+    <value>Brak wymaganych uprawnień.</value>
+  </data>
+  <data name="common.field" xml:space="preserve">
+    <value>Pole</value>
+  </data>
+  <data name="common.fieldIds" xml:space="preserve">
+    <value>Identyfikatory pól</value>
+  </data>
+  <data name="common.fieldName" xml:space="preserve">
+    <value>Nazwa pola</value>
+  </data>
+  <data name="common.file" xml:space="preserve">
+    <value>Plik</value>
+  </data>
+  <data name="common.flow" xml:space="preserve">
+    <value>Przepływ</value>
+  </data>
+  <data name="common.folderName" xml:space="preserve">
+    <value>Nazwa folderu</value>
+  </data>
+  <data name="common.fullTextNotSupported" xml:space="preserve">
+    <value>Klauzula wyszukiwania w zapytaniu nie jest obsługiwana.</value>
+  </data>
+  <data name="common.httpContentTypeNotDefined" xml:space="preserve">
+    <value>Nie określono typu zawartości pliku (content-type).</value>
+  </data>
+  <data name="common.httpDownloadFailed" xml:space="preserve">
+    <value>Nie udało się pobrać pliku.</value>
+  </data>
+  <data name="common.httpDownloadRequestSize" xml:space="preserve">
+    <value>Plik przekracza maksymalny rozmiar żądania.</value>
+  </data>
+  <data name="common.httpFileNameNotDefined" xml:space="preserve">
+    <value>Nie określono nazwy pliku.</value>
+  </data>
+  <data name="common.httpInvalidRequest" xml:space="preserve">
+    <value>Model jest nieprawidłowy.</value>
+  </data>
+  <data name="common.httpInvalidRequestFormat" xml:space="preserve">
+    <value>Treść żądania ma nieprawidłowy format.</value>
+  </data>
+  <data name="common.httpOnlyAsUser" xml:space="preserve">
+    <value>Operacja niedozwolona dla klientów.</value>
+  </data>
+  <data name="common.httpValidationError" xml:space="preserve">
+    <value>Błąd walidacji</value>
+  </data>
+  <data name="common.initialStep" xml:space="preserve">
+    <value>Krok początkowy</value>
+  </data>
+  <data name="common.jsError" xml:space="preserve">
+    <value>Wykonanie skryptu nie powiodło się z powodu błędu wykonania JavaScript: {message}</value>
+  </data>
+  <data name="common.jsNotAllowed" xml:space="preserve">
+    <value>Skrypt zabronił wykonania operacji.</value>
+  </data>
+  <data name="common.jsParseError" xml:space="preserve">
+    <value>Wykonanie skryptu nie powiodło się z powodu błędu składni JavaScript: {message}</value>
+  </data>
+  <data name="common.jsRejected" xml:space="preserve">
+    <value>Skrypt odrzucił operację.</value>
+  </data>
+  <data name="common.language" xml:space="preserve">
+    <value>Kod języka</value>
+  </data>
+  <data name="common.login" xml:space="preserve">
+    <value>Zaloguj się</value>
+  </data>
+  <data name="common.logout" xml:space="preserve">
+    <value>Wyloguj się</value>
+  </data>
+  <data name="common.maxCharacters" xml:space="preserve">
+    <value>Maks. liczba znaków</value>
+  </data>
+  <data name="common.maxHeight" xml:space="preserve">
+    <value>Maks. wysokość</value>
+  </data>
+  <data name="common.maxItems" xml:space="preserve">
+    <value>Maks. liczba elementów</value>
+  </data>
+  <data name="common.maxLength" xml:space="preserve">
+    <value>Maks. długość</value>
+  </data>
+  <data name="common.maxSize" xml:space="preserve">
+    <value>Maks. rozmiar</value>
+  </data>
+  <data name="common.maxValue" xml:space="preserve">
+    <value>Maks. wartość</value>
+  </data>
+  <data name="common.maxWidth" xml:space="preserve">
+    <value>Maks. szerokość</value>
+  </data>
+  <data name="common.maxWords" xml:space="preserve">
+    <value>Maks. liczba słów</value>
+  </data>
+  <data name="common.minCharacters" xml:space="preserve">
+    <value>Min. liczba znaków</value>
+  </data>
+  <data name="common.minHeight" xml:space="preserve">
+    <value>Min. wysokość</value>
+  </data>
+  <data name="common.minItems" xml:space="preserve">
+    <value>Min. liczba elementów</value>
+  </data>
+  <data name="common.minLength" xml:space="preserve">
+    <value>Min. długość</value>
+  </data>
+  <data name="common.minSize" xml:space="preserve">
+    <value>Min. rozmiar</value>
+  </data>
+  <data name="common.minValue" xml:space="preserve">
+    <value>Min. wartość</value>
+  </data>
+  <data name="common.minWidth" xml:space="preserve">
+    <value>Min. szerokość</value>
+  </data>
+  <data name="common.minWords" xml:space="preserve">
+    <value>Min. liczba słów</value>
+  </data>
+  <data name="common.name" xml:space="preserve">
+    <value>Nazwa</value>
+  </data>
+  <data name="common.notFoundValue" xml:space="preserve">
+    <value>- nie znaleziono -</value>
+  </data>
+  <data name="common.numDays" xml:space="preserve">
+    <value>Liczba dni</value>
+  </data>
+  <data name="common.odataFailure" xml:space="preserve">
+    <value>Nie udało się przetworzyć zapytania: {message}, zapytanie: {odata}</value>
+  </data>
+  <data name="common.odataFilterNotValid" xml:space="preserve">
+    <value>Nieprawidłowa klauzula OData $filter: {message}</value>
+  </data>
+  <data name="common.odataNotSupported" xml:space="preserve">
+    <value>Operacja OData nie jest obsługiwana w zapytaniu: {odata}</value>
+  </data>
+  <data name="common.odataSearchNotValid" xml:space="preserve">
+    <value>Nieprawidłowa klauzula OData $search: {message}</value>
+  </data>
+  <data name="common.oldPassword" xml:space="preserve">
+    <value>Stare hasło</value>
+  </data>
+  <data name="common.other" xml:space="preserve">
+    <value>Inne</value>
+  </data>
+  <data name="common.partitioning" xml:space="preserve">
+    <value>Podział</value>
+  </data>
+  <data name="common.password" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="common.passwordConfirm" xml:space="preserve">
+    <value>Potwierdź</value>
+  </data>
+  <data name="common.pattern" xml:space="preserve">
+    <value>Wzorzec</value>
+  </data>
+  <data name="common.permissions" xml:space="preserve">
+    <value>Uprawnienia</value>
+  </data>
+  <data name="common.planId" xml:space="preserve">
+    <value>Identyfikator planu</value>
+  </data>
+  <data name="common.previewUrls" xml:space="preserve">
+    <value>Adresy URL podglądu</value>
+  </data>
+  <data name="common.product" xml:space="preserve">
+    <value>Squidex Headless CMS</value>
+  </data>
+  <data name="common.properties" xml:space="preserve">
+    <value>Właściwości</value>
+  </data>
+  <data name="common.property" xml:space="preserve">
+    <value>Właściwość</value>
+  </data>
+  <data name="common.readonlyMode" xml:space="preserve">
+    <value>Aplikacja działa obecnie w trybie tylko do odczytu.</value>
+  </data>
+  <data name="common.remove" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="common.resultTooLarge" xml:space="preserve">
+    <value>Zbiór wyników jest zbyt duży, aby go pobrać. Użyj parametru $take, aby zmniejszyć liczbę elementów.</value>
+  </data>
+  <data name="common.role" xml:space="preserve">
+    <value>Rola</value>
+  </data>
+  <data name="common.save" xml:space="preserve">
+    <value>Zapisz</value>
+  </data>
+  <data name="common.schemaId" xml:space="preserve">
+    <value>Identyfikator schematu</value>
+  </data>
+  <data name="common.signoutRedirectUrl" xml:space="preserve">
+    <value>Adres URL przekierowania po wylogowaniu</value>
+  </data>
+  <data name="common.signup" xml:space="preserve">
+    <value>Zarejestruj się</value>
+  </data>
+  <data name="common.success" xml:space="preserve">
+    <value>Sukces</value>
+  </data>
+  <data name="common.text" xml:space="preserve">
+    <value>Tekst</value>
+  </data>
+  <data name="common.trigger" xml:space="preserve">
+    <value>Wyzwalacz</value>
+  </data>
+  <data name="common.warning" xml:space="preserve">
+    <value>Ostrzeżenie</value>
+  </data>
+  <data name="common.workflow" xml:space="preserve">
+    <value>Przepływ pracy</value>
+  </data>
+  <data name="common.workflowStep" xml:space="preserve">
+    <value>Krok</value>
+  </data>
+  <data name="common.workflowTransition" xml:space="preserve">
+    <value>Przejście</value>
+  </data>
+  <data name="contents.bulkInsertQueryNotUnique" xml:space="preserve">
+    <value>Zapytanie pasuje do więcej niż jednej treści.</value>
+  </data>
+  <data name="contents.componentNotCreatable" xml:space="preserve">
+    <value>Nie można utworzyć treści komponentu.</value>
+  </data>
+  <data name="contents.draftNotCreateForUnpublished" xml:space="preserve">
+    <value>Nową wersję można utworzyć tylko dla opublikowanej treści.</value>
+  </data>
+  <data name="contents.draftToDeleteNotFound" xml:space="preserve">
+    <value>Brak elementów do usunięcia.</value>
+  </data>
+  <data name="contents.invalidAllQuery" xml:space="preserve">
+    <value>Należy określić identyfikatory albo zakres harmonogramu.</value>
+  </data>
+  <data name="contents.invalidArrayOfObjects" xml:space="preserve">
+    <value>Nieprawidłowy typ JSON, oczekiwano tablicy obiektów.</value>
+  </data>
+  <data name="contents.invalidArrayOfStrings" xml:space="preserve">
+    <value>Nieprawidłowy typ JSON, oczekiwano tablicy ciągów znaków.</value>
+  </data>
+  <data name="contents.invalidBoolean" xml:space="preserve">
+    <value>Nieprawidłowy typ JSON, oczekiwano wartości logicznej.</value>
+  </data>
+  <data name="contents.invalidComponentNoObject" xml:space="preserve">
+    <value>Nieprawidłowy obiekt JSON, oczekiwano obiektu z polem 'schemaId'.</value>
+  </data>
+  <data name="contents.invalidComponentNoType" xml:space="preserve">
+    <value>Nieprawidłowy komponent. Nie znaleziono pola 'schemaId'.</value>
+  </data>
+  <data name="contents.invalidComponentUnknownSchema" xml:space="preserve">
+    <value>Nieprawidłowy komponent. Nie znaleziono schematu.</value>
+  </data>
+  <data name="contents.invalidGeolocation" xml:space="preserve">
+    <value>Nieprawidłowy typ JSON, oczekiwano obiektu z szerokością i długością geograficzną.</value>
+  </data>
+  <data name="contents.invalidGeolocationLatitude" xml:space="preserve">
+    <value>Szerokość geograficzna musi mieścić się w zakresie od -90 do 90.</value>
+  </data>
+  <data name="contents.invalidGeolocationLongitude" xml:space="preserve">
+    <value>Długość geograficzna musi mieścić się w zakresie od -180 do 180.</value>
+  </data>
+  <data name="contents.invalidNumber" xml:space="preserve">
+    <value>Nieprawidłowy typ JSON, oczekiwano liczby.</value>
+  </data>
+  <data name="contents.invalidRichText" xml:space="preserve">
+    <value>Nieprawidłowy tekst sformatowany.</value>
+  </data>
+  <data name="contents.invalidString" xml:space="preserve">
+    <value>Nieprawidłowy typ JSON, oczekiwano ciągu znaków.</value>
+  </data>
+  <data name="contents.invalidUserInfo" xml:space="preserve">
+    <value>Nieprawidłowy typ JSON, oczekiwano obiektu apiKey+role.</value>
+  </data>
+  <data name="contents.invalidUserInfoApiKey" xml:space="preserve">
+    <value>Należy określić ApiKey.</value>
+  </data>
+  <data name="contents.invalidUserInfoRole" xml:space="preserve">
+    <value>Należy określić rolę.</value>
+  </data>
+  <data name="contents.listReferences" xml:space="preserve">
+    <value>Odwołania: {count}</value>
+  </data>
+  <data name="contents.referenced" xml:space="preserve">
+    <value>Treść jest używana w innej treści i nie można jej usunąć ani cofnąć jej publikacji.</value>
+  </data>
+  <data name="contents.schemaNotPublished" xml:space="preserve">
+    <value>Schemat nie jest opublikowany.</value>
+  </data>
+  <data name="contents.singletonNotChangeable" xml:space="preserve">
+    <value>Nie można zmienić treści typu singleton.</value>
+  </data>
+  <data name="contents.singletonNotCreatable" xml:space="preserve">
+    <value>Nie można utworzyć treści typu singleton.</value>
+  </data>
+  <data name="contents.singletonNotDeletable" xml:space="preserve">
+    <value>Nie można usunąć treści typu singleton.</value>
+  </data>
+  <data name="contents.statusNotValid" xml:space="preserve">
+    <value>Status nie jest zdefiniowany w przepływie pracy.</value>
+  </data>
+  <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
+    <value>Nie można zmienić statusu z {oldStatus} na {newStatus}.</value>
+  </data>
+  <data name="contents.validation.aspectRatio" xml:space="preserve">
+    <value>Wymagane proporcje: {width}:{height}.</value>
+  </data>
+  <data name="contents.validation.assetNotFound" xml:space="preserve">
+    <value>Nie znaleziono identyfikatora {id}.</value>
+  </data>
+  <data name="contents.validation.assetType" xml:space="preserve">
+    <value>Nieoczekiwany typ, wymagany: {type}.</value>
+  </data>
+  <data name="contents.validation.between" xml:space="preserve">
+    <value>Wartość musi mieścić się w zakresie od {min} do {max}.</value>
+  </data>
+  <data name="contents.validation.characterCount" xml:space="preserve">
+    <value>Wymagana liczba znaków: {count}.</value>
+  </data>
+  <data name="contents.validation.charactersBetween" xml:space="preserve">
+    <value>Liczba znaków musi mieścić się w zakresie od {min} do {max}.</value>
+  </data>
+  <data name="contents.validation.createOnly" xml:space="preserve">
+    <value>Pola nie można zmienić po utworzeniu.</value>
+  </data>
+  <data name="contents.validation.duplicates" xml:space="preserve">
+    <value>Wartości nie mogą się powtarzać.</value>
+  </data>
+  <data name="contents.validation.error" xml:space="preserve">
+    <value>Walidacja nie powiodła się z powodu błędu wewnętrznego.</value>
+  </data>
+  <data name="contents.validation.exactValue" xml:space="preserve">
+    <value>Wymagana wartość: {value}.</value>
+  </data>
+  <data name="contents.validation.extension" xml:space="preserve">
+    <value>Niedozwolone rozszerzenie pliku.</value>
+  </data>
+  <data name="contents.validation.invalid" xml:space="preserve">
+    <value>Nieprawidłowa wartość.</value>
+  </data>
+  <data name="contents.validation.itemCount" xml:space="preserve">
+    <value>Wymagana liczba elementów: {count}.</value>
+  </data>
+  <data name="contents.validation.itemCountBetween" xml:space="preserve">
+    <value>Liczba elementów musi mieścić się w zakresie od {min} do {max}.</value>
+  </data>
+  <data name="contents.validation.max" xml:space="preserve">
+    <value>Wartość musi być mniejsza lub równa {max}.</value>
+  </data>
+  <data name="contents.validation.maxCharacters" xml:space="preserve">
+    <value>Maksymalna liczba znaków tekstu: {max}.</value>
+  </data>
+  <data name="contents.validation.maximumHeight" xml:space="preserve">
+    <value>Wysokość {height}px musi być mniejsza niż {max}px.</value>
+  </data>
+  <data name="contents.validation.maximumSize" xml:space="preserve">
+    <value>Rozmiar {size} musi być mniejszy niż {max}.</value>
+  </data>
+  <data name="contents.validation.maximumWidth" xml:space="preserve">
+    <value>Szerokość {width}px musi być mniejsza niż {max}px.</value>
+  </data>
+  <data name="contents.validation.maxItems" xml:space="preserve">
+    <value>Maksymalna liczba elementów: {max}.</value>
+  </data>
+  <data name="contents.validation.maxLength" xml:space="preserve">
+    <value>Maksymalna liczba znaków: {max}.</value>
+  </data>
+  <data name="contents.validation.maxWords" xml:space="preserve">
+    <value>Maksymalna liczba słów: {max}.</value>
+  </data>
+  <data name="contents.validation.min" xml:space="preserve">
+    <value>Wartość musi być większa lub równa {min}.</value>
+  </data>
+  <data name="contents.validation.minimumHeight" xml:space="preserve">
+    <value>Wysokość {height}px musi być większa niż {min}px.</value>
+  </data>
+  <data name="contents.validation.minimumSize" xml:space="preserve">
+    <value>Rozmiar {size} musi być większy niż {min}.</value>
+  </data>
+  <data name="contents.validation.minimumWidth" xml:space="preserve">
+    <value>Szerokość {width}px musi być większa niż {min}px.</value>
+  </data>
+  <data name="contents.validation.minItems" xml:space="preserve">
+    <value>Minimalna liczba elementów: {min}.</value>
+  </data>
+  <data name="contents.validation.minLength" xml:space="preserve">
+    <value>Minimalna liczba znaków: {min}.</value>
+  </data>
+  <data name="contents.validation.minNormalCharacters" xml:space="preserve">
+    <value>Minimalna liczba znaków tekstu: {min}.</value>
+  </data>
+  <data name="contents.validation.minWords" xml:space="preserve">
+    <value>Minimalna liczba słów: {min}.</value>
+  </data>
+  <data name="contents.validation.mustBeEmpty" xml:space="preserve">
+    <value>Wartość nie może być określona.</value>
+  </data>
+  <data name="contents.validation.normalCharacterCount" xml:space="preserve">
+    <value>Wymagana liczba znaków tekstu: {count}.</value>
+  </data>
+  <data name="contents.validation.normalCharactersBetween" xml:space="preserve">
+    <value>Liczba znaków tekstu musi mieścić się w zakresie od {min} do {max}.</value>
+  </data>
+  <data name="contents.validation.notAllowed" xml:space="preserve">
+    <value>Niedozwolona wartość.</value>
+  </data>
+  <data name="contents.validation.pattern" xml:space="preserve">
+    <value>Wartość nie pasuje do wzorca.</value>
+  </data>
+  <data name="contents.validation.referenceNotFound" xml:space="preserve">
+    <value>Nie znaleziono odwołania '{id}'.</value>
+  </data>
+  <data name="contents.validation.referenceToInvalidSchema" xml:space="preserve">
+    <value>Odwołanie '{id}' wskazuje nieprawidłowy schemat.</value>
+  </data>
+  <data name="contents.validation.regexTooSlow" xml:space="preserve">
+    <value>Wyrażenie regularne działa zbyt wolno.</value>
+  </data>
+  <data name="contents.validation.required" xml:space="preserve">
+    <value>Pole jest wymagane.</value>
+  </data>
+  <data name="contents.validation.unique" xml:space="preserve">
+    <value>Istnieje już inna treść o tej samej wartości.</value>
+  </data>
+  <data name="contents.validation.uniqueObjectValues" xml:space="preserve">
+    <value>Elementy nie mogą mieć powtarzających się wartości pól '{field}'.</value>
+  </data>
+  <data name="contents.validation.unknownField" xml:space="preserve">
+    <value>Nieznane pole typu {fieldType}.</value>
+  </data>
+  <data name="contents.validation.wordCount" xml:space="preserve">
+    <value>Wymagana liczba słów: {count}.</value>
+  </data>
+  <data name="contents.validation.wordsBetween" xml:space="preserve">
+    <value>Liczba słów musi mieścić się w zakresie od {min} do {max}.</value>
+  </data>
+  <data name="contents.workflowErrorUpdate" xml:space="preserve">
+    <value>Przepływ pracy nie pozwala na zmiany w statusie {status}</value>
+  </data>
+  <data name="dotnet_identity_DefaultEror" xml:space="preserve">
+    <value>Wystąpił nieznany błąd.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateEmail" xml:space="preserve">
+    <value>Ten adres e-mail jest już zajęty.</value>
+  </data>
+  <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
+    <value>Ten adres e-mail jest już używany przez innego użytkownika. To logowanie zewnętrzne można dodać do konta na stronie profilu.</value>
+  </data>
+  <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
+    <value>Nieprawidłowy adres e-mail.</value>
+  </data>
+  <data name="dotnet_identity_InvalidUserName" xml:space="preserve">
+    <value>Nazwa użytkownika '{0}' jest nieprawidłowa, może zawierać tylko litery i cyfry.</value>
+  </data>
+  <data name="dotnet_identity_LoginAlreadyAssociated" xml:space="preserve">
+    <value>Użytkownik z tym logowaniem już istnieje.</value>
+  </data>
+  <data name="dotnet_identity_PasswordMismatch" xml:space="preserve">
+    <value>Nieprawidłowe hasło.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresDigit" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną cyfrę ('0'-'9').</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną małą literę ('a'-'z').</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jeden znak, który nie jest literą ani cyfrą.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Minimalna liczba różnych znaków w haśle: {0}.</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUpper" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną wielką literę ('A'-'Z').</value>
+  </data>
+  <data name="dotnet_identity_PasswordTooShort" xml:space="preserve">
+    <value>Hasło jest za krótkie.</value>
+  </data>
+  <data name="dotnet_identity_PwnedError" xml:space="preserve">
+    <value>To hasło wyciekło wcześniej z jakiegoś serwisu i nie powinno być nigdy używane. Jeśli było już gdzieś używane, należy je zmienić!</value>
+  </data>
+  <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
+    <value>Użytkownik jest zablokowany.</value>
+  </data>
+  <data name="exceptions.domainObjectConflict" xml:space="preserve">
+    <value>Obiekt ({id}) już istnieje.</value>
+  </data>
+  <data name="exceptions.domainObjectDeleted" xml:space="preserve">
+    <value>Obiekt ({id}) został usunięty.</value>
+  </data>
+  <data name="exceptions.domainObjectNotFound" xml:space="preserve">
+    <value>Obiekt ({id}) nie istnieje.</value>
+  </data>
+  <data name="exceptions.domainObjectVersion" xml:space="preserve">
+    <value>Dla obiektu ({id}) żądano wersji {expectedVersion}, ale znaleziono wersję {currentVersion}.</value>
+  </data>
+  <data name="history.apps.assetScriptsConfigured" xml:space="preserve">
+    <value>zaktualizował(a) skrypty zasobów</value>
+  </data>
+  <data name="history.apps.clientAdded" xml:space="preserve">
+    <value>dodał(a) klienta {[Id]} do aplikacji</value>
+  </data>
+  <data name="history.apps.clientRevoked" xml:space="preserve">
+    <value>unieważnił(a) klienta {[Id]}</value>
+  </data>
+  <data name="history.apps.clientSecretRegenerated" xml:space="preserve">
+    <value>wygenerował(a) ponownie klucz tajny klienta {[Id]}</value>
+  </data>
+  <data name="history.apps.clientUpdated" xml:space="preserve">
+    <value>zaktualizował(a) klienta {[Id]}</value>
+  </data>
+  <data name="history.apps.common.updated" xml:space="preserve">
+    <value>zaktualizował(a) ustawienia ogólne</value>
+  </data>
+  <data name="history.apps.contributoreAssigned" xml:space="preserve">
+    <value>przypisał(a) użytkownikowi {user:[Contributor]} rolę {[Role]}</value>
+  </data>
+  <data name="history.apps.contributoreRemoved" xml:space="preserve">
+    <value>usunął(-ęła) użytkownika {user:[Contributor]} z aplikacji</value>
+  </data>
+  <data name="history.apps.created" xml:space="preserve">
+    <value>utworzył(a) aplikację.</value>
+  </data>
+  <data name="history.apps.imageRemoved" xml:space="preserve">
+    <value>usunął(-ęła) obraz aplikacji</value>
+  </data>
+  <data name="history.apps.imageUploaded" xml:space="preserve">
+    <value>przesłał(a) nowy obraz aplikacji</value>
+  </data>
+  <data name="history.apps.languagedAdded" xml:space="preserve">
+    <value>dodał(a) język {[Language]}</value>
+  </data>
+  <data name="history.apps.languagedRemoved" xml:space="preserve">
+    <value>usunął(-ęła) język {[Language]}</value>
+  </data>
+  <data name="history.apps.languagedSetToMaster" xml:space="preserve">
+    <value>zmienił(a) język główny na {[Language]}</value>
+  </data>
+  <data name="history.apps.languagedUpdated" xml:space="preserve">
+    <value>zaktualizował(a) język {[Language]}</value>
+  </data>
+  <data name="history.apps.planChanged" xml:space="preserve">
+    <value>zmienił(a) plan na {[Plan]}</value>
+  </data>
+  <data name="history.apps.planReset" xml:space="preserve">
+    <value>zresetował(a) plan</value>
+  </data>
+  <data name="history.apps.roleAdded" xml:space="preserve">
+    <value>dodał(a) rolę {[Name]}</value>
+  </data>
+  <data name="history.apps.roleDeleted" xml:space="preserve">
+    <value>usunął(-ęła) rolę {[Name]}</value>
+  </data>
+  <data name="history.apps.roleUpdated" xml:space="preserve">
+    <value>zaktualizował(a) rolę {[Name]}</value>
+  </data>
+  <data name="history.apps.settingsUpdated" xml:space="preserve">
+    <value>zaktualizował(a) ustawienia interfejsu</value>
+  </data>
+  <data name="history.apps.transfered" xml:space="preserve">
+    <value>przeniósł(-osła) aplikację</value>
+  </data>
+  <data name="history.apps.workflowAdded" xml:space="preserve">
+    <value>dodał(a) przepływ pracy {[Name]}.</value>
+  </data>
+  <data name="history.apps.workflowDeleted" xml:space="preserve">
+    <value>usunął(-ęła) przepływ pracy.</value>
+  </data>
+  <data name="history.apps.workflowUpdated" xml:space="preserve">
+    <value>zaktualizował(a) przepływ pracy.</value>
+  </data>
+  <data name="history.assets.replaced" xml:space="preserve">
+    <value>zastąpił(a) zasób.</value>
+  </data>
+  <data name="history.assets.updated" xml:space="preserve">
+    <value>zaktualizował(a) zasób.</value>
+  </data>
+  <data name="history.assets.uploaded" xml:space="preserve">
+    <value>przesłał(a) zasób.</value>
+  </data>
+  <data name="history.contents.created" xml:space="preserve">
+    <value>utworzył(a) treść {[Schema]}.</value>
+  </data>
+  <data name="history.contents.deleted" xml:space="preserve">
+    <value>usunął(-ęła) treść {[Schema]}.</value>
+  </data>
+  <data name="history.contents.draftCreated" xml:space="preserve">
+    <value>utworzył(a) nową wersję roboczą.</value>
+  </data>
+  <data name="history.contents.draftDeleted" xml:space="preserve">
+    <value>usunął(-ęła) wersję roboczą.</value>
+  </data>
+  <data name="history.contents.scheduleCompleted" xml:space="preserve">
+    <value>zaplanował(a) zmianę statusu treści {[Schema]} na {[Status]}.</value>
+  </data>
+  <data name="history.contents.scheduleFailed" xml:space="preserve">
+    <value>– nie udało się zaplanować zmiany statusu treści {[Schema]}.</value>
+  </data>
+  <data name="history.contents.updated" xml:space="preserve">
+    <value>zaktualizował(a) treść {[Schema]}.</value>
+  </data>
+  <data name="history.schemas.created" xml:space="preserve">
+    <value>utworzył(a) schemat {[Name]}.</value>
+  </data>
+  <data name="history.schemas.deleted" xml:space="preserve">
+    <value>usunął(-ęła) schemat {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldAdded" xml:space="preserve">
+    <value>dodał(a) pole {[Field]} do schematu {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldDeleted" xml:space="preserve">
+    <value>usunął(-ęła) pole {[Field]} ze schematu {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldDisabled" xml:space="preserve">
+    <value>wyłączył(a) pole {[Field]} w schemacie {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldHidden" xml:space="preserve">
+    <value>ukrył(a) pole {[Field]} w schemacie {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldLocked" xml:space="preserve">
+    <value>zablokował(a) pole {[Field]} w schemacie {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldShown" xml:space="preserve">
+    <value>pokazał(a) pole {[Field]} w schemacie {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldsReordered" xml:space="preserve">
+    <value>zmienił(a) kolejność pól w schemacie {[Name]}.</value>
+  </data>
+  <data name="history.schemas.fieldUpdated" xml:space="preserve">
+    <value>zaktualizował(a) pole {[Field]} w schemacie {[Name]}.</value>
+  </data>
+  <data name="history.schemas.published" xml:space="preserve">
+    <value>opublikował(a) schemat {[Name]}.</value>
+  </data>
+  <data name="history.schemas.scriptsConfigured" xml:space="preserve">
+    <value>skonfigurował(a) skrypty schematu {[Name]}.</value>
+  </data>
+  <data name="history.schemas.unpublished" xml:space="preserve">
+    <value>cofnął(-ęła) publikację schematu {[Name]}.</value>
+  </data>
+  <data name="history.schemas.updated" xml:space="preserve">
+    <value>zaktualizował(a) schemat {[Name]}.</value>
+  </data>
+  <data name="history.statusChanged" xml:space="preserve">
+    <value>zmienił(a) status treści {[Schema]} na {[Status]}.</value>
+  </data>
+  <data name="history.teams.contributoreAssigned" xml:space="preserve">
+    <value>przypisał(a) użytkownikowi {user:[Contributor]} rolę {[Role]}.</value>
+  </data>
+  <data name="history.teams.contributoreRemoved" xml:space="preserve">
+    <value>usunął(-ęła) użytkownika {user:[Contributor]} z zespołu.</value>
+  </data>
+  <data name="history.teams.created" xml:space="preserve">
+    <value>utworzył(a) zespół {[Name]}.</value>
+  </data>
+  <data name="history.teams.planChanged" xml:space="preserve">
+    <value>zmienił(a) plan na {[Plan]}.</value>
+  </data>
+  <data name="history.teams.planReset" xml:space="preserve">
+    <value>zresetował(a) plan.</value>
+  </data>
+  <data name="history.teams.updated" xml:space="preserve">
+    <value>zaktualizował(a) ustawienia ogólne i zmienił(a) nazwę na {[Name]}.</value>
+  </data>
+  <data name="jobs.alreadyRunning" xml:space="preserve">
+    <value>Inne zadanie jest już uruchomione.</value>
+  </data>
+  <data name="jobs.backup" xml:space="preserve">
+    <value>Kopia zapasowa</value>
+  </data>
+  <data name="jobs.invalidTaskName" xml:space="preserve">
+    <value>Nieprawidłowa nazwa zadania</value>
+  </data>
+  <data name="jobs.maxReached" xml:space="preserve">
+    <value>Maksymalna liczba kopii zapasowych: {max}.</value>
+  </data>
+  <data name="jobs.notifyFailed" xml:space="preserve">
+    <value>Zadanie '{job}' zakończyło się niepowodzeniem.</value>
+  </data>
+  <data name="jobs.notifySuccess" xml:space="preserve">
+    <value>Zadanie '{job}' zostało pomyślnie zakończone.</value>
+  </data>
+  <data name="jobs.restore" xml:space="preserve">
+    <value>Przywracanie</value>
+  </data>
+  <data name="jobs.ruleRun" xml:space="preserve">
+    <value>Ponowne uruchomienie reguły.</value>
+  </data>
+  <data name="jobs.ruleRunNamed" xml:space="preserve">
+    <value>Ponowne uruchomienie reguły '{name}'.</value>
+  </data>
+  <data name="jobs.ruleRunNamedSnapshot" xml:space="preserve">
+    <value>Ponowne uruchomienie reguły '{name}' na podstawie stanów.</value>
+  </data>
+  <data name="jobs.ruleRunSnapshot" xml:space="preserve">
+    <value>Ponowne uruchomienie reguły na podstawie stanów</value>
+  </data>
+  <data name="login.githubPrivateEmail" xml:space="preserve">
+    <value>Adres e-mail w serwisie Github jest ustawiony jako prywatny. Aby logować się przez Github, ustaw go jako publiczny.</value>
+  </data>
+  <data name="login.test.headline" xml:space="preserve">
+    <value>Test zakończony powodzeniem</value>
+  </data>
+  <data name="login.test.text" xml:space="preserve">
+    <value>Test logowania zakończył się powodzeniem. Można teraz zapisać ustawienia. Zalecamy wykonanie końcowego testu z użyciem rzeczywistego procesu logowania.</value>
+  </data>
+  <data name="login.test.title" xml:space="preserve">
+    <value>Test logowania</value>
+  </data>
+  <data name="rules.validation.invalidCronExpression" xml:space="preserve">
+    <value>Nieprawidłowe wyrażenie Cron.</value>
+  </data>
+  <data name="rules.validation.invalidCronTimezone" xml:space="preserve">
+    <value>Strefa czasowa nie jest prawidłowym identyfikatorem IANA.</value>
+  </data>
+  <data name="rules.validation.invalidNextStepId" xml:space="preserve">
+    <value>Nieprawidłowy identyfikator następnego kroku</value>
+  </data>
+  <data name="rules.validation.invalidStepId" xml:space="preserve">
+    <value>Nieprawidłowy identyfikator kroku</value>
+  </data>
+  <data name="rules.validation.noStartStep" xml:space="preserve">
+    <value>Przepływ nie ma kroku początkowego</value>
+  </data>
+  <data name="rules.validation.noSteps" xml:space="preserve">
+    <value>Przepływ nie ma żadnego kroku</value>
+  </data>
+  <data name="rules.validation.schemaNotFound" xml:space="preserve">
+    <value>Schemat {id} nie istnieje.</value>
+  </data>
+  <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
+    <value>Nie można jednocześnie używać obliczanej wartości domyślnej i wartości domyślnej.</value>
+  </data>
+  <data name="schemas.duplicateFieldName" xml:space="preserve">
+    <value>Pole '{field}' zostało dodane dwukrotnie.</value>
+  </data>
+  <data name="schemas.fieldCannotBeUIField" xml:space="preserve">
+    <value>Pole nie może być polem interfejsu.</value>
+  </data>
+  <data name="schemas.fieldIsLocked" xml:space="preserve">
+    <value>Pole schematu jest zablokowane.</value>
+  </data>
+  <data name="schemas.fieldNameAlreadyExists" xml:space="preserve">
+    <value>Pole o tej nazwie już istnieje.</value>
+  </data>
+  <data name="schemas.fieldNotInSchema" xml:space="preserve">
+    <value>Pole nie należy do schematu.</value>
+  </data>
+  <data name="schemas.fieldsNotCovered" xml:space="preserve">
+    <value>Identyfikatory pól nie obejmują wszystkich pól.</value>
+  </data>
+  <data name="schemas.nameAlreadyExists" xml:space="preserve">
+    <value>Schemat o tej nazwie już istnieje.</value>
+  </data>
+  <data name="schemas.noPermission" xml:space="preserve">
+    <value>Brak uprawnień do tego schematu.</value>
+  </data>
+  <data name="schemas.number.inlineEditorError" xml:space="preserve">
+    <value>Edycja w wierszu nie jest dozwolona dla edytora przycisków opcji.</value>
+  </data>
+  <data name="schemas.onlyArraysHaveNested" xml:space="preserve">
+    <value>Pola zagnieżdżone mogą mieć tylko pola tablicowe.</value>
+  </data>
+  <data name="schemas.onylArraysInRoot" xml:space="preserve">
+    <value>Pole zagnieżdżone nie może być polem tablicowym.</value>
+  </data>
+  <data name="schemas.references.resolveError" xml:space="preserve">
+    <value>Odwołania można rozwijać tylko wtedy, gdy MaxItems wynosi 1.</value>
+  </data>
+  <data name="schemas.string.inlineEditorError" xml:space="preserve">
+    <value>Edycja w wierszu jest dozwolona tylko dla list rozwijanych, slugów i pól tekstowych.</value>
+  </data>
+  <data name="schemas.stringEditorsNeedAllowedValuesError" xml:space="preserve">
+    <value>Przyciski opcji lub lista rozwijana wymagają określenia dozwolonych wartości.</value>
+  </data>
+  <data name="schemas.tags.editorNeedsAllowedValues" xml:space="preserve">
+    <value>Pola wyboru lub lista rozwijana wymagają określenia dozwolonych wartości.</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeDisabled" xml:space="preserve">
+    <value>Nie można wyłączyć pola interfejsu.</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeEnabled" xml:space="preserve">
+    <value>Nie można włączyć pola interfejsu.</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeHidden" xml:space="preserve">
+    <value>Nie można ukryć pola interfejsu.</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeShown" xml:space="preserve">
+    <value>Nie można pokazać pola interfejsu.</value>
+  </data>
+  <data name="search.contentResult" xml:space="preserve">
+    <value>Treść: {name}</value>
+  </data>
+  <data name="search.contentsResult" xml:space="preserve">
+    <value>Treści: {name}</value>
+  </data>
+  <data name="search.schemaResult" xml:space="preserve">
+    <value>Schemat: {name}</value>
+  </data>
+  <data name="setup.createUser.button" xml:space="preserve">
+    <value>Utwórz użytkownika</value>
+  </data>
+  <data name="setup.createUser.confirmPassword" xml:space="preserve">
+    <value>Potwierdź</value>
+  </data>
+  <data name="setup.createUser.failure" xml:space="preserve">
+    <value>Nie skonfigurowano ani uwierzytelniania hasłem, ani zewnętrznego dostawcy uwierzytelniania, np. Google. Sprawdź ustawienia i logi.</value>
+  </data>
+  <data name="setup.createUser.headline" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="setup.createUser.headlineCreate" xml:space="preserve">
+    <value>Utwórz administratora</value>
+  </data>
+  <data name="setup.createUser.loginHint" xml:space="preserve">
+    <value>Skonfigurowano co najmniej jednego zewnętrznego dostawcę uwierzytelniania, np. Google. Wystarczy przejść na stronę logowania i zalogować się, aby zostać administratorem.</value>
+  </data>
+  <data name="setup.createUser.loginLink" xml:space="preserve">
+    <value>Przejdź do strony logowania.</value>
+  </data>
+  <data name="setup.createUser.separator" xml:space="preserve">
+    <value>LUB</value>
+  </data>
+  <data name="setup.headline" xml:space="preserve">
+    <value>Instalacja</value>
+  </data>
+  <data name="setup.hint" xml:space="preserve">
+    <value>Ten ekran jest widoczny, ponieważ nie istnieje jeszcze żaden użytkownik. Po utworzeniu użytkownika nie będzie można ponownie użyć tej strony konfiguracji.</value>
+  </data>
+  <data name="setup.madeBy" xml:space="preserve">
+    <value>Z dumą stworzone przez</value>
+  </data>
+  <data name="setup.madeByCopyright" xml:space="preserve">
+    <value>Sebastian Stehle i współtwórcy, 2016-2024</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
+    <value>W tej konfiguracji tylko administratorzy mogą tworzyć nowe aplikacje. Aby to zmienić, ustaw zmienną środowiskową &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAll" xml:space="preserve">
+    <value>W tej konfiguracji każdy użytkownik może tworzyć nowe aplikacje. Aby to zmienić, ustaw zmienną środowiskową &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleFolder.warning" xml:space="preserve">
+    <value>Używany jest &lt;strong&gt;magazyn zasobów w folderze&lt;/strong&gt;, w którym wszystkie zasoby są przechowywane w systemie plików. Pamiętaj, aby uwzględnić folder zasobów w strategii tworzenia kopii zapasowych i – w przypadku korzystania z Dockera – zamapować go na wolumen.</value>
+  </data>
+  <data name="setup.ruleFtp.warning" xml:space="preserve">
+    <value>Używany jest &lt;strong&gt;magazyn zasobów FTP&lt;/strong&gt;. Ten typ magazynu nie jest zalecany ze względu na niską wydajność.</value>
+  </data>
+  <data name="setup.ruleHttps.failure" xml:space="preserve">
+    <value> Strona nie jest otwarta przez https. Jeśli to ostrzeżenie jest błędne, Squidex nie może wykryć trybu https, ponieważ instancja działa za odwrotnym proxy, np. nginx. Upewnij się, że nagłówki http są prawidłowo przekazywane za pomocą nagłówków &lt;code&gt;X-Forwarded-*&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleHttps.success" xml:space="preserve">
+    <value>Gratulacje, instalacja Squidex jest otwarta przez bezpieczne połączenie (https).</value>
+  </data>
+  <data name="setup.rules.headline" xml:space="preserve">
+    <value>Lista kontrolna systemu</value>
+  </data>
+  <data name="setup.ruleTeamCreation.warningAdmins" xml:space="preserve">
+    <value>W tej konfiguracji tylko administratorzy mogą tworzyć nowe zespoły. Aby to zmienić, ustaw zmienną środowiskową &lt;code&gt;UI__ONLYADMINSCANCREATETEAMS=false&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleTeamCreation.warningAll" xml:space="preserve">
+    <value>W tej konfiguracji każdy użytkownik może tworzyć nowe zespoły. Aby to zmienić, ustaw zmienną środowiskową &lt;code&gt;UI__ONLYADMINSCANCREATETEAMS=true&lt;/code&gt;.</value>
+  </data>
+  <data name="setup.ruleUrl.failure" xml:space="preserve">
+    <value>Squidex powinien być dostępny tylko pod jednym kanonicznym adresem URL, skonfigurowanym w zmiennej środowiskowej &lt;code&gt;URLS__BASEURL&lt;/code&gt;. Bieżący bazowy adres URL &lt;code&gt;{actual}&lt;/code&gt; nie jest zgodny z bazowym adresem URL &lt;code&gt;{configured}&lt;/code&gt;. Ta zmienna musi wskazywać publiczny adres URL, pod którym dostępna jest instancja Squidex.</value>
+  </data>
+  <data name="setup.ruleUrl.success" xml:space="preserve">
+    <value>Gratulacje, zmienna środowiskowa &lt;code&gt;URLS__BASEURL&lt;/code&gt; jest prawidłowo skonfigurowana. Ta zmienna musi wskazywać publiczny adres URL, pod którym dostępna jest instancja Squidex.</value>
+  </data>
+  <data name="setup.title" xml:space="preserve">
+    <value>Instalacja</value>
+  </data>
+  <data name="teams.appsAssigned" xml:space="preserve">
+    <value>Nie można usunąć zespołu, do którego są przypisane aplikacje.</value>
+  </data>
+  <data name="teams.authDomainNotConfigured" xml:space="preserve">
+    <value>Nie skonfigurowano domeny uwierzytelniania.</value>
+  </data>
+  <data name="teams.authDomainNotVerified" xml:space="preserve">
+    <value>Nie znaleziono rekordu DNS TXT '{name}' o wartości '{value}'.</value>
+  </data>
+  <data name="teams.domainInUse" xml:space="preserve">
+    <value>Domena jest już używana przez inny zespół.</value>
+  </data>
+  <data name="users.accessDenied.text" xml:space="preserve">
+    <value>Ta operacja jest niedozwolona, konto może być zablokowane.</value>
+  </data>
+  <data name="users.accessDenied.title" xml:space="preserve">
+    <value>Odmowa dostępu</value>
+  </data>
+  <data name="users.consent.agree" xml:space="preserve">
+    <value>Wyrażam zgodę</value>
+  </data>
+  <data name="users.consent.cookiesHeadline" xml:space="preserve">
+    <value>Pliki cookie i analityka</value>
+  </data>
+  <data name="users.consent.cookiesText" xml:space="preserve">
+    <value>&lt;p&gt; Rozumiem i zgadzam się, że Squidex używa plików cookie, aby zapewnić jak najlepsze działanie platformy i przechowywać stan logowania. &lt;/p&gt;&lt;p&gt; Rozumiem i zgadzam się, że Squidex korzysta z Google Analytics (z funkcją anonimizacji). Google Analytics to usługa analityki internetowej, która zbiera i analizuje dane o zachowaniu użytkowników. &lt;/p&gt;&lt;p&gt; Akceptuję &lt;a href="{privacyUrl}" target="_blank" rel="noopener"&gt;politykę prywatności&lt;/a&gt;.&lt;/p&gt;</value>
+  </data>
+  <data name="users.consent.emailHeadline" xml:space="preserve">
+    <value>Automatyczne wiadomości e-mail (opcjonalnie)</value>
+  </data>
+  <data name="users.consent.emailText" xml:space="preserve">
+    <value>Rozumiem i zgadzam się, że Squidex wysyła wiadomości e-mail z informacjami o nowych funkcjach, zmianach niezgodnych wstecz i przerwach w działaniu.</value>
+  </data>
+  <data name="users.consent.headline" xml:space="preserve">
+    <value>Potrzebujemy zgody</value>
+  </data>
+  <data name="users.consent.needed" xml:space="preserve">
+    <value>Należy wyrazić zgodę.</value>
+  </data>
+  <data name="users.consent.piiHeadline" xml:space="preserve">
+    <value>Dane osobowe</value>
+  </data>
+  <data name="users.consent.piiText" xml:space="preserve">
+    <value>Rozumiem i zgadzam się, że Squidex zbiera następujące dane osobowe pobierane od zewnętrznych dostawców uwierzytelniania, takich jak Google, Microsoft czy Github. &lt;ul class="personal-information"&gt; &lt;li&gt; Podstawowe dane osobowe (imię, nazwisko i zdjęcie) są udostępniane wszystkim innym użytkownikom, aby mogli dodać mnie do swojej przestrzeni roboczej. &lt;/li&gt;&lt;li&gt; W każdej chwili mogę zmienić te dane, aby zanonimizować swoje konto. &lt;/li&gt;&lt;li&gt; Moje konto użytkownika ma unikalny identyfikator, a przy wszystkich moich zmianach zapisywane jest, że to ja je wprowadziłem(-am), i ta informacja jest udostępniana innym użytkownikom. &lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="users.consent.title" xml:space="preserve">
+    <value>Zgoda</value>
+  </data>
+  <data name="users.deleteYourselfError" xml:space="preserve">
+    <value>Nie można usunąć własnego konta.</value>
+  </data>
+  <data name="users.emailNotVerified" xml:space="preserve">
+    <value>Dostawca uwierzytelniania nie zweryfikował adresu e-mail.</value>
+  </data>
+  <data name="users.error.headline" xml:space="preserve">
+    <value>Operacja nie powiodła się</value>
+  </data>
+  <data name="users.error.text" xml:space="preserve">
+    <value>Bardzo przepraszamy, coś poszło nie tak.</value>
+  </data>
+  <data name="users.error.title" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="users.errorHappened" xml:space="preserve">
+    <value>Wystąpił nieoczekiwany wyjątek.</value>
+  </data>
+  <data name="users.lockedOutText" xml:space="preserve">
+    <value>Konto jest zablokowane, skontaktuj się z administratorem.</value>
+  </data>
+  <data name="users.lockedOutTitle" xml:space="preserve">
+    <value>Konto zablokowane</value>
+  </data>
+  <data name="users.lockYourselfError" xml:space="preserve">
+    <value>Nie można zablokować własnego konta.</value>
+  </data>
+  <data name="users.login.custom" xml:space="preserve">
+    <value>Podaj adres e-mail, aby zalogować się kontem firmowym przez logowanie jednokrotne (SSO).</value>
+  </data>
+  <data name="users.login.emailBusinessPlaceholder" xml:space="preserve">
+    <value>Podaj służbowy adres e-mail</value>
+  </data>
+  <data name="users.login.emailPlaceholder" xml:space="preserve">
+    <value>Podaj adres e-mail</value>
+  </data>
+  <data name="users.login.error" xml:space="preserve">
+    <value>Nieprawidłowy adres e-mail lub hasło</value>
+  </data>
+  <data name="users.login.loginWith" xml:space="preserve">
+    <value>{action} przez &lt;strong&gt;{provider}&lt;/strong&gt;</value>
+  </data>
+  <data name="users.login.passwordPlaceholder" xml:space="preserve">
+    <value>Podaj hasło</value>
+  </data>
+  <data name="users.login.separator" xml:space="preserve">
+    <value>LUB</value>
+  </data>
+  <data name="users.logout.headline" xml:space="preserve">
+    <value>Wylogowano</value>
+  </data>
+  <data name="users.logout.text" xml:space="preserve">
+    <value>Zamknij to okno.</value>
+  </data>
+  <data name="users.logout.title" xml:space="preserve">
+    <value>Wylogowanie</value>
+  </data>
+  <data name="users.noCustomDomain" xml:space="preserve">
+    <value>Nie zarejestrowano serwera uwierzytelniania.</value>
+  </data>
+  <data name="users.noEmailAddress" xml:space="preserve">
+    <value>Nie udało się pobrać adresu e-mail od dostawcy uwierzytelniania.</value>
+  </data>
+  <data name="users.profile.aboutHint" xml:space="preserve">
+    <value>Prosimy o kilka informacji o sobie. Pomogą nam lepiej poznać naszych użytkowników i ulepszać produkt.</value>
+  </data>
+  <data name="users.profile.aboutTitle" xml:space="preserve">
+    <value>O mnie</value>
+  </data>
+  <data name="users.profile.addLoginDone" xml:space="preserve">
+    <value>Dodano logowanie.</value>
+  </data>
+  <data name="users.profile.changePassword" xml:space="preserve">
+    <value>Zmień hasło</value>
+  </data>
+  <data name="users.profile.changePasswordDone" xml:space="preserve">
+    <value>Zmieniono hasło.</value>
+  </data>
+  <data name="users.profile.clientHint" xml:space="preserve">
+    <value>Dane uwierzytelniające klienta umożliwiają dostęp do API z informacjami z profilu i osobistymi uprawnieniami, np. w celu tworzenia aplikacji.</value>
+  </data>
+  <data name="users.profile.clientTitle" xml:space="preserve">
+    <value>Klient</value>
+  </data>
+  <data name="users.profile.companyRole" xml:space="preserve">
+    <value>Rola zawodowa</value>
+  </data>
+  <data name="users.profile.companySize" xml:space="preserve">
+    <value>Ile osób pracuje w firmie?</value>
+  </data>
+  <data name="users.profile.confirmPassword" xml:space="preserve">
+    <value>Potwierdź</value>
+  </data>
+  <data name="users.profile.generateClient" xml:space="preserve">
+    <value>Wygeneruj</value>
+  </data>
+  <data name="users.profile.generateClientDone" xml:space="preserve">
+    <value>Wygenerowano klucz tajny klienta.</value>
+  </data>
+  <data name="users.profile.headline" xml:space="preserve">
+    <value>Edytuj profil</value>
+  </data>
+  <data name="users.profile.hideProfile" xml:space="preserve">
+    <value>Nie pokazuj mojego profilu innym użytkownikom</value>
+  </data>
+  <data name="users.profile.loginsTitle" xml:space="preserve">
+    <value>Logowania</value>
+  </data>
+  <data name="users.profile.passwordTitle" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="users.profile.pii" xml:space="preserve">
+    <value>Dane osobowe</value>
+  </data>
+  <data name="users.profile.project" xml:space="preserve">
+    <value>Rodzaj realizowanego projektu</value>
+  </data>
+  <data name="users.profile.projectBackend" xml:space="preserve">
+    <value>Zarządzanie danymi backendu</value>
+  </data>
+  <data name="users.profile.projectCommerce" xml:space="preserve">
+    <value>Rozwiązanie e-commerce</value>
+  </data>
+  <data name="users.profile.projectLearning" xml:space="preserve">
+    <value>Żaden, chcę się tylko nauczyć</value>
+  </data>
+  <data name="users.profile.projectMobileApp" xml:space="preserve">
+    <value>Aplikacja mobilna</value>
+  </data>
+  <data name="users.profile.projectNewsMagazine" xml:space="preserve">
+    <value>Serwis informacyjny</value>
+  </data>
+  <data name="users.profile.projectPersonalBlog" xml:space="preserve">
+    <value>Blog osobisty</value>
+  </data>
+  <data name="users.profile.projectSmallBusiness" xml:space="preserve">
+    <value>Strona dla małej firmy</value>
+  </data>
+  <data name="users.profile.propertiesHint" xml:space="preserve">
+    <value>Właściwości niestandardowe można wykorzystać w regułach i skryptach.</value>
+  </data>
+  <data name="users.profile.propertiesTitle" xml:space="preserve">
+    <value>Właściwości</value>
+  </data>
+  <data name="users.profile.propertyAdd" xml:space="preserve">
+    <value>Dodaj właściwość</value>
+  </data>
+  <data name="users.profile.removeLoginDone" xml:space="preserve">
+    <value>Usunięto dostawcę logowania.</value>
+  </data>
+  <data name="users.profile.roleBusinessAnalyst" xml:space="preserve">
+    <value>Analityk biznesowy</value>
+  </data>
+  <data name="users.profile.roleBusinessOwner" xml:space="preserve">
+    <value>Właściciel firmy</value>
+  </data>
+  <data name="users.profile.roleContentCreator" xml:space="preserve">
+    <value>Twórca treści</value>
+  </data>
+  <data name="users.profile.roleEmployee" xml:space="preserve">
+    <value>Pracownik firmy</value>
+  </data>
+  <data name="users.profile.roleProductManager" xml:space="preserve">
+    <value>Menedżer produktu</value>
+  </data>
+  <data name="users.profile.roleSoftwareDeveloper" xml:space="preserve">
+    <value>Programista</value>
+  </data>
+  <data name="users.profile.setPassword" xml:space="preserve">
+    <value>Ustaw hasło</value>
+  </data>
+  <data name="users.profile.setPasswordDone" xml:space="preserve">
+    <value>Ustawiono hasło.</value>
+  </data>
+  <data name="users.profile.sizeLarge" xml:space="preserve">
+    <value>101-1000</value>
+  </data>
+  <data name="users.profile.sizeMedium" xml:space="preserve">
+    <value>51-100</value>
+  </data>
+  <data name="users.profile.sizeSingle" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="users.profile.sizeSmall" xml:space="preserve">
+    <value>2-10</value>
+  </data>
+  <data name="users.profile.sizeVeryLarge" xml:space="preserve">
+    <value>1000+</value>
+  </data>
+  <data name="users.profile.title" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="users.profile.updateProfileDone" xml:space="preserve">
+    <value>Zaktualizowano konto.</value>
+  </data>
+  <data name="users.profile.updatePropertiesDone" xml:space="preserve">
+    <value>Zaktualizowano konto.</value>
+  </data>
+  <data name="users.profile.uploadPicture" xml:space="preserve">
+    <value>Prześlij zdjęcie</value>
+  </data>
+  <data name="users.profile.uploadPictureDone" xml:space="preserve">
+    <value>Przesłano zdjęcie.</value>
+  </data>
+  <data name="users.unlockYourselfError" xml:space="preserve">
+    <value>Nie można odblokować własnego konta.</value>
+  </data>
+  <data name="users.userLocked" xml:space="preserve">
+    <value>Użytkownik nie może się zalogować.</value>
+  </data>
+  <data name="users.userNotFound" xml:space="preserve">
+    <value>Nie znaleziono użytkownika.</value>
+  </data>
+  <data name="validation.between" xml:space="preserve">
+    <value>{property|upper}: wartość musi mieścić się w zakresie od {min} do {max}.</value>
+  </data>
+  <data name="validation.greaterEqualsThan" xml:space="preserve">
+    <value>{property|upper}: wartość musi być większa lub równa wartości pola {other|lower}.</value>
+  </data>
+  <data name="validation.greaterThan" xml:space="preserve">
+    <value>{property|upper}: wartość musi być większa niż wartość pola {other|lower}.</value>
+  </data>
+  <data name="validation.javascriptProperty" xml:space="preserve">
+    <value>{property|upper}: wartość nie jest prawidłową nazwą właściwości JavaScript.</value>
+  </data>
+  <data name="validation.lessEqualsThan" xml:space="preserve">
+    <value>{property|upper}: wartość musi być mniejsza lub równa wartości pola {other|lower}.</value>
+  </data>
+  <data name="validation.lessThan" xml:space="preserve">
+    <value>{property|upper}: wartość musi być mniejsza niż wartość pola {other|lower}.</value>
+  </data>
+  <data name="validation.notAnImage" xml:space="preserve">
+    <value>Zdjęcie nie jest prawidłowym obrazem.</value>
+  </data>
+  <data name="validation.notAnValidSvg" xml:space="preserve">
+    <value>Plik SVG jest niebezpieczny i zawiera znaczniki script.</value>
+  </data>
+  <data name="validation.onlyOneFile" xml:space="preserve">
+    <value>Można przesłać tylko jeden plik.</value>
+  </data>
+  <data name="validation.required" xml:space="preserve">
+    <value>{property|upper}: to pole jest wymagane.</value>
+  </data>
+  <data name="validation.requiredBoth" xml:space="preserve">
+    <value>Jeśli używane jest pole {property1|lower} lub {property2|lower}, oba muszą być określone.</value>
+  </data>
+  <data name="validation.requiredValue" xml:space="preserve">
+    <value>Należy określić wartość.</value>
+  </data>
+  <data name="validation.slug" xml:space="preserve">
+    <value>{property|upper}: wartość nie jest prawidłowym slugiem.</value>
+  </data>
+  <data name="validation.url" xml:space="preserve">
+    <value>{property|upper}: wartość nie jest prawidłowym adresem URL.</value>
+  </data>
+  <data name="validation.valid" xml:space="preserve">
+    <value>{property|upper}: nieprawidłowa wartość.</value>
+  </data>
+  <data name="workflows.overlap" xml:space="preserve">
+    <value>Kilka przepływów pracy obejmuje wszystkie schematy.</value>
+  </data>
+  <data name="workflows.publishedIsInitial" xml:space="preserve">
+    <value>Krok początkowy nie może być krokiem publikacji.</value>
+  </data>
+  <data name="workflows.publishedNotDefined" xml:space="preserve">
+    <value>Przepływ pracy musi mieć krok publikacji.</value>
+  </data>
+  <data name="workflows.publishedStepNotFound" xml:space="preserve">
+    <value>Przejście ma nieprawidłowy cel.</value>
+  </data>
+  <data name="workflows.schemaOverlap" xml:space="preserve">
+    <value>Schemat '{schema}' jest objęty kilkoma przepływami pracy.</value>
+  </data>
+</root>
