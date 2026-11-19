@@ -252,7 +252,7 @@ describe('WorkflowView', () => {
             .renameStep('1', 'a');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
-            initial: '1',
+            initial: 'a',
             steps: {
                 a: {
                     transitions: {
@@ -270,6 +270,53 @@ describe('WorkflowView', () => {
                 3: { transitions: {}, color: '#0000ff' },
             },
         });
+    });
+
+    it('should not change initial step if other step renamed', () => {
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .renameStep('2', 'b');
+
+        expect(workflow.dto.initial).toEqual('1');
+    });
+
+    it('should return same workflow if step renamed to existing step', () => {
+        const workflow = new WorkflowView(dto)
+            .setStep('1', { color: '#00ff00' })
+            .setStep('2', { color: '#ff0000' });
+
+        const updated = workflow.renameStep('1', '2');
+
+        expect(updated).toBe(workflow);
+    });
+
+    it('should return same workflow if step renamed to locked step', () => {
+        const workflow = new WorkflowView(dto)
+            .setStep('1');
+
+        const updated = workflow.renameStep('1', 'Published');
+
+        expect(updated).toBe(workflow);
+    });
+
+    it('should return same workflow if locked step renamed', () => {
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('Published');
+
+        const updated = workflow.renameStep('Published', '2');
+
+        expect(updated).toBe(workflow);
+    });
+
+    it('should return same workflow if step renamed to empty name', () => {
+        const workflow = new WorkflowView(dto)
+            .setStep('1');
+
+        const updated = workflow.renameStep('1', '');
+
+        expect(updated).toBe(workflow);
     });
 
     it('should add transitions to workflow', () => {

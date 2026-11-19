@@ -303,7 +303,12 @@ export class WorkflowView {
     }
 
     public renameStep(name: string, newName: string) {
-        if (!this.dto.steps[name] || name === newName) {
+        if (!this.dto.steps[name] || name === newName || !newName) {
+            return this;
+        }
+
+        // Renaming to an existing step would silently overwrite it.
+        if (this.dto.steps[newName] || isLocked(name) || isLocked(newName)) {
             return this;
         }
 
@@ -312,6 +317,10 @@ export class WorkflowView {
 
             for (const step of Object.values(clone.steps) as any[]) {
                 renameInObj(step.transitions, name, newName);
+            }
+
+            if (clone.initial === name) {
+                clone.initial = newName;
             }
 
             return true;
@@ -332,7 +341,7 @@ export class WorkflowView {
 }
 
 function renameInObj(target: any, name: string, newName: string) {
-    const existing = target[name];
+    const existing = target?.[name];
     if (existing) {
         target[newName] = existing;
         delete target[name];
