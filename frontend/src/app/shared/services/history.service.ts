@@ -43,12 +43,15 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
             }
         }
 
-        let result = message.replace(/{([^\s:]*):([^}]*)}/, () => {
+        // Parameters like team or workflow names can contain braces and end up outside of the markers.
+        let result = escapeHTML(message);
+
+        result = result.replace(/{([^\s:]*):([^}]*)}/, () => {
             return `<span class="user-ref">${escapeHTML(placeholderValues.shift() || '')}</span>`;
         });
 
         result = result.replace(/{([^}]*)}/g, (match: string, marker: string) => {
-            return `<span class="marker-ref">${escapeHTML(marker)}</span>`;
+            return `<span class="marker-ref">${marker}</span>`;
         });
 
         return result;

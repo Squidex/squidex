@@ -42,6 +42,28 @@ describe('formatHistoryMessage', () => {
         );
     });
 
+    it('should escape HTML outside of markers', () => {
+        const message = formatHistoryMessage(
+            'renamed team to {Team}<img src="x">}.',
+            userProvider.object,
+        )();
+
+        expect(message).toEqual(
+            'renamed team to <span class="marker-ref">Team</span>&lt;img src=&quot;x&quot;&gt;}.',
+        );
+    });
+
+    it('should not escape marker twice', () => {
+        const message = formatHistoryMessage(
+            '{A & B}',
+            userProvider.object,
+        )();
+
+        expect(message).toEqual(
+            '<span class="marker-ref">A &amp; B</span>',
+        );
+    });
+
     it('should embed user ref with unknown type', () => {
         const message = formatHistoryMessage(
             '{unknown:User1}',
