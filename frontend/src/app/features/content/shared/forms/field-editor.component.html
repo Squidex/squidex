@@ -20,9 +20,10 @@
                 <sqx-menu alignment="right" small>
                     <ng-content></ng-content>
 
-                    @if (isString()) {
+                    @if (isString() && hasChatBot()) {
                         <sqx-menu-item
-                            [disabled]="isDisabled() || isCollapsed() || !hasChatBot()"
+                            (action)="chatDialog.show()"
+                            [disabled]="isDisabled() || isCollapsed()"
                             label="AI"
                             menuLabel="i18n:contents.fieldAIMenu"
                             small
