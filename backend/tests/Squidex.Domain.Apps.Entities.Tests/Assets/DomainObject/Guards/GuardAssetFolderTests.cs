@@ -109,6 +109,23 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
             new ValidationError("Cannot add folder to its own child.", "ParentId"));
     }
 
+    [Fact]
+    public async Task Should_throw_exception_if_moving_to_itself()
+    {
+        var operation = Operation(CreateAssetFolder());
+
+        var parentId = operation.CommandId;
+
+        A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
+            .Returns(
+            [
+                CreateAssetFolder().WithId(operation.CommandId),
+            ]);
+
+        await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
+            new ValidationError("Cannot add folder to its own child.", "ParentId"));
+    }
+
     private AssetFolderOperation Operation(AssetFolder assetFolder)
     {
         return Operation(assetFolder, Mocks.FrontendUser());
