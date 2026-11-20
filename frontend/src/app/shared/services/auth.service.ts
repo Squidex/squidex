@@ -157,13 +157,13 @@ export class AuthService {
         const MAX_ATTEMPTS = 5;
 
         for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-            const promiseTimeout = delayPromise(2000);
-            const promiseUser = this.userManager.signinRedirectCallback();
-
-            const result = Promise.race([promiseTimeout, promiseUser]);
-
-            if (result === promiseUser) {
-                return getProfile(await promiseUser);
+            try {
+                const user = await this.userManager.signinSilent();
+                if (user) {
+                    return getProfile(user);
+                }
+            } catch {
+                // Retry, e.g. when the silent request timed out.
             }
 
             if (attempt < MAX_ATTEMPTS) {
