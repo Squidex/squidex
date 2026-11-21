@@ -46,10 +46,11 @@ type SchemaValues = {
     fieldsInLists?: string[];
     fieldsInReferences?: string[];
     fieldRules?: FieldRuleDto[];
+    previewUrls?: Record<string, string>;
     properties?: SchemaPropertiesDto;
 };
 
-function createSchema({ name, properties, id, fields, fieldsInLists, fieldsInReferences, fieldRules }: SchemaValues = {}) {
+function createSchema({ name, properties, id, fields, fieldsInLists, fieldsInReferences, fieldRules, previewUrls }: SchemaValues = {}) {
     id = id || 1;
 
 
@@ -66,7 +67,7 @@ function createSchema({ name, properties, id, fields, fieldsInLists, fieldsInRef
         lastModified: DateTime.now(),
         lastModifiedBy: 'me',
         name: name || `schema-name${id}`,
-        previewUrls: {},
+        previewUrls: previewUrls || {},
         properties: properties || new SchemaPropertiesDto(),
         scripts: new SchemaScriptsDto(),
         type: 'Default',
