@@ -9,7 +9,7 @@
 import { Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, TranslatePipe } from '@app/shared';
+import { AuthService, ContentDto, DropdownMenuComponent, interpolate, isSafeUrl, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-preview-button',
@@ -85,6 +85,9 @@ export class PreviewButtonComponent {
     private navigateTo(name: string) {
         const urlVars = { ...this.content(), ...this.authService.user || {} };
         const urlLink = interpolate(this.schema().previewUrls[name], urlVars, 'iv');
+        if (!isSafeUrl(urlLink)) {
+            return;
+        }
 
         window.open(urlLink, '_blank');
     }
