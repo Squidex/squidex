@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
@@ -35,7 +36,9 @@ public sealed class UsagesController(
     IUrlGenerator urlGenerator)
     : ApiController(commandBus)
 {
-    private readonly IDataProtector dataProtector = dataProtection.CreateProtector("LogToken");
+    // The download URL needs no other credentials, therefore it must only be valid for a short time.
+    private static readonly TimeSpan LogTokenLifetime = TimeSpan.FromMinutes(5);
+    private readonly ITimeLimitedDataProtector dataProtector = dataProtection.CreateProtector("LogToken").ToTimeLimitedDataProtector();
 
     /// <summary>
     /// Get api calls as log file.
@@ -50,7 +53,7 @@ public sealed class UsagesController(
     [ApiCosts(0)]
     public IActionResult GetLog(string app)
     {
-        var token = dataProtector.Protect(App.Id.ToString());
+        var token = dataProtector.Protect(App.Id.ToString(), LogTokenLifetime);
 
         // Generate an URL with a encrypted token to provide a normal GET link without authorization infos.
         var url = urlGenerator.BuildUrl($"/api/apps/log/{token}/");
@@ -65,8 +68,16 @@ public sealed class UsagesController(
     [ApiExplorerSettings(IgnoreApi = true)]
     public IActionResult GetLogFile(string token)
     {
-        // Decrypt the token that has previously been generated.
-        var appId = DomainId.Create(dataProtector.Unprotect(token));
+        DomainId appId;
+        try
+        {
+            // Decrypt the token that has previously been generated. This also fails when the token has expired.
+            appId = DomainId.Create(dataProtector.Unprotect(token));
+        }
+        catch (CryptographicException)
+        {
+            return NotFound();
+        }
 
         var fileDate = DateTime.UtcNow;
         var fileName = $"Usage-{fileDate:yyy-MM-dd}.csv";
