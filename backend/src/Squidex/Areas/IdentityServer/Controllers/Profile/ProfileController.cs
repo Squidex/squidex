@@ -201,7 +201,7 @@ public sealed class ProfileController(
             throw new ValidationException(T.Get("validation.notAnImage"));
         }
 
-        await using (var resizeStream = assetResized.OpenWrite())
+        await using (var resizeStream = assetResized.OpenRead())
         {
             await userPictureStore.UploadAsync(id, resizeStream, ct);
         }
