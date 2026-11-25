@@ -25,6 +25,15 @@ export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto 
     return isSafeUrl(result) ? result : '';
 }
 
+export function getSafeOrigin(url: string | undefined | null) {
+    if (!isSafeUrl(url)) {
+        return null;
+    }
+
+    // Used as target origin for messages, so that the context (including the access token) only reaches the configured page.
+    return new URL(url!, window.location.href).origin;
+}
+
 export function isSafeUrl(url: string | undefined | null) {
     if (!url) {
         return false;

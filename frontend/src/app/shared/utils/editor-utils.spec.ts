@@ -6,7 +6,7 @@
  */
 
 import { AppSettingsDto, EditorDto } from '../model';
-import { computeEditorUrl, isSafeUrl } from './editor-utils';
+import { computeEditorUrl, getSafeOrigin, isSafeUrl } from './editor-utils';
 
 describe('EditorUtils', () => {
     const settings = new AppSettingsDto({
@@ -116,6 +116,26 @@ describe('EditorUtils', () => {
             const result = isSafeUrl(url);
 
             expect(result).toBe(false);
+        });
+    });
+
+    it('should return origin of absolute url', () => {
+        const result = getSafeOrigin('https://editor.squidex.io/path/editor.html?query=1');
+
+        expect(result).toEqual('https://editor.squidex.io');
+    });
+
+    it('should return own origin of relative url', () => {
+        const result = getSafeOrigin('/editors/editor.html');
+
+        expect(result).toEqual(window.location.origin);
+    });
+
+    ['javascript:alert(1)', 'data:text/html,<script>alert(1)</script>', '', null, undefined].forEach(url => {
+        it(`should return null as origin of unsafe url ${url}`, () => {
+            const result = getSafeOrigin(url);
+
+            expect(result).toBeNull();
         });
     });
 });

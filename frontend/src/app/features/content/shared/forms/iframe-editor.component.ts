@@ -8,7 +8,7 @@
 import { booleanAttribute, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, untracked, viewChild } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, ModalDirective, SafeResourceUrlPipe, ThemeService, Types } from '@app/shared';
+import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, getSafeOrigin, ModalDirective, SafeResourceUrlPipe, ThemeService, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-iframe-editor',
@@ -96,6 +96,10 @@ export class IFrameEditorComponent {
         return computeEditorUrl(this.url(), this.appsState.snapshot.selectedSettings);
     });
 
+    protected readonly computedOrigin = computed(() => {
+        return getSafeOrigin(this.computedUrl());
+    });
+
     protected readonly assetsDialog = new DialogModel();
 
     protected readonly contentsDialog = new DialogModel();
@@ -150,6 +154,10 @@ export class IFrameEditorComponent {
     protected onWindowMessage(event: MessageEvent) {
         const iframe = this.iframe()?.nativeElement;
         if (!iframe || event.source !== iframe.contentWindow) {
+            return;
+        }
+
+        if (event.origin !== this.computedOrigin()) {
             return;
         }
 
@@ -350,10 +358,15 @@ export class IFrameEditorComponent {
             return;
         }
 
+        const origin = this.computedOrigin();
+        if (!origin) {
+            return;
+        }
+
         if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
             const message = { type, ...payload };
 
-            iframe.contentWindow.postMessage(message, '*');
+            iframe.contentWindow.postMessage(message, origin);
         }
     }
 }

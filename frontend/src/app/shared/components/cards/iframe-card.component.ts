@@ -7,7 +7,7 @@
 
 import { Component, computed, effect, ElementRef, inject, input, viewChild } from '@angular/core';
 import { ApiUrlConfig, ThemeService, Types } from '@app/framework';
-import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
+import { AppDto, AuthService, getSafeOrigin, TeamDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-iframe-card',
@@ -33,6 +33,10 @@ export class IFrameCardComponent {
     public readonly app = input<AppDto | null>();
 
     protected readonly iframe = viewChild<ElementRef<HTMLIFrameElement>>('iframe');
+
+    protected readonly origin = computed(() => {
+        return getSafeOrigin(this.options()?.src);
+    });
 
     protected readonly context = computed(() => {
         const team = this.team();
@@ -66,6 +70,10 @@ export class IFrameCardComponent {
             return;
         }
 
+        if (event.origin !== this.origin()) {
+            return;
+        }
+
         if (event.data?.type === 'started') {
             this.isInitialized = true;
 
@@ -92,6 +100,11 @@ export class IFrameCardComponent {
             return;
         }
 
-        target.postMessage({ type, ...payload }, '*');
+        const origin = this.origin();
+        if (!origin) {
+            return;
+        }
+
+        target.postMessage({ type, ...payload }, origin);
     }
 }
