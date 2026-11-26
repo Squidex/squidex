@@ -198,7 +198,7 @@ public sealed class DynamicSchemeProvider(
             Events = new OidcHandler(new MyIdentityOptions
             {
                 OidcOnSignoutRedirectUrl = config.SignoutRedirectUrl,
-            }, isTeamScheme, config.Domain ?? string.Empty),
+            }, isTeamScheme, config.Domain ?? string.Empty, false),
             Authority = config.Authority,
             CallbackPath = new PathString($"/signin-{name}"),
             ClientId = config.ClientId,

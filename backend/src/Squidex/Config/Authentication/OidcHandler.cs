@@ -13,7 +13,7 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Config.Authentication;
 
-public sealed class OidcHandler(MyIdentityOptions options, bool trustEmails = true, string? emailDomain = null) : OpenIdConnectEvents
+public sealed class OidcHandler(MyIdentityOptions options, bool trustEmails = true, string? emailDomain = null, bool trustSquidexClaims = true) : OpenIdConnectEvents
 {
     public override Task TokenValidated(TokenValidatedContext context)
     {
@@ -42,7 +42,18 @@ public sealed class OidcHandler(MyIdentityOptions options, bool trustEmails = tr
 
         if (principal != null)
         {
-            (principal.Identity as ClaimsIdentity).SetEmailVerified(IsEmailVerified(principal));
+            var identity = principal.Identity as ClaimsIdentity;
+
+            // Squidex claims (e.g. permissions) are stored for the user, so only the providers of the instance can define them.
+            if (!trustSquidexClaims && identity != null)
+            {
+                foreach (var claim in identity.Claims.GetSquidexClaims().ToList())
+                {
+                    identity.RemoveClaim(claim);
+                }
+            }
+
+            identity.SetEmailVerified(IsEmailVerified(principal));
         }
 
         return base.TicketReceived(context);
