@@ -7,7 +7,7 @@
 
 import { booleanAttribute, Component, computed, effect, ElementRef, inject, input, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, ThemeService, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, getSafeOrigin, SafeResourceUrlPipe, SchemaDto, ThemeService, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-extension',
@@ -59,6 +59,10 @@ export class ContentExtensionComponent {
         return computeEditorUrl(this.editorUrl(), this.appsState.snapshot.selectedSettings);
     });
 
+    protected readonly computedOrigin = computed(() => {
+        return getSafeOrigin(this.computedUrl());
+    });
+
     constructor() {
         effect(() => {
             this.sendMessage('themeChanged', { theme: this.themeService.theme() });
@@ -72,6 +76,10 @@ export class ContentExtensionComponent {
     protected onWindowMessage(event: MessageEvent) {
         const iframe = this.iframe()?.nativeElement;
         if (!iframe || event.source !== iframe.contentWindow) {
+            return;
+        }
+
+        if (event.origin !== this.computedOrigin()) {
             return;
         }
 
@@ -112,10 +120,15 @@ export class ContentExtensionComponent {
             return;
         }
 
+        const origin = this.computedOrigin();
+        if (!origin) {
+            return;
+        }
+
         if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
             const message = { type, ...payload };
 
-            iframe.contentWindow.postMessage(message, '*');
+            iframe.contentWindow.postMessage(message, origin);
         }
     }
 }
