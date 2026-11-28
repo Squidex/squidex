@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 
@@ -349,6 +350,73 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     }
 
     [Fact]
+    public void Should_throw_exception_if_api_key_role_has_more_permissions_than_user()
+    {
+        var operation = Operation(CreateContent(Status.Draft), normalSchema, RoleUser(Role.Editor));
+
+        Assert.Throws<DomainForbiddenException>(() => operation.MustNotGrantMorePermissions(UserInfoData("key1", Role.Owner)));
+    }
+
+    [Fact]
+    public void Should_throw_exception_if_api_key_role_has_developer_permissions_but_user_is_editor()
+    {
+        var operation = Operation(CreateContent(Status.Draft), normalSchema, RoleUser(Role.Editor));
+
+        Assert.Throws<DomainForbiddenException>(() => operation.MustNotGrantMorePermissions(UserInfoData("key1", Role.Developer)));
+    }
+
+    [Fact]
+    public void Should_not_throw_exception_if_api_key_role_has_permissions_of_user()
+    {
+        var operation = Operation(CreateContent(Status.Draft), normalSchema, RoleUser(Role.Editor));
+
+        operation.MustNotGrantMorePermissions(UserInfoData("key1", Role.Editor));
+        operation.MustNotGrantMorePermissions(UserInfoData("key1", Role.Reader));
+    }
+
+    [Fact]
+    public void Should_not_throw_exception_if_api_key_role_is_unknown()
+    {
+        var operation = Operation(CreateContent(Status.Draft), normalSchema, RoleUser(Role.Editor));
+
+        operation.MustNotGrantMorePermissions(UserInfoData("key1", "unknown"));
+    }
+
+    [Fact]
+    public void Should_not_throw_exception_if_api_key_already_exists()
+    {
+        var content = CreateContent(Status.Draft) with
+        {
+            CurrentVersion = new ContentVersion(Status.Draft, UserInfoData("key1", Role.Owner)),
+        };
+
+        var operation = Operation(content, normalSchema, RoleUser(Role.Editor));
+
+        operation.MustNotGrantMorePermissions(UserInfoData("key1", Role.Owner));
+    }
+
+    [Fact]
+    public void Should_throw_exception_if_existing_api_key_gets_role_with_more_permissions()
+    {
+        var content = CreateContent(Status.Draft) with
+        {
+            CurrentVersion = new ContentVersion(Status.Draft, UserInfoData("key1", Role.Editor)),
+        };
+
+        var operation = Operation(content, normalSchema, RoleUser(Role.Editor));
+
+        Assert.Throws<DomainForbiddenException>(() => operation.MustNotGrantMorePermissions(UserInfoData("key1", Role.Owner)));
+    }
+
+    [Fact]
+    public void Should_not_throw_exception_if_api_key_is_assigned_without_user()
+    {
+        var operation = Operation(CreateContent(Status.Draft), normalSchema, null);
+
+        operation.MustNotGrantMorePermissions(UserInfoData("key1", Role.Owner));
+    }
+
+    [Fact]
     public async Task Should_throw_exception_if_referenced()
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
@@ -390,6 +458,21 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
             CommandId = content.Id,
             Schema = operationSchema,
         };
+    }
+
+    private ClaimsPrincipal RoleUser(string roleName)
+    {
+        App.TryGetRole(roleName, false, out var role);
+
+        return Mocks.FrontendUser(permissions: role!.Permissions.ToIds().ToArray());
+    }
+
+    private static ContentData UserInfoData(string apiKey, string role)
+    {
+        return new ContentData()
+            .AddField("field",
+                new ContentFieldData()
+                    .AddInvariant(JsonValue.Object().Add("apiKey", apiKey).Add("role", role)));
     }
 
     private WriteContent CreateDraftContent(Status status, DomainId? id = null)

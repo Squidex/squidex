@@ -220,6 +220,8 @@ public partial class ContentDomainObject(
 
                     if (!newData.Equals(Snapshot.EditingData))
                     {
+                        operation.MustNotGrantMorePermissions(newData);
+
                         Update(c, newData);
                     }
 
@@ -283,6 +285,8 @@ public partial class ContentDomainObject(
             await operation.ValidateContentAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
+        operation.MustNotGrantMorePermissions(c.Data);
+
         Create(c, status);
     }
 
@@ -318,6 +322,8 @@ public partial class ContentDomainObject(
 
             if (!newData.Equals(Snapshot.EditingData))
             {
+                operation.MustNotGrantMorePermissions(newData);
+
                 Update(c, newData);
             }
         }
@@ -402,6 +408,8 @@ public partial class ContentDomainObject(
             await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
+        operation.MustNotGrantMorePermissions(newData);
+
         Update(c, newData);
     }
 
@@ -439,6 +447,8 @@ public partial class ContentDomainObject(
         {
             await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
+
+        operation.MustNotGrantMorePermissions(newData);
 
         Update(c, newData);
     }
